@@ -42,4 +42,8 @@ scripts/                 db-test.sh, db-push.sh, db-check.sh, db-types.sh (+ lib
 ## Next.js 16 notes
 - `middleware.ts` is now `proxy.ts` (export `proxy`).
 - `cacheComponents` is on: anything reading cookies (any Supabase server query) must sit inside `<Suspense>`.
+- Server-side Supabase `createClient()` calls `connection()` first, because Supabase's token-expiry
+  check uses `Date.now()`, which Cache Components rejects during prerender/prefetch. Keep it.
+- Auth: `getCurrentUser()` in `src/lib/auth.ts` (verified claims + staff record). `src/proxy.ts`
+  redirects signed-out visitors away from `/dashboard`; pages still check staff access themselves.
 - Read `node_modules/next/dist/docs/` before using an unfamiliar API.

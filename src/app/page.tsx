@@ -1,15 +1,22 @@
 import { Suspense } from "react";
+import Link from "next/link";
+import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { supabaseConfig } from "@/lib/supabase/env";
 
 export default function Home() {
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8 px-4 py-16">
-      <header>
-        <h1 className="text-3xl font-semibold tracking-tight">GGG.Cafe</h1>
-        <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-          Softball player development and game strategy.
-        </p>
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-semibold tracking-tight">GGG.Cafe</h1>
+          <p className="mt-2 text-zinc-600 dark:text-zinc-400">
+            Softball player development and game strategy.
+          </p>
+        </div>
+        <Suspense fallback={null}>
+          <AccountLink />
+        </Suspense>
       </header>
 
       <section className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
@@ -19,6 +26,19 @@ export default function Home() {
         </Suspense>
       </section>
     </main>
+  );
+}
+
+async function AccountLink() {
+  if (!supabaseConfig()) return null;
+  const user = await getCurrentUser();
+  return (
+    <Link
+      href={user ? "/dashboard" : "/login"}
+      className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+    >
+      {user ? "Open dashboard" : "Sign in"}
+    </Link>
   );
 }
 
