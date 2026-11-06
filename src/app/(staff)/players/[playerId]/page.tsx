@@ -68,7 +68,7 @@ async function PlayerContent({ params }: Pick<PageProps<"/players/[playerId]">, 
         <dl className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3">
           {facts.map(([label, value]) => (
             <div key={label}>
-              <dt className="text-xs text-zinc-500">{label}</dt>
+              <dt className="text-xs text-muted">{label}</dt>
               <dd>{value}</dd>
             </div>
           ))}

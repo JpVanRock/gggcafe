@@ -214,7 +214,7 @@ export function RosterEntryEditor({
       <button type="submit" disabled={pending} className={secondaryButtonClass}>
         {pending ? "…" : "Save"}
       </button>
-      {state.error && <span className="text-xs text-red-600 dark:text-red-400">{state.error}</span>}
+      {state.error && <span className="text-xs text-danger">{state.error}</span>}
     </form>
   );
 }

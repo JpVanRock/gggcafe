@@ -92,7 +92,7 @@ async function TeamContent({
 
       <Card title="Season">
         {seasons.length === 0 ? (
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="text-sm text-muted">
             Rosters belong to a season. {editor ? "Create the first one below." : "An editor needs to create one."}
           </p>
         ) : (
@@ -103,8 +103,8 @@ async function TeamContent({
                 href={`/teams/${team.id}?season=${s.id}`}
                 className={`rounded-full border px-3 py-1 text-sm ${
                   s.id === season?.id
-                    ? "border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
-                    : "border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+                    ? "border-pink bg-pink text-white"
+                    : "border-navy-600 hover:bg-navy-800"
                 }`}
               >
                 {s.name}
@@ -140,13 +140,13 @@ async function TeamContent({
                 </thead>
                 <tbody>
                   {roster.map((r) => (
-                    <tr key={r.id} className={r.active ? "" : "text-zinc-400"}>
+                    <tr key={r.id} className={r.active ? "" : "text-muted/70"}>
                       <td className={`${tdClass} tabular-nums`}>{r.jersey_number ?? "–"}</td>
                       <td className={tdClass}>
                         <Link href={`/players/${r.player.id}`} className="font-medium hover:underline">
                           {playerName(r.player)}
                         </Link>
-                        {r.player.is_slapper && <span className="ml-2 text-xs text-zinc-500">slapper</span>}
+                        {r.player.is_slapper && <span className="ml-2 text-xs text-muted">slapper</span>}
                         {!r.active && <span className="ml-2 text-xs">inactive</span>}
                       </td>
                       <td className={tdClass} title={r.player.primary_position ? POSITION_LABEL[r.player.primary_position] : undefined}>
@@ -158,11 +158,11 @@ async function TeamContent({
                         <td className={tdClass}>
                           <details className="relative">
                             <summary className={`${secondaryButtonClass} cursor-pointer list-none`}>Edit</summary>
-                            <div className="mt-2 flex flex-col gap-2 rounded-md border border-zinc-200 p-3 dark:border-zinc-800">
+                            <div className="mt-2 flex flex-col gap-2 rounded-md border border-navy-700 p-3">
                               <RosterEntryEditor id={r.id} jersey={r.jersey_number} active={r.active} />
                               <form action={removeFromRoster}>
                                 <input type="hidden" name="id" value={r.id} />
-                                <button type="submit" className="text-xs text-red-600 hover:underline dark:text-red-400">
+                                <button type="submit" className="text-xs text-danger hover:underline">
                                   Remove from {season.name} roster
                                 </button>
                               </form>

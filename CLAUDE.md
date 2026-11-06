@@ -45,6 +45,19 @@ scripts/                 db-test.sh, db-push.sh, db-check.sh, db-types.sh (+ lib
   Play-by-play (`plate_appearances`, `pitches`) is optional detail for strategy views.
 - Pitch zones: 1–9 strike-zone grid from the catcher's view, 11–14 outside quadrants.
 
+## Brand
+- Logo: `public/brand/ggg-cafe-logo.webp` (use `<Logo>` from `src/components/brand.tsx`);
+  favicon/icons in `src/app/` are generated from it.
+- Type logo "GGG.CAFE": `public/brand/ggg-cafe-wordmark.png` (transparent, `<Wordmark>`). It sits
+  bottom-right on every page via `<SiteFooter>` in the root layout; keep pages from covering it. The logo lettering is Montecatini Pro
+  (Louise Fili, commercial) and only appears as the image.
+- Site font: Jost (next/font/google), chosen to pair with Montecatini Pro; has tabular figures.
+- Always dark. Use the tokens from `src/app/globals.css`, never zinc/gray or `dark:` classes:
+  `navy-950` page, `navy-900` cards, `navy-800` hover/inputs, `navy-700/600` borders,
+  `ink` text, `muted` secondary text, `neon` (logo yellow) primary buttons/titles/numbers,
+  `pink` (logo pink) links/focus/selected/accents, `danger` errors.
+- Page titles: uppercase, letter-spaced, neon, with a short pink rule (see `PageHeader`).
+
 ## Next.js 16 notes
 - `middleware.ts` is now `proxy.ts` (export `proxy`).
 - `cacheComponents` is on: anything reading cookies (any Supabase server query) must sit inside `<Suspense>`.

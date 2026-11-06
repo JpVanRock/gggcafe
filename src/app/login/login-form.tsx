@@ -18,7 +18,7 @@ export function LoginForm() {
           autoComplete="email"
           required
           defaultValue={state.email}
-          className="rounded-md border border-zinc-300 bg-transparent px-3 py-2 outline-none focus:border-zinc-500 focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700"
+          className="rounded-md border border-navy-600 bg-navy-950 px-3 py-2 outline-none focus:border-pink focus:ring-2 focus:ring-pink/30"
         />
       </label>
 
@@ -29,18 +29,18 @@ export function LoginForm() {
           name="password"
           autoComplete="current-password"
           required
-          className="rounded-md border border-zinc-300 bg-transparent px-3 py-2 outline-none focus:border-zinc-500 focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700"
+          className="rounded-md border border-navy-600 bg-navy-950 px-3 py-2 outline-none focus:border-pink focus:ring-2 focus:ring-pink/30"
         />
       </label>
 
-      <p aria-live="polite" className="min-h-5 text-sm text-red-600 dark:text-red-400">
+      <p aria-live="polite" className="min-h-5 text-sm text-danger">
         {state.error}
       </p>
 
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-zinc-900 px-4 py-2 font-medium text-white transition hover:bg-zinc-700 disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+        className="rounded-md bg-neon px-4 py-2 font-semibold text-navy-950 transition hover:bg-neon-bright disabled:opacity-60"
       >
         {pending ? "Signing in…" : "Sign in"}
       </button>

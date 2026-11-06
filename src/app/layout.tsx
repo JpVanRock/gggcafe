@@ -1,15 +1,13 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Jost } from "next/font/google";
 import "./globals.css";
+import { SiteFooter } from "@/components/brand";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Pairs with the logo's Montecatini Pro: a 1920s-style geometric sans with tabular figures.
+const jost = Jost({
+  variable: "--font-jost",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -17,13 +15,18 @@ export const metadata: Metadata = {
   description: "Softball player development and game strategy",
 };
 
+export const viewport: Viewport = {
+  themeColor: "#01092d",
+  colorScheme: "dark",
+};
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en" className={`${jost.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col">
+        {children}
+        <SiteFooter />
+      </body>
     </html>
   );
 }

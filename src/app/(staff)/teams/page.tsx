@@ -74,7 +74,7 @@ function TeamTable({ teams, empty }: { teams: TeamRow[]; empty: string }) {
                 <Link href={`/teams/${t.id}`} className="font-medium hover:underline">
                   {t.name}
                 </Link>
-                {t.organization && <span className="ml-2 text-zinc-500">{t.organization}</span>}
+                {t.organization && <span className="ml-2 text-muted">{t.organization}</span>}
               </td>
               <td className={tdClass}>{t.age_group ?? "–"}</td>
               <td className={tdClass}>{FORMAT_LABEL[t.format]}</td>

@@ -30,7 +30,7 @@ async function Dashboard() {
     return (
       <>
         <PageHeader title="Almost there" description={user.email ?? undefined} />
-        <p className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
+        <p className="rounded-lg border border-pink/50 bg-pink/10 p-4 text-ink">
           You&apos;re signed in, but your account isn&apos;t on the GGG.Cafe staff
           list yet. Ask an admin to add you.
         </p>
@@ -61,8 +61,8 @@ async function Dashboard() {
         <dl className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
           {rows.map(({ label, count, href }) => (
             <div key={label}>
-              <dt className="text-xs text-zinc-500">{label}</dt>
-              <dd className="text-2xl font-semibold tabular-nums">
+              <dt className="text-xs text-muted">{label}</dt>
+              <dd className="text-3xl font-semibold tabular-nums text-neon">
                 {href ? (
                   <Link href={href} className="hover:underline">
                     {count ?? "–"}

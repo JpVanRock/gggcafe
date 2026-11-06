@@ -57,7 +57,7 @@ async function PlayersContent({ searchParams }: Pick<PageProps<"/players">, "sea
     <div className="flex flex-col gap-6">
       {canEdit(user.staff.role) && (
         <Disclosure summary="Add a player" open={all.length === 0}>
-          <p className="mb-4 text-sm text-zinc-500">
+          <p className="mb-4 text-sm text-muted">
             Tip: to add someone straight onto a team, use &ldquo;Add a new player&rdquo; on the team&apos;s page.
           </p>
           <PlayerForm />
@@ -69,7 +69,7 @@ async function PlayersContent({ searchParams }: Pick<PageProps<"/players">, "sea
           <input name="q" defaultValue={query} placeholder="Search by name" aria-label="Search players" className={`${inputClass} max-w-xs`} />
           <button type="submit" className={buttonClass}>Search</button>
           {query && (
-            <Link href="/players" className="self-center text-sm text-zinc-500 hover:underline">Clear</Link>
+            <Link href="/players" className="self-center text-sm text-muted hover:underline">Clear</Link>
           )}
         </form>
 
@@ -112,7 +112,7 @@ async function PlayersContent({ searchParams }: Pick<PageProps<"/players">, "sea
                             {latest.jersey_number && ` #${latest.jersey_number}`}
                           </Link>
                         ) : (
-                          <span className="text-zinc-400">Not on a roster</span>
+                          <span className="text-muted/70">Not on a roster</span>
                         )}
                       </td>
                     </tr>

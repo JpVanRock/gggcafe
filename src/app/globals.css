@@ -1,26 +1,58 @@
 @import "tailwindcss";
 
+/*
+ * GGG.Cafe brand. Colors are sampled from the logo (public/brand/ggg-cafe-logo.webp).
+ * The logo's lettering is Montecatini Pro (Art Nouveau, Louise Fili); the site text is
+ * Jost, a 1920s-style geometric sans that sits quietly beside it and has tabular figures.
+ * The site is always dark: the logo is designed for the navy background.
+ */
+@theme {
+  --color-navy-950: #01092d; /* logo background: the page */
+  --color-navy-900: #061137; /* cards */
+  --color-navy-800: #0d1a4a; /* inputs, hover rows */
+  --color-navy-700: #1b2a63; /* borders */
+  --color-navy-600: #2c3d80; /* stronger borders */
+  --color-ink: #f1f3fb;      /* main text */
+  --color-muted: #a3acd1;    /* secondary text (8:1 on navy) */
+  --color-neon: #e9fa05;     /* logo yellow: primary buttons, headings, numbers */
+  --color-neon-bright: #f4ff66;
+  --color-pink: #fe207a;     /* logo pink: links, focus, selected, accents */
+  --color-pink-soft: #ff6aa6;
+  --color-danger: #ff7a7a;   /* errors, kept apart from the brand pink */
+
+  --font-sans: var(--font-jost), ui-sans-serif, system-ui, sans-serif;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
+  background: var(--color-navy-950);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: var(--color-pink);
+  color: #fff;
+}
+
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--color-pink);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Numbers line up in stat tables */
+td,
+dd {
+  font-variant-numeric: tabular-nums;
+}
+
+a {
+  text-decoration-color: var(--color-pink);
+  text-underline-offset: 3px;
 }

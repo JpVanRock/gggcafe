@@ -3,28 +3,41 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { supabaseConfig } from "@/lib/supabase/env";
+import { Logo } from "@/components/brand";
 
 export default function Home() {
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8 px-4 py-16">
-      <header className="flex flex-wrap items-start justify-between gap-4">
+    <main className="relative flex flex-1 flex-col items-center overflow-hidden px-4 pt-14 pb-4 sm:pt-16">
+      {/* soft pink glow behind the badge */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-32 left-1/2 h-[32rem] w-[32rem] -translate-x-1/2 rounded-full bg-pink/10 blur-3xl"
+      />
+      <div className="relative flex w-full max-w-xl flex-1 flex-col items-center gap-8 text-center">
+        <h1 className="sr-only">GGG.Cafe</h1>
+        <Logo
+          size={240}
+          priority
+          className="h-48 w-48 shadow-[0_0_60px_rgba(254,32,122,0.35)] sm:h-60 sm:w-60"
+        />
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight">GGG.Cafe</h1>
-          <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-            Softball player development and game strategy.
+          <p className="text-lg font-medium uppercase tracking-[0.2em] text-neon sm:text-xl">
+            Player development &amp; game strategy
+          </p>
+          <p className="mt-3 text-muted">
+            Softball stats, scouting and progress tracking for our coaches and staff.
           </p>
         </div>
-        <Suspense fallback={null}>
+        <Suspense fallback={<div className="h-12" />}>
           <AccountLink />
         </Suspense>
-      </header>
 
-      <section className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
-        <h2 className="text-sm font-medium text-zinc-500">Database</h2>
-        <Suspense fallback={<p className="mt-1">Checking connection…</p>}>
-          <DatabaseStatus />
-        </Suspense>
-      </section>
+        <footer className="mt-auto pt-8 text-xs text-muted">
+          <Suspense fallback={<span>Checking database…</span>}>
+            <DatabaseStatus />
+          </Suspense>
+        </footer>
+      </div>
     </main>
   );
 }
@@ -35,7 +48,7 @@ async function AccountLink() {
   return (
     <Link
       href={user ? "/dashboard" : "/login"}
-      className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+      className="rounded-md bg-neon px-6 py-3 font-semibold text-navy-950 shadow-[0_0_24px_rgba(233,250,5,0.25)] transition hover:bg-neon-bright"
     >
       {user ? "Open dashboard" : "Sign in"}
     </Link>
@@ -60,7 +73,7 @@ async function DatabaseStatus() {
     .select("id", { count: "exact", head: true });
 
   if (!error) {
-    return <StatusLine ok>Connected. Schema is in place.</StatusLine>;
+    return <StatusLine ok>Database connected. Schema is in place.</StatusLine>;
   }
   if (error.code === "PGRST205" || error.code === "42P01") {
     return (
@@ -75,10 +88,10 @@ async function DatabaseStatus() {
 
 function StatusLine({ ok, children }: { ok: boolean; children: React.ReactNode }) {
   return (
-    <p className="mt-1 flex items-center gap-2">
+    <p className="flex items-center justify-center gap-2">
       <span
         aria-hidden
-        className={`inline-block h-2 w-2 rounded-full ${ok ? "bg-emerald-500" : "bg-amber-500"}`}
+        className={`inline-block h-2 w-2 rounded-full ${ok ? "bg-neon" : "bg-pink"}`}
       />
       <span>{children}</span>
     </p>
