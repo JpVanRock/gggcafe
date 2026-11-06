@@ -1,5 +1,6 @@
 import "server-only";
 import { cache } from "react";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 export type StaffRole = "viewer" | "coach" | "admin";
@@ -36,3 +37,30 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
       : null,
   };
 });
+
+export function canEdit(role: StaffRole) {
+  return role === "coach" || role === "admin";
+}
+
+export type StaffUser = CurrentUser & { staff: NonNullable<CurrentUser["staff"]> };
+
+/**
+ * For staff pages: the signed-in staff member, or a redirect to /login
+ * (signed out) or /dashboard (signed in but not on staff, which explains why).
+ */
+export async function requireStaffPage(): Promise<StaffUser> {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+  if (!user.staff) redirect("/dashboard");
+  return user as StaffUser;
+}
+
+/** For server actions that change data: an error message unless the user is a coach or admin. */
+export async function editorCheck(): Promise<string | null> {
+  const user = await getCurrentUser();
+  if (!user) return "Your session has ended. Sign in again.";
+  if (!user.staff || !canEdit(user.staff.role)) {
+    return "You don't have permission to change this. Ask an admin to make you a coach.";
+  }
+  return null;
+}

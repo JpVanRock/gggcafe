@@ -11,7 +11,13 @@ SITE:     Next.js 16 App Router + TypeScript + Tailwind, `src/`. Not hosted yet.
 
 ## Layout
 ```
-src/app/                 pages (App Router)
+src/app/                 pages (App Router): / and /login are public
+src/app/(staff)/         signed-in area with shared nav: dashboard, teams, players
+                         (each feature folder has page.tsx, actions.ts, client forms)
+src/components/ui.tsx    shared page/form/table building blocks
+src/lib/auth.ts          getCurrentUser, requireStaffPage, canEdit, editorCheck
+src/lib/form.ts          FormData readers + friendlyDbError for server actions
+src/lib/softball.ts      positions, bats/throws, formats, row types (must match DB enums)
 src/lib/supabase/        server.ts (Server Components/Actions), client.ts (browser),
                          env.ts, database.types.ts (generated: npm run db:types)
 src/proxy.ts             refreshes the Supabase auth session each request (Next 16 "proxy", formerly middleware)

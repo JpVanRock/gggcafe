@@ -3,7 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 import { supabaseConfig } from "@/lib/supabase/env";
 
 /** Pages that need a signed-in user. The page itself still checks staff access. */
-const PROTECTED_PREFIXES = ["/dashboard"];
+const PROTECTED_PREFIXES = ["/dashboard", "/teams", "/players"];
 
 /**
  * Runs before every page request:
