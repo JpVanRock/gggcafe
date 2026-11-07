@@ -49,6 +49,17 @@ do $$ begin
   raise exception 'FAIL: viewer could write a coach note';
 exception when insufficient_privilege then null;
 end $$;
+do $$ begin
+  perform public.save_harada_plan('00000000-0000-0000-0000-0000000000c4', '{"main_goal": "viewer goal"}'::jsonb);
+  raise exception 'FAIL: viewer could save a Harada chart';
+exception when insufficient_privilege then null;
+end $$;
+do $$ begin
+  insert into public.twis_checks (player_id, activity_id, on_date)
+  values ('00000000-0000-0000-0000-0000000000c1', '00000000-0000-0000-0000-0000000000ba', '2026-09-18');
+  raise exception 'FAIL: viewer could tick a TWIS box';
+exception when insufficient_privilege then null;
+end $$;
 update public.teams set notes = 'viewer edit';
 select pg_temp.expect('viewer update had no effect',
   (select count(*) from public.teams where notes = 'viewer edit'), 0::bigint);
@@ -59,6 +70,11 @@ set role authenticated;
 select set_config('request.jwt.claims', '{"sub":"11111111-0000-0000-0000-000000000002"}', false);
 insert into public.coach_notes (player_id, area, note)
 values ('00000000-0000-0000-0000-0000000000c3', 'catching', 'Quicker transfer on throws to 2B.');
+select pg_temp.expect('coach can save a Harada chart',
+  public.save_harada_plan('00000000-0000-0000-0000-0000000000c4', '{"main_goal": "Steal 20 bases", "pillars": [{"position": 1, "title": "Jumps", "actions": [{"position": 1, "title": "Lead-off drill"}]}]}'::jsonb) is not null, true);
+select pg_temp.expect('coach chart created_by is the coach',
+  (select created_by from public.harada_plans where player_id = '00000000-0000-0000-0000-0000000000c4'),
+  '11111111-0000-0000-0000-000000000002'::uuid);
 select pg_temp.expect('coach note author defaults to the coach',
   (select author_id from public.coach_notes where note like 'Quicker transfer%'),
   '11111111-0000-0000-0000-000000000002'::uuid);

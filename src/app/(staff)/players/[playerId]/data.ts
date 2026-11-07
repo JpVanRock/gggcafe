@@ -1,0 +1,464 @@
+import "server-only";
+import type { createClient } from "@/lib/supabase/server";
+import { addDays, formatTime, isoWeekday, weekDates } from "@/lib/dates";
+import type { Player, Position } from "@/lib/softball";
+import { MENTAL_FIELDS, type MentalPlan } from "./shared";
+import { TRAINING_CATEGORY_LABEL, type Check, type Routine, type TrainingCategory } from "@/lib/achievements";
+
+export { MENTAL_FIELDS, type MentalField, type MentalPlan } from "./shared";
+
+type Supabase = Awaited<ReturnType<typeof createClient>>;
+
+// ---------------------------------------------------------------------------
+// TWIS
+// ---------------------------------------------------------------------------
+
+export const EVENT_KIND_LABEL: Record<string, string> = {
+  practice: "Practice",
+  workout: "Workout",
+  lesson: "Lesson",
+  meeting: "Team meeting",
+  other: "Team event",
+};
+
+export type TwisKind = "game" | "event" | "activity";
+
+export type TwisItem = {
+  key: string;
+  kind: TwisKind;
+  /** id of the activity, team event or game */
+  refId: string;
+  /** the date stored on the check-off (weekly activities use the week's Monday) */
+  onDate: string;
+  title: string;
+  detail: string | null;
+  tag: string;
+  checked: boolean;
+};
+
+export type TwisCell = { key: string; date: string | null; items: TwisItem[] };
+
+export type TwisWeek = {
+  monday: string;
+  cells: TwisCell[]; // Monday..Sunday, then "any day this week"
+  done: number;
+  total: number;
+};
+
+type GameRow = {
+  id: string;
+  game_date: string;
+  start_time: string | null;
+  venue: string | null;
+  event_name: string | null;
+  status: string;
+  home_team_id: string;
+  away_team_id: string;
+  home: { name: string; short_name: string | null } | null;
+  away: { name: string; short_name: string | null } | null;
+};
+
+type EventRow = {
+  id: string;
+  kind: string;
+  title: string | null;
+  event_date: string;
+  start_time: string | null;
+  end_time: string | null;
+  location: string | null;
+};
+
+export type ActivityRow = {
+  id: string;
+  title: string;
+  details: string | null;
+  days: number[];
+  starts_on: string;
+  ends_on: string | null;
+  pillar_id: string | null;
+  pillar: { title: string } | null;
+  category: TrainingCategory | null;
+};
+
+export async function loadTwisWeek(supabase: Supabase, playerId: string, monday: string): Promise<TwisWeek> {
+  const sunday = addDays(monday, 6);
+
+  const { data: rosterData } = await supabase
+    .from("roster_entries")
+    .select("team_id")
+    .eq("player_id", playerId)
+    .eq("active", true);
+  const teamIds = [...new Set(((rosterData ?? []) as { team_id: string }[]).map((r) => r.team_id))];
+  const teamList = teamIds.join(",");
+
+  const [eventsResult, gamesResult, activitiesResult, checksResult] = await Promise.all([
+    teamIds.length
+      ? supabase
+          .from("team_events")
+          .select("id, kind, title, event_date, start_time, end_time, location")
+          .in("team_id", teamIds)
+          .gte("event_date", monday)
+          .lte("event_date", sunday)
+      : Promise.resolve({ data: [] }),
+    teamIds.length
+      ? supabase
+          .from("games")
+          .select(
+            "id, game_date, start_time, venue, event_name, status, home_team_id, away_team_id, home:teams!home_team_id(name, short_name), away:teams!away_team_id(name, short_name)",
+          )
+          .or(`home_team_id.in.(${teamList}),away_team_id.in.(${teamList})`)
+          .neq("status", "cancelled")
+          .gte("game_date", monday)
+          .lte("game_date", sunday)
+      : Promise.resolve({ data: [] }),
+    loadActivities(supabase, playerId, monday, sunday),
+    supabase
+      .from("twis_checks")
+      .select("activity_id, team_event_id, game_id, on_date")
+      .eq("player_id", playerId)
+      .gte("on_date", monday)
+      .lte("on_date", sunday),
+  ]);
+
+  const checked = new Set(
+    ((checksResult.data ?? []) as { activity_id: string | null; team_event_id: string | null; game_id: string | null; on_date: string }[]).map(
+      (c) => (c.activity_id ? `a:${c.activity_id}:${c.on_date}` : c.team_event_id ? `e:${c.team_event_id}` : `g:${c.game_id}`),
+    ),
+  );
+
+  const dates = weekDates(monday);
+  const byDate = new Map<string, { sort: string; item: TwisItem }[]>(dates.map((d) => [d, []]));
+  const anyDay: TwisItem[] = [];
+
+  for (const g of (gamesResult.data ?? []) as unknown as GameRow[]) {
+    const home = teamIds.includes(g.home_team_id);
+    const opponent = home ? g.away : g.home;
+    const key = `g:${g.id}`;
+    byDate.get(g.game_date)?.push({
+      sort: `0${g.start_time ?? "99"}`,
+      item: {
+        key,
+        kind: "game",
+        refId: g.id,
+        onDate: g.game_date,
+        title: `${home ? "vs" : "@"} ${opponent?.short_name || opponent?.name || "TBD"}`,
+        detail: [formatTime(g.start_time), g.event_name, g.venue].filter(Boolean).join(" · ") || null,
+        tag: "Game",
+        checked: checked.has(key),
+      },
+    });
+  }
+
+  for (const e of (eventsResult.data ?? []) as EventRow[]) {
+    const key = `e:${e.id}`;
+    const time = [formatTime(e.start_time), formatTime(e.end_time)].filter(Boolean).join("–");
+    byDate.get(e.event_date)?.push({
+      sort: `0${e.start_time ?? "99"}`,
+      item: {
+        key,
+        kind: "event",
+        refId: e.id,
+        onDate: e.event_date,
+        title: e.title || EVENT_KIND_LABEL[e.kind] || "Team event",
+        detail: [time, e.location].filter(Boolean).join(" · ") || null,
+        tag: EVENT_KIND_LABEL[e.kind] ?? "Team",
+        checked: checked.has(key),
+      },
+    });
+  }
+
+  for (const a of activitiesResult) {
+    const tag = a.category ? TRAINING_CATEGORY_LABEL[a.category].title.split(" ")[0] : (a.pillar?.title ?? "My activity");
+    if (a.days.length === 0) {
+      const key = `a:${a.id}:${monday}`;
+      anyDay.push({ key, kind: "activity", refId: a.id, onDate: monday, title: a.title, detail: a.details, tag, checked: checked.has(key) });
+      continue;
+    }
+    for (const d of dates) {
+      if (!a.days.includes(isoWeekday(d)) || d < a.starts_on || (a.ends_on && d > a.ends_on)) continue;
+      const key = `a:${a.id}:${d}`;
+      byDate.get(d)?.push({
+        sort: `1${a.title}`,
+        item: { key, kind: "activity", refId: a.id, onDate: d, title: a.title, detail: a.details, tag, checked: checked.has(key) },
+      });
+    }
+  }
+
+  const cells: TwisCell[] = dates.map((d) => ({
+    key: d,
+    date: d,
+    items: (byDate.get(d) ?? []).sort((x, y) => x.sort.localeCompare(y.sort)).map((x) => x.item),
+  }));
+  cells.push({ key: "any", date: null, items: anyDay });
+
+  const all = cells.flatMap((c) => c.items);
+  return { monday, cells, done: all.filter((i) => i.checked).length, total: all.length };
+}
+
+/** Activities that apply at some point between the two dates. */
+export async function loadActivities(supabase: Supabase, playerId: string, from: string, to: string): Promise<ActivityRow[]> {
+  const { data } = await supabase
+    .from("player_activities")
+    .select("id, title, details, days, starts_on, ends_on, pillar_id, category, pillar:harada_pillars(title)")
+    .eq("player_id", playerId)
+    .lte("starts_on", to)
+    .or(`ends_on.is.null,ends_on.gte.${from}`)
+    .order("created_at");
+  return (data ?? []) as unknown as ActivityRow[];
+}
+
+// ---------------------------------------------------------------------------
+// Goals (Harada Method)
+// ---------------------------------------------------------------------------
+
+export type HaradaAction = { id: string; position: number; title: string; done_on: string | null };
+export type HaradaPillar = { id: string; position: number; title: string; actions: HaradaAction[] };
+export type HaradaChart = {
+  id: string;
+  main_goal: string;
+  purpose: string | null;
+  target_date: string | null;
+  pillars: HaradaPillar[];
+};
+
+export async function loadHarada(supabase: Supabase, playerId: string): Promise<HaradaChart | null> {
+  const { data: plan } = await supabase
+    .from("harada_plans")
+    .select("id, main_goal, purpose, target_date")
+    .eq("player_id", playerId)
+    .eq("status", "active")
+    .maybeSingle();
+  if (!plan) return null;
+
+  const { data: pillars } = await supabase
+    .from("harada_pillars")
+    .select("id, position, title, actions:harada_actions(id, position, title, done_on)")
+    .eq("plan_id", plan.id)
+    .order("position");
+
+  return {
+    ...(plan as Omit<HaradaChart, "pillars">),
+    pillars: ((pillars ?? []) as HaradaPillar[]).map((p) => ({
+      ...p,
+      actions: [...p.actions].sort((a, b) => a.position - b.position),
+    })),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Goals (SMART Method)
+// ---------------------------------------------------------------------------
+
+export type SmartGoal = {
+  id: string;
+  title: string;
+  area: string;
+  specific: string | null;
+  measurable: string | null;
+  achievable: string | null;
+  relevant: string | null;
+  target_date: string | null;
+  status: "active" | "achieved" | "missed" | "dropped";
+  achieved_on: string | null;
+  metric_key: string | null;
+  baseline_value: number | null;
+  target_value: number | null;
+  metric: { name: string; unit: string; better: "higher" | "lower" } | null;
+};
+
+export async function loadSmartGoals(supabase: Supabase, playerId: string): Promise<SmartGoal[]> {
+  const { data } = await supabase
+    .from("development_goals")
+    .select(
+      "id, title, area, specific, measurable, achievable, relevant, target_date, status, achieved_on, metric_key, baseline_value, target_value, metric:metrics(name, unit, better)",
+    )
+    .eq("player_id", playerId)
+    .order("target_date", { ascending: true, nullsFirst: false })
+    .order("created_at");
+  return (data ?? []) as unknown as SmartGoal[];
+}
+
+export type MetricOption = { key: string; name: string; unit: string };
+
+export async function loadMetricOptions(supabase: Supabase): Promise<MetricOption[]> {
+  const { data } = await supabase.from("metrics").select("key, name, unit").order("name");
+  return (data ?? []) as MetricOption[];
+}
+
+// ---------------------------------------------------------------------------
+// Performance Training (routines = player activities with a training category)
+// ---------------------------------------------------------------------------
+
+export type DrillInfo = {
+  name: string;
+  description: string;
+  equipment: string | null;
+  video_url: string | null;
+};
+
+export type RoutineRow = Routine & {
+  title: string;
+  details: string | null;
+  drill: DrillInfo | null;
+};
+
+export type Performance = {
+  routines: RoutineRow[];
+  checks: Check[];
+  library: { id: string; name: string; category: TrainingCategory | null }[];
+  earned: { achievement_key: string; unlocked_on: string }[];
+};
+
+export async function loadPerformance(supabase: Supabase, playerId: string): Promise<Performance> {
+  const [routinesResult, libraryResult, earnedResult] = await Promise.all([
+    supabase
+      .from("player_activities")
+      .select("id, title, details, days, starts_on, ends_on, category, drill:drills(name, description, equipment, video_url)")
+      .eq("player_id", playerId)
+      .not("category", "is", null)
+      .order("created_at"),
+    supabase.from("drills").select("id, name, category").order("name"),
+    supabase.from("player_achievements").select("achievement_key, unlocked_on").eq("player_id", playerId),
+  ]);
+  const routines = (routinesResult.data ?? []) as unknown as RoutineRow[];
+  const ids = routines.map((r) => r.id);
+  const { data: checks } = ids.length
+    ? await supabase.from("twis_checks").select("activity_id, on_date").in("activity_id", ids)
+    : { data: [] };
+  return {
+    routines,
+    checks: (checks ?? []) as Check[],
+    library: (libraryResult.data ?? []) as Performance["library"],
+    earned: (earnedResult.data ?? []) as Performance["earned"],
+  };
+}
+
+// ---------------------------------------------------------------------------
+// IQ Test
+// ---------------------------------------------------------------------------
+
+export type IqTopic = "general" | "hitting" | "pitching" | "position";
+
+export type IqQuestion = {
+  id: string;
+  topic: IqTopic;
+  position: Position | null;
+  scenario: string;
+  question: string;
+  choices: string[];
+  correct_index: number;
+  explanation: string | null;
+  difficulty: number;
+  active: boolean;
+};
+
+export type IqAnswer = { question_id: string; is_correct: boolean; answered_on: string; created_at: string };
+
+export async function loadIq(supabase: Supabase, playerId: string) {
+  const [questionsResult, answersResult] = await Promise.all([
+    supabase
+      .from("iq_questions")
+      .select("id, topic, position, scenario, question, choices, correct_index, explanation, difficulty, active")
+      .order("topic")
+      .order("position", { nullsFirst: true })
+      .order("created_at"),
+    supabase
+      .from("iq_answers")
+      .select("question_id, is_correct, answered_on, created_at")
+      .eq("player_id", playerId)
+      .order("created_at"),
+  ]);
+  return {
+    questions: (questionsResult.data ?? []) as IqQuestion[],
+    answers: (answersResult.data ?? []) as IqAnswer[],
+  };
+}
+
+export type IqData = Awaited<ReturnType<typeof loadIq>>;
+
+// ---------------------------------------------------------------------------
+// Mental GP
+// ---------------------------------------------------------------------------
+
+export async function loadMentalPlan(supabase: Supabase, playerId: string): Promise<MentalPlan | null> {
+  const { data } = await supabase
+    .from("mental_game_plans")
+    .select(`${MENTAL_FIELDS.map((f) => f.name).join(", ")}, updated_at`)
+    .eq("player_id", playerId)
+    .maybeSingle();
+  return (data as MentalPlan | null) ?? null;
+}
+
+// ---------------------------------------------------------------------------
+// Pop Report
+// ---------------------------------------------------------------------------
+
+export type Rostering = {
+  id: string;
+  jersey_number: string | null;
+  active: boolean;
+  team: { id: string; name: string; short_name: string | null; is_own_team: boolean } | null;
+  season: { name: string; start_date: string | null } | null;
+};
+
+export type MetricProgress = {
+  metric_key: string;
+  metric_name: string;
+  unit: string;
+  better: "higher" | "lower";
+  measurements: number;
+  first_value: number | null;
+  latest_value: number | null;
+  latest_measured_on: string | null;
+  best_value: number | null;
+  improvement: number | null;
+};
+
+export type Evaluation = { area: string; rating: number; evaluated_on: string; comments: string | null };
+
+export type PopReport = {
+  rosters: Rostering[];
+  metrics: MetricProgress[];
+  evaluations: Evaluation[]; // latest per skill area
+};
+
+export async function loadPopReport(supabase: Supabase, playerId: string): Promise<PopReport> {
+  const [rosterResult, metricsResult, evalResult] = await Promise.all([
+    supabase
+      .from("roster_entries")
+      .select("id, jersey_number, active, team:teams(id, name, short_name, is_own_team), season:seasons(name, start_date)")
+      .eq("player_id", playerId),
+    supabase.from("player_metric_progress").select("*").eq("player_id", playerId).order("metric_name"),
+    supabase
+      .from("skill_evaluations")
+      .select("area, rating, evaluated_on, comments")
+      .eq("player_id", playerId)
+      .order("evaluated_on", { ascending: false }),
+  ]);
+
+  const latestByArea = new Map<string, Evaluation>();
+  for (const e of (evalResult.data ?? []) as Evaluation[]) {
+    if (!latestByArea.has(e.area)) latestByArea.set(e.area, e);
+  }
+
+  return {
+    rosters: ((rosterResult.data ?? []) as unknown as Rostering[]).sort((a, b) =>
+      (b.season?.start_date ?? "").localeCompare(a.season?.start_date ?? ""),
+    ),
+    metrics: (metricsResult.data ?? []) as MetricProgress[],
+    evaluations: [...latestByArea.values()],
+  };
+}
+
+export function currentRostering(pop: PopReport) {
+  return pop.rosters.find((r) => r.active && r.team?.is_own_team) ?? pop.rosters[0] ?? null;
+}
+
+export function firstName(p: Pick<Player, "first_name" | "preferred_name">) {
+  return p.preferred_name || p.first_name;
+}
+
+/** "Avery's", "Chris'" */
+export function possessive(name: string) {
+  return /s$/i.test(name) ? `${name}'` : `${name}'s`;
+}

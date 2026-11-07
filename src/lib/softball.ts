@@ -49,6 +49,28 @@ export type Season = {
   end_date: string | null;
 };
 
+export const GOAL_METHODS = ["harada", "smart"] as const;
+export type GoalMethod = (typeof GOAL_METHODS)[number];
+export const GOAL_METHOD_LABEL: Record<GoalMethod, string> = { harada: "Harada Method", smart: "SMART Method" };
+
+export const SKILL_AREAS = [
+  "hitting", "short_game", "pitching", "catching", "infield", "outfield",
+  "baserunning", "mental", "strength_conditioning", "other",
+] as const;
+export type SkillArea = (typeof SKILL_AREAS)[number];
+export const SKILL_AREA_LABEL: Record<SkillArea, string> = {
+  hitting: "Hitting",
+  short_game: "Short game",
+  pitching: "Pitching",
+  catching: "Catching",
+  infield: "Infield",
+  outfield: "Outfield",
+  baserunning: "Baserunning",
+  mental: "Mental",
+  strength_conditioning: "Strength & conditioning",
+  other: "General",
+};
+
 export type Player = {
   id: string;
   first_name: string;
@@ -61,6 +83,7 @@ export type Player = {
   secondary_positions: Position[];
   is_slapper: boolean;
   notes: string | null;
+  goal_method: GoalMethod;
 };
 
 export function playerName(p: Pick<Player, "first_name" | "last_name" | "preferred_name">) {

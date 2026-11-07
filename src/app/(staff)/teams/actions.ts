@@ -182,3 +182,102 @@ export async function removeFromRoster(fd: FormData): Promise<void> {
   await supabase.from("roster_entries").delete().eq("id", id);
   refresh();
 }
+
+// ---------------------------------------------------------------------------
+// Team schedule (shown in each player's TWIS)
+// ---------------------------------------------------------------------------
+
+const EVENT_KINDS = ["practice", "workout", "lesson", "meeting", "other"] as const;
+const GAME_TYPES = ["league", "tournament_pool", "tournament_bracket", "showcase", "scrimmage", "exhibition"] as const;
+const TIME = /^\d{2}:\d{2}$/;
+
+function timeOf(fd: FormData, name: string) {
+  const value = text(fd, name);
+  return value && TIME.test(value) ? value : null;
+}
+
+/** Adds a practice or other team event, optionally repeating weekly. */
+export async function addTeamEvent(_prev: FormState, fd: FormData): Promise<FormState> {
+  const denied = await editorCheck();
+  if (denied) return { error: denied };
+
+  const teamId = text(fd, "team_id");
+  if (!isUuid(teamId)) return { error: "Unknown team." };
+  const eventDate = isoDate(fd, "event_date");
+  if (!eventDate) return { error: "Pick a date." };
+  const start_time = timeOf(fd, "start_time");
+  const end_time = timeOf(fd, "end_time");
+  if (start_time && end_time && end_time <= start_time) return { error: "The end time is before the start time." };
+
+  const repeatUntil = isoDate(fd, "repeat_until");
+  if (repeatUntil && repeatUntil < eventDate) return { error: "“Repeat until” is before the first date." };
+
+  // Weekly repeats, capped at 30 so a typo can't flood the schedule.
+  const dates = [eventDate];
+  while (repeatUntil && dates.length < 30) {
+    const next = new Date(`${dates[dates.length - 1]}T00:00:00Z`);
+    next.setUTCDate(next.getUTCDate() + 7);
+    const iso = next.toISOString().slice(0, 10);
+    if (iso > repeatUntil) break;
+    dates.push(iso);
+  }
+
+  const base = {
+    team_id: teamId,
+    kind: oneOf(fd, "kind", EVENT_KINDS) ?? "practice",
+    title: text(fd, "title"),
+    start_time,
+    end_time,
+    location: text(fd, "location"),
+    notes: text(fd, "notes"),
+  };
+  const supabase = await createClient();
+  const { error } = await supabase.from("team_events").insert(dates.map((event_date) => ({ ...base, event_date })));
+  if (error) return { error: friendlyDbError(error) };
+
+  refresh();
+  return { error: null, saved: true };
+}
+
+export async function deleteTeamEvent(fd: FormData): Promise<void> {
+  if (await editorCheck()) return;
+  const id = text(fd, "id");
+  if (!isUuid(id)) return;
+  const supabase = await createClient();
+  await supabase.from("team_events").delete().eq("id", id);
+  refresh();
+}
+
+export async function addGame(_prev: FormState, fd: FormData): Promise<FormState> {
+  const denied = await editorCheck();
+  if (denied) return { error: denied };
+
+  const teamId = text(fd, "team_id");
+  const opponentId = text(fd, "opponent_id");
+  if (!isUuid(teamId)) return { error: "Unknown team." };
+  if (!isUuid(opponentId)) return { error: "Choose the opponent. Add them on the Teams page first if they're new." };
+  if (opponentId === teamId) return { error: "A team can't play itself." };
+  const game_date = isoDate(fd, "game_date");
+  if (!game_date) return { error: "Pick the game date." };
+  const seasonId = text(fd, "season_id");
+  const innings = wholeNumber(fd, "scheduled_innings", 1, 15);
+  if (innings === "invalid") return { error: "Innings should be between 1 and 15." };
+  const home = fd.get("home_away") !== "away";
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("games").insert({
+    season_id: isUuid(seasonId) ? seasonId : null,
+    game_date,
+    start_time: timeOf(fd, "start_time"),
+    home_team_id: home ? teamId : opponentId,
+    away_team_id: home ? opponentId : teamId,
+    venue: text(fd, "venue"),
+    event_name: text(fd, "event_name"),
+    game_type: oneOf(fd, "game_type", GAME_TYPES) ?? "league",
+    scheduled_innings: innings ?? 7,
+  });
+  if (error) return { error: friendlyDbError(error) };
+
+  refresh();
+  return { error: null, saved: true };
+}

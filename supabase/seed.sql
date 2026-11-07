@@ -158,3 +158,38 @@ insert into public.drill_assignments (player_id, drill_id, prescription, assigne
 insert into public.coach_notes (player_id, game_id, area, note) values
   ('00000000-0000-0000-0000-0000000000c1', '00000000-0000-0000-0000-0000000000e2', 'hitting',
    'Chased two drops below the zone with 2 strikes. Good HR on a hanging changeup.');
+
+-- Player dashboard -------------------------------------------------------------
+-- Week of Mon 2026-09-14: a Tuesday practice here; game 2 (Sat 09-19) is in the same week.
+insert into public.team_events (id, team_id, kind, event_date, start_time, end_time, location) values
+  ('00000000-0000-0000-0000-0000000000b9', '00000000-0000-0000-0000-0000000000b1', 'practice', '2026-09-15', '17:30', '19:00', 'Field 2');
+
+select public.save_harada_plan('00000000-0000-0000-0000-0000000000c1', '{
+  "main_goal": "Start at shortstop for a 14U national team",
+  "purpose": "Lead the infield and play in college",
+  "target_date": "2027-07-31",
+  "pillars": [
+    {"position": 1, "title": "Hitting power", "actions": [
+      {"position": 1, "title": "Tee work 3x a week"},
+      {"position": 2, "title": "Hit the weight room twice a week"},
+      {"position": 3, "title": "Film one swing a week"}]},
+    {"position": 2, "title": "Mental toughness", "actions": [
+      {"position": 1, "title": "Use the reset routine after every error"}]}
+  ]
+}'::jsonb);
+update public.harada_actions set done_on = '2026-09-20'
+ where title = 'Tee work 3x a week';
+
+insert into public.player_activities (id, player_id, title, days, starts_on, pillar_id)
+select '00000000-0000-0000-0000-0000000000ba', '00000000-0000-0000-0000-0000000000c1', 'Tee work', '{1,3,5}', '2026-09-14', p.id
+  from public.harada_pillars p where p.title = 'Hitting power';
+insert into public.player_activities (id, player_id, title, starts_on, ends_on) values
+  ('00000000-0000-0000-0000-0000000000bb', '00000000-0000-0000-0000-0000000000c1', 'Watch game film with Coach', '2026-09-14', '2026-09-20');
+
+insert into public.twis_checks (player_id, activity_id, team_event_id, game_id, on_date) values
+  ('00000000-0000-0000-0000-0000000000c1', '00000000-0000-0000-0000-0000000000ba', null, null, '2026-09-14'),
+  ('00000000-0000-0000-0000-0000000000c1', null, '00000000-0000-0000-0000-0000000000b9', null, '2026-09-15'),
+  ('00000000-0000-0000-0000-0000000000c1', null, null, '00000000-0000-0000-0000-0000000000e2', '2026-09-19');
+
+insert into public.mental_game_plans (player_id, focus_words, reset_routine) values
+  ('00000000-0000-0000-0000-0000000000c1', 'Breathe. See it. Drive it.', 'Glove off, deep breath, look at the foul pole, next pitch.');

@@ -11,12 +11,22 @@ import {
 import {
   Card, Disclosure, EmptyState, Loading, PageHeader, secondaryButtonClass, tableClass, tdClass, thClass,
 } from "@/components/ui";
-import { removeFromRoster } from "../actions";
+import { ConfirmSubmit } from "@/components/confirm-submit";
+import { addDays, formatDay, formatTime, todayISO } from "@/lib/dates";
+import { deleteTeamEvent, removeFromRoster } from "../actions";
 import {
-  ExistingRosterPlayerForm, NewRosterPlayerForm, RosterEntryEditor, SeasonForm, TeamForm,
+  ExistingRosterPlayerForm, GameForm, NewRosterPlayerForm, RosterEntryEditor, SeasonForm, TeamEventForm, TeamForm,
 } from "../forms";
 
 export const metadata: Metadata = { title: "Team · GGG.Cafe" };
+
+const EVENT_LABEL: Record<string, string> = {
+  practice: "Practice",
+  workout: "Workout",
+  lesson: "Lesson",
+  meeting: "Meeting",
+  other: "Event",
+};
 
 export default function TeamPage({ params, searchParams }: PageProps<"/teams/[teamId]">) {
   return (
@@ -78,6 +88,48 @@ async function TeamContent({
       .filter((p) => !onRoster.has(p.id))
       .map((p) => ({ id: p.id, label: `${p.last_name}, ${p.preferred_name || p.first_name}` }));
   }
+
+  // Schedule: the next 8 weeks of practices/events and games
+  const today = todayISO();
+  const until = addDays(today, 56);
+  const [eventsResult, gamesResult, opponentsResult] = await Promise.all([
+    supabase
+      .from("team_events")
+      .select("id, kind, title, event_date, start_time, end_time, location")
+      .eq("team_id", team.id)
+      .gte("event_date", today)
+      .lte("event_date", until),
+    supabase
+      .from("games")
+      .select("id, game_date, start_time, venue, event_name, status, home_team_id, home:teams!home_team_id(name), away:teams!away_team_id(name)")
+      .or(`home_team_id.eq.${team.id},away_team_id.eq.${team.id}`)
+      .gte("game_date", today)
+      .lte("game_date", until),
+    editor && team.is_own_team
+      ? supabase.from("teams").select("id, name").eq("is_own_team", false).order("name")
+      : Promise.resolve({ data: [] }),
+  ]);
+  type ScheduleRow = { key: string; date: string; time: string | null; tag: string; title: string; where: string | null; eventId?: string };
+  const schedule: ScheduleRow[] = [
+    ...((eventsResult.data ?? []) as { id: string; kind: string; title: string | null; event_date: string; start_time: string | null; end_time: string | null; location: string | null }[]).map((e) => ({
+      key: `e${e.id}`,
+      date: e.event_date,
+      time: [formatTime(e.start_time), formatTime(e.end_time)].filter(Boolean).join("–") || null,
+      tag: EVENT_LABEL[e.kind] ?? "Event",
+      title: e.title || EVENT_LABEL[e.kind] || "Team event",
+      where: e.location,
+      eventId: e.id,
+    })),
+    ...((gamesResult.data ?? []) as unknown as { id: string; game_date: string; start_time: string | null; venue: string | null; event_name: string | null; status: string; home_team_id: string; home: { name: string } | null; away: { name: string } | null }[]).map((g) => ({
+      key: `g${g.id}`,
+      date: g.game_date,
+      time: formatTime(g.start_time),
+      tag: g.status === "cancelled" ? "Cancelled" : "Game",
+      title: g.home_team_id === team.id ? `vs ${g.away?.name ?? "TBD"}` : `@ ${g.home?.name ?? "TBD"}`,
+      where: [g.event_name, g.venue].filter(Boolean).join(" · ") || null,
+    })),
+  ].sort((a, b) => (a.date + (a.time ?? "")).localeCompare(b.date + (b.time ?? "")));
+  const opponents = (opponentsResult.data ?? []) as { id: string; name: string }[];
 
   const subtitle = [
     team.is_own_team ? "Our team" : "Opponent",
@@ -187,6 +239,53 @@ async function TeamContent({
                   <ExistingRosterPlayerForm teamId={team.id} seasonId={season.id} players={otherPlayers} />
                 </Disclosure>
               )}
+            </div>
+          )}
+        </Card>
+      )}
+
+      {team.is_own_team && (
+        <Card title="Schedule (next 8 weeks)">
+          <p className="mb-4 text-sm text-muted">Practices and games here show up in every rostered player&apos;s TWIS checklist.</p>
+          {schedule.length === 0 ? (
+            <EmptyState>Nothing scheduled yet.{editor && " Add practices and games below."}</EmptyState>
+          ) : (
+            <ul className="divide-y divide-navy-800">
+              {schedule.map((row) => (
+                <li key={row.key} className="flex flex-wrap items-center gap-x-4 gap-y-1 py-2.5 text-sm">
+                  <span className="w-28 shrink-0 font-mono text-xs text-neon uppercase">{formatDay(row.date)}</span>
+                  <span
+                    className={`rounded px-1.5 py-px font-mono text-[10px] font-bold tracking-wider uppercase ${
+                      row.tag === "Game" ? "bg-neon text-navy-950" : row.tag === "Cancelled" ? "bg-navy-700 text-muted" : "bg-pink text-navy-950"
+                    }`}
+                  >
+                    {row.tag}
+                  </span>
+                  <span className="font-medium">{row.title}</span>
+                  <span className="text-muted">{[row.time, row.where].filter(Boolean).join(" · ")}</span>
+                  {editor && row.eventId && (
+                    <form action={deleteTeamEvent} className="ml-auto">
+                      <input type="hidden" name="id" value={row.eventId} />
+                      <ConfirmSubmit
+                        message={`Remove ${row.title} on ${formatDay(row.date)}? Players' check-offs for it go too.`}
+                        className="text-xs text-danger hover:underline"
+                      >
+                        Remove
+                      </ConfirmSubmit>
+                    </form>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+          {editor && (
+            <div className="mt-4 flex flex-col gap-3">
+              <Disclosure summary="Add a practice or team event">
+                <TeamEventForm teamId={team.id} />
+              </Disclosure>
+              <Disclosure summary="Add a game">
+                <GameForm teamId={team.id} seasonId={season?.id ?? null} opponents={opponents} />
+              </Disclosure>
             </div>
           )}
         </Card>

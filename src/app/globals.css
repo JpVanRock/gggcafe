@@ -21,6 +21,7 @@
   --color-danger: #ff7a7a;   /* errors, kept apart from the brand pink */
 
   --font-sans: var(--font-jost), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-space-mono), ui-monospace, monospace;
 }
 
 :root {
@@ -31,6 +32,8 @@ body {
   background: var(--color-navy-950);
   color: var(--color-ink);
   font-family: var(--font-sans);
+  /* decorative doodles may hang off a board's edge, never off the page */
+  overflow-x: clip;
 }
 
 ::selection {
@@ -55,4 +58,9 @@ dd {
 a {
   text-decoration-color: var(--color-pink);
   text-underline-offset: 3px;
+}
+
+/* Keep the page from scrolling behind an open pop-up */
+html:has(dialog[open]) {
+  overflow: hidden;
 }

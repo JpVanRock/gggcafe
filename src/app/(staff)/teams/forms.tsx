@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { Field, FormMessage, buttonClass, inputClass, secondaryButtonClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
@@ -8,7 +9,8 @@ import {
   type Team,
 } from "@/lib/softball";
 import {
-  addExistingPlayerToRoster, addNewPlayerToRoster, createSeason, createTeam, updateRosterEntry, updateTeam,
+  addExistingPlayerToRoster, addGame, addNewPlayerToRoster, addTeamEvent, createSeason, createTeam, updateRosterEntry,
+  updateTeam,
 } from "./actions";
 
 export function TeamForm({ team }: { team?: Team }) {
@@ -215,6 +217,149 @@ export function RosterEntryEditor({
         {pending ? "…" : "Save"}
       </button>
       {state.error && <span className="text-xs text-danger">{state.error}</span>}
+    </form>
+  );
+}
+
+const EVENT_KIND_OPTIONS = [
+  ["practice", "Practice"],
+  ["workout", "Workout"],
+  ["lesson", "Lesson"],
+  ["meeting", "Team meeting"],
+  ["other", "Other"],
+] as const;
+
+export function TeamEventForm({ teamId }: { teamId: string }) {
+  const [state, action, pending] = useActionState(addTeamEvent, initialFormState);
+  return (
+    <form action={action} className="grid gap-4 sm:grid-cols-4">
+      <input type="hidden" name="team_id" value={teamId} />
+      <Field label="Type">
+        <select name="kind" defaultValue="practice" className={inputClass}>
+          {EVENT_KIND_OPTIONS.map(([value, label]) => (
+            <option key={value} value={value}>{label}</option>
+          ))}
+        </select>
+      </Field>
+      <div className="sm:col-span-3">
+        <Field label="Title" hint="Optional, e.g. “Hitting practice”">
+          <input name="title" className={inputClass} />
+        </Field>
+      </div>
+      <Field label="Date">
+        <input type="date" name="event_date" required className={inputClass} />
+      </Field>
+      <Field label="Starts">
+        <input type="time" name="start_time" className={inputClass} />
+      </Field>
+      <Field label="Ends">
+        <input type="time" name="end_time" className={inputClass} />
+      </Field>
+      <Field label="Repeat weekly until" hint="Optional">
+        <input type="date" name="repeat_until" className={inputClass} />
+      </Field>
+      <div className="sm:col-span-2">
+        <Field label="Location">
+          <input name="location" className={inputClass} />
+        </Field>
+      </div>
+      <div className="sm:col-span-2">
+        <Field label="Notes">
+          <input name="notes" className={inputClass} />
+        </Field>
+      </div>
+      <div className="flex items-center gap-4 sm:col-span-4">
+        <button type="submit" disabled={pending} className={buttonClass}>
+          {pending ? "Adding…" : "Add to schedule"}
+        </button>
+        <FormMessage error={state.error} saved={state.saved} />
+      </div>
+    </form>
+  );
+}
+
+const GAME_TYPE_OPTIONS = [
+  ["league", "League"],
+  ["tournament_pool", "Tournament: pool play"],
+  ["tournament_bracket", "Tournament: bracket"],
+  ["showcase", "Showcase"],
+  ["scrimmage", "Scrimmage"],
+  ["exhibition", "Exhibition"],
+] as const;
+
+export function GameForm({
+  teamId,
+  seasonId,
+  opponents,
+}: {
+  teamId: string;
+  seasonId: string | null;
+  opponents: { id: string; name: string }[];
+}) {
+  const [state, action, pending] = useActionState(addGame, initialFormState);
+  if (opponents.length === 0) {
+    return (
+      <p className="text-sm text-muted">
+        Add the opponent on the <Link href="/teams" className="underline">Teams</Link> page first (choose “An opponent”), then
+        schedule the game here.
+      </p>
+    );
+  }
+  return (
+    <form action={action} className="grid gap-4 sm:grid-cols-4">
+      <input type="hidden" name="team_id" value={teamId} />
+      {seasonId && <input type="hidden" name="season_id" value={seasonId} />}
+      <div className="sm:col-span-2">
+        <Field label="Opponent">
+          <select name="opponent_id" required defaultValue="" className={inputClass}>
+            <option value="" disabled>Choose…</option>
+            {opponents.map((o) => (
+              <option key={o.id} value={o.id}>{o.name}</option>
+            ))}
+          </select>
+        </Field>
+      </div>
+      <fieldset className="flex items-end gap-4 sm:col-span-2">
+        <legend className="mb-1.5 text-sm font-medium">We are</legend>
+        <label className="flex items-center gap-2 text-sm">
+          <input type="radio" name="home_away" value="home" defaultChecked className="accent-pink" /> Home
+        </label>
+        <label className="flex items-center gap-2 text-sm">
+          <input type="radio" name="home_away" value="away" className="accent-pink" /> Away
+        </label>
+      </fieldset>
+      <Field label="Date">
+        <input type="date" name="game_date" required className={inputClass} />
+      </Field>
+      <Field label="Start time">
+        <input type="time" name="start_time" className={inputClass} />
+      </Field>
+      <Field label="Type">
+        <select name="game_type" defaultValue="league" className={inputClass}>
+          {GAME_TYPE_OPTIONS.map(([value, label]) => (
+            <option key={value} value={value}>{label}</option>
+          ))}
+        </select>
+      </Field>
+      <Field label="Innings">
+        <input name="scheduled_innings" inputMode="numeric" defaultValue="7" className={inputClass} />
+      </Field>
+      <div className="sm:col-span-2">
+        <Field label="Field / venue">
+          <input name="venue" className={inputClass} />
+        </Field>
+      </div>
+      <div className="sm:col-span-2">
+        <Field label="Tournament or event" hint="Optional">
+          <input name="event_name" className={inputClass} />
+        </Field>
+      </div>
+      <div className="flex items-center gap-4 sm:col-span-4">
+        <button type="submit" disabled={pending} className={buttonClass}>
+          {pending ? "Adding…" : "Add game"}
+        </button>
+        <FormMessage error={state.error} saved={state.saved} />
+      </div>
     </form>
   );
 }
