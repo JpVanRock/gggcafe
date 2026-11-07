@@ -19,9 +19,12 @@ export default function LoginPage() {
 
       <LoginForm />
 
-      <p className="text-center text-sm text-muted">
-        No account, or forgot your password? Ask a GGG.Cafe admin.
-      </p>
+      <div className="flex flex-col gap-2 text-center text-sm text-muted">
+        <Link href="/forgot-password" className="text-pink-soft underline hover:text-ink">
+          Forgot your password?
+        </Link>
+        <p>No account? Ask a GGG.Cafe admin.</p>
+      </div>
     </main>
   );
 }

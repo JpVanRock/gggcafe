@@ -5,7 +5,10 @@ Unrelated to investment-os — none of that project's rules, sources or database
 
 GITHUB:   https://github.com/JpVanRock/gggcafe (public repo — never commit secrets)
 DATABASE: Supabase project `vhvjoigbkyuebsduonpf` (US East / Ohio), settings in `.env.local`
-SITE:     Next.js 16 App Router + TypeScript + Tailwind, `src/`. Not hosted yet.
+SITE:     Next.js 16 App Router + TypeScript + Tailwind, `src/`.
+HOSTING:  Vercel team "GGG", project `gggcafe`, https://gggcafe.vercel.app. Every push to main
+          deploys to production. Vercel env vars: NEXT_PUBLIC_SUPABASE_URL and
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY only (never the DB password).
 
 @AGENTS.md
 
@@ -139,6 +142,10 @@ like a sports brand or media-day graphics. Never childish or preschool.
 - `cacheComponents` is on: anything reading cookies (any Supabase server query) must sit inside `<Suspense>`.
 - Server-side Supabase `createClient()` calls `connection()` first, because Supabase's token-expiry
   check uses `Date.now()`, which Cache Components rejects during prerender/prefetch. Keep it.
+- Password reset: /forgot-password emails a link (`resetPasswordForEmail`, redirect to
+  /auth/confirm?next=/reset-password); /auth/confirm (route handler) signs her in from `?code=` or
+  `?token_hash=&type=`; /reset-password sets the new password. Supabase Auth URL config: Site URL
+  https://gggcafe.vercel.app, Redirect URLs https://gggcafe.vercel.app/** (localhost isn't listed).
 - Auth: `getCurrentUser()` in `src/lib/auth.ts` (verified claims + staff record). `src/proxy.ts`
   redirects signed-out visitors away from `/dashboard`; pages still check staff access themselves.
 - Read `node_modules/next/dist/docs/` before using an unfamiliar API.
