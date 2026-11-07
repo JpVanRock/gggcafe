@@ -112,5 +112,5 @@ export function MenuItem({ name, value, note }: { name: string; value?: ReactNod
 
 /** Heading inside a pop-up. */
 export function DetailHeading({ children }: { children: ReactNode }) {
-  return <h3 className="mb-3 font-mono text-xs font-bold tracking-[0.2em] text-pink-soft uppercase">{children}</h3>;
+  return <h3 className="mb-3 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">{children}</h3>;
 }

@@ -152,6 +152,10 @@ like a sports brand or media-day graphics. Never childish or preschool.
   wordmark, which the brand kit approves only over navy). `day:` variant for Day-only tweaks.
   The sign-in tagline swaps to `elevate-together-navy.png` (same artwork, ink recolored to brand navy)
   in Day Game, with no panel behind it (user's choice).
+- Text sizes (user, 2026-11-07): body text is one notch larger than Tailwind's defaults
+  (`text-xs` 13px, `text-sm` 15px, base 17px; set in globals.css @theme). Titles (text-lg and up)
+  are unchanged. Small headers (card section labels, DetailHeading, table headers) pin 12px with
+  `text-[0.75rem] leading-4`.
 - Use the tokens from `src/app/globals.css`, never zinc/gray or `dark:` classes:
   `navy-950` page, `navy-900` cards, `navy-800` hover/inputs, `navy-700/600` borders,
   `ink` text, `muted` secondary text, `neon` (brand yellow) primary-button fills, `highlight` titles/numbers,

@@ -42,7 +42,7 @@ export function PageHeader({
 }
 
 /** Small uppercase pink label, echoing "CAFE" in the logo. */
-export const sectionLabelClass = "text-xs font-semibold uppercase tracking-[0.14em] text-pink-soft";
+export const sectionLabelClass = "text-[0.75rem] leading-4 font-semibold uppercase tracking-[0.14em] text-pink-soft";
 
 export function Card({ title, children, actions }: { title?: string; children: ReactNode; actions?: ReactNode }) {
   return (
@@ -98,5 +98,5 @@ export function FormMessage({ error, saved }: { error: string | null; saved?: bo
 }
 
 export const tableClass = "w-full text-left text-sm";
-export const thClass = "border-b border-navy-700 py-2 pr-4 text-xs font-semibold uppercase tracking-wider text-muted";
+export const thClass = "border-b border-navy-700 py-2 pr-4 text-[0.75rem] leading-4 font-semibold uppercase tracking-wider text-muted";
 export const tdClass = "border-b border-navy-800 py-2 pr-4";

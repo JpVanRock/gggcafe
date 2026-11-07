@@ -27,6 +27,15 @@
   --color-highlight: #e7fb06; /* emphasis text (titles, numbers): neon at night, navy by day */
   --color-on-accent: #000a2d; /* text on neon or pink fills: navy in both modes */
 
+  /* Body text one notch larger than Tailwind's defaults (12/14/16px -> 13/15/17px). Titles use
+     text-lg and up, which are unchanged. Small headers pin 12px with text-[0.75rem]. */
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: calc(1.125 / 0.8125);
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: calc(1.375 / 0.9375);
+  --text-base: 1.0625rem;
+  --text-base--line-height: calc(1.625 / 1.0625);
+
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-jost), ui-sans-serif, system-ui, sans-serif; /* titles, tables, stat numbers */
   --font-mono: var(--font-space-mono), ui-monospace, monospace;
@@ -80,6 +89,8 @@ body {
   background: var(--color-navy-950);
   color: var(--color-ink);
   font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
   /* decorative doodles may hang off a board's edge, never off the page */
   overflow-x: clip;
 }
