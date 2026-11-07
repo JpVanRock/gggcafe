@@ -4,8 +4,9 @@ import { GOAL_METHOD_LABEL, batsThrows, playerName, type Player } from "@/lib/so
 import {
   currentRostering, firstName, possessive,
   type ActivityRow, type HaradaChart, type IqData, type MentalPlan, type MetricOption, type Performance, type PopReport,
-  type SmartGoal, type TwisWeek,
+  type SmartGoal, type TeamDugout, type TwisWeek,
 } from "./data";
+import { DugoutStrip } from "@/components/dugout-strip";
 import { GoalsDetail, GoalsSummary } from "./goals";
 import { IqDetail, IqSummary, buildLibrary, buildPositions, buildQuizzes, buildTracks } from "./iq";
 import { TrophyRoomDetail, TrophyRoomSummary, buildTrophyRoom } from "./trophy-room";
@@ -33,6 +34,7 @@ export function PlayerMenu({
   metricOptions,
   performance,
   iq,
+  dugout,
   today,
   canEdit: editor,
 }: {
@@ -43,6 +45,7 @@ export function PlayerMenu({
   metricOptions: MetricOption[];
   performance: Performance;
   iq: IqData;
+  dugout: TeamDugout[];
   mental: MentalPlan | null;
   pop: PopReport;
   activities: ActivityRow[];
@@ -191,14 +194,17 @@ export function PlayerMenu({
         </div>
       </header>
 
-      <TwisBoard
-        playerId={player.id}
-        week={twis}
-        today={today}
-        activities={activities.filter((a) => !a.category)}
-        pillars={(chart?.pillars ?? []).map((p) => ({ id: p.id, title: p.title }))}
-        canEdit={editor}
-      />
+      <div className="flex flex-col gap-3">
+        <DugoutStrip teams={dugout} canEdit={editor} />
+        <TwisBoard
+          playerId={player.id}
+          week={twis}
+          today={today}
+          activities={activities.filter((a) => !a.category)}
+          pillars={(chart?.pillars ?? []).map((p) => ({ id: p.id, title: p.title }))}
+          canEdit={editor}
+        />
+      </div>
 
       <section aria-label="Player menu" className="grid gap-8 md:grid-cols-2">
         {sections.map((section, i) => (

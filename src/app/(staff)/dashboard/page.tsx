@@ -76,6 +76,26 @@ async function Dashboard() {
         </dl>
       </Card>
 
+      <Card title="Coaches Dugout">
+        <ul className="grid gap-3 sm:grid-cols-3">
+          {[
+            { href: "/dugout", label: "Standards & Culture", note: "What your team stands for" },
+            { href: "/dugout/plans", label: "Practice Plans", note: "Build, print and share" },
+            { href: "/dugout/drills", label: "Drill Library", note: "Every drill, tagged" },
+          ].map((item) => (
+            <li key={item.href}>
+              <Link
+                href={item.href}
+                className="block rounded-lg border border-navy-700 px-4 py-3 transition hover:border-pink hover:bg-navy-800"
+              >
+                <span className="block font-semibold text-highlight uppercase tracking-wide">{item.label}</span>
+                <span className="text-sm text-muted">{item.note}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </Card>
+
       {editor && (
         <Card title="Get started">
           <ol className="list-decimal space-y-1 pl-5 text-sm">

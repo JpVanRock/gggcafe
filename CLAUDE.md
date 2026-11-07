@@ -8,7 +8,8 @@ DATABASE: Supabase project `vhvjoigbkyuebsduonpf` (US East / Ohio), settings in 
 SITE:     Next.js 16 App Router + TypeScript + Tailwind, `src/`.
 HOSTING:  Vercel team "GGG", project `gggcafe`, https://gggcafe.vercel.app. Every push to main
           deploys to production. Vercel env vars: NEXT_PUBLIC_SUPABASE_URL and
-          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY only (never the DB password).
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY (never the DB password). Optional, server-only, for
+          emailing practice plans: RESEND_API_KEY + EMAIL_FROM (see src/lib/email.ts).
 
 @AGENTS.md
 
@@ -105,6 +106,32 @@ tests/unit/              node --test unit tests (npm run test:unit)
   the ring. Every test question has a `diagram` drawn by `src/components/diamond.tsx`: it shows
   the situation only, never the answer.
 - Coaches/admins fill dashboards in for now; player logins are a planned follow-up.
+
+## Coaches Dugout (`/dugout`, nav "Dugout")
+- Header tabs (`dugout/tabs.tsx`): Standards & Culture (`/dugout`), Practice Plans (`/dugout/plans`),
+  Drill Library (`/dugout/drills`). Team pills (`?team=`) appear when there is more than one own team.
+- Team Standards (ordered list, title + optional detail) and Team Culture (optional headline +
+  description, blank line = new paragraph) per team; saved together by the `save_team_dugout` RPC.
+  Players see them in the "From the Dugout" strip above TWIS (`components/dugout-strip.tsx`): Team
+  Standards / Team Culture pill buttons open pop-ups, one section per active own team.
+- Drill library: `practice_drills` (shared by all teams), tags `drill_tag` (labels in `src/lib/dugout.ts`,
+  user's list: infield, outfield, defense, catchers, pitchers, catchers & pitchers, warm-up routine,
+  throwing routine), optional usual equipment that is copied into plans.
+- Practice plans: setup (date, start time, indoor/outdoor, total time, location, focus), then the
+  builder (`plans/[planId]/builder.tsx`, @dnd-kit): drag library drills into the timeline (or + Add),
+  reorder, each drill needs a time limit (required to finalize), coaches (staff coaches/admins or a
+  typed name) and optional equipment; custom blocks (water break) have no drill_id. Drills are
+  copied into the plan (`practice_plan_drills`) so printed plans don't change with the library.
+  Field: drag players from the team's active roster (latest season) to positions, or tap a player
+  then a position; several players can share a position and one player can be in several spots.
+  Autosaves through the `save_practice_plan` RPC (one transaction; final plans raise P0004).
+- Finalize & Print: finalizes, opens `/dugout/plans/[id]/pdf` (@react-pdf/renderer, `src/lib/pdf/`,
+  DM Sans + Jost WOFF files and the logo PNG traced in via next.config.ts). Finalize & Share: pick
+  coaches (`coaching_staff()` RPC: coach/admin emails, coaches only), emails the PDF through Resend;
+  without RESEND_API_KEY/EMAIL_FROM it opens the coach's email app (mailto) instead.
+  Final plans are read-only (`sheet.tsx`) until "Reopen to edit".
+- Practice-plan math (clock times, totals, equipment checklist, finalize checks) lives in
+  `src/lib/dugout.ts` (no imports; unit-tested). Field layout `FIELD_SPOT` is shared by web and PDF.
 
 ## Softball conventions
 - Default format is fastpitch; `teams.format` allows slowpitch.

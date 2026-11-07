@@ -193,3 +193,34 @@ insert into public.twis_checks (player_id, activity_id, team_event_id, game_id, 
 
 insert into public.mental_game_plans (player_id, focus_words, reset_routine) values
   ('00000000-0000-0000-0000-0000000000c1', 'Breathe. See it. Drive it.', 'Glove off, deep breath, look at the foul pole, next pitch.');
+
+-- Coaches Dugout ------------------------------------------------------------------
+insert into public.team_culture (team_id, headline, statement) values
+  ('00000000-0000-0000-0000-0000000000b1', 'Compete. Connect. Elevate.',
+   'We play fast and we play for each other. Every rep is a chance to get better.
+
+Mistakes are part of the game. How we answer them is who we are.');
+insert into public.team_standards (team_id, position, title, detail) values
+  ('00000000-0000-0000-0000-0000000000b1', 1, 'Be early', 'On the field and ready 15 minutes before practice starts.'),
+  ('00000000-0000-0000-0000-0000000000b1', 2, 'Sprint on and off the field', null),
+  ('00000000-0000-0000-0000-0000000000b1', 3, 'Next pitch', 'Reset after every mistake. One deep breath, then the next pitch.');
+
+insert into public.practice_drills (id, name, description, tags, equipment) values
+  ('00000000-0000-0000-0000-0000000000f1', 'Dynamic warm-up', 'High knees, butt kicks, carioca and build-up sprints, foul line to foul line.', '{warm_up}', 'Cones'),
+  ('00000000-0000-0000-0000-0000000000f2', 'Progressive throwing', 'Wrist flips, one-knee, then full throws stepping back every 10 throws to 120 ft.', '{throwing}', null),
+  ('00000000-0000-0000-0000-0000000000f3', 'Five-ball relay', 'Outfield to cutoff to base. Hit the cut chest-high; cut turns glove side.', '{outfield,defense}', '5 balls per group'),
+  ('00000000-0000-0000-0000-0000000000f4', 'Backhand-forehand circuit', 'Rolled balls to each side; stay low, glove out front, quick exchange.', '{infield}', 'Bucket of balls'),
+  ('00000000-0000-0000-0000-0000000000f5', 'Bullpen with catchers', 'Pitch counts by zone; catchers frame and call every pitch.', '{catchers_pitchers}', 'Plate, buckets');
+
+insert into public.practice_plans (id, team_id, practice_date, start_time, setting, total_minutes, location, focus) values
+  ('00000000-0000-0000-0000-0000000000f9', '00000000-0000-0000-0000-0000000000b1', '2026-09-15', '17:30', 'outdoor', 120, 'Field 2', 'Defense and relays');
+insert into public.practice_plan_drills (plan_id, position, drill_id, name, description, tags, minutes, coaches, equipment) values
+  ('00000000-0000-0000-0000-0000000000f9', 1, '00000000-0000-0000-0000-0000000000f1', 'Dynamic warm-up', 'High knees, butt kicks, carioca and build-up sprints, foul line to foul line.', '{warm_up}', 15, '{Coach Sam}', 'Cones'),
+  ('00000000-0000-0000-0000-0000000000f9', 2, '00000000-0000-0000-0000-0000000000f2', 'Progressive throwing', 'Wrist flips, one-knee, then full throws stepping back every 10 throws to 120 ft.', '{throwing}', 15, '{Coach Sam}', null),
+  ('00000000-0000-0000-0000-0000000000f9', 3, null, 'Water break', null, '{}', 5, '{}', null);
+insert into public.practice_plan_positions (plan_id, position, player_id, sort) values
+  ('00000000-0000-0000-0000-0000000000f9', 'SS', '00000000-0000-0000-0000-0000000000c1', 1),
+  ('00000000-0000-0000-0000-0000000000f9', 'P',  '00000000-0000-0000-0000-0000000000c2', 2),
+  ('00000000-0000-0000-0000-0000000000f9', 'C',  '00000000-0000-0000-0000-0000000000c3', 3),
+  ('00000000-0000-0000-0000-0000000000f9', 'CF', '00000000-0000-0000-0000-0000000000c4', 4),
+  ('00000000-0000-0000-0000-0000000000f9', 'SS', '00000000-0000-0000-0000-0000000000c4', 5);

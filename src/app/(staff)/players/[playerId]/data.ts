@@ -3,6 +3,7 @@ import type { createClient } from "@/lib/supabase/server";
 import { addDays, formatTime, isoWeekday, weekDates } from "@/lib/dates";
 import type { FieldPosition, Player, Position } from "@/lib/softball";
 import type { DiamondSpec } from "@/components/diamond";
+import type { TeamCulture, TeamStandard } from "@/components/team-standards";
 import { MENTAL_FIELDS, type MentalPlan } from "./shared";
 import { TRAINING_CATEGORY_LABEL, type Check, type Routine, type TrainingCategory } from "@/lib/achievements";
 
@@ -510,4 +511,46 @@ export function firstName(p: Pick<Player, "first_name" | "preferred_name">) {
 /** "Avery's", "Chris'" */
 export function possessive(name: string) {
   return /s$/i.test(name) ? `${name}'` : `${name}'s`;
+}
+
+// ---------------------------------------------------------------------------
+// From the Dugout: Team Standards and Team Culture for her active teams
+// ---------------------------------------------------------------------------
+
+export type TeamDugout = {
+  team: { id: string; name: string };
+  culture: TeamCulture | null;
+  standards: TeamStandard[];
+};
+
+export async function loadTeamDugout(supabase: Supabase, playerId: string): Promise<TeamDugout[]> {
+  const { data: rosterData } = await supabase
+    .from("roster_entries")
+    .select("team:teams(id, name, is_own_team)")
+    .eq("player_id", playerId)
+    .eq("active", true);
+  const teams = new Map<string, { id: string; name: string }>();
+  for (const r of (rosterData ?? []) as unknown as { team: { id: string; name: string; is_own_team: boolean } | null }[]) {
+    if (r.team?.is_own_team) teams.set(r.team.id, { id: r.team.id, name: r.team.name });
+  }
+  if (teams.size === 0) return [];
+
+  const ids = [...teams.keys()];
+  const [cultureResult, standardsResult] = await Promise.all([
+    supabase.from("team_culture").select("team_id, headline, statement").in("team_id", ids),
+    supabase.from("team_standards").select("team_id, title, detail").in("team_id", ids).order("position"),
+  ]);
+  const cultures = (cultureResult.data ?? []) as (TeamCulture & { team_id: string })[];
+  const standards = (standardsResult.data ?? []) as (TeamStandard & { team_id: string })[];
+
+  return [...teams.values()]
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((team) => {
+      const c = cultures.find((x) => x.team_id === team.id);
+      return {
+        team,
+        culture: c ? { headline: c.headline, statement: c.statement } : null,
+        standards: standards.filter((s) => s.team_id === team.id).map(({ title, detail }) => ({ title, detail })),
+      };
+    });
 }

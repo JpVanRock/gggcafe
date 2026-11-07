@@ -13,6 +13,14 @@ export const buttonClass =
 export const secondaryButtonClass =
   "inline-flex items-center justify-center rounded-md border border-navy-600 px-3 py-1.5 text-sm transition hover:border-pink hover:bg-navy-800 disabled:opacity-60";
 
+/** Pill buttons for the big actions (Finalize & Print, Finalize & Share). */
+export const pillButtonClass =
+  "inline-flex items-center justify-center gap-2 rounded-full bg-neon px-5 py-2 text-sm font-semibold uppercase tracking-wider text-on-accent transition hover:bg-neon-bright disabled:cursor-not-allowed disabled:opacity-50";
+export const pillOutlineClass =
+  "inline-flex items-center justify-center gap-2 rounded-full border border-pink px-5 py-2 text-sm font-semibold uppercase tracking-wider text-ink transition hover:bg-pink hover:text-on-accent disabled:cursor-not-allowed disabled:opacity-50";
+export const pillQuietClass =
+  "inline-flex items-center justify-center gap-2 rounded-full border border-navy-600 px-4 py-2 text-sm transition hover:border-pink hover:bg-navy-800 disabled:opacity-50";
+
 export function PageHeader({
   title,
   description,

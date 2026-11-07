@@ -8,7 +8,7 @@ import { isUuid, type Player } from "@/lib/softball";
 import { Loading } from "@/components/ui";
 import {
   loadActivities, loadHarada, loadIq, loadMentalPlan, loadMetricOptions, loadPerformance, loadPopReport, loadSmartGoals,
-  loadTwisWeek,
+  loadTeamDugout, loadTwisWeek,
 } from "./data";
 import { PlayerMenu } from "./player-menu";
 
@@ -36,7 +36,7 @@ async function PlayerDashboard({ params, searchParams }: Pick<PageProps<"/player
 
   const today = todayISO();
   const monday = weekStart(isISODate(week) ? week : today);
-  const [twis, chart, mental, pop, activities, smartGoals, metricOptions, performance, iq] = await Promise.all([
+  const [twis, chart, mental, pop, activities, smartGoals, metricOptions, performance, iq, dugout] = await Promise.all([
     loadTwisWeek(supabase, player.id, monday),
     loadHarada(supabase, player.id),
     loadMentalPlan(supabase, player.id),
@@ -46,6 +46,7 @@ async function PlayerDashboard({ params, searchParams }: Pick<PageProps<"/player
     loadMetricOptions(supabase),
     loadPerformance(supabase, player.id),
     loadIq(supabase, player.id),
+    loadTeamDugout(supabase, player.id),
   ]);
 
   return (
@@ -60,6 +61,7 @@ async function PlayerDashboard({ params, searchParams }: Pick<PageProps<"/player
       metricOptions={metricOptions}
       performance={performance}
       iq={iq}
+      dugout={dugout}
       today={today}
       canEdit={editor}
     />
