@@ -15,7 +15,7 @@ HOSTING:  Vercel team "GGG", project `gggcafe`, https://gggcafe.vercel.app. Ever
 
 ## Layout
 ```
-src/app/                 pages (App Router): / and /login are public
+src/app/                 pages (App Router): /, /login and /register are public; /family is the parents' home
 src/app/(staff)/         signed-in area with shared nav: dashboard, teams, players
                          (each feature folder has page.tsx, actions.ts, client forms)
 src/components/ui.tsx    shared page/form/table building blocks
@@ -123,8 +123,21 @@ tests/unit/              node --test unit tests (npm run test:unit)
 
 ## Coaches Dugout (`/dugout`, nav "Dugout")
 - Header tabs (`dugout/tabs.tsx`): Standards & Culture (`/dugout`), Calendar (`/dugout/calendar`),
-  Practice Plans (`/dugout/plans`), Drill Library (`/dugout/drills`). Team pills (`?team=`) appear when
-  there is more than one own team.
+  Practice Plans (`/dugout/plans`), Drill Library (`/dugout/drills`), Team Budget (`/dugout/budget`),
+  Parents (`/dugout/parents`). Team pills (`?team=`) appear when there is more than one own team.
+- Team Budget, per team and season (`?season=`): registration costs every player owes (`budget_fees`,
+  saved by `save_budget_fees`), per-player discount/extra charge (`budget_adjustments`), and the ledger
+  `budget_entries` (kind payment/income/expense). Money math in `src/lib/budget.ts` (cents; no
+  imports; unit-tested). Coaches/admins edit, other staff view.
+- Parents (user's choice: sign-in accounts, team totals only): parents sign up at `/register` (name,
+  email, password, team code, daughter's name) and land on `/family`. A coach turns on a 6-character
+  team code (`teams.parent_code`, Dugout → Parents) and approves each request by matching it to a
+  player (`parent_links`, status pending/approved/declined). Parents are not staff and can read no
+  app tables; they get data only through security-definer functions: `parent_home()` (their links)
+  and `team_budget_summary()` (staff, or approved parents of that team), which returns team totals,
+  expenses/income and player payments as daily totals with no names. `components/budget-summary.tsx`
+  draws it for parents and as the coaches' summary/"Parent view". Non-staff parents signing in are
+  sent from /dashboard to /family.
 - Calendar: month grid Monday–Sunday (`?month=2026-11`; day-by-day list on phones) of `team_events`
   plus games (read-only; games are managed on the team page). These are the same events TWIS shows,
   so anything entered here appears in each player's TWIS. Only coaches/admins add, change or remove

@@ -3,7 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 import { supabaseConfig } from "@/lib/supabase/env";
 
 /** Pages that need a signed-in user. The page itself still checks staff access. */
-const PROTECTED_PREFIXES = ["/dashboard", "/teams", "/players"];
+const PROTECTED_PREFIXES = ["/dashboard", "/dugout", "/teams", "/players", "/family"];
 
 /**
  * Runs before every page request:
@@ -47,7 +47,7 @@ export async function proxy(request: NextRequest) {
   if (!signedIn && PROTECTED_PREFIXES.some((p) => path === p || path.startsWith(`${p}/`))) {
     return redirectKeepingCookies(request, response, "/login");
   }
-  if (signedIn && path === "/login") {
+  if (signedIn && (path === "/login" || path === "/register")) {
     return redirectKeepingCookies(request, response, "/dashboard");
   }
 

@@ -27,12 +27,22 @@ async function Dashboard() {
   if (!user) redirect("/login");
 
   if (!user.staff) {
+    // Parents have their own home page.
+    const supabase = await createClient();
+    const { data: parent } = await supabase.from("parent_accounts").select("user_id").eq("user_id", user.id).maybeSingle();
+    if (parent) redirect("/family");
     return (
       <>
         <PageHeader title="Almost there" description={user.email ?? undefined} />
         <p className="rounded-lg border border-pink/50 bg-pink/10 p-4 text-ink">
           You&apos;re signed in, but your account isn&apos;t on the GGG.Cafe staff
           list yet. Ask an admin to add you.
+        </p>
+        <p className="mt-4 text-sm text-muted">
+          A parent?{" "}
+          <Link href="/family" className="text-pink hover:underline">
+            Set up your family account →
+          </Link>
         </p>
       </>
     );
