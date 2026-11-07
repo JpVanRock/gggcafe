@@ -11,6 +11,7 @@ import {
   loadTeamDugout, loadTwisWeek,
 } from "./data";
 import { PlayerMenu } from "./player-menu";
+import { signedPhotoUrls } from "@/lib/player-photos";
 
 export const metadata: Metadata = { title: "Player · GGG.Cafe" };
 
@@ -48,6 +49,7 @@ async function PlayerDashboard({ params, searchParams }: Pick<PageProps<"/player
     loadIq(supabase, player.id),
     loadTeamDugout(supabase, player.id),
   ]);
+  const photoUrl = player.photo_path ? ((await signedPhotoUrls(supabase, [player.photo_path])).get(player.photo_path) ?? null) : null;
 
   return (
     <PlayerMenu
@@ -62,6 +64,7 @@ async function PlayerDashboard({ params, searchParams }: Pick<PageProps<"/player
       performance={performance}
       iq={iq}
       dugout={dugout}
+      photoUrl={photoUrl}
       today={today}
       canEdit={editor}
     />

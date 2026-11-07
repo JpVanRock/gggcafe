@@ -35,6 +35,7 @@ export function PlayerMenu({
   performance,
   iq,
   dugout,
+  photoUrl,
   today,
   canEdit: editor,
 }: {
@@ -46,6 +47,7 @@ export function PlayerMenu({
   performance: Performance;
   iq: IqData;
   dugout: TeamDugout[];
+  photoUrl: string | null;
   mental: MentalPlan | null;
   pop: PopReport;
   activities: ActivityRow[];
@@ -95,7 +97,7 @@ export function PlayerMenu({
       title: `${possessive(name)} Pop Report`,
       variant: "pink",
       summary: <PopSummary player={player} pop={pop} />,
-      detail: <PopDetail player={player} pop={pop} canEdit={editor} />,
+      detail: <PopDetail player={player} pop={pop} canEdit={editor} photoUrl={photoUrl} />,
     },
     {
       key: "mental",
@@ -166,6 +168,14 @@ export function PlayerMenu({
           {team?.jersey_number ?? player.primary_position ?? ""}
         </OutlineText>
         <div className="relative pt-6 sm:pt-10">
+          {photoUrl && (
+            // eslint-disable-next-line @next/next/no-img-element -- short-lived signed Storage URL
+            <img
+              src={photoUrl}
+              alt={`${name} ${player.last_name}`}
+              className="mx-auto mb-5 size-28 rounded-full border-2 border-neon object-cover shadow-[0_0_0_6px_rgb(0_10_45),0_0_0_7px_rgb(254_31_124)] sm:size-32"
+            />
+          )}
           <p className="flex items-center justify-center gap-3 font-mono text-xs tracking-[0.35em] text-pink-soft uppercase">
             <SpeedStripes className="h-3 w-9 text-pink" />
             Player menu
@@ -175,6 +185,23 @@ export function PlayerMenu({
             {name} <span className="text-ink">{player.last_name}</span>
           </h1>
           {tagline && <p className="mx-auto mt-4 max-w-2xl font-mono text-sm text-muted">{tagline}</p>}
+          {player.walk_up_songs.length > 0 && (
+            <p className="mx-auto mt-3 flex max-w-2xl flex-wrap items-baseline justify-center gap-x-4 gap-y-1 text-sm">
+              <span className="font-mono text-[0.75rem] leading-4 tracking-[0.25em] text-pink-soft uppercase">Walk-up</span>
+              {player.walk_up_songs.map((song, i) => {
+                const label = `${song.title}${song.artist ? ` · ${song.artist}` : ""}`;
+                return song.link ? (
+                  <a key={i} href={song.link} target="_blank" rel="noopener noreferrer" className="font-semibold text-ink hover:text-pink">
+                    {label} ↗
+                  </a>
+                ) : (
+                  <span key={i} className="font-semibold text-ink">
+                    {label}
+                  </span>
+                );
+              })}
+            </p>
+          )}
           {(iq.rings.length > 0 || iq.gloves.length > 0 || room.championsOn) && (
             <div className="mt-6 flex flex-wrap items-end justify-center gap-6" aria-label="Trophies, rings and Golden Gloves">
               {room.plaques

@@ -5,7 +5,7 @@ import { useActionState } from "react";
 import { Field, FormMessage, buttonClass, inputClass, secondaryButtonClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import {
-  BATS, BATS_LABEL, FORMATS, FORMAT_LABEL, POSITIONS, POSITION_LABEL, THROWS, THROWS_LABEL,
+  AGE_GROUPS, BATS, BATS_LABEL, FORMATS, FORMAT_LABEL, POSITIONS, POSITION_LABEL, THROWS, THROWS_LABEL,
   type Team,
 } from "@/lib/softball";
 import {
@@ -38,8 +38,16 @@ export function TeamForm({ team }: { team?: Team }) {
       <Field label="Short name" hint="Shown in tight spaces, like box scores">
         <input name="short_name" defaultValue={team?.short_name ?? ""} placeholder="GGG" className={inputClass} />
       </Field>
-      <Field label="Age group">
-        <input name="age_group" defaultValue={team?.age_group ?? ""} placeholder="14U, Varsity…" className={inputClass} />
+      <Field label="Age group" hint="Players are grouped by their team's age group">
+        <select name="age_group" defaultValue={team?.age_group ?? ""} className={inputClass}>
+          <option value="">—</option>
+          {AGE_GROUPS.map((a) => (
+            <option key={a} value={a}>{a}</option>
+          ))}
+          {team?.age_group && !(AGE_GROUPS as readonly string[]).includes(team.age_group) && (
+            <option value={team.age_group}>{team.age_group}</option>
+          )}
+        </select>
       </Field>
       <Field label="Format">
         <select name="format" defaultValue={team?.format ?? "fastpitch"} className={inputClass}>

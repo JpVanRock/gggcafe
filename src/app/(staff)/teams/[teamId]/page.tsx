@@ -15,6 +15,7 @@ import { ConfirmSubmit } from "@/components/confirm-submit";
 import { addDays, formatDay, formatTime, todayISO } from "@/lib/dates";
 import { deleteTeamEvent, removeFromRoster } from "../actions";
 import { LogoUpload } from "./logo-upload";
+import { IntakeForm } from "../../players/intake-form";
 import {
   ExistingRosterPlayerForm, GameForm, NewRosterPlayerForm, RosterEntryEditor, SeasonForm, TeamEventForm, TeamForm,
 } from "../forms";
@@ -232,8 +233,12 @@ async function TeamContent({
 
           {editor && (
             <div className="mt-4 flex flex-col gap-3">
-              <Disclosure summary="Add a new player" open={roster.length === 0}>
-                <NewRosterPlayerForm teamId={team.id} seasonId={season.id} />
+              <Disclosure summary={team.is_own_team ? "Player intake form" : "Add a new player"} open={roster.length === 0}>
+                {team.is_own_team ? (
+                  <IntakeForm teams={[]} fixedTeam={{ id: team.id, seasonId: season.id }} />
+                ) : (
+                  <NewRosterPlayerForm teamId={team.id} seasonId={season.id} />
+                )}
               </Disclosure>
               {otherPlayers.length > 0 && (
                 <Disclosure summary="Add an existing player">

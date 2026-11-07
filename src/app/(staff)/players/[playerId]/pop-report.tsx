@@ -44,13 +44,14 @@ export function PopSummary({ player, pop }: { player: Player; pop: PopReport }) 
   );
 }
 
-export function PopDetail({ player, pop, canEdit }: { player: Player; pop: PopReport; canEdit: boolean }) {
+export function PopDetail({ player, pop, canEdit, photoUrl }: { player: Player; pop: PopReport; canEdit: boolean; photoUrl?: string | null }) {
   const facts: [string, string][] = [
     ["Position", player.primary_position ? `${player.primary_position} · ${POSITION_LABEL[player.primary_position]}` : "–"],
     ["Also plays", player.secondary_positions.length ? player.secondary_positions.join(", ") : "–"],
     ["Bats", player.bats ? BATS_LABEL[player.bats] : "–"],
     ["Throws", player.throws ? THROWS_LABEL[player.throws] : "–"],
     ["Class of", player.grad_year ? String(player.grad_year) : "–"],
+    ["Born", player.birth_date ? formatLongDate(player.birth_date) : "–"],
     ["Slapper", player.is_slapper ? "Yes" : "No"],
   ];
 
@@ -163,7 +164,7 @@ export function PopDetail({ player, pop, canEdit }: { player: Player; pop: PopRe
 
       {canEdit && (
         <Disclosure summary="Edit profile">
-          <PlayerForm player={player} />
+          <PlayerForm player={player} photoUrl={photoUrl} />
         </Disclosure>
       )}
     </div>

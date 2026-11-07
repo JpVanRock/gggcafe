@@ -88,7 +88,25 @@ export type Player = {
   is_slapper: boolean;
   notes: string | null;
   goal_method: GoalMethod;
+  birth_date: string | null;
+  /** path in the private player-photos bucket; shown through a signed URL */
+  photo_path: string | null;
+  walk_up_songs: WalkUpSong[];
 };
+
+export type WalkUpSong = { title: string; artist: string | null; link: string | null };
+export const MAX_WALK_UP_SONGS = 3;
+
+/** Age groups for the Players page tabs, taken from the team she plays for. */
+export const AGE_GROUPS = ["8U", "10U", "11U", "12U", "13U", "14U", "15U", "16U", "17U", "18U"] as const;
+export type AgeGroup = (typeof AGE_GROUPS)[number];
+
+/** A team's age group as one of AGE_GROUPS ("16u", "16 U", "GGG 16U" → "16U"), or null. */
+export function ageGroupOf(teamAgeGroup: string | null | undefined): AgeGroup | null {
+  const match = /(\d{1,2})\s*u\b/i.exec(teamAgeGroup ?? "");
+  const group = match ? `${Number(match[1])}U` : null;
+  return (AGE_GROUPS as readonly string[]).includes(group ?? "") ? (group as AgeGroup) : null;
+}
 
 export function playerName(p: Pick<Player, "first_name" | "last_name" | "preferred_name">) {
   return `${p.preferred_name || p.first_name} ${p.last_name}`;
