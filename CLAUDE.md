@@ -144,8 +144,13 @@ like a sports brand or media-day graphics. Never childish or preschool.
   root layout). Day Game only re-maps tokens in `globals.css`, so use tokens by ROLE:
   `text-highlight` for emphasis text (neon at night, navy by day; never `text-neon`),
   `text-on-accent` for text on neon/pink fills (never `text-navy-950`), `bg-neon`/`bg-pink` for fills.
-  `keep-night` keeps a piece in night colors (the field diagram; navy chips behind the yellow tagline
-  and wordmark, which the brand kit approves only over navy). `day:` variant for Day-only tweaks.
+  `keep-night` keeps a piece in night colors (the field diagram; the footer, which becomes a full-width
+  navy strip in Day Game so the yellow wordmark stays on navy). `day:` variant for Day-only tweaks.
+  The sign-in tagline swaps to `elevate-together-navy.png` (same artwork, ink recolored to brand navy)
+  in Day Game, with no panel behind it.
+- Only clickable things look like buttons: no bordered or filled pills/chips/panels around
+  non-interactive text or artwork (user feedback, 2026-11-07). Use plain text, lists with dividers,
+  or colored text for labels and statuses.
 - Use the tokens from `src/app/globals.css`, never zinc/gray or `dark:` classes:
   `navy-950` page, `navy-900` cards, `navy-800` hover/inputs, `navy-700/600` borders,
   `ink` text, `muted` secondary text, `neon` (brand yellow) primary-button fills, `highlight` titles/numbers,
