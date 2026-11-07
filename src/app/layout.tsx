@@ -1,10 +1,20 @@
 import type { Metadata, Viewport } from "next";
-import { Jost, Space_Mono } from "next/font/google";
+import { DM_Sans, Jost, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { SiteFooter } from "@/components/brand";
 import { THEME_BOOT_SCRIPT } from "@/lib/theme";
 
-// Pairs with the logo's Montecatini Pro: a 1920s-style geometric sans with tabular figures.
+// Body and interface (brand kit): clear at small sizes; the opsz axis tunes letter shapes per size.
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  axes: ["opsz"],
+  display: "swap",
+});
+
+// Titles, tables and stat numbers: pairs with the logo's Montecatini Pro, and has tabular
+// figures (DM Sans doesn't), so numbers line up in columns.
 const jost = Jost({
   variable: "--font-jost",
   subsets: ["latin"],
@@ -32,7 +42,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     // suppressHydrationWarning: the boot script may set data-theme="day" before React loads
-    <html lang="en" className={`${jost.variable} ${spaceMono.variable} h-full antialiased`} suppressHydrationWarning>
+    <html lang="en" className={`${dmSans.variable} ${jost.variable} ${spaceMono.variable} h-full antialiased`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
       </head>

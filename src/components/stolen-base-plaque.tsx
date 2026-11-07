@@ -21,7 +21,7 @@ function Engraved({ y, size, spacing, children }: { y: number; size: number; spa
     fontSize: size,
     letterSpacing: spacing,
     fontWeight: 600,
-    style: { fontFamily: "var(--font-sans)" },
+    style: { fontFamily: "var(--font-display)" }, // engraving sized for Jost's letter widths
   };
   return (
     <>

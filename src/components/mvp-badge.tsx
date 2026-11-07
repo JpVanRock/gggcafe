@@ -50,7 +50,7 @@ export function MvpBadge({
         fontSize="36"
         fontWeight="800"
         letterSpacing="1"
-        style={{ fontFamily: "var(--font-sans)" }}
+        style={{ fontFamily: "var(--font-display)" }}
       >
         MVP
       </text>

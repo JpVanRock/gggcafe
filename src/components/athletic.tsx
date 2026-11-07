@@ -6,7 +6,7 @@ export function OutlineText({ children, className = "", stroke = "var(--color-na
   return (
     <span
       aria-hidden
-      className={`pointer-events-none leading-none font-bold text-transparent select-none ${className}`}
+      className={`pointer-events-none font-display leading-none font-bold text-transparent select-none ${className}`}
       style={{ WebkitTextStroke: `1.5px ${stroke}` }}
     >
       {children}

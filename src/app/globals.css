@@ -3,8 +3,9 @@
 /*
  * GGG.Cafe brand. Navy, neon yellow and neon pink are the brand kit's official values
  * (Edition 03: #000A2D, #E7FB06, #FE1F7C); the other navy shades and soft tints are derived.
- * The logo's lettering is Montecatini Pro (Art Nouveau, Louise Fili); the site text is
- * Jost, a 1920s-style geometric sans that sits quietly beside it and has tabular figures.
+ * Type: DM Sans for body and interface (brand kit: body copy, buttons, navigation, captions).
+ * Jost, the 1920s-style geometric sans that pairs with the logo's Montecatini Pro, for titles,
+ * tables and stat numbers: it has tabular figures, so numbers line up (DM Sans has none).
  * The site is always dark: the logo is designed for the navy background.
  */
 /* Day Game: `day:` styles apply while the white background is on (html[data-theme="day"]). */
@@ -26,7 +27,8 @@
   --color-highlight: #e7fb06; /* emphasis text (titles, numbers): neon at night, navy by day */
   --color-on-accent: #000a2d; /* text on neon or pink fills: navy in both modes */
 
-  --font-sans: var(--font-jost), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-jost), ui-sans-serif, system-ui, sans-serif; /* titles, tables, stat numbers */
   --font-mono: var(--font-space-mono), ui-monospace, monospace;
 }
 
@@ -109,4 +111,19 @@ a {
 /* Keep the page from scrolling behind an open pop-up */
 html:has(dialog[open]) {
   overflow: hidden;
+}
+
+/*
+ * Jost where it does a better job than DM Sans: page and board titles, tables, and
+ * numbers (anything marked tabular-nums, and definition values). In the base layer, so
+ * an explicit utility such as font-mono still wins.
+ */
+@layer base {
+  h1,
+  h2,
+  table,
+  dd,
+  .tabular-nums {
+    font-family: var(--font-display);
+  }
 }

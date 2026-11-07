@@ -132,7 +132,11 @@ like a sports brand or media-day graphics. Never childish or preschool.
 - Type logo "GGG.CAFE": `public/brand/ggg-cafe-wordmark.png` (transparent, `<Wordmark>`). It sits
   bottom-right on every page via `<SiteFooter>` in the root layout; keep pages from covering it. The logo lettering is Montecatini Pro
   (Louise Fili, commercial) and only appears as the image.
-- Site font: Jost (next/font/google), chosen to pair with Montecatini Pro; has tabular figures.
+- Fonts (next/font/google, user's choice after a side-by-side test, 2026-11-07): DM Sans (`font-sans`,
+  brand kit) for body and interface (text, buttons, navigation, forms, captions). Jost
+  (`font-display`) for h1/h2 titles, tables, `dd` values, anything `tabular-nums`, outlined numerals
+  and the award engravings: DM Sans has no tabular figures, so numbers wouldn't line up. The
+  Jost rule lives in `@layer base` in globals.css, so `font-mono` (Space Mono) still wins.
 - Brand kit (Edition 03, from the user; not in the repo): colors Navy #000A2D, Neon Yellow #E7FB06,
   Neon Pink #FE1F7C, White. The site tokens (`navy-950`, `neon`, `pink`) use exactly these values;
   hard-coded glows use the same RGB (0 10 45 / 231 251 6 / 254 31 124). Tagline "Elevate Together": use ONLY the supplied artwork
