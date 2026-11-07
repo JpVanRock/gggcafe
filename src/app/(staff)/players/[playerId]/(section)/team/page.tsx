@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { EmptyState, Loading } from "@/components/ui";
+import { ScrollToHash } from "@/components/scroll-to-hash";
 import { CultureStatement, StandardsList, hasCulture } from "@/components/team-standards";
 import { loadTeamDugout } from "../../data";
 import { loadPlayer } from "../../section-data";
@@ -21,7 +22,7 @@ export default function TeamPage({ params }: PageProps<"/players/[playerId]/team
 
 function Heading({ id, children }: { id: string; children: React.ReactNode }) {
   return (
-    <h2 id={id} className="mb-5 scroll-mt-24 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">
+    <h2 id={id} className="mb-5 scroll-mt-40 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">
       {children}
     </h2>
   );
@@ -64,6 +65,7 @@ async function Team({ params }: Pick<PageProps<"/players/[playerId]/team">, "par
           ))}
         </div>
       )}
+      <ScrollToHash />
     </SectionShell>
   );
 }
