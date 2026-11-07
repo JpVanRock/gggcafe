@@ -585,14 +585,13 @@ function LibraryPicker({ library, actions }: { library: LibraryInfo; actions: Ac
         )}
       </div>
       {library.shelves.length > 0 && (
-        <dl className="mt-4 grid gap-x-8 font-mono text-[11px] tracking-wider uppercase sm:grid-cols-2">
+        <ul className="mt-4 flex flex-wrap gap-2">
           {library.shelves.map((s) => (
-            <div key={s.name} className="flex justify-between gap-3 border-b border-navy-700 py-1.5">
-              <dt className="text-muted">{s.name}</dt>
-              <dd className="text-ink tabular-nums">{s.count}</dd>
-            </div>
+            <li key={s.name} className="rounded-full border border-navy-600 px-3 py-1 font-mono text-[11px] tracking-wider text-muted uppercase">
+              {s.name} · {s.count}
+            </li>
           ))}
-        </dl>
+        </ul>
       )}
       <TestFollowUps test={library} testKey={key} actions={actions} />
     </div>

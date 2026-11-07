@@ -43,7 +43,7 @@ export function Modal({
         onClick={(e) => {
           if (e.target === dialog.current) dialog.current?.close();
         }}
-        className="m-auto max-h-[calc(100dvh-2rem)] w-[min(64rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-navy-600 bg-navy-900 p-0 text-ink shadow-2xl backdrop:bg-navy-950/80 backdrop:backdrop-blur-sm day:backdrop:bg-[rgb(0_10_45/0.45)]"
+        className="m-auto max-h-[calc(100dvh-2rem)] w-[min(64rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-navy-600 bg-navy-900 p-0 text-ink shadow-2xl backdrop:bg-navy-950/80 backdrop:backdrop-blur-sm"
       >
         <div className="flex max-h-[calc(100dvh-2rem)] flex-col">
           <header className="flex items-start justify-between gap-4 border-b border-navy-700 px-5 py-4 sm:px-6">
