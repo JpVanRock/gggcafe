@@ -13,7 +13,7 @@ export function ForgotForm() {
   if (state.sent) {
     return (
       <div className="rounded-md border border-neon/60 bg-neon/10 p-4 text-sm" role="status">
-        <p className="font-semibold text-neon">Check your email.</p>
+        <p className="font-semibold text-highlight">Check your email.</p>
         <p className="mt-1 text-ink/90">
           If {state.email} has a GGG.Cafe account, a reset link is on its way. Open it in this browser within the hour.
         </p>
@@ -47,7 +47,7 @@ export function ForgotForm() {
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-neon px-4 py-2 font-semibold text-navy-950 transition hover:bg-neon-bright disabled:opacity-60"
+        className="rounded-md bg-neon px-4 py-2 font-semibold text-on-accent transition hover:bg-neon-bright disabled:opacity-60"
       >
         {pending ? "Sending…" : "Email me a reset link"}
       </button>

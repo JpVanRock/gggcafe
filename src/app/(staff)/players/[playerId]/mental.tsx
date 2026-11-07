@@ -16,7 +16,7 @@ export function MentalSummary({ plan }: { plan: MentalPlan | null }) {
   }
   return (
     <div className="flex flex-col gap-4">
-      {plan.focus_words && <p className="text-xl leading-snug font-semibold text-neon">“{plan.focus_words}”</p>}
+      {plan.focus_words && <p className="text-xl leading-snug font-semibold text-highlight">“{plan.focus_words}”</p>}
       {SUMMARY_FIELDS.map((name) => {
         const field = MENTAL_FIELDS.find((f) => f.name === name)!;
         return <MenuItem key={name} name={field.label} value={plan[name] ? "✓" : "—"} note={firstLine(plan[name])} />;
@@ -36,7 +36,7 @@ export function MentalDetail({ playerId, plan, canEdit }: { playerId: string; pl
           {filled.map((f) => (
             <section key={f.name} className={f.name === "focus_words" ? "md:col-span-2" : ""}>
               <DetailHeading>{f.label}</DetailHeading>
-              <p className={`whitespace-pre-wrap ${f.name === "focus_words" ? "text-2xl font-semibold text-neon" : "text-ink/90"}`}>
+              <p className={`whitespace-pre-wrap ${f.name === "focus_words" ? "text-2xl font-semibold text-highlight" : "text-ink/90"}`}>
                 {plan![f.name]}
               </p>
             </section>

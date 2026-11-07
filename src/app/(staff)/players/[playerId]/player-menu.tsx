@@ -168,7 +168,7 @@ export function PlayerMenu({
             Player menu
             <SpeedStripes className="h-3 w-9 text-pink" />
           </p>
-          <h1 className="mt-3 text-5xl leading-none font-bold tracking-tight text-neon uppercase sm:text-7xl">
+          <h1 className="mt-3 text-5xl leading-none font-bold tracking-tight text-highlight uppercase sm:text-7xl">
             {name} <span className="text-ink">{player.last_name}</span>
           </h1>
           {tagline && <p className="mx-auto mt-4 max-w-2xl font-mono text-sm text-muted">{tagline}</p>}

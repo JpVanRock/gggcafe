@@ -141,7 +141,7 @@ export function Diamond({ spec, className = "" }: { spec: DiamondSpec; className
   }
 
   return (
-    <figure className={`overflow-hidden rounded-xl border border-navy-700 bg-navy-950 ${className}`}>
+    <figure className={`keep-night overflow-hidden rounded-xl border border-navy-700 bg-navy-950 ${className}`}>
       <svg viewBox="0 0 400 370" role="img" aria-label={describeDiamond(spec)} className="block h-auto w-full">
         <defs>
           <marker id="dmd-arrow-run" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">

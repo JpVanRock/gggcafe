@@ -46,7 +46,7 @@ export function MvpBadge({
         x="60"
         y="80"
         textAnchor="middle"
-        className="fill-neon"
+        className="fill-highlight"
         fontSize="36"
         fontWeight="800"
         letterSpacing="1"

@@ -63,7 +63,7 @@ export function GoalsForm({ playerId, chart }: { playerId: string; chart: Harada
           const p = pillar(i + 1);
           return (
             <fieldset key={i} className="rounded-xl border border-navy-700 p-4">
-              <legend className="px-1 font-mono text-xs font-bold tracking-widest text-neon uppercase">Area {i + 1}</legend>
+              <legend className="px-1 font-mono text-xs font-bold tracking-widest text-highlight uppercase">Area {i + 1}</legend>
               <input
                 name={`pillar_${i + 1}`}
                 aria-label={`Area ${i + 1} name`}

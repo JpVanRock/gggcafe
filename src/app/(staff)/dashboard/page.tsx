@@ -62,7 +62,7 @@ async function Dashboard() {
           {rows.map(({ label, count, href }) => (
             <div key={label}>
               <dt className="text-xs text-muted">{label}</dt>
-              <dd className="text-3xl font-semibold tabular-nums text-neon">
+              <dd className="text-3xl font-semibold tabular-nums text-highlight">
                 {href ? (
                   <Link href={href} className="hover:underline">
                     {count ?? "–"}

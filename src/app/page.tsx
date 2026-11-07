@@ -4,10 +4,12 @@ import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { supabaseConfig } from "@/lib/supabase/env";
 import { Logo } from "@/components/brand";
+import { CornerThemeToggle } from "@/components/theme-toggle";
 
 export default function Home() {
   return (
     <main className="relative flex flex-1 flex-col items-center overflow-hidden px-4 pt-14 pb-4 sm:pt-16">
+      <CornerThemeToggle />
       {/* soft pink glow behind the badge */}
       <div
         aria-hidden
@@ -21,7 +23,7 @@ export default function Home() {
           className="h-48 w-48 shadow-[0_0_60px_rgba(254,31,124,0.35)] sm:h-60 sm:w-60"
         />
         <div>
-          <p className="text-lg font-medium uppercase tracking-[0.2em] text-neon sm:text-xl">
+          <p className="text-lg font-medium uppercase tracking-[0.2em] text-highlight sm:text-xl">
             Player development &amp; game strategy
           </p>
           <p className="mt-3 text-muted">
@@ -48,7 +50,7 @@ async function AccountLink() {
   return (
     <Link
       href={user ? "/dashboard" : "/login"}
-      className="rounded-md bg-neon px-6 py-3 font-semibold text-navy-950 shadow-[0_0_24px_rgba(231,251,6,0.25)] transition hover:bg-neon-bright"
+      className="rounded-md bg-neon px-6 py-3 font-semibold text-on-accent shadow-[0_0_24px_rgba(231,251,6,0.25)] transition hover:bg-neon-bright"
     >
       {user ? "Open dashboard" : "Sign in"}
     </Link>

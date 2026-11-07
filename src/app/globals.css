@@ -7,6 +7,9 @@
  * Jost, a 1920s-style geometric sans that sits quietly beside it and has tabular figures.
  * The site is always dark: the logo is designed for the navy background.
  */
+/* Day Game: `day:` styles apply while the white background is on (html[data-theme="day"]). */
+@custom-variant day (&:where([data-theme="day"], [data-theme="day"] *));
+
 @theme {
   --color-navy-950: #000a2d; /* brand kit navy: the page */
   --color-navy-900: #061137; /* cards */
@@ -20,6 +23,8 @@
   --color-pink: #fe1f7c;     /* brand kit neon pink: links, focus, selected, accents */
   --color-pink-soft: #ff6aa6;
   --color-danger: #ff7a7a;   /* errors, kept apart from the brand pink */
+  --color-highlight: #e7fb06; /* emphasis text (titles, numbers): neon at night, navy by day */
+  --color-on-accent: #000a2d; /* text on neon or pink fills: navy in both modes */
 
   --font-sans: var(--font-jost), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-space-mono), ui-monospace, monospace;
@@ -27,6 +32,46 @@
 
 :root {
   color-scheme: dark;
+}
+
+/*
+ * Day Game (the white background, chosen with the switch at the top right; the
+ * default is Night Game). Only these tokens change. Neon yellow and pink stay the
+ * brand colors for buttons, boards and accents, and text on them stays navy
+ * (`on-accent`). Small-text pink and red go darker so they read on white.
+ */
+:root[data-theme="day"] {
+  color-scheme: light;
+  --color-navy-950: #ffffff; /* page */
+  --color-navy-900: #f4f6fb; /* cards */
+  --color-navy-800: #e9edf6; /* inputs, hover rows */
+  --color-navy-700: #d3d9e8; /* borders */
+  --color-navy-600: #a9b3ce; /* stronger borders */
+  --color-ink: #000a2d;      /* main text: brand navy */
+  --color-muted: #4a5578;    /* secondary text (7:1 on white) */
+  --color-highlight: #000a2d;
+  --color-pink-soft: #c2135d; /* pink text (5.6:1 on white) */
+  --color-danger: #c62828;
+}
+
+/*
+ * Pieces that keep Night Game colors on either background: the field diagram
+ * (it draws its own dark field) and the navy backing behind brand artwork (the
+ * brand kit approves the yellow tagline and wordmark only over navy).
+ */
+:root[data-theme="day"] .keep-night {
+  color-scheme: dark;
+  --color-navy-950: #000a2d;
+  --color-navy-900: #061137;
+  --color-navy-800: #0d1a4a;
+  --color-navy-700: #1b2a63;
+  --color-navy-600: #2c3d80;
+  --color-ink: #f1f3fb;
+  --color-muted: #a3acd1;
+  --color-highlight: #e7fb06;
+  --color-pink-soft: #ff6aa6;
+  --color-danger: #ff7a7a;
+  color: var(--color-ink);
 }
 
 body {

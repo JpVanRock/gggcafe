@@ -8,7 +8,7 @@ export const inputClass =
 
 /** Primary action: the logo's neon yellow. */
 export const buttonClass =
-  "inline-flex items-center justify-center rounded-md bg-neon px-4 py-2 text-sm font-semibold text-navy-950 transition hover:bg-neon-bright disabled:opacity-60";
+  "inline-flex items-center justify-center rounded-md bg-neon px-4 py-2 text-sm font-semibold text-on-accent transition hover:bg-neon-bright disabled:opacity-60";
 
 export const secondaryButtonClass =
   "inline-flex items-center justify-center rounded-md border border-navy-600 px-3 py-1.5 text-sm transition hover:border-pink hover:bg-navy-800 disabled:opacity-60";
@@ -32,7 +32,7 @@ export function PageHeader({
             ← {back.label}
           </Link>
         )}
-        <h1 className="text-2xl font-semibold uppercase tracking-[0.08em] text-neon">{title}</h1>
+        <h1 className="text-2xl font-semibold uppercase tracking-[0.08em] text-highlight">{title}</h1>
         <span aria-hidden className="mt-2 block h-0.5 w-12 rounded-full bg-pink" />
         {description && <p className="mt-2 text-sm text-muted">{description}</p>}
       </div>
@@ -91,7 +91,7 @@ export function Loading() {
 
 export function FormMessage({ error, saved }: { error: string | null; saved?: boolean }) {
   return (
-    <p aria-live="polite" className={`min-h-5 text-sm ${error ? "text-danger" : "text-neon"}`}>
+    <p aria-live="polite" className={`min-h-5 text-sm ${error ? "text-danger" : "text-highlight"}`}>
       {error ?? (saved ? "Saved." : "")}
     </p>
   );

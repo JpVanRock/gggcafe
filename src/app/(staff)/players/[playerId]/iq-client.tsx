@@ -47,7 +47,7 @@ export function QuizRunner({ playerId, quizzes, canEdit }: { playerId: string; q
             <div>
               <div className="flex items-baseline justify-between gap-3">
                 <p className="font-bold tracking-wide uppercase">{quiz.label}</p>
-                <p className="font-mono text-lg font-bold text-neon">{quiz.stats.pct === null ? "New" : `${quiz.stats.pct}%`}</p>
+                <p className="font-mono text-lg font-bold text-highlight">{quiz.stats.pct === null ? "New" : `${quiz.stats.pct}%`}</p>
               </div>
               <p className="mt-1 text-xs text-muted">
                 {quiz.stats.mastered}/{quiz.stats.total} mastered · {quiz.stats.answered} answered
@@ -79,7 +79,7 @@ export function QuizRunner({ playerId, quizzes, canEdit }: { playerId: string; q
     return (
       <div className="rounded-xl border border-neon bg-neon/10 p-6 text-center">
         <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">{run.label}</p>
-        <p className="mt-2 text-4xl font-bold text-neon">
+        <p className="mt-2 text-4xl font-bold text-highlight">
           {score}/{run.questions.length}
         </p>
         <p className="mt-1 text-sm text-muted">
@@ -135,11 +135,11 @@ export function QuizRunner({ playerId, quizzes, canEdit }: { playerId: string; q
                       : "border-navy-600 hover:border-pink disabled:hover:border-navy-600"
                 }`}
               >
-                <span className={`font-mono font-bold ${isCorrect ? "text-neon" : isWrongPick ? "text-pink-soft" : "text-muted"}`}>
+                <span className={`font-mono font-bold ${isCorrect ? "text-highlight" : isWrongPick ? "text-pink-soft" : "text-muted"}`}>
                   {LETTERS[i]}
                 </span>
                 <span>{choice}</span>
-                {isCorrect && <span className="ml-auto font-bold text-neon">✓</span>}
+                {isCorrect && <span className="ml-auto font-bold text-highlight">✓</span>}
               </button>
             </li>
           );
@@ -154,7 +154,7 @@ export function QuizRunner({ playerId, quizzes, canEdit }: { playerId: string; q
 
       {feedback && (
         <div className="mt-4" aria-live="polite">
-          <p className={`font-bold ${feedback.correct ? "text-neon" : "text-pink-soft"}`}>{feedback.correct ? "Correct!" : "Not quite."}</p>
+          <p className={`font-bold ${feedback.correct ? "text-highlight" : "text-pink-soft"}`}>{feedback.correct ? "Correct!" : "Not quite."}</p>
           {feedback.explanation && <p className="mt-1 text-sm text-ink/90">{feedback.explanation}</p>}
           <div className="mt-4 flex gap-2">
             <button
@@ -744,10 +744,10 @@ export function IqTests({
         {result.passed && result.awardEarned && session.track === "baserunning" && (
           <div className="mt-4 flex flex-col items-center gap-2">
             <StolenBasePlaque name={plate.name} number={plate.number} level={session.level} size={220} />
-            <p className="text-sm font-bold text-neon">Stolen Base Leader plaque earned for Baserunning IQ Level {session.level}.</p>
+            <p className="text-sm font-bold text-highlight">Stolen Base Leader plaque earned for Baserunning IQ Level {session.level}.</p>
           </div>
         )}
-        <p className="mt-3 text-4xl font-bold text-neon tabular-nums">
+        <p className="mt-3 text-4xl font-bold text-highlight tabular-nums">
           {result.correct}/{result.total} <span className="text-2xl text-muted">· {pct}%</span>
         </p>
         <p className="mt-2 text-sm">
@@ -797,7 +797,7 @@ export function IqTests({
         <div className="mt-4 flex justify-center">
           <MvpBadge label={mvpLabel(session)} size={96} />
         </div>
-        <p className="mt-3 text-3xl font-bold text-neon">Review complete · MVP</p>
+        <p className="mt-3 text-3xl font-bold text-highlight">Review complete · MVP</p>
         <p className="mt-2 text-sm">
           {right} of {total} right on the second try. {right === total ? "Every miss turned into a make." : "Read the explanations once more, then take the test again."}
         </p>
@@ -901,11 +901,11 @@ export function IqTests({
                             : "border-navy-600 hover:border-pink disabled:hover:border-navy-600"
                       }`}
                     >
-                      <span className={`font-mono font-bold ${isCorrect ? "text-neon" : isWrongPick ? "text-pink-soft" : "text-muted"}`}>
+                      <span className={`font-mono font-bold ${isCorrect ? "text-highlight" : isWrongPick ? "text-pink-soft" : "text-muted"}`}>
                         {LETTERS[i]}
                       </span>
                       <span>{choice}</span>
-                      {isCorrect && <span className="ml-auto font-bold text-neon">✓</span>}
+                      {isCorrect && <span className="ml-auto font-bold text-highlight">✓</span>}
                     </button>
                   </li>
                 );
@@ -913,7 +913,7 @@ export function IqTests({
             </ol>
             {feedback && (
               <div className="mt-4" aria-live="polite">
-                <p className={`font-bold ${feedback.correct ? "text-neon" : "text-pink-soft"}`}>{feedback.correct ? "Correct." : "Not quite."}</p>
+                <p className={`font-bold ${feedback.correct ? "text-highlight" : "text-pink-soft"}`}>{feedback.correct ? "Correct." : "Not quite."}</p>
                 {feedback.explanation && <p className="mt-1 text-sm text-ink/90">{feedback.explanation}</p>}
                 <button type="button" onClick={next} disabled={pending} className={`${buttonClass} mt-4`}>
                   {nextOpen(session.questions, session.done, session.index + 1) < session.questions.length

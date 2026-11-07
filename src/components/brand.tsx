@@ -33,7 +33,8 @@ export function Wordmark({ className = "" }: { className?: string }) {
 export function SiteFooter() {
   return (
     <footer className="mx-auto flex w-full max-w-5xl justify-end px-4 pt-10 pb-6">
-      <Link href="/" aria-label="GGG.Cafe home" className="opacity-90 transition hover:opacity-100">
+      {/* keep-night: in Day Game the wordmark sits on a navy chip (brand kit: artwork over navy) */}
+      <Link href="/" aria-label="GGG.Cafe home" className="keep-night rounded-xl bg-navy-950 px-3 py-2 opacity-90 transition hover:opacity-100">
         <Wordmark className="w-36 sm:w-44" />
       </Link>
     </footer>

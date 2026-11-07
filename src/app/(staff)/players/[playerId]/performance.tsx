@@ -70,7 +70,7 @@ export function PerformanceSummary({ summary }: { summary: Summary }) {
           {summary.streak.current > 0 && ` · ${summary.streak.current}-week streak`}
         </span>
         {latest.map((a) => (
-          <span key={a.def.key} className="rounded-md border border-neon/60 px-2 py-0.5 font-mono text-[11px] font-bold tracking-wider text-neon uppercase">
+          <span key={a.def.key} className="rounded-md border border-neon/60 px-2 py-0.5 font-mono text-[11px] font-bold tracking-wider text-highlight uppercase">
             {a.def.title}
           </span>
         ))}
@@ -90,7 +90,7 @@ export function HexBadge({ unlocked, pct }: { unlocked: boolean; pct: number }) 
         strokeLinejoin="round"
       />
       {unlocked ? (
-        <path d="m13 22.5 5 5 9-10" fill="none" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="stroke-navy-950" />
+        <path d="m13 22.5 5 5 9-10" fill="none" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="stroke-on-accent" />
       ) : (
         <text x="20" y="26" textAnchor="middle" className="fill-muted font-mono text-[10px] font-bold">
           {pct}%
@@ -110,7 +110,7 @@ function AchievementBadge({ a }: { a: AchievementProgress }) {
       <div className="flex items-start gap-2.5">
         <HexBadge unlocked={unlocked} pct={Math.round((a.current / a.target) * 100)} />
         <div className="min-w-0">
-          <p className={`text-sm font-bold ${unlocked ? "text-neon" : "text-ink"}`}>{a.def.title}</p>
+          <p className={`text-sm font-bold ${unlocked ? "text-highlight" : "text-ink"}`}>{a.def.title}</p>
           <p className="text-xs text-muted">{a.def.description}</p>
         </div>
       </div>
@@ -162,7 +162,7 @@ function RoutineCard({ r, today, canEdit }: { r: RoutineRow; today: string; canE
           </div>
         )}
       </div>
-      {r.details && <p className="mt-2 font-mono text-sm text-neon">{r.details}</p>}
+      {r.details && <p className="mt-2 font-mono text-sm text-highlight">{r.details}</p>}
       {r.drill?.description && <p className="mt-1.5 text-sm text-ink/85">{r.drill.description}</p>}
       {r.drill?.equipment && <p className="mt-1 text-xs text-muted">Equipment: {r.drill.equipment}</p>}
       {r.drill?.video_url && (
@@ -203,7 +203,7 @@ export function PerformanceDetail({
         {stats.map(([label, value]) => (
           <div key={label} className="rounded-xl border border-navy-700 p-3">
             <dt className="font-mono text-[11px] tracking-wider text-muted uppercase">{label}</dt>
-            <dd className="mt-1 text-2xl font-bold text-neon tabular-nums">{value}</dd>
+            <dd className="mt-1 text-2xl font-bold text-highlight tabular-nums">{value}</dd>
           </div>
         ))}
       </dl>

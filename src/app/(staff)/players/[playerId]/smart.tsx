@@ -90,7 +90,7 @@ function SmartGoalCard({
         </div>
         <span
           className={`rounded px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase ${
-            done ? "bg-neon text-navy-950" : "border border-pink text-pink-soft"
+            done ? "bg-neon text-on-accent" : "border border-pink text-pink-soft"
           }`}
         >
           {done ? `Achieved${goal.achieved_on ? ` ${short(goal.achieved_on)}` : ""}` : "In progress"}
@@ -100,7 +100,7 @@ function SmartGoalCard({
       <dl className="mt-4 grid gap-2">
         {rows.map(([letter, label, value]) => (
           <div key={letter} className="grid grid-cols-[1.75rem_1fr] gap-2">
-            <dt className="font-mono text-lg leading-6 font-bold text-neon" title={label}>
+            <dt className="font-mono text-lg leading-6 font-bold text-highlight" title={label}>
               {letter}
             </dt>
             <dd className="text-sm leading-6">
@@ -115,7 +115,7 @@ function SmartGoalCard({
         <div className="mt-4">
           <p className="text-xs text-muted">
             {p.name}: {p.latest !== null ? `latest ${p.latest} ${p.unit}` : "no measurement yet"} · target {p.target} {p.unit}
-            {p.reached && <span className="ml-1 font-semibold text-neon">Target reached</span>}
+            {p.reached && <span className="ml-1 font-semibold text-highlight">Target reached</span>}
           </p>
           {p.pct !== null && (
             <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-navy-800" aria-hidden>

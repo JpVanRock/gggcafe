@@ -50,7 +50,7 @@ export function TwisBoard({
       <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-pink via-pink to-neon" />
       <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 id="twis-title" className="text-4xl leading-none font-bold tracking-wide text-neon uppercase sm:text-5xl">
+          <h2 id="twis-title" className="text-4xl leading-none font-bold tracking-wide text-highlight uppercase sm:text-5xl">
             TWIS
           </h2>
           <p className="mt-2 font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">This Week in Softball</p>

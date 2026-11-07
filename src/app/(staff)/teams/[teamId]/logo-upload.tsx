@@ -80,7 +80,7 @@ export function LogoUpload({ teamId, logoUrl }: { teamId: string; logoUrl: strin
           )}
         </div>
         <p className="text-xs text-muted">PNG, JPG or WebP, up to 2 MB. A square image with a transparent background looks best.</p>
-        <p aria-live="polite" className={`min-h-4 text-xs ${error ? "text-danger" : "text-neon"}`}>
+        <p aria-live="polite" className={`min-h-4 text-xs ${error ? "text-danger" : "text-highlight"}`}>
           {error ?? status}
         </p>
       </div>

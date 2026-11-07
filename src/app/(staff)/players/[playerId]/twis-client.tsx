@@ -17,8 +17,8 @@ export type TwisCellView = {
 };
 
 const TAG_CLASS: Record<TwisItem["kind"], string> = {
-  game: "bg-neon text-navy-950",
-  event: "bg-pink text-navy-950",
+  game: "bg-neon text-on-accent",
+  event: "bg-pink text-on-accent",
   activity: "border border-navy-600 text-muted",
 };
 
@@ -50,7 +50,7 @@ export function TwisChecklist({ playerId, cells, canEdit }: { playerId: string; 
         <div className="h-2 flex-1 overflow-hidden rounded-full bg-navy-800" aria-hidden>
           <div className="h-full rounded-full bg-neon transition-all" style={{ width: `${items.length ? (done / items.length) * 100 : 0}%` }} />
         </div>
-        <p className="font-mono text-sm tabular-nums text-neon" aria-live="polite">
+        <p className="font-mono text-sm tabular-nums text-highlight" aria-live="polite">
           {done}/{items.length} done
         </p>
       </div>
@@ -63,7 +63,7 @@ export function TwisChecklist({ playerId, cells, canEdit }: { playerId: string; 
             className={`rounded-xl border p-3 ${cell.isToday ? "border-pink bg-pink/10" : "border-navy-700 bg-navy-950/40"}`}
           >
             <header className="flex items-baseline justify-between gap-2">
-              <span className="font-mono text-xs font-bold tracking-widest text-neon uppercase">{cell.label}</span>
+              <span className="font-mono text-xs font-bold tracking-widest text-highlight uppercase">{cell.label}</span>
               <span className="font-mono text-xs text-muted">{cell.isToday ? "Today" : cell.sublabel}</span>
             </header>
             {cell.items.length === 0 ? (

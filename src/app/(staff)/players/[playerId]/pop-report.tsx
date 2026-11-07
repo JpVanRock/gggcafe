@@ -129,7 +129,7 @@ export function PopDetail({ player, pop, canEdit }: { player: Player; pop: PopRe
                     <td className={tdClass}>{m.metric_name}</td>
                     <td className={tdClass}>{metricValue(m, m.latest_value)}</td>
                     <td className={tdClass}>{metricValue(m, m.best_value)}</td>
-                    <td className={`${tdClass} ${Number(m.improvement) > 0 ? "text-neon" : ""}`}>
+                    <td className={`${tdClass} ${Number(m.improvement) > 0 ? "text-highlight" : ""}`}>
                       {changeLabel(m)}
                     </td>
                     <td className={tdClass}>{m.latest_measured_on ? formatLongDate(m.latest_measured_on) : "–"}</td>
@@ -149,7 +149,7 @@ export function PopDetail({ player, pop, canEdit }: { player: Player; pop: PopRe
               <li key={e.area} className="rounded-lg border border-navy-700 p-3">
                 <div className="flex items-baseline justify-between">
                   <span className="text-sm capitalize">{e.area.replaceAll("_", " ")}</span>
-                  <span className="font-mono text-neon" aria-label={`${e.rating} out of 5`}>
+                  <span className="font-mono text-highlight" aria-label={`${e.rating} out of 5`}>
                     {"●".repeat(e.rating)}
                     <span className="text-navy-600">{"●".repeat(5 - e.rating)}</span>
                   </span>

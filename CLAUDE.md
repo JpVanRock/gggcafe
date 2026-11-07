@@ -139,9 +139,16 @@ like a sports brand or media-day graphics. Never childish or preschool.
   (`public/brand/elevate-together-yellow.png`, `<Tagline>` in `src/components/brand.tsx`; custom
   lighter Permanent Marker), never retype it in the font, never lock it up with a logo, don't
   stretch/outline/add effects/recolor. Sign-in page: logo 8.4rem, tagline, "Good Vibes Only".
-- Always dark. Use the tokens from `src/app/globals.css`, never zinc/gray or `dark:` classes:
+- Night Game (dark, default) / Day Game (white) switch at the top right (`src/components/theme-toggle.tsx`,
+  `html[data-theme="day"]`, saved in localStorage `ggg-theme`, applied before paint by a script in the
+  root layout). Day Game only re-maps tokens in `globals.css`, so use tokens by ROLE:
+  `text-highlight` for emphasis text (neon at night, navy by day; never `text-neon`),
+  `text-on-accent` for text on neon/pink fills (never `text-navy-950`), `bg-neon`/`bg-pink` for fills.
+  `keep-night` keeps a piece in night colors (the field diagram; navy chips behind the yellow tagline
+  and wordmark, which the brand kit approves only over navy). `day:` variant for Day-only tweaks.
+- Use the tokens from `src/app/globals.css`, never zinc/gray or `dark:` classes:
   `navy-950` page, `navy-900` cards, `navy-800` hover/inputs, `navy-700/600` borders,
-  `ink` text, `muted` secondary text, `neon` (logo yellow) primary buttons/titles/numbers,
+  `ink` text, `muted` secondary text, `neon` (brand yellow) primary-button fills, `highlight` titles/numbers,
   `pink` (logo pink) links/focus/selected/accents, `danger` errors.
 - Page titles: uppercase, letter-spaced, neon, with a short pink rule (see `PageHeader`).
 

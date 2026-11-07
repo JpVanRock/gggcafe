@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Jost, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { SiteFooter } from "@/components/brand";
+import { THEME_BOOT_SCRIPT } from "@/lib/theme";
 
 // Pairs with the logo's Montecatini Pro: a 1920s-style geometric sans with tabular figures.
 const jost = Jost({
@@ -30,7 +31,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${jost.variable} ${spaceMono.variable} h-full antialiased`}>
+    // suppressHydrationWarning: the boot script may set data-theme="day" before React loads
+    <html lang="en" className={`${jost.variable} ${spaceMono.variable} h-full antialiased`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+      </head>
       <body className="flex min-h-full flex-col">
         {children}
         <SiteFooter />

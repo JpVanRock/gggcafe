@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { signOut } from "@/app/auth/actions";
 import { secondaryButtonClass } from "@/components/ui";
 import { Logo } from "@/components/brand";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard" },
@@ -21,12 +22,13 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
           </Link>
           <nav className="flex gap-4 text-sm font-medium uppercase tracking-wider">
             {NAV.map((item) => (
-              <Link key={item.href} href={item.href} className="text-muted hover:text-neon">
+              <Link key={item.href} href={item.href} className="text-muted hover:text-highlight">
                 {item.label}
               </Link>
             ))}
           </nav>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-4">
+            <ThemeToggle />
             <Suspense fallback={null}>
               <UserMenu />
             </Suspense>

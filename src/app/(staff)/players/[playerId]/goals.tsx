@@ -62,11 +62,11 @@ function OpenWindow64({ chart }: { chart: HaradaChart }) {
             <div key={block} className="grid grid-cols-3 gap-0.5 rounded-lg bg-pink/25 p-0.5">
               {Array.from({ length: 9 }, (_, cell) =>
                 cell === 4 ? (
-                  <Cell key={cell} className="bg-neon font-bold text-navy-950">
+                  <Cell key={cell} className="bg-neon font-bold text-on-accent">
                     {chart.main_goal}
                   </Cell>
                 ) : (
-                  <Cell key={cell} className="bg-navy-800 font-semibold text-neon">
+                  <Cell key={cell} className="bg-navy-800 font-semibold text-highlight">
                     {pillarAt(cell)?.title}
                   </Cell>
                 ),
@@ -80,14 +80,14 @@ function OpenWindow64({ chart }: { chart: HaradaChart }) {
             {Array.from({ length: 9 }, (_, cell) => {
               if (cell === 4) {
                 return (
-                  <Cell key={cell} className="bg-navy-700 font-semibold text-neon">
+                  <Cell key={cell} className="bg-navy-700 font-semibold text-highlight">
                     {pillar?.title}
                   </Cell>
                 );
               }
               const action = pillar?.actions.find((a) => a.position === RING.indexOf(cell) + 1);
               return (
-                <Cell key={cell} className={action?.done_on ? "bg-neon/15 text-neon" : "bg-navy-950/70 text-ink"}>
+                <Cell key={cell} className={action?.done_on ? "bg-neon/15 text-highlight" : "bg-navy-950/70 text-ink"}>
                   {action && (
                     <span>
                       {action.title}
@@ -124,7 +124,7 @@ export function GoalsDetail({ playerId, chart, canEdit }: { playerId: string; ch
     <div className="flex flex-col gap-8">
       <section>
         <DetailHeading>Main goal</DetailHeading>
-        <p className="text-2xl leading-snug font-semibold text-neon">{chart.main_goal}</p>
+        <p className="text-2xl leading-snug font-semibold text-highlight">{chart.main_goal}</p>
         {chart.purpose && <p className="mt-3 max-w-3xl whitespace-pre-wrap text-ink/90">{chart.purpose}</p>}
         <p className="mt-3 font-mono text-xs tracking-wider text-muted uppercase">
           {chart.target_date && `Target ${formatLongDate(chart.target_date)} · `}
@@ -147,7 +147,7 @@ export function GoalsDetail({ playerId, chart, canEdit }: { playerId: string; ch
               <div key={p.id} className="rounded-xl border border-navy-700 bg-navy-950/40 p-4">
                 <div className="flex items-baseline justify-between gap-3">
                   <h4 className="font-semibold">{p.title}</h4>
-                  <span className="font-mono text-sm text-neon tabular-nums">
+                  <span className="font-mono text-sm text-highlight tabular-nums">
                     {p.actions.filter((a) => a.done_on).length}/{p.actions.length}
                   </span>
                 </div>

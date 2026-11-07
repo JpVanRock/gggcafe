@@ -157,7 +157,7 @@ export function TrophyRoomDetail({ room }: { room: TrophyRoom }) {
               <li key={a.def.key} className="flex items-start gap-2.5 rounded-xl border border-neon/60 bg-neon/5 p-3">
                 <HexBadge unlocked pct={100} />
                 <div className="min-w-0">
-                  <p className="text-sm font-bold text-neon">{a.def.title}</p>
+                  <p className="text-sm font-bold text-highlight">{a.def.title}</p>
                   <p className="text-xs text-muted">{a.def.description}</p>
                 </div>
               </li>

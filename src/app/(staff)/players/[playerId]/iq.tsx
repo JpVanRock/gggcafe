@@ -268,7 +268,7 @@ export function IqDetail({
                 <p className="font-mono text-[11px] tracking-wider text-pink-soft uppercase">{topicLabel(q)}</p>
                 <p className="mt-1 text-ink/80 italic">{q.scenario}</p>
                 <p className="mt-1 font-semibold">{q.question}</p>
-                <p className="mt-2 text-neon">✓ {q.choices[q.correct_index]}</p>
+                <p className="mt-2 text-highlight">✓ {q.choices[q.correct_index]}</p>
                 {q.explanation && <p className="mt-1 text-xs text-muted">{q.explanation}</p>}
               </li>
             ))}
@@ -293,7 +293,7 @@ export function IqDetail({
                       </p>
                       <p className="mt-1 text-sm">{q.scenario}</p>
                       <p className="text-sm font-semibold">{q.question}</p>
-                      <p className="mt-1 text-xs text-neon">✓ {q.choices[q.correct_index]}</p>
+                      <p className="mt-1 text-xs text-highlight">✓ {q.choices[q.correct_index]}</p>
                     </div>
                     <form action={setIqQuestionActive}>
                       <input type="hidden" name="id" value={q.id} />
