@@ -88,16 +88,17 @@ async function Dashboard() {
             {waiting.map((w) => (
               <li key={w.team_id} className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
                 <span className="font-semibold">{w.team_name}</span>
-                {Number(w.player_claims) > 0 && (
-                  <Link href={`/teams/${w.team_id}#claims`} className="text-pink hover:underline">
-                    {w.player_claims} player claim{Number(w.player_claims) === 1 ? "" : "s"} →
-                  </Link>
-                )}
-                {Number(w.parent_requests) > 0 && (
-                  <Link href={`/dugout/parents?team=${w.team_id}`} className="text-pink hover:underline">
-                    {w.parent_requests} parent request{Number(w.parent_requests) === 1 ? "" : "s"} →
-                  </Link>
-                )}
+                <span className="text-muted">
+                  {[
+                    Number(w.player_claims) > 0 && `${w.player_claims} player claim${Number(w.player_claims) === 1 ? "" : "s"}`,
+                    Number(w.parent_requests) > 0 && `${w.parent_requests} parent request${Number(w.parent_requests) === 1 ? "" : "s"}`,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </span>
+                <Link href={`/dugout/roster?team=${w.team_id}#waiting`} className="text-pink hover:underline">
+                  Review in Roster →
+                </Link>
               </li>
             ))}
           </ul>

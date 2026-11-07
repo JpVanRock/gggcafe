@@ -141,6 +141,14 @@ tests/unit/              node --test unit tests (npm run test:unit)
   player can only add rows in her own name; history shows who changed what).
 - Pop Report coach notes (players.notes) are shown to coaches only.
 
+## Dugout Roster tab (`/dugout/roster`)
+- "Waiting for approval" first (player claims + parent requests for the team, approve/decline in place),
+  then the season's roster with each player's account status (Claimed / Waiting) and approved parents,
+  then player accounts (remove access). Player intake button. The Roster tab, the Dugout nav link and
+  the dashboard card show the waiting count (`pending_approvals()`). Shared pieces:
+  `src/lib/approvals.ts` (loadTeamApprovals) and `dugout/approvals.tsx` (also used by the team page and
+  the Parents tab).
+
 ## Player accounts (claims) — user's choices: full edit, find her spot by name + jersey
 - Teams have a coach `welcome_message` (team form). Players sign up at `/register` (Player/Parent toggle;
   players pick their team from `signup_teams()`), then `/me` shows the welcome message and "Claim my
@@ -164,7 +172,7 @@ tests/unit/              node --test unit tests (npm run test:unit)
 - DB tests: `tests/db/players.test.sql`.
 
 ## Coaches Dugout (`/dugout`, nav "Dugout")
-- Header tabs (`dugout/tabs.tsx`): Standards & Culture (`/dugout`), Calendar (`/dugout/calendar`),
+- Header tabs (`dugout/tabs.tsx`): Standards & Culture (`/dugout`), Roster (`/dugout/roster`), Calendar (`/dugout/calendar`),
   Practice Plans (`/dugout/plans`), GameDay Prep (`/dugout/gameday`), Drill Library (`/dugout/drills`),
   Team Budget (`/dugout/budget`), Parents (`/dugout/parents`).
 - GameDay Prep (from the user's Lineup + Defensive Rotations tabs): season player cards

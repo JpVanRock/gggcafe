@@ -5,12 +5,12 @@ import { Suspense } from "react";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Card, EmptyState, Loading, buttonClass, inputClass, pillQuietClass, secondaryButtonClass } from "@/components/ui";
-import { formatDay } from "@/lib/dates";
-import { compareJersey } from "@/lib/softball";
+import { Card, EmptyState, Loading, buttonClass, pillQuietClass } from "@/components/ui";
 import { loadOwnTeams } from "../data";
 import { TeamPicker } from "../team-picker";
-import { decideParentLink, removeParentLink, setParentCode } from "./actions";
+import { removeParentLink, setParentCode } from "./actions";
+import { PendingParentList } from "../approvals";
+import { loadTeamApprovals } from "@/lib/approvals";
 
 export const metadata: Metadata = { title: "Parents · Coaches Dugout · GGG.Cafe" };
 
@@ -22,22 +22,6 @@ export default function ParentsPage({ searchParams }: PageProps<"/dugout/parents
   );
 }
 
-type LinkRow = {
-  link_id: string;
-  parent_name: string;
-  email: string | null;
-  child_name: string;
-  player_id: string | null;
-  status: "pending" | "approved" | "declined";
-  requested_at: string;
-};
-type RosterRow = {
-  jersey_number: string | null;
-  season: { start_date: string | null } | null;
-  player: { id: string; first_name: string; last_name: string; preferred_name: string | null } | null;
-};
-
-const norm = (s: string) => s.toLowerCase().replace(/[^a-z]/g, "");
 
 async function Parents({ searchParams }: Pick<PageProps<"/dugout/parents">, "searchParams">) {
   const user = await requireStaffPage();
@@ -70,37 +54,14 @@ async function Parents({ searchParams }: Pick<PageProps<"/dugout/parents">, "sea
   const host = h.get("x-forwarded-host") ?? h.get("host") ?? "gggcafe.vercel.app";
   const signUpUrl = `${host.startsWith("localhost") ? "http" : "https"}://${host}/register`;
 
-  const [codeResult, linksResult, rosterResult] = await Promise.all([
+  const [codeResult, approvals] = await Promise.all([
     supabase.from("teams").select("parent_code").eq("id", team.id).maybeSingle(),
-    supabase.rpc("team_parent_links", { p_team_id: team.id }),
-    supabase
-      .from("roster_entries")
-      .select("jersey_number, season:seasons(start_date), player:players(id, first_name, last_name, preferred_name)")
-      .eq("team_id", team.id)
-      .eq("active", true),
+    loadTeamApprovals(supabase, team.id),
   ]);
   const code = (codeResult.data?.parent_code as string | null) ?? null;
-  const links = (linksResult.data ?? []) as LinkRow[];
-
-  // Players to match requests to: the team's active roster, latest season first, once each.
-  const seen = new Set<string>();
-  const players = ((rosterResult.data ?? []) as unknown as RosterRow[])
-    .filter((r) => r.player)
-    .sort(
-      (a, b) =>
-        (b.season?.start_date ?? "").localeCompare(a.season?.start_date ?? "") || compareJersey(a.jersey_number, b.jersey_number),
-    )
-    .filter((r) => !seen.has(r.player!.id) && seen.add(r.player!.id))
-    .map((r) => ({
-      id: r.player!.id,
-      label: `${r.jersey_number ? `#${r.jersey_number} ` : ""}${r.player!.preferred_name || r.player!.first_name} ${r.player!.last_name}`,
-      keys: [
-        norm(`${r.player!.first_name}${r.player!.last_name}`),
-        norm(`${r.player!.preferred_name ?? ""}${r.player!.last_name}`),
-      ],
-    }));
+  const links = approvals.parentLinks;
+  const players = approvals.parentPlayers;
   const nameOf = new Map(players.map((p) => [p.id, p.label]));
-  const guess = (child: string) => players.find((p) => p.keys.includes(norm(child)))?.id ?? "";
 
   const pending = links.filter((l) => l.status === "pending");
   const approved = links.filter((l) => l.status === "approved");
@@ -158,37 +119,7 @@ async function Parents({ searchParams }: Pick<PageProps<"/dugout/parents">, "sea
         {pending.length === 0 ? (
           <EmptyState>No requests waiting.</EmptyState>
         ) : (
-          <ul className="flex flex-col gap-3">
-            {pending.map((l) => (
-              <li key={l.link_id} className="rounded-xl border border-pink/50 bg-navy-950/40 p-4">
-                <p className="font-semibold">
-                  {l.parent_name} <span className="font-normal text-muted">· {l.email}</span>
-                </p>
-                <p className="mt-0.5 text-sm text-muted">
-                  Daughter: <span className="text-ink">{l.child_name}</span> · asked {formatDay(l.requested_at.slice(0, 10))}
-                </p>
-                <form action={decideParentLink} className="mt-3 flex flex-wrap items-center gap-2">
-                  <input type="hidden" name="link_id" value={l.link_id} />
-                  <select name="player_id" required defaultValue={guess(l.child_name)} aria-label={`Which player is ${l.child_name}?`} className={`${inputClass} max-w-xs`}>
-                    <option value="" disabled>
-                      Which player is she?
-                    </option>
-                    {players.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.label}
-                      </option>
-                    ))}
-                  </select>
-                  <button type="submit" name="decision" value="approve" className={buttonClass}>
-                    Approve
-                  </button>
-                  <button type="submit" name="decision" value="decline" formNoValidate className={secondaryButtonClass}>
-                    Decline
-                  </button>
-                </form>
-              </li>
-            ))}
-          </ul>
+          <PendingParentList links={pending} players={players} />
         )}
       </Card>
 

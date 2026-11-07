@@ -15,7 +15,8 @@ import { ConfirmSubmit } from "@/components/confirm-submit";
 import { addDays, formatDay, formatTime, todayISO } from "@/lib/dates";
 import { deleteTeamEvent, removeFromRoster } from "../actions";
 import { LogoUpload } from "./logo-upload";
-import { ClaimsCard, type ClaimRow, type SpotOption } from "./claims";
+import { ClaimsCard } from "./claims";
+import { loadTeamApprovals, type ClaimRow, type SpotOption } from "@/lib/approvals";
 import {
   ExistingRosterPlayerForm, GameForm, NewRosterPlayerForm, RosterEntryEditor, SeasonForm, TeamEventForm, TeamForm,
 } from "../forms";
@@ -92,22 +93,9 @@ async function TeamContent({
   }
 
   // Players' account claims (coaches only, our teams)
-  let claims: ClaimRow[] = [];
-  let spots: SpotOption[] = [];
-  if (editor && team.is_own_team) {
-    const [claimsResult, spotsResult] = await Promise.all([
-      supabase.rpc("team_player_claims", { p_team_id: team.id }),
-      supabase
-        .from("roster_entries")
-        .select("id, season_id, jersey_number, player:players(first_name, last_name, preferred_name)")
-        .eq("team_id", team.id),
-    ]);
-    claims = (claimsResult.data ?? []) as ClaimRow[];
-    spots = ((spotsResult.data ?? []) as unknown as { id: string; season_id: string; jersey_number: string | null; player: Pick<Player, "first_name" | "last_name" | "preferred_name"> | null }[])
-      .filter((r) => r.player)
-      .map((r) => ({ id: r.id, season_id: r.season_id, label: `${r.jersey_number ? `#${r.jersey_number} ` : ""}${playerName(r.player!)}` }))
-      .sort((a, b) => a.label.localeCompare(b.label, undefined, { numeric: true }));
-  }
+  const approvals = editor && team.is_own_team ? await loadTeamApprovals(supabase, team.id) : null;
+  const claims: ClaimRow[] = approvals?.claims ?? [];
+  const spots: SpotOption[] = approvals?.spots ?? [];
   const claimOf = new Map(claims.filter((c) => c.roster_entry_id && c.status !== "declined").map((c) => [c.roster_entry_id!, c.status]));
 
   // Schedule: the next 8 weeks of practices/events and games
@@ -288,7 +276,7 @@ async function TeamContent({
         </Card>
       )}
 
-      {editor && team.is_own_team && <ClaimsCard claims={claims} spots={spots} />}
+      {editor && team.is_own_team && <ClaimsCard teamId={team.id} claims={claims} spots={spots} />}
 
       {team.is_own_team && (
         <Card title="Schedule (next 8 weeks)">
