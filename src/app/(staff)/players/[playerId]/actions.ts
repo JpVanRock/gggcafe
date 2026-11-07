@@ -607,7 +607,7 @@ export async function answerIqLevelQuestion(input: {
   return { error: null, correct, correctIndex: q.correct_index, explanation: q.explanation };
 }
 
-/** Grades a test; 80%+ earns the award (ring, Golden Glove, or World Series Trophy). A perfect score earns the MVP badge too. */
+/** Grades a test; 80%+ earns the award (ring, Golden Glove, or Champions Trophy). A perfect score earns the MVP badge too. */
 export async function finishIqLevel(input: {
   attemptId: string;
 }): Promise<{ error: string | null; correct?: number; total?: number; passed?: boolean; awardEarned?: boolean }> {

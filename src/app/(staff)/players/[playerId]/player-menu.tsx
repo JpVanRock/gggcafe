@@ -10,7 +10,7 @@ import { GoalsDetail, GoalsSummary } from "./goals";
 import { IqDetail, IqSummary, buildLibrary, buildPositions, buildQuizzes, buildTracks } from "./iq";
 import { TrophyRoomDetail, TrophyRoomSummary, buildTrophyRoom } from "./trophy-room";
 import { StolenBasePlaque } from "@/components/stolen-base-plaque";
-import { WorldSeriesTrophy } from "@/components/world-series-trophy";
+import { ChampionsTrophy } from "@/components/champions-trophy";
 import { RingCase } from "@/components/rings";
 import { GoldenGlove } from "@/components/golden-glove";
 import { MentalDetail, MentalSummary } from "./mental";
@@ -172,9 +172,8 @@ export function PlayerMenu({
             {name} <span className="text-ink">{player.last_name}</span>
           </h1>
           {tagline && <p className="mx-auto mt-4 max-w-2xl font-mono text-sm text-muted">{tagline}</p>}
-          {(iq.rings.length > 0 || iq.gloves.length > 0 || room.worldSeriesOn) && (
+          {(iq.rings.length > 0 || iq.gloves.length > 0 || room.championsOn) && (
             <div className="mt-6 flex flex-wrap items-end justify-center gap-6" aria-label="Trophies, rings and Golden Gloves">
-              {room.worldSeriesOn && <WorldSeriesTrophy size={56} />}
               {room.plaques
                 .filter((p) => p.earnedOn)
                 .map((p) => (
@@ -186,6 +185,7 @@ export function PlayerMenu({
                 .map((p) => (
                   <GoldenGlove key={p.position} name={plate.name} number={plate.number} position={p.label} engrave={false} size={72} />
                 ))}
+              {room.championsOn && <ChampionsTrophy size={52} />}
             </div>
           )}
         </div>

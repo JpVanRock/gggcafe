@@ -117,14 +117,14 @@ export function buildPositions(iq: IqData, mine: Position[]): PositionInfo[] {
   });
 }
 
-/** The Extra Credit Library: shelves, her runs, and the World Series Trophy. */
+/** The Extra Credit Library: shelves, her runs, and the Champions Trophy. */
 export function buildLibrary(iq: IqData): LibraryInfo {
   const questions = iq.questions.filter((q) => q.active && q.track === "extra");
   const shelves = new Map<string, number>();
   for (const q of questions) shelves.set(q.section ?? "Library", (shelves.get(q.section ?? "Library") ?? 0) + 1);
   return {
     shelves: [...shelves].map(([name, count]) => ({ name, count })).sort((a, b) => a.name.localeCompare(b.name)),
-    trophyEarnedOn: iq.worldSeries ? formatLongDate(iq.worldSeries.earned_on) : null,
+    trophyEarnedOn: iq.championsTrophy ? formatLongDate(iq.championsTrophy.earned_on) : null,
     ...testState(iq, iq.attempts.filter((a) => a.track === "extra"), questions.length),
   };
 }

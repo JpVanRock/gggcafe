@@ -1,12 +1,13 @@
-// The GGG World Series Trophy: earned by answering every Extra Credit Library
+// The GGG Champions Trophy: earned by answering every Extra Credit Library
 // question in one run with 80%+. The art is the user's render, cut out of its
 // white background; the blurred reflection streak on the base was repainted and
-// the bottom gold plinth redrawn crisp (public/awards/world-series-trophy.webp).
+// the bottom gold plinth redrawn crisp, and the band's "WORLD SERIES" re-lettered
+// "CHAMPIONS" (public/awards/champions-trophy.webp).
 // Works in server and client components.
 import Image from "next/image";
-import art from "../../public/awards/world-series-trophy.webp";
+import art from "../../public/awards/champions-trophy.webp";
 
-export function WorldSeriesTrophy({
+export function ChampionsTrophy({
   earned = true,
   size = 200,
   className = "",
@@ -16,7 +17,7 @@ export function WorldSeriesTrophy({
   size?: number;
   className?: string;
 }) {
-  const label = `GGG World Series Trophy${earned ? "" : ", not earned yet"}`;
+  const label = `GGG Champions Trophy${earned ? "" : ", not earned yet"}`;
   return (
     <Image
       src={art}

@@ -390,6 +390,7 @@ export async function loadIq(supabase: Supabase, playerId: string) {
     supabase.from("player_rings").select("track, level, earned_on").eq("player_id", playerId),
     supabase.from("player_golden_gloves").select("position, earned_on").eq("player_id", playerId),
     supabase.from("player_mvp_badges").select("track, level, position, earned_on").eq("player_id", playerId).order("earned_on"),
+    // the GGG Champions Trophy (table named for its original "World Series" name)
     supabase.from("player_world_series_trophies").select("earned_on").eq("player_id", playerId).maybeSingle(),
     supabase
       .from("iq_level_attempts")
@@ -403,7 +404,7 @@ export async function loadIq(supabase: Supabase, playerId: string) {
     rings: (ringsResult.data ?? []) as { track: "defense" | "baserunning"; level: number; earned_on: string }[],
     gloves: (glovesResult.data ?? []) as { position: FieldPosition; earned_on: string }[],
     mvps: (mvpResult.data ?? []) as { track: IqTrack; level: number; position: FieldPosition | null; earned_on: string }[],
-    worldSeries: (trophyResult.data ?? null) as { earned_on: string } | null,
+    championsTrophy: (trophyResult.data ?? null) as { earned_on: string } | null,
     attempts: (attemptsResult.data ?? []) as IqAttempt[],
   };
 }

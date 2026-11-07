@@ -8,7 +8,7 @@ import { Diamond, type DiamondSpec } from "@/components/diamond";
 import { Ring, TRACK_LABEL, type RingTrack } from "@/components/rings";
 import { GoldenGlove } from "@/components/golden-glove";
 import { MvpBadge } from "@/components/mvp-badge";
-import { WorldSeriesTrophy } from "@/components/world-series-trophy";
+import { ChampionsTrophy } from "@/components/champions-trophy";
 import { StolenBasePlaque } from "@/components/stolen-base-plaque";
 import { DetailHeading } from "./menu";
 import { useRouter } from "next/navigation";
@@ -558,16 +558,16 @@ function LibraryPicker({ library, actions }: { library: LibraryInfo; actions: Ac
   return (
     <div className="rounded-xl border border-navy-700 bg-navy-950/40 p-4">
       <div className="flex flex-wrap items-center gap-4">
-        <WorldSeriesTrophy earned={Boolean(library.trophyEarnedOn)} size={110} />
+        <ChampionsTrophy earned={Boolean(library.trophyEarnedOn)} size={110} />
         <div className="min-w-56 flex-1">
           <p className="text-sm text-muted">
             {total
-              ? `${total} questions on the playbook topics the tests don't cover, on ${library.shelves.length} shelves. Work through them in any order, as many at a time as you like, with a hint whenever you want one. Answer every question in a run with ${PASS_PCT}% or better (${needed(total)} of ${total}) to earn the GGG World Series Trophy.`
+              ? `${total} questions on the playbook topics the tests don't cover, on ${library.shelves.length} shelves. Work through them in any order, as many at a time as you like, with a hint whenever you want one. Answer every question in a run with ${PASS_PCT}% or better (${needed(total)} of ${total}) to earn the GGG Champions Trophy.`
               : "The library's questions are on their way."}
           </p>
           <p className="mt-2 text-xs text-muted">
             {library.trophyEarnedOn
-              ? `GGG World Series Trophy earned ${library.trophyEarnedOn}`
+              ? `GGG Champions Trophy earned ${library.trophyEarnedOn}`
               : library.best
                 ? `Best run ${library.best.correct}/${library.best.total}. Needs ${PASS_PCT}%.`
                 : "No runs yet."}
@@ -725,7 +725,7 @@ export function IqTests({
     const missed = result.total - result.correct;
     const position = session.track === "position" ? POSITION_LABEL[session.position!] : null;
     const extra = session.track === "extra";
-    const award = position ? "Golden Glove" : extra ? "GGG World Series Trophy" : "championship ring";
+    const award = position ? "Golden Glove" : extra ? "GGG Champions Trophy" : "championship ring";
     const perfect = result.total > 0 && result.correct === result.total;
     return (
       <div className={`rounded-xl border p-6 text-center ${result.passed ? "border-neon bg-neon/10" : "border-pink/60 bg-pink/5"}`}>
@@ -735,7 +735,7 @@ export function IqTests({
             {position ? (
               <GoldenGlove name={plate.name} number={plate.number} position={position} year={new Date().getFullYear()} size={300} />
             ) : extra ? (
-              <WorldSeriesTrophy size={240} />
+              <ChampionsTrophy size={240} />
             ) : (
               <Ring track={session.track as RingTrack} level={session.level} earned size={150} />
             )}
@@ -756,7 +756,7 @@ export function IqTests({
               ? position
                 ? `${position} Golden Glove earned.`
                 : extra
-                  ? "Every library question answered at 80% or better. The GGG World Series Trophy is yours."
+                  ? "Every library question answered at 80% or better. The GGG Champions Trophy is yours."
                   : `Level ${session.level} passed. Championship ring earned${session.level < 3 ? `, and Level ${session.level + 1} is unlocked` : ""}.`
               : `Passed again. The ${award} is already in the case.`
             : `${PASS_PCT}% earns the ${award} (${needed(result.total)} of ${result.total}).`}
@@ -966,7 +966,7 @@ export function IqTests({
         <PositionPicker positions={positions} plate={plate} actions={actions} />
       </section>
       <section>
-        <DetailHeading>Extra Credit Library · GGG World Series Trophy</DetailHeading>
+        <DetailHeading>Extra Credit Library · GGG Champions Trophy</DetailHeading>
         <LibraryPicker library={library} actions={actions} />
       </section>
       {error && (

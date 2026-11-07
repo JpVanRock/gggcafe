@@ -75,14 +75,16 @@ tests/unit/              node --test unit tests (npm run test:unit)
   on shelves (`iq_questions.section`, e.g. "Defense · Vocabulary"). One run deals the whole
   library; she answers in any order (shelf chips), with a hint on any question (`hint_used`), and
   progress saves. A run is graded only once every question is answered (`finish_iq_level` raises
-  P0003 before that); 80%+ earns the GGG World Series Trophy (`player_world_series_trophies`).
+  P0003 before that); 80%+ earns the GGG Champions Trophy (table `player_world_series_trophies`, named for its
+  original "World Series" name; the user renamed it).
 - MVP badge (`player_mvp_badges`, one per test): earned when `iq_review_status` finds every missed
   question answered again, or outright for a perfect score. Drawn by `src/components/mvp-badge.tsx`.
 - Stolen Base Leader plaques: one per Baserunning IQ level, earned with that level's ring (no table).
   `src/components/stolen-base-plaque.tsx` engraves name and number on the gold bar, with
   "BASERUNNING IQ · LEVEL n · {Rookie|Varsity|All-American}" beneath.
-- Trophy Room (`trophy-room.tsx`, last menu board, `trophy` board variant): World Series Trophy,
-  plaque, rings, Golden Gloves, MVP badges and Performance Training achievements; unearned ones dim.
+- Trophy Room (`trophy-room.tsx`, last menu board, `trophy` board variant), shelves top to bottom:
+  championship rings, Stolen Base Leader plaques, Golden Gloves, MVP badges, Performance Training
+  achievements, then the GGG Champions Trophy at the bottom (user's order). Unearned ones dim.
 - Question source of truth: `supabase/iq/{defense,baserunning,positions,extra}.json`. After editing,
   generate a NEW migration with `scripts/iq/build-playbook-migration.py` (validates everything,
   slugs each question `{track}-{level}-{nn}` / `position-{pos}-{nn}` and upserts on the slug, so
@@ -95,7 +97,7 @@ tests/unit/              node --test unit tests (npm run test:unit)
   test, "Review missed" re-asks each missed question once (`iq_answers.review_of`, `hint_used`
   when she asked for the hint); `iq_review_status` sets `reviewed_at` once all are done.
 - Award art is the user's own renders, cut out to transparent WebP in `public/awards/`:
-  `world-series-trophy.webp`, `stolen-base-plaque.webp` (acrylic made see-through),
+  `champions-trophy.webp` (band re-lettered CHAMPIONS), `stolen-base-plaque.webp` (acrylic see-through),
   `championship-ring.webp` (the GGG championship ring, reflection removed; every ring uses it,
   unearned ones dimmed gray; `src/components/rings.tsx`) and `golden-glove.webp` (trophy;
   `src/components/golden-glove.tsx` engraves her name, number, position and year on the gold plate
