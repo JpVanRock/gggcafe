@@ -3,6 +3,9 @@
 
 export const POSITIONS = ["P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DP", "FLEX", "EH"] as const;
 export type Position = (typeof POSITIONS)[number];
+/** The nine positions on the field (no DP/FLEX/EH): position IQ tests and Golden Gloves. */
+export const FIELD_POSITIONS = ["P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"] as const satisfies readonly Position[];
+export type FieldPosition = (typeof FIELD_POSITIONS)[number];
 export const POSITION_LABEL: Record<Position, string> = {
   P: "Pitcher",
   C: "Catcher",
@@ -40,6 +43,7 @@ export type Team = {
   is_own_team: boolean;
   home_field: string | null;
   notes: string | null;
+  logo_url: string | null;
 };
 
 export type Season = {

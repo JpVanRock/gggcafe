@@ -281,3 +281,28 @@ export async function addGame(_prev: FormState, fd: FormData): Promise<FormState
   refresh();
   return { error: null, saved: true };
 }
+
+// ---------------------------------------------------------------------------
+// Team logo (shown on the team page)
+// ---------------------------------------------------------------------------
+
+const LOGO_PATH = /^[0-9a-f-]{36}\/\d+\.(png|jpg|jpeg|webp)$/i;
+
+/** Saves (or clears) the team's logo after the browser has uploaded it to Storage. */
+export async function setTeamLogo(input: { teamId: string; path: string | null }): Promise<{ error: string | null }> {
+  const denied = await editorCheck();
+  if (denied) return { error: denied };
+  if (!isUuid(input.teamId)) return { error: "Unknown team." };
+  if (input.path !== null && (!LOGO_PATH.test(input.path) || !input.path.startsWith(`${input.teamId}/`))) {
+    return { error: "That upload doesn't belong to this team." };
+  }
+
+  const supabase = await createClient();
+  const logo_url = input.path ? supabase.storage.from("team-logos").getPublicUrl(input.path).data.publicUrl : null;
+  const { data, error } = await supabase.from("teams").update({ logo_url }).eq("id", input.teamId).select("id");
+  if (error) return { error: friendlyDbError(error) };
+  if (!data?.length) return { error: "That team no longer exists, or you can't edit it." };
+
+  refresh();
+  return { error: null };
+}

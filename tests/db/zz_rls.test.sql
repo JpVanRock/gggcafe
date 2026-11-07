@@ -60,6 +60,31 @@ do $$ begin
   raise exception 'FAIL: viewer could tick a TWIS box';
 exception when insufficient_privilege then null;
 end $$;
+do $$ begin
+  perform public.start_iq_level('00000000-0000-0000-0000-0000000000c4', 'defense', 1::smallint);
+  raise exception 'FAIL: viewer could start an IQ level test';
+exception when insufficient_privilege then null;
+end $$;
+do $$ begin
+  insert into public.player_golden_gloves (player_id, position) values ('00000000-0000-0000-0000-0000000000c4', 'SS');
+  raise exception 'FAIL: viewer could award a Golden Glove';
+exception when insufficient_privilege then null;
+end $$;
+do $$ begin
+  insert into public.player_mvp_badges (player_id, track, level) values ('00000000-0000-0000-0000-0000000000c4', 'defense', 1);
+  raise exception 'FAIL: viewer could award an MVP badge';
+exception when insufficient_privilege then null;
+end $$;
+do $$ begin
+  insert into public.player_world_series_trophies (player_id) values ('00000000-0000-0000-0000-0000000000c4');
+  raise exception 'FAIL: viewer could award the World Series Trophy';
+exception when insufficient_privilege then null;
+end $$;
+do $$ begin
+  insert into storage.objects (bucket_id, name) values ('team-logos', 'viewer/logo.png');
+  raise exception 'FAIL: viewer could upload a team logo';
+exception when insufficient_privilege then null;
+end $$;
 update public.teams set notes = 'viewer edit';
 select pg_temp.expect('viewer update had no effect',
   (select count(*) from public.teams where notes = 'viewer edit'), 0::bigint);
@@ -75,6 +100,18 @@ select pg_temp.expect('coach can save a Harada chart',
 select pg_temp.expect('coach chart created_by is the coach',
   (select created_by from public.harada_plans where player_id = '00000000-0000-0000-0000-0000000000c4'),
   '11111111-0000-0000-0000-000000000002'::uuid);
+do $$
+declare n int;
+begin
+  insert into storage.objects (bucket_id, name) values ('team-logos', 'team/logo.png');
+  get diagnostics n = row_count;
+  perform pg_temp.expect('coach uploaded a team logo', n, 1);
+end $$;
+do $$ begin
+  insert into storage.objects (bucket_id, name) values ('some-other-bucket', 'x.png');
+  raise exception 'FAIL: coach could write to another bucket';
+exception when insufficient_privilege or foreign_key_violation then null;
+end $$;
 select pg_temp.expect('coach note author defaults to the coach',
   (select author_id from public.coach_notes where note like 'Quicker transfer%'),
   '11111111-0000-0000-0000-000000000002'::uuid);

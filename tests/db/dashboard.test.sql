@@ -166,3 +166,273 @@ end $$;
 insert into public.iq_answers (player_id, question_id, chosen_index, is_correct)
 select '00000000-0000-0000-0000-0000000000c1', id, 1, true from public.iq_questions where topic = 'general' limit 1;
 select pg_temp.expect('answer recorded', (select count(*) from public.iq_answers), 1::bigint);
+
+-- IQ levels and rings ---------------------------------------------------------
+-- The real playbook questions are seeded by migration; set them aside so these
+-- checks run on a known set: 5 Level 1 defense questions (answer always index 0) and 1 Level 2.
+select pg_temp.expect('playbook questions seeded: 20-30 active in each of the 6 levels (30 is the cap)',
+  (select count(*) filter (where n between 20 and 30)
+     from (select track, level, count(*) n from public.iq_questions
+            where track in ('defense', 'baserunning') and active group by 1, 2) t), 6::bigint);
+select pg_temp.expect('position questions seeded: 21 active per fielding position',
+  (select string_agg(position || ':' || n, ',' order by position)
+     from (select position::text, count(*) n from public.iq_questions where track = 'position' and active group by 1) t),
+  '1B:21,2B:21,3B:21,C:21,CF:21,LF:21,P:21,RF:21,SS:21');
+select pg_temp.expect('Extra Credit Library seeded: questions on both playbooks, each on a shelf with a hint',
+  (select count(distinct split_part(section, ' · ', 1)) || ':' || bool_and(coalesce(hint, '') <> '' and slug like 'extra-%')
+     from public.iq_questions where track = 'extra' and active), '2:true');
+select pg_temp.expect('the first 60 seeded questions were matched to slugs, not duplicated',
+  (select count(*) from public.iq_questions where track is not null and slug is null), 0::bigint);
+select pg_temp.expect('practice question aligned with the playbook',
+  (select choices[correct_index + 1] from public.iq_questions
+    where track is null and scenario like 'You''re the runner on second base, nobody out.%'),
+  'Get a good jump, then take third once she throws to first');
+update public.iq_questions set active = false where track is not null;
+insert into public.iq_questions (topic, track, level, scenario, question, choices, correct_index)
+select 'general', 'defense', 1, 'scenario ' || g, 'question ' || g, array['right', 'wrong'], 0 from generate_series(1, 5) g;
+insert into public.iq_questions (topic, track, level, scenario, question, choices, correct_index)
+values ('general', 'defense', 2, 'l2', 'l2 q', array['right', 'wrong'], 0);
+
+-- Level 2 is locked before Level 1 is passed
+do $$ begin
+  perform public.start_iq_level('00000000-0000-0000-0000-0000000000c1', 'defense', 2::smallint);
+  raise exception 'FAIL: Level 2 started before Level 1 was passed';
+exception when raise_exception then null;
+end $$;
+
+-- Fail Level 1 with 3/5 (60%): no ring
+do $$
+declare v_attempt uuid := public.start_iq_level('00000000-0000-0000-0000-0000000000c1', 'defense', 1::smallint);
+        r record;
+begin
+  insert into public.iq_answers (player_id, question_id, chosen_index, is_correct, attempt_id)
+  select '00000000-0000-0000-0000-0000000000c1', id, case when rn <= 3 then 0 else 1 end, rn <= 3, v_attempt
+    from (select id, row_number() over (order by scenario) rn from public.iq_questions where track = 'defense' and level = 1 and active) q;
+  select * into r from public.finish_iq_level(v_attempt);
+  perform pg_temp.expect('60% graded', r.correct::int || '/' || r.total::int, '3/5');
+  perform pg_temp.expect('60% fails', r.passed, false);
+  perform pg_temp.expect('no ring at 60%', r.award_earned, false);
+end $$;
+
+-- Pass Level 1 with 4/5 (exactly 80%): ring earned, Level 2 opens
+do $$
+declare v_attempt uuid := public.start_iq_level('00000000-0000-0000-0000-0000000000c1', 'defense', 1::smallint);
+        r record;
+begin
+  insert into public.iq_answers (player_id, question_id, chosen_index, is_correct, attempt_id)
+  select '00000000-0000-0000-0000-0000000000c1', id, case when rn <= 4 then 0 else 1 end, rn <= 4, v_attempt
+    from (select id, row_number() over (order by scenario) rn from public.iq_questions where track = 'defense' and level = 1 and active) q;
+  select * into r from public.finish_iq_level(v_attempt);
+  perform pg_temp.expect('80% passes', r.passed, true);
+  perform pg_temp.expect('ring earned at 80%', r.award_earned, true);
+  -- finishing again changes nothing
+  select * into r from public.finish_iq_level(v_attempt);
+  perform pg_temp.expect('re-finish keeps result', r.passed, true);
+  perform pg_temp.expect('re-finish earns no second ring', r.award_earned, false);
+end $$;
+select pg_temp.expect('one Level 1 defense ring',
+  (select count(*) from public.player_rings where player_id = '00000000-0000-0000-0000-0000000000c1' and track = 'defense' and level = 1), 1::bigint);
+select pg_temp.expect('Level 2 now opens',
+  public.start_iq_level('00000000-0000-0000-0000-0000000000c1', 'defense', 2::smallint) is not null, true);
+
+-- An answer counts once per attempt
+do $$
+declare v_attempt uuid := public.start_iq_level('00000000-0000-0000-0000-0000000000c1', 'defense', 1::smallint);
+        v_q uuid := (select id from public.iq_questions where track = 'defense' and level = 1 and active limit 1);
+begin
+  insert into public.iq_answers (player_id, question_id, chosen_index, is_correct, attempt_id)
+  values ('00000000-0000-0000-0000-0000000000c1', v_q, 0, true, v_attempt);
+  insert into public.iq_answers (player_id, question_id, chosen_index, is_correct, attempt_id)
+  values ('00000000-0000-0000-0000-0000000000c1', v_q, 0, true, v_attempt);
+  raise exception 'FAIL: the same question was answered twice in one attempt';
+exception when unique_violation then null;
+end $$;
+
+-- Track questions need a level, and practice questions must not have one
+do $$ begin
+  insert into public.iq_questions (topic, track, scenario, question, choices, correct_index)
+  values ('general', 'baserunning', 's', 'q', array['a', 'b'], 0);
+  raise exception 'FAIL: a track question without a level was accepted';
+exception when check_violation then null;
+end $$;
+
+-- Team logos
+select pg_temp.expect('team-logos bucket is public',
+  (select public from storage.buckets where id = 'team-logos'), true);
+do $$ begin
+  update public.teams set logo_url = 'http://insecure.example/logo.png' where id = '00000000-0000-0000-0000-0000000000b1';
+  raise exception 'FAIL: a non-https logo URL was accepted';
+exception when check_violation then null;
+end $$;
+
+-- Saved progress: starting again resumes the open test; restarting deals a new one
+do $$
+declare a1 uuid; a2 uuid; a3 uuid;
+begin
+  a1 := public.start_iq_level('00000000-0000-0000-0000-0000000000c3', 'defense', 1::smallint);
+  a2 := public.start_iq_level('00000000-0000-0000-0000-0000000000c3', 'defense', 1::smallint);
+  perform pg_temp.expect('second start resumes the same test', a2, a1);
+  perform pg_temp.expect('the test keeps its dealt order',
+    (select array_length(question_order, 1) from public.iq_level_attempts where id = a1), 5);
+  a3 := public.start_iq_level('00000000-0000-0000-0000-0000000000c3', 'defense', 1::smallint, true);
+  perform pg_temp.expect('restart deals a new test', a3 <> a1, true);
+  perform pg_temp.expect('the abandoned test is gone', (select count(*) from public.iq_level_attempts where id = a1), 0::bigint);
+end $$;
+
+-- Review: missed questions, answered again, completes the review
+do $$
+declare v_attempt uuid; r record;
+begin
+  v_attempt := public.start_iq_level('00000000-0000-0000-0000-0000000000c3', 'defense', 1::smallint);
+  -- answer 3 of 5 correctly, leave 2 wrong
+  insert into public.iq_answers (player_id, question_id, chosen_index, is_correct, attempt_id)
+  select '00000000-0000-0000-0000-0000000000c3', q, case when i <= 3 then 0 else 1 end, i <= 3, v_attempt
+    from unnest((select question_order from public.iq_level_attempts where id = v_attempt)) with ordinality as t(q, i);
+  perform public.finish_iq_level(v_attempt);
+  select * into r from public.iq_review_status(v_attempt);
+  perform pg_temp.expect('review: 2 missed', r.missed, 2);
+  perform pg_temp.expect('review: none answered yet', r.reviewed, 0);
+  perform pg_temp.expect('review: not complete', r.complete, false);
+
+  insert into public.iq_answers (player_id, question_id, chosen_index, is_correct, review_of, hint_used)
+  select '00000000-0000-0000-0000-0000000000c3', q, 0, true, v_attempt, i = 4
+    from unnest((select question_order from public.iq_level_attempts where id = v_attempt)) with ordinality as t(q, i)
+   where i > 3;
+  select * into r from public.iq_review_status(v_attempt);
+  perform pg_temp.expect('review complete after all missed are answered', r.complete, true);
+  perform pg_temp.expect('reviewed_at stamped', (select reviewed_at is not null from public.iq_level_attempts where id = v_attempt), true);
+  perform pg_temp.expect('hint use recorded',
+    (select count(*) from public.iq_answers where review_of = v_attempt and hint_used), 1::bigint);
+  perform pg_temp.expect('finishing the review earns the MVP badge',
+    (select count(*) from public.player_mvp_badges
+      where player_id = '00000000-0000-0000-0000-0000000000c3' and track = 'defense' and level = 1 and attempt_id = v_attempt), 1::bigint);
+  -- a second completed review of the same test doesn't add another badge
+  perform public.iq_review_status(v_attempt);
+  perform pg_temp.expect('one MVP badge per test',
+    (select count(*) from public.player_mvp_badges where player_id = '00000000-0000-0000-0000-0000000000c3'), 1::bigint);
+end $$;
+
+-- An answer belongs to a test or a review, never both
+do $$ begin
+  insert into public.iq_answers (player_id, question_id, chosen_index, is_correct, attempt_id, review_of)
+  select '00000000-0000-0000-0000-0000000000c3', q.id, 0, true, a.id, a.id
+    from public.iq_questions q, public.iq_level_attempts a where q.active and q.track = 'defense' limit 1;
+  raise exception 'FAIL: an answer counted for both a test and a review';
+exception when check_violation then null;
+end $$;
+
+-- Position IQ tests and the Golden Glove --------------------------------------
+insert into public.iq_questions (topic, position, track, level, scenario, question, choices, correct_index)
+select 'position', 'SS', 'position', 1, 'ss scenario ' || g, 'q', array['right', 'wrong'], 0 from generate_series(1, 5) g;
+insert into public.iq_questions (topic, position, track, level, scenario, question, choices, correct_index)
+values ('position', 'C', 'position', 1, 'c scenario', 'q', array['right', 'wrong'], 0);
+
+do $$ begin
+  perform public.start_iq_level('00000000-0000-0000-0000-0000000000c1', 'position', 1::smallint);
+  raise exception 'FAIL: a position test started without a position';
+exception when invalid_parameter_value then null;
+end $$;
+do $$ begin
+  perform public.start_iq_level('00000000-0000-0000-0000-0000000000c1', 'position', 2::smallint, false, 'SS');
+  raise exception 'FAIL: a position test started at Level 2';
+exception when invalid_parameter_value then null;
+end $$;
+do $$ begin
+  perform public.start_iq_level('00000000-0000-0000-0000-0000000000c1', 'defense', 1::smallint, false, 'SS');
+  raise exception 'FAIL: a playbook level took a position';
+exception when invalid_parameter_value then null;
+end $$;
+do $$ begin
+  insert into public.iq_questions (topic, position, track, level, scenario, question, choices, correct_index)
+  values ('position', 'DP', 'position', 1, 'dp', 'q', array['a', 'b'], 0);
+  raise exception 'FAIL: a position test question for DP was accepted';
+exception when check_violation then null;
+end $$;
+
+do $$
+declare ss uuid; c uuid; r record;
+begin
+  ss := public.start_iq_level('00000000-0000-0000-0000-0000000000c1', 'position', 1::smallint, false, 'SS');
+  c := public.start_iq_level('00000000-0000-0000-0000-0000000000c1', 'position', 1::smallint, false, 'C');
+  perform pg_temp.expect('SS and C tests can be open side by side', ss <> c, true);
+  perform pg_temp.expect('starting SS again resumes it',
+    public.start_iq_level('00000000-0000-0000-0000-0000000000c1', 'position', 1::smallint, false, 'SS'), ss);
+  perform pg_temp.expect('the SS test deals only the 5 SS questions',
+    (select count(*) from public.iq_questions q, public.iq_level_attempts a
+      where a.id = ss and q.id = any (a.question_order) and q.position = 'SS'), 5::bigint);
+  perform pg_temp.expect('the SS test has nothing else',
+    (select array_length(question_order, 1) from public.iq_level_attempts where id = ss), 5);
+
+  -- 4 of 5 (80%) earns the Golden Glove
+  insert into public.iq_answers (player_id, question_id, chosen_index, is_correct, attempt_id)
+  select '00000000-0000-0000-0000-0000000000c1', q, case when i <= 4 then 0 else 1 end, i <= 4, ss
+    from unnest((select question_order from public.iq_level_attempts where id = ss)) with ordinality as t(q, i);
+  select * into r from public.finish_iq_level(ss);
+  perform pg_temp.expect('position test: 80% passes', r.passed, true);
+  perform pg_temp.expect('position test: Golden Glove earned', r.award_earned, true);
+  perform pg_temp.expect('position test earns no ring', (select count(*) from public.player_rings where attempt_id = ss), 0::bigint);
+  perform pg_temp.expect('the C test is still open', (select finished_at is null from public.iq_level_attempts where id = c), true);
+end $$;
+select pg_temp.expect('one SS Golden Glove',
+  (select string_agg(position::text, ',') from public.player_golden_gloves where player_id = '00000000-0000-0000-0000-0000000000c1'), 'SS');
+
+-- A perfect score earns the MVP badge outright (nothing to review)
+do $$
+declare c uuid; r record;
+begin
+  c := public.start_iq_level('00000000-0000-0000-0000-0000000000c1', 'position', 1::smallint, false, 'C');
+  insert into public.iq_answers (player_id, question_id, chosen_index, is_correct, attempt_id)
+  select '00000000-0000-0000-0000-0000000000c1', q, 0, true, c
+    from unnest((select question_order from public.iq_level_attempts where id = c)) as t(q);
+  select * into r from public.finish_iq_level(c);
+  perform pg_temp.expect('perfect C test earns the Golden Glove', r.award_earned, true);
+  perform pg_temp.expect('perfect score earns the MVP badge',
+    (select count(*) from public.player_mvp_badges where attempt_id = c and position = 'C'), 1::bigint);
+end $$;
+select pg_temp.expect('an 80% test (not perfect) earns no MVP badge before its review',
+  (select count(*) from public.player_mvp_badges
+    where player_id = '00000000-0000-0000-0000-0000000000c1' and position = 'SS'), 0::bigint);
+
+-- Extra Credit Library and the GGG World Series Trophy -------------------------
+update public.iq_questions set active = false where track = 'extra';
+insert into public.iq_questions (topic, track, level, section, scenario, question, choices, correct_index, hint)
+select 'general', 'extra', 1, 'Shelf ' || (g % 2), 'extra ' || g, 'q', array['right', 'wrong'], 0, 'h' from generate_series(1, 5) g;
+
+do $$ begin
+  insert into public.iq_questions (topic, track, level, scenario, question, choices, correct_index)
+  values ('general', 'extra', 1, 'no shelf', 'q', array['a', 'b'], 0);
+  raise exception 'FAIL: a library question without a section was accepted';
+exception when check_violation then null;
+end $$;
+do $$ begin
+  perform public.start_iq_level('00000000-0000-0000-0000-0000000000c1', 'extra', 2::smallint);
+  raise exception 'FAIL: the library started at Level 2';
+exception when invalid_parameter_value then null;
+end $$;
+
+do $$
+declare x uuid; r record;
+begin
+  x := public.start_iq_level('00000000-0000-0000-0000-0000000000c1', 'extra', 1::smallint);
+  perform pg_temp.expect('a library run deals every active library question',
+    (select array_length(question_order, 1) from public.iq_level_attempts where id = x), 5);
+  -- answer 4 of 5 (one wrong), in any order, with a hint on one
+  insert into public.iq_answers (player_id, question_id, chosen_index, is_correct, attempt_id, hint_used)
+  select '00000000-0000-0000-0000-0000000000c1', q, case when i = 1 then 1 else 0 end, i <> 1, x, i = 2
+    from unnest((select question_order from public.iq_level_attempts where id = x)) with ordinality as t(q, i)
+   where i <= 4;
+  begin
+    perform public.finish_iq_level(x);
+    raise exception 'FAIL: a library run was graded with a question unanswered';
+  exception when sqlstate 'P0003' then null;
+  end;
+  insert into public.iq_answers (player_id, question_id, chosen_index, is_correct, attempt_id)
+  select '00000000-0000-0000-0000-0000000000c1', (select question_order[5] from public.iq_level_attempts where id = x), 0, true, x;
+  select * into r from public.finish_iq_level(x);
+  perform pg_temp.expect('library run: 4/5 = 80% passes', r.correct::int || '/' || r.total::int || ' ' || r.passed, '4/5 true');
+  perform pg_temp.expect('library run earns the World Series Trophy', r.award_earned, true);
+  perform pg_temp.expect('one World Series Trophy',
+    (select count(*) from public.player_world_series_trophies where player_id = '00000000-0000-0000-0000-0000000000c1'), 1::bigint);
+  perform pg_temp.expect('hint used on a library answer is recorded',
+    (select count(*) from public.iq_answers where attempt_id = x and hint_used), 1::bigint);
+end $$;

@@ -1,0 +1,2747 @@
+[
+  {
+    "level": 1,
+    "topic": "No runners, <2 outs: bunt coverage at 1B",
+    "scenario": "Nobody on, one out. The batter drops a bunt toward the pitcher. You're the second baseman.",
+    "question": "Where do you go?",
+    "choices": [
+      "Cover second base",
+      "Cover first base",
+      "Charge in toward the bunt",
+      "Back up the pitcher"
+    ],
+    "correct_index": 1,
+    "explanation": "The first baseman charges the bunt, so first base is empty. You slide over to cover first and take the throw while the shortstop takes second.",
+    "hint": "Think about which bag empties out when the corners charge.",
+    "playbook_page": 3,
+    "diagram": {
+      "runners": [],
+      "outs": 1,
+      "you": "2B",
+      "ball": {
+        "at": "bunt-P",
+        "type": "bunt"
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "No runners, <2 outs: who fields the bunt",
+    "scenario": "Nobody on, nobody out. The batter bunts down the third-base side, and both you and the pitcher can get to it. You're the third baseman.",
+    "question": "Who should field it?",
+    "choices": [
+      "You, the third baseman",
+      "The pitcher",
+      "The catcher",
+      "The shortstop"
+    ],
+    "correct_index": 0,
+    "explanation": "When a corner can reach a bunt, she takes it away from the pitcher. The third baseman is the best choice because she's already moving toward first as she picks it up. Call for it loudly.",
+    "hint": "Which fielder can pick it up and throw without turning her body around?",
+    "playbook_page": 3,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "3B",
+      "ball": {
+        "at": "bunt-3B",
+        "type": "bunt"
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "No runners, <2 outs: catcher backup on a ground ball",
+    "scenario": "Nobody on, one out. Routine ground ball to the shortstop, who throws to first. You're the catcher.",
+    "question": "What's your job on this play?",
+    "choices": [
+      "Stay at home plate",
+      "Cover third base",
+      "Trail the batter toward first, staying in foul ground",
+      "Walk out toward the mound"
+    ],
+    "correct_index": 2,
+    "explanation": "With nobody on there's no play at the plate, so you follow the batter toward first, staying in foul ground. If the throw gets past the first baseman, you're there to stop the batter from taking an extra base.",
+    "hint": "With nobody on, there's no play at home. Where could a bad throw end up?",
+    "playbook_page": 6,
+    "diagram": {
+      "runners": [],
+      "outs": 1,
+      "you": "C",
+      "ball": {
+        "at": "SS",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "No runners, <2 outs: ground-ball single to left",
+    "scenario": "Nobody on, nobody out. A ground ball gets through the left side into left field for a single. You're the left fielder.",
+    "question": "Where do you throw?",
+    "choices": [
+      "First base",
+      "Third base",
+      "Home plate",
+      "Second base"
+    ],
+    "correct_index": 3,
+    "explanation": "The only runner is the batter. Get the ball to second, using the shortstop as your cut, so she can't stretch the hit into a double.",
+    "hint": "Which base is the batter trying to reach next?",
+    "playbook_page": 7,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "LF",
+      "ball": {
+        "at": "LF",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "home",
+          "to": "first",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 2B, <2 outs: lining up as the cut on a fly to left",
+    "scenario": "Runner on second, nobody out. Fly ball to left field, and the runner is tagging up to try for third. You're the shortstop going out to be the cut.",
+    "question": "Where do you line up?",
+    "choices": [
+      "Between the left fielder and second base",
+      "Between the left fielder and home plate",
+      "Between the left fielder and third base",
+      "On top of third base"
+    ],
+    "correct_index": 2,
+    "explanation": "The throw is headed to third to stop the tag-up, so the cut sets up in a straight line between the left fielder and third base. Peek at the bag to check your line, and listen for teammates telling you to shift left or right.",
+    "hint": "A cut stands on a straight line. What are the two ends of that line?",
+    "playbook_page": 27,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 0,
+      "you": "SS",
+      "ball": {
+        "at": "LF",
+        "type": "fly"
+      },
+      "arrows": [
+        {
+          "from": "second",
+          "to": "third",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 1B, <2 outs: hard comebacker to the pitcher",
+    "scenario": "Runner on first, nobody out. A hard ground ball comes right back to you on the mound.",
+    "question": "Where do you throw?",
+    "choices": [
+      "First base",
+      "Second base",
+      "Third base",
+      "Nowhere yet, look the runner back first"
+    ],
+    "correct_index": 1,
+    "explanation": "A hard-hit ball gives you time to get the lead runner at second, and the shortstop may be able to turn two. On a slow roller you'd take the sure out at first instead.",
+    "hint": "A hard-hit ball buys you time. Which runner can you go after?",
+    "playbook_page": 13,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 0,
+      "you": "P",
+      "ball": {
+        "at": "P",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 1B, <2 outs: force out at second",
+    "scenario": "Runner on first, one out. Hard grounder to the shortstop, who throws to you covering second. You're the second baseman.",
+    "question": "What do you need to do to get the runner coming from first?",
+    "choices": [
+      "Catch it and tag the runner as she slides in",
+      "Catch it and throw to first without touching the base",
+      "Catch it and chase the runner back toward first",
+      "Catch it and touch second base"
+    ],
+    "correct_index": 3,
+    "explanation": "Because the batter is running, the runner from first is forced to second. On a force out you only need the ball and a foot on the bag, and then you can turn and throw to first for the double play.",
+    "hint": "Is the runner from first forced to leave her base?",
+    "playbook_page": 15,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 1,
+      "you": "2B",
+      "ball": {
+        "at": "SS",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "first",
+          "to": "second",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 1,
+    "topic": "No runners, <2 outs: obstruction at first base",
+    "scenario": "Nobody on, one out. The batter hits a ground-ball single to left and heads for first. You're the first baseman covering the bag, and you don't have the ball.",
+    "question": "If you're standing in her path and she has to run around you, what can the umpire call?",
+    "choices": [
+      "Obstruction on you",
+      "Interference on the runner",
+      "Nothing, the base belongs to the fielder",
+      "An automatic out on the runner"
+    ],
+    "correct_index": 0,
+    "explanation": "Obstruction is a defensive player without the ball getting in a runner's way. Cover the base, but leave the runner a clear path to and around it.",
+    "hint": "Think about whether you had the ball when she ran into your path.",
+    "playbook_page": 2,
+    "diagram": {
+      "runners": [],
+      "outs": 1,
+      "you": "1B",
+      "ball": {
+        "at": "LF",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "home",
+          "to": "first",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 1,
+    "topic": "No runners, 2 outs: hard grounder right at the right fielder",
+    "scenario": "Nobody on, two outs. A hard ground ball comes straight at you in right field.",
+    "question": "Where do you throw?",
+    "choices": [
+      "Through the cut to second base",
+      "Third base",
+      "First base",
+      "Run it back in to the infield"
+    ],
+    "correct_index": 2,
+    "explanation": "A ball hit hard right at you gives you a shot at throwing the batter out at first, which ends the inning with two outs. On a normal single you'd throw through the cut to second instead.",
+    "hint": "How quickly did the ball reach you compared with the batter's run?",
+    "playbook_page": 73,
+    "diagram": {
+      "runners": [],
+      "outs": 2,
+      "you": "RF",
+      "ball": {
+        "at": "RF",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 1B, 2 outs: ground-ball single to left",
+    "scenario": "Runner on first, two outs. A ground ball single goes into left field, and the runner is running hard. You're the left fielder.",
+    "question": "Where does your throw go?",
+    "choices": [
+      "Through the cut to third base",
+      "Through the cut to second base",
+      "First base",
+      "Home plate"
+    ],
+    "correct_index": 0,
+    "explanation": "With two outs the runner on first is going on contact and will try to go first to third. Throw through the shortstop cut to third to keep her from getting there.",
+    "hint": "With two outs she was running on contact. How far is she trying to go?",
+    "playbook_page": 77,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 2,
+      "you": "LF",
+      "ball": {
+        "at": "LF",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "first",
+          "to": "second",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 2B, <2 outs: check the runner before throwing to 1B",
+    "scenario": "Runner on second, one out. Ground ball to you at shortstop.",
+    "question": "What's your play?",
+    "choices": [
+      "Throw to third right away to get the lead runner",
+      "Look the runner back to second, then throw to first",
+      "Throw to first without looking at the runner",
+      "Run the ball over to second base"
+    ],
+    "correct_index": 1,
+    "explanation": "The runner at second isn't forced, so a throw to third would need a tag. Freeze her with a look, then take the out at first; if she commits toward third, go after her instead.",
+    "hint": "Before you throw, what could the runner on second do behind your back?",
+    "playbook_page": 23,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 1,
+      "you": "SS",
+      "ball": {
+        "at": "SS",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 2B, <2 outs: who covers second on a bunt",
+    "scenario": "Runner on second, nobody out. The batter bunts to the pitcher. The shortstop runs to cover third and the second baseman covers first. You're the center fielder.",
+    "question": "What's your job?",
+    "choices": [
+      "Back up third base",
+      "Back up first base",
+      "Stay deep in center",
+      "Run in and cover second base"
+    ],
+    "correct_index": 3,
+    "explanation": "With the shortstop at third and the second baseman at first, no infielder is left for second. The center fielder runs in and takes the bag, while the left and right fielders back up third and first.",
+    "hint": "Count the infielders who just left. Who is left to cover the middle?",
+    "playbook_page": 20,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 0,
+      "you": "CF",
+      "ball": {
+        "at": "bunt-P",
+        "type": "bunt"
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 1B, <2 outs: force removed after the out at first",
+    "scenario": "Runner on first, one out. A hard grounder is hit to the first baseman right next to the bag. She steps on first for the out, then throws to you covering second. You're the shortstop.",
+    "question": "What do you have to do to get the runner from first?",
+    "choices": [
+      "Touch second base",
+      "Tag the runner",
+      "Throw back to first base",
+      "Nothing, she's already out"
+    ],
+    "correct_index": 1,
+    "explanation": "Once the batter is out at first, the runner from first is no longer forced, so the force at second is gone. Now it's a tag play, and the first baseman should tell you that.",
+    "hint": "Once the batter is out, is the runner from first still forced?",
+    "playbook_page": 14,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 1,
+      "you": "SS",
+      "ball": {
+        "at": "1B",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "first",
+          "to": "second",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 1B, <2 outs: double cut on a gap ball",
+    "scenario": "Runner on first, one out. A ground ball splits the right-center gap, and the second baseman races out to be the first cut. You're the first baseman.",
+    "question": "What's your job?",
+    "choices": [
+      "Stay on first base",
+      "Cover second base",
+      "Set up as a second cut lined up toward home",
+      "Back up home plate"
+    ],
+    "correct_index": 2,
+    "explanation": "On a gap ball the runner from first may try to score, so the throw may need two relays. You become the second (double) cut in line with home, the catcher stays at the plate, and the pitcher backs her up.",
+    "hint": "On a long throw home, the relay may need more than one link.",
+    "playbook_page": 18,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 1,
+      "you": "1B",
+      "ball": {
+        "at": "RCF-gap",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "first",
+          "to": "second",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 3B, <2 outs: slow roller to the first baseman",
+    "scenario": "Runner on third, one out. A slow ground ball is hit to you at first base, a few steps in front of the bag.",
+    "question": "What's the best play?",
+    "choices": [
+      "Move toward the batter-runner and tag her, keeping the runner at third in sight",
+      "Turn and run to first base to step on it",
+      "Throw home right away",
+      "Throw to second base"
+    ],
+    "correct_index": 0,
+    "explanation": "Going toward the batter to tag her keeps the runner at third in front of you. If you turn your back to run to the bag, she can break for home without you seeing it.",
+    "hint": "Where does your back face if you turn and run to the bag?",
+    "playbook_page": 31,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 1,
+      "you": "1B",
+      "ball": {
+        "at": "1B",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 2B, 2 outs: take the out at first",
+    "scenario": "Runner on second, two outs. Routine ground ball to you at shortstop, and the runner is running on contact.",
+    "question": "Where do you throw?",
+    "choices": [
+      "Third base to tag the runner",
+      "Home plate",
+      "First base",
+      "Second base"
+    ],
+    "correct_index": 2,
+    "explanation": "With two outs, the out at first ends the inning and the runner's advance doesn't matter. Don't trade an easy out at first for a hard tag play at third.",
+    "hint": "With two outs, which out is the surest?",
+    "playbook_page": 80,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 2,
+      "you": "SS",
+      "ball": {
+        "at": "SS",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "second",
+          "to": "third",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 3B, 2 outs: bunt to the third baseman",
+    "scenario": "Runner on third, two outs. The batter bunts toward you at third, and the runner breaks for home.",
+    "question": "Where do you throw?",
+    "choices": [
+      "Home plate to stop the run",
+      "Second base",
+      "Hold the ball",
+      "First base"
+    ],
+    "correct_index": 3,
+    "explanation": "With two outs, getting the batter at first ends the inning, and the run can't count when the third out is the batter retired before she reaches first. The catcher stays home and calls for the throw to first.",
+    "hint": "If the third out comes before the batter reaches first, does the run count?",
+    "playbook_page": 83,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 2,
+      "you": "3B",
+      "ball": {
+        "at": "bunt-3B",
+        "type": "bunt"
+      },
+      "arrows": [
+        {
+          "from": "third",
+          "to": "home",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 2B, <2 outs: rundown throwing lane",
+    "scenario": "Runner on second, one out. The runner wanders too far off the bag and gets caught between second and third. You're the third baseman with the ball, and the shortstop is at second.",
+    "question": "How should you and the shortstop line up so you can throw back and forth?",
+    "choices": [
+      "Both on the same side of the base path",
+      "Directly on the base line with the runner between you",
+      "On opposite sides of the base path",
+      "It doesn't matter as long as you throw hard"
+    ],
+    "correct_index": 0,
+    "explanation": "If the runner is directly between you, a throw can hit her. Both fielders step to the same side of the base path so the ball has a clear lane.",
+    "hint": "You don't want your throw to hit the runner.",
+    "playbook_page": 2,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 1,
+      "you": "3B",
+      "arrows": [
+        {
+          "from": "second",
+          "to": "third",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 1B, 2 outs: interference on a ground ball to 2B",
+    "scenario": "Runner on first, two outs. Ground ball to you at second base, and the runner from first runs into you while you're fielding it.",
+    "question": "What's the call?",
+    "choices": [
+      "Obstruction on you",
+      "No call, the base path belongs to the runner",
+      "No pitch, everyone goes back",
+      "Interference on the runner"
+    ],
+    "correct_index": 3,
+    "explanation": "A fielder making a play on a batted ball has the right to that spot. When a runner runs into her, that's interference on the offense, so you don't have to get out of her way to field the ball.",
+    "hint": "Who has the right of way when a fielder is playing the ball?",
+    "playbook_page": 2,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 2,
+      "you": "2B",
+      "ball": {
+        "at": "2B",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "first",
+          "to": "second",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 1B, <2 outs: slow bunt, take the sure out",
+    "scenario": "Runner on first, nobody out. A soft bunt dies on the grass and you have to charge hard to get it. You're the third baseman.",
+    "question": "Where do you throw?",
+    "choices": [
+      "Second base to get the lead runner",
+      "First base",
+      "Hold the ball",
+      "Home plate"
+    ],
+    "correct_index": 1,
+    "explanation": "On a slow bunt there's usually no time to beat the lead runner to second, so take the sure out at first, where the second baseman is covering. On a hard bunt you'd look to get the lead runner instead.",
+    "hint": "After charging a slow bunt, do you have time for the lead runner?",
+    "playbook_page": 13,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 0,
+      "you": "3B",
+      "ball": {
+        "at": "bunt-3B",
+        "type": "bunt"
+      },
+      "arrows": [
+        {
+          "from": "first",
+          "to": "second",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 1B & 2B, <2 outs: hard bunt to the pitcher",
+    "scenario": "Runners on first and second, nobody out. The batter bunts it hard right back to you on the mound.",
+    "question": "Where do you throw?",
+    "choices": [
+      "First base for the sure out",
+      "Second base",
+      "Third base",
+      "Home plate"
+    ],
+    "correct_index": 2,
+    "explanation": "Both runners are forced, and a hard bunt gives you time to get the lead runner at third, where the shortstop is covering. On a slow bunt you'd take the out at first.",
+    "hint": "A hard bunt gets to you fast. Which forced runner is closest to scoring?",
+    "playbook_page": 37,
+    "diagram": {
+      "runners": [
+        "first",
+        "second"
+      ],
+      "outs": 0,
+      "you": "P",
+      "ball": {
+        "at": "bunt-P",
+        "type": "bunt"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Bases loaded, <2 outs: ground ball with the infield in",
+    "scenario": "Bases loaded, one out, infield playing in. Ground ball to you at shortstop.",
+    "question": "Where do you throw?",
+    "choices": [
+      "Home to the catcher",
+      "First base for the sure out",
+      "Third base",
+      "Hold it and look the runners back"
+    ],
+    "correct_index": 0,
+    "explanation": "With the infield in and less than two outs, the job is to stop the run. Every runner is forced, so the catcher just touches home, and then she can look to first or third for a second out.",
+    "hint": "With the infield in, which runner are you trying to stop?",
+    "playbook_page": 49,
+    "diagram": {
+      "runners": [
+        "first",
+        "second",
+        "third"
+      ],
+      "outs": 1,
+      "you": "SS",
+      "ball": {
+        "at": "SS",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Bases loaded, <2 outs: who calls the throw on a fly ball",
+    "scenario": "Bases loaded, one out. A fly ball to left field is caught and the runner on third tags up. The throw could go home or to third.",
+    "question": "Who decides where the throw goes?",
+    "choices": [
+      "The left fielder",
+      "The shortstop, as the cut",
+      "The third baseman",
+      "The catcher"
+    ],
+    "correct_index": 3,
+    "explanation": "The catcher is facing the whole play and leads the communication. She makes the call, home or third, based on the score and how fast the runner on third is.",
+    "hint": "Who can see the whole field and every runner from her spot?",
+    "playbook_page": 52,
+    "diagram": {
+      "runners": [
+        "first",
+        "second",
+        "third"
+      ],
+      "outs": 1,
+      "you": "C",
+      "ball": {
+        "at": "LF",
+        "type": "fly"
+      },
+      "arrows": [
+        {
+          "from": "third",
+          "to": "home",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 1B & 3B, <2 outs: runner breaks home on a grounder",
+    "scenario": "Runners on first and third, one out, infield playing in. Ground ball to you at shortstop, and the runner on third breaks for home.",
+    "question": "Where do you throw?",
+    "choices": [
+      "First base for the sure out",
+      "Home to the catcher",
+      "Third base, behind the runner",
+      "Hold the ball and run at her"
+    ],
+    "correct_index": 1,
+    "explanation": "Always check the runner at third first. If she's going, throw home to cut down the run; if she holds, look her back and take the out at first.",
+    "hint": "Which runner is about to score?",
+    "playbook_page": 57,
+    "diagram": {
+      "runners": [
+        "first",
+        "third"
+      ],
+      "outs": 1,
+      "you": "SS",
+      "ball": {
+        "at": "SS",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "third",
+          "to": "home",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 2B & 3B, <2 outs: squeeze bunt to third",
+    "scenario": "Runners on second and third, one out. The runner on third breaks with the pitch and the batter squares to bunt: it's a squeeze. The bunt comes to you at third base.",
+    "question": "Where do you throw?",
+    "choices": [
+      "First base for the sure out",
+      "Third base",
+      "Home to the catcher",
+      "Hold the ball"
+    ],
+    "correct_index": 2,
+    "explanation": "On a squeeze the runner from third is already going, so field it and throw home, where the catcher has stayed to take the throw. Only take the out at first when the runner isn't trying to score.",
+    "hint": "On a squeeze, where is the runner from third already headed?",
+    "playbook_page": 64,
+    "diagram": {
+      "runners": [
+        "second",
+        "third"
+      ],
+      "outs": 1,
+      "you": "3B",
+      "ball": {
+        "at": "bunt-3B",
+        "type": "bunt"
+      },
+      "arrows": [
+        {
+          "from": "third",
+          "to": "home",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 2B & 3B, <2 outs: catcher on a bunt in front of the plate",
+    "scenario": "Runners on second and third, nobody out. The batter bunts a few feet in front of the plate, and the charging pitcher can get to it too. You're the catcher.",
+    "question": "What should you do?",
+    "choices": [
+      "Let the pitcher field it and stay home for a throw",
+      "Pounce on it yourself and throw to first",
+      "Run to cover third base",
+      "Back up first base"
+    ],
+    "correct_index": 0,
+    "explanation": "With a runner on third, home plate can't be left empty. If another fielder can make the play, let her have it and stay at the plate so you can take a throw if the runner tries to score.",
+    "hint": "If you leave the plate, who protects it?",
+    "playbook_page": 63,
+    "diagram": {
+      "runners": [
+        "second",
+        "third"
+      ],
+      "outs": 0,
+      "you": "C",
+      "ball": {
+        "at": "bunt-C",
+        "type": "bunt"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 1B & 2B, 2 outs: hard grounder at third",
+    "scenario": "Runners on first and second, two outs. A hard ground ball is hit right at you at third base, near the bag.",
+    "question": "What's your play?",
+    "choices": [
+      "Step on third base",
+      "Throw to first",
+      "Tag the runner coming from second",
+      "Throw to second"
+    ],
+    "correct_index": 0,
+    "explanation": "The runner from second is forced to third, so on a hard ball right at you, just step on the bag for the third out; no tag needed. If the ball pulls you forward or is hit slowly, throw to first instead.",
+    "hint": "With two outs, what's the quickest out from where you're standing?",
+    "playbook_page": 89,
+    "diagram": {
+      "runners": [
+        "first",
+        "second"
+      ],
+      "outs": 2,
+      "you": "3B",
+      "ball": {
+        "at": "3B",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Bases loaded, 2 outs: force at home on a bunt",
+    "scenario": "Bases loaded, two outs. The batter bunts it right in front of the plate and you pick it up. You're the catcher.",
+    "question": "Do you need to tag the runner coming home from third?",
+    "choices": [
+      "Yes, plays at the plate are always tag plays",
+      "No, just touch home plate with the ball",
+      "Only if she slides",
+      "Yes, the runner on third is never forced"
+    ],
+    "correct_index": 1,
+    "explanation": "With the bases loaded, every runner is forced, including the one coming home. Step on the plate with the ball for the third out; a throw to first works too.",
+    "hint": "With the bases loaded, is the runner from third forced?",
+    "playbook_page": 92,
+    "diagram": {
+      "runners": [
+        "first",
+        "second",
+        "third"
+      ],
+      "outs": 2,
+      "you": "C",
+      "ball": {
+        "at": "bunt-C",
+        "type": "bunt"
+      },
+      "arrows": [
+        {
+          "from": "third",
+          "to": "home",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 1B & 3B, 2 outs: pitcher's backup on a single to left",
+    "scenario": "Runners on first and third, two outs. A ground ball single goes into left field. You're the pitcher.",
+    "question": "Where do you go?",
+    "choices": [
+      "Back up home plate",
+      "Cover first base",
+      "Back up third base",
+      "Back up second base"
+    ],
+    "correct_index": 2,
+    "explanation": "The runner from third scores on a two-out single, so the left fielder throws through the shortstop cut to third to stop the runner coming from first. The pitcher backs up third in case that throw gets away.",
+    "hint": "Where will the left fielder's throw go if the runner from first tries for third?",
+    "playbook_page": 99,
+    "diagram": {
+      "runners": [
+        "first",
+        "third"
+      ],
+      "outs": 2,
+      "you": "P",
+      "ball": {
+        "at": "LF",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 2B & 3B, 2 outs: filling in at first on a single to right",
+    "scenario": "Runners on second and third, two outs. A ground ball gets past you into right field for a single. You're the second baseman.",
+    "question": "Once the ball is by you, where do you go?",
+    "choices": [
+      "Cover second base",
+      "Become the cut to home",
+      "Back up the right fielder",
+      "Fill in at first base"
+    ],
+    "correct_index": 3,
+    "explanation": "The first baseman usually becomes the cut to home on this play, which leaves first open. You fill in at first so there's still a play on the batter-runner; the shortstop has second and the center fielder backs up right.",
+    "hint": "Which bag did the first baseman leave behind?",
+    "playbook_page": 105,
+    "diagram": {
+      "runners": [
+        "second",
+        "third"
+      ],
+      "outs": 2,
+      "you": "2B",
+      "ball": {
+        "at": "RF",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "No runners, <2 outs: right fielder on a bunt",
+    "scenario": "Nobody on, nobody out. The batter bunts to the pitcher, who turns to throw to the second baseman covering first. You're the right fielder.",
+    "question": "Where should you be?",
+    "choices": [
+      "Backing up first base",
+      "Backing up second base",
+      "Charging in toward the infield grass",
+      "Staying deep in right field"
+    ],
+    "correct_index": 0,
+    "explanation": "Every throw to first on a bunt needs someone behind it. Sprint in behind the bag so a wild throw doesn't send the batter to second or third.",
+    "hint": "Follow the throw. Who is standing behind the target?",
+    "playbook_page": 3,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "RF",
+      "ball": {
+        "at": "bunt-P",
+        "type": "bunt"
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 2B, <2 outs: tag play at third",
+    "scenario": "Runner on second, one out. Ground ball back to the pitcher, and the runner breaks for third. The pitcher throws to you at third base.",
+    "question": "What do you need to do to get the runner out?",
+    "choices": [
+      "Just touch third base",
+      "Tag the runner",
+      "Throw to first for the out",
+      "Step on third, then throw home"
+    ],
+    "correct_index": 1,
+    "explanation": "First base was open behind her, so the runner from second was never forced to run. That makes it a tag play: you have to put the ball on her before she reaches the bag.",
+    "hint": "Was anyone behind her forcing her to leave second?",
+    "playbook_page": 22,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 1,
+      "you": "3B",
+      "ball": {
+        "at": "P",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "second",
+          "to": "third",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 3B, <2 outs: catcher on a bunt to the pitcher",
+    "scenario": "Runner on third, nobody out. The batter bunts it right back to the pitcher. You're the catcher.",
+    "question": "What's your job?",
+    "choices": [
+      "Charge out and field it yourself",
+      "Follow the batter toward first",
+      "Stay at home and tell the pitcher where to throw",
+      "Cover third base"
+    ],
+    "correct_index": 2,
+    "explanation": "With a runner on third, the plate can't be left empty. Stay home, watch whether the runner goes, and tell the pitcher to throw home or to first.",
+    "hint": "If you leave your spot, who guards the plate?",
+    "playbook_page": 28,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 0,
+      "you": "C",
+      "ball": {
+        "at": "bunt-P",
+        "type": "bunt"
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 3B, <2 outs: pitcher's backup on a fly to left",
+    "scenario": "Runner on third, one out. Fly ball to left field, and the runner tags up to try to score. You're the pitcher.",
+    "question": "Where do you go?",
+    "choices": [
+      "Back up third base",
+      "Cover home plate",
+      "Stay on the mound",
+      "Back up home plate"
+    ],
+    "correct_index": 3,
+    "explanation": "The throw is coming to the plate through the cut, and the catcher is taking it. Get behind home, in line with the throw, so a ball that gets away doesn't roll to the backstop.",
+    "hint": "Where is the throw going, and who is behind that spot?",
+    "playbook_page": 35,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 1,
+      "you": "P",
+      "ball": {
+        "at": "LF",
+        "type": "fly"
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Vocabulary: the squeeze",
+    "scenario": "Runner on third, one out. As the pitch is released, the runner sprints for home and the batter squares around to bunt. You're the catcher.",
+    "question": "What is the offense running?",
+    "choices": [
+      "A squeeze",
+      "A hit-and-run",
+      "A delayed steal",
+      "A fake bunt and slash"
+    ],
+    "correct_index": 0,
+    "explanation": "On a squeeze, the runner leaves third with the pitch and the batter has to get the bunt down wherever it's thrown. Everyone near the plate should expect the throw to go home.",
+    "hint": "Why would the runner leave before the ball is even bunted?",
+    "playbook_page": 2,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 1,
+      "you": "C",
+      "arrows": [
+        {
+          "from": "third",
+          "to": "home",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Vocabulary: the lead runner",
+    "scenario": "Runners on first and second, nobody out. Before the pitch, your coach yells, \"Look for the lead runner!\" You're the third baseman.",
+    "question": "Which runner is she talking about?",
+    "choices": [
+      "The runner on first",
+      "The runner on second",
+      "The batter",
+      "Whichever runner is fastest"
+    ],
+    "correct_index": 1,
+    "explanation": "The lead runner is the one farthest along, with no runner ahead of her. Here that's the runner on second, the one closest to scoring.",
+    "hint": "Which runner has nobody in front of her?",
+    "playbook_page": 2,
+    "diagram": {
+      "runners": [
+        "first",
+        "second"
+      ],
+      "outs": 0,
+      "you": "3B"
+    }
+  },
+  {
+    "level": 1,
+    "topic": "No runners, 2 outs: covering third on a bunt to third",
+    "scenario": "Nobody on, two outs. The batter bunts down the third-base line and the third baseman charges in and fields it. You're the pitcher, and you charged too.",
+    "question": "Now that she has the ball, where do you go?",
+    "choices": [
+      "Cover first base",
+      "Back up home",
+      "Cover third base",
+      "Stay where you are"
+    ],
+    "correct_index": 2,
+    "explanation": "When the third baseman comes in for the bunt, her base is empty. Peel off and cover it so a bad throw doesn't hand the batter an easy extra base.",
+    "hint": "Which bag did the fielder leave behind?",
+    "playbook_page": 71,
+    "diagram": {
+      "runners": [],
+      "outs": 2,
+      "you": "P",
+      "ball": {
+        "at": "bunt-3B",
+        "type": "bunt"
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "No runners, 2 outs: pitcher's backup on a single to center",
+    "scenario": "Nobody on, two outs. Ground ball single up the middle into center field. You're the pitcher.",
+    "question": "Where do you go?",
+    "choices": [
+      "Back up first base",
+      "Back up third base",
+      "Cover home",
+      "Back up second base"
+    ],
+    "correct_index": 3,
+    "explanation": "The center fielder's throw is going to second to hold the batter at first. Get in line behind second so an overthrow doesn't give her another base.",
+    "hint": "Follow the throw: where will the center fielder send it?",
+    "playbook_page": 73,
+    "diagram": {
+      "runners": [],
+      "outs": 2,
+      "you": "P",
+      "ball": {
+        "at": "CF",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "home",
+          "to": "first",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 1,
+    "topic": "No runners, 2 outs: cut on a single to right",
+    "scenario": "Nobody on, two outs. A ground ball rolls through the right side for a single, not hit hard enough for a play at first. You're the second baseman.",
+    "question": "What's your job once the ball is past you?",
+    "choices": [
+      "Go out and be the cut for a throw to second",
+      "Cover first base",
+      "Cover second base",
+      "Back up the right fielder"
+    ],
+    "correct_index": 0,
+    "explanation": "You go out toward the ball and line up as the cut to second. The shortstop takes the bag and receives the throw.",
+    "hint": "Which infielder is closest to the line between right field and second?",
+    "playbook_page": 73,
+    "diagram": {
+      "runners": [],
+      "outs": 2,
+      "you": "2B",
+      "ball": {
+        "at": "RF",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "home",
+          "to": "first",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 1,
+    "topic": "No runners, 2 outs: third baseman on a ball in the left-center gap",
+    "scenario": "Nobody on, two outs. A ground ball splits the left-center gap and the batter is rounding first. The shortstop is running out to be the cut. You're the third baseman.",
+    "question": "What's your job?",
+    "choices": [
+      "Run out as a second cut",
+      "Cover third and help call where the throw should go",
+      "Cover second base",
+      "Back up the left fielder"
+    ],
+    "correct_index": 1,
+    "explanation": "The shortstop is the cut, so you hold your bag in case the batter tries to stretch it. Use your voice to help the outfielder and cut pick the right base.",
+    "hint": "Someone has to guard the farthest base the batter might try for.",
+    "playbook_page": 74,
+    "diagram": {
+      "runners": [],
+      "outs": 2,
+      "you": "3B",
+      "ball": {
+        "at": "LCF-gap",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "home",
+          "to": "first",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 1,
+    "topic": "No runners, 2 outs: third baseman on a bunt the catcher fields",
+    "scenario": "Nobody on, two outs. The batter drops a bunt a few feet in front of the plate. You charge in from third, but the catcher calls you off and picks it up.",
+    "question": "What do you do next?",
+    "choices": [
+      "Keep running to back up the catcher",
+      "Cover first base",
+      "Get back and cover third base",
+      "Cover second base"
+    ],
+    "correct_index": 2,
+    "explanation": "Once you're called off, your base is empty and you're the closest player to it. Hustle back so a bad throw doesn't let the batter run all the way around.",
+    "hint": "You left a bag empty when you charged.",
+    "playbook_page": 71,
+    "diagram": {
+      "runners": [],
+      "outs": 2,
+      "you": "3B",
+      "ball": {
+        "at": "bunt-C",
+        "type": "bunt"
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 1B, 2 outs: left fielder's backup on a single to right",
+    "scenario": "Runner on first, two outs. Ground ball single to right field, and the runner from first is heading for third. You're the left fielder.",
+    "question": "Where do you go?",
+    "choices": [
+      "Back up second base",
+      "Stay in left field",
+      "Back up the right fielder",
+      "Back up third base"
+    ],
+    "correct_index": 3,
+    "explanation": "The right fielder's throw is going to third through the cut. You're the player in line behind that bag, so get there before the throw does.",
+    "hint": "Which base is the throw headed to, and who is behind it?",
+    "playbook_page": 78,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 2,
+      "you": "LF",
+      "ball": {
+        "at": "RF",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "first",
+          "to": "second",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 1B, 2 outs: hard single right at the center fielder",
+    "scenario": "Runner on first, two outs. A hard ground ball single comes straight at you in center field, and you field it quickly.",
+    "question": "Where do you throw?",
+    "choices": [
+      "Second base",
+      "Third base",
+      "Home plate",
+      "First base"
+    ],
+    "correct_index": 0,
+    "explanation": "How hard the ball is hit decides this one. A hard ball right at you is in your glove fast, so the throw goes to second; if you'd had to charge a slow ball, you'd go through the cut to third instead.",
+    "hint": "How quickly did the ball reach you?",
+    "playbook_page": 77,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 2,
+      "you": "CF",
+      "ball": {
+        "at": "CF",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 2B, 2 outs: right fielder's backup on a single to left",
+    "scenario": "Runner on second, two outs. Ground ball single to left field, and the throw is going home. You're the right fielder.",
+    "question": "Where do you go?",
+    "choices": [
+      "Back up first base",
+      "Back up second base",
+      "Back up home plate",
+      "Stay in right field"
+    ],
+    "correct_index": 1,
+    "explanation": "While everyone watches the play at the plate, the batter will try to take second on the throw. Get behind second so a cut-off throw or a bad relay there doesn't get away.",
+    "hint": "Where will the batter-runner try to go while everyone watches home?",
+    "playbook_page": 81,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 2,
+      "you": "RF",
+      "ball": {
+        "at": "LF",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "second",
+          "to": "third",
+          "kind": "run"
+        },
+        {
+          "from": "home",
+          "to": "first",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 2B, 2 outs: shortstop on a ground ball to third",
+    "scenario": "Runner on second, two outs. Ground ball to the third baseman. You're the shortstop.",
+    "question": "What's your job?",
+    "choices": [
+      "Cover second base",
+      "Cover first base",
+      "Back up the third baseman",
+      "Cover home plate"
+    ],
+    "correct_index": 2,
+    "explanation": "The third baseman is making the play to first and the second baseman has second. Get behind her in case the ball skips through, so a misplay doesn't turn into extra bases.",
+    "hint": "If the ball gets by the fielder, who's there to stop it?",
+    "playbook_page": 81,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 2,
+      "you": "SS",
+      "ball": {
+        "at": "3B",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 3B, 2 outs: single to left with a run scoring",
+    "scenario": "Runner on third, two outs. A ground ball single goes into left field, and the runner from third scores easily. You're the left fielder.",
+    "question": "Where do you throw?",
+    "choices": [
+      "Home plate",
+      "Third base",
+      "First base",
+      "Second base"
+    ],
+    "correct_index": 3,
+    "explanation": "That run is in no matter what you do. Get the ball to second through your cut so the batter stays at first and out of scoring position.",
+    "hint": "You can't stop the run. Which runner can you still control?",
+    "playbook_page": 85,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 2,
+      "you": "LF",
+      "ball": {
+        "at": "LF",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "third",
+          "to": "home",
+          "kind": "run"
+        },
+        {
+          "from": "home",
+          "to": "first",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 3B, 2 outs: second baseman on a comebacker",
+    "scenario": "Runner on third, two outs. Ground ball right back to the pitcher. You're the second baseman.",
+    "question": "What's your job?",
+    "choices": [
+      "Back up the pitcher in case the ball gets by her",
+      "Cover first base",
+      "Cover second base",
+      "Cover home"
+    ],
+    "correct_index": 0,
+    "explanation": "The first baseman has first and the shortstop has second, so you back up the ball. If it deflects off the pitcher, you're there to keep it in the infield.",
+    "hint": "If the ball deflects off the pitcher, who is behind her?",
+    "playbook_page": 84,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 2,
+      "you": "2B",
+      "ball": {
+        "at": "P",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 3B, 2 outs: covering second on a single to right",
+    "scenario": "Runner on third, two outs. A ground ball single goes into right field, and the second baseman runs out to be the cut. You're the shortstop.",
+    "question": "Where do you go?",
+    "choices": [
+      "Cover third base",
+      "Cover second base",
+      "Go out as a second cut",
+      "Back up the right fielder"
+    ],
+    "correct_index": 1,
+    "explanation": "With the second baseman out as the cut, second base is yours. Get to the bag and be ready for the throw so the batter stays at first.",
+    "hint": "Which bag did the second baseman just leave?",
+    "playbook_page": 86,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 2,
+      "you": "SS",
+      "ball": {
+        "at": "RF",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "third",
+          "to": "home",
+          "kind": "run"
+        },
+        {
+          "from": "home",
+          "to": "first",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Communication: who stays quiet on a ground ball",
+    "scenario": "Runners on second and third, two outs. Ground ball to you at shortstop, and your teammates start calling out where the throw should go.",
+    "question": "Who should NOT be calling out where to throw?",
+    "choices": [
+      "The catcher",
+      "The third baseman",
+      "You, the fielder making the play",
+      "The pitcher"
+    ],
+    "correct_index": 2,
+    "explanation": "Everyone else talks so the fielder can focus on the catch and the throw. Your job is to field it cleanly and listen to the call.",
+    "hint": "Whose eyes need to stay locked on the ball?",
+    "playbook_page": 5,
+    "diagram": {
+      "runners": [
+        "second",
+        "third"
+      ],
+      "outs": 2,
+      "you": "SS",
+      "ball": {
+        "at": "SS",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Bases loaded, 2 outs: where the force plays are",
+    "scenario": "Bases loaded, two outs. Before the pitch, your coach asks you to name your options on a ground ball. You're the shortstop.",
+    "question": "Which bases have a force play?",
+    "choices": [
+      "Only home plate",
+      "Only first and second",
+      "None, every runner has to be tagged",
+      "Every base, including home"
+    ],
+    "correct_index": 3,
+    "explanation": "With the bases loaded, every runner has someone behind her, so all of them must run on a ground ball. You can get a force by touching any base with the ball, home included.",
+    "hint": "Does every runner have someone behind her pushing her to the next base?",
+    "playbook_page": 2,
+    "diagram": {
+      "runners": [
+        "first",
+        "second",
+        "third"
+      ],
+      "outs": 2,
+      "you": "SS"
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 3B, 2 outs: runner breaks on a grounder to second",
+    "scenario": "Runner on third, two outs. Routine ground ball to you at second base, and the runner on third takes off for home on contact.",
+    "question": "Where do you throw?",
+    "choices": [
+      "First base",
+      "Home to the catcher",
+      "Third base",
+      "Hold the ball"
+    ],
+    "correct_index": 0,
+    "explanation": "With two outs, the out at first ends the inning and the run doesn't count if the batter is retired before she reaches the bag. The runner had to go on contact, so ignore her and take the sure out.",
+    "hint": "Does the run count if the third out is the batter at first?",
+    "playbook_page": 84,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 2,
+      "you": "2B",
+      "ball": {
+        "at": "2B",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "third",
+          "to": "home",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 2B, 2 outs: catcher on a bunt to first",
+    "scenario": "Runner on second, two outs. The batter bunts toward first. You charge out from behind the plate, but the first baseman calls you off and fields it.",
+    "question": "Where do you go now?",
+    "choices": [
+      "Follow the play down the first-base line",
+      "Get back and cover home",
+      "Cover third base",
+      "Stay where you are"
+    ],
+    "correct_index": 1,
+    "explanation": "With a runner on second, home can't sit empty. Once you're called off, get back to the plate in case she tries to score while the throw goes to first.",
+    "hint": "Which base is the runner on second ultimately trying to reach?",
+    "playbook_page": 79,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 2,
+      "you": "C",
+      "ball": {
+        "at": "bunt-1B",
+        "type": "bunt"
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 1B, 2 outs: pitcher's backup on a gap ball",
+    "scenario": "Runner on first, two outs. A ground ball splits the right-center gap, and the runner from first is flying around second. You're the pitcher.",
+    "question": "Where do you go?",
+    "choices": [
+      "Back up second base",
+      "Cover first base",
+      "Back up home plate",
+      "Stay on the mound"
+    ],
+    "correct_index": 2,
+    "explanation": "With two outs she was running on contact, and a gap ball gives her a real shot at scoring. Get behind the plate so a bad relay doesn't cost you a run or extra bases.",
+    "hint": "On a ball in the gap, how far could the lead runner try to go?",
+    "playbook_page": 78,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 2,
+      "you": "P",
+      "ball": {
+        "at": "RCF-gap",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "first",
+          "to": "second",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 1B, <2 outs: bunt right at the catcher",
+    "scenario": "Runner on first, nobody out. The batter bunts it firmly, and it rolls right to you in front of the plate. You're the catcher.",
+    "question": "Where do you throw?",
+    "choices": [
+      "First base",
+      "Third base",
+      "Hold it",
+      "Second base"
+    ],
+    "correct_index": 3,
+    "explanation": "A bunt that comes straight to you gives you time to get the lead runner, so throw to the shortstop covering second. If you have to chase the ball, take the sure out at first instead.",
+    "hint": "When the ball comes right to you, which runner can you go after?",
+    "playbook_page": 12,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 0,
+      "you": "C",
+      "ball": {
+        "at": "bunt-C",
+        "type": "bunt"
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 3B, <2 outs: first baseman on a fly to right",
+    "scenario": "Runner on third, one out. Fly ball to right field, and the runner on third tags up to score. You're the first baseman.",
+    "question": "What's your job?",
+    "choices": [
+      "Line up as the cut between the right fielder and home",
+      "Stay on first base",
+      "Cover second base",
+      "Back up the catcher"
+    ],
+    "correct_index": 0,
+    "explanation": "The batter is out on the catch, so first base doesn't need you. Get in line between the right fielder and the plate so the catcher can have you cut the throw or let it go through.",
+    "hint": "With the batter already out, where are you most useful?",
+    "playbook_page": 36,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 1,
+      "you": "1B",
+      "ball": {
+        "at": "RF",
+        "type": "fly"
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 3B, <2 outs: shortstop on a bunt",
+    "scenario": "Runner on third, nobody out. The batter bunts toward the pitcher, and both corners charge. You're the shortstop.",
+    "question": "What's your job?",
+    "choices": [
+      "Cover second base",
+      "Cover third and yell if the runner breaks or strays too far",
+      "Cover first base",
+      "Charge in behind the pitcher"
+    ],
+    "correct_index": 1,
+    "explanation": "With the third baseman charging, her bag is empty. Get there and be the eyes on that runner, so the fielder knows right away if she should throw home.",
+    "hint": "Once the third baseman leaves, who can see the runner on third best?",
+    "playbook_page": 28,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 0,
+      "you": "SS",
+      "ball": {
+        "at": "bunt-P",
+        "type": "bunt"
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runners at 1B & 3B, <2 outs: comebacker with the runner holding",
+    "scenario": "Runners on first and third, one out. Ground ball back to you on the mound, and the runner on third stays close to her bag.",
+    "question": "What's your play?",
+    "choices": [
+      "Throw home right away",
+      "Throw to third",
+      "Look the runner back to third, then throw to first",
+      "Run at the runner on third"
+    ],
+    "correct_index": 2,
+    "explanation": "Freeze the runner with a look so she can't score on your throw, then take the out at first. If she breaks for the plate, the throw goes to the catcher instead.",
+    "hint": "What keeps the runner on third from scoring while you throw?",
+    "playbook_page": 56,
+    "diagram": {
+      "runners": [
+        "first",
+        "third"
+      ],
+      "outs": 1,
+      "you": "P",
+      "ball": {
+        "at": "P",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runners at 2B & 3B, <2 outs: after the out at first on a bunt",
+    "scenario": "Runners on second and third, nobody out. The batter bunts to the pitcher, the runners hold, and the pitcher throws to you covering first for the out. You're the second baseman.",
+    "question": "What should you do right after the catch?",
+    "choices": [
+      "Throw the ball back to the pitcher right away",
+      "Throw to second base",
+      "Roll the ball back to the mound",
+      "Check the lead runner before doing anything else"
+    ],
+    "correct_index": 3,
+    "explanation": "Runners love to take off when a fielder relaxes after an out. Look at the lead runner right away so she can't sneak home or grab an extra base.",
+    "hint": "The out is made, but are the runners finished?",
+    "playbook_page": 62,
+    "diagram": {
+      "runners": [
+        "second",
+        "third"
+      ],
+      "outs": 0,
+      "you": "2B",
+      "ball": {
+        "at": "bunt-P",
+        "type": "bunt"
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 2B, 2 outs: lining up the cut from home",
+    "scenario": "Runner on second, two outs. Single to left, and the runner is heading home. The shortstop goes out as the cut but drifts a few steps off the line between the left fielder and the plate. You're the catcher.",
+    "question": "What do you do?",
+    "choices": [
+      "Call her left or right until she's in line",
+      "Leave home to go get the throw",
+      "Tell the left fielder to throw to second instead",
+      "Say nothing and let her find it"
+    ],
+    "correct_index": 0,
+    "explanation": "From the plate you can see the whole throwing line, so you steer the cut. Tell her which way to move so the throw comes straight through to you.",
+    "hint": "Who has the best view of the line from the ball to the plate?",
+    "playbook_page": 5,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 2,
+      "you": "C",
+      "ball": {
+        "at": "LF",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "second",
+          "to": "third",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 3B, 2 outs: covering second without the ball",
+    "scenario": "Runner on third, two outs. A ground ball rolls into the right-center gap and the batter rounds first, headed for second. You're the shortstop covering second, and the throw hasn't arrived yet.",
+    "question": "What do you need to be careful about?",
+    "choices": [
+      "Standing in the base path so she has to go around you",
+      "Staying out of her path until you have the ball",
+      "Faking a tag to slow her down",
+      "Blocking the bag with your foot"
+    ],
+    "correct_index": 1,
+    "explanation": "A fielder without the ball can't get in the runner's way. If she has to go around you or stop, the umpire can call obstruction on you.",
+    "hint": "What's the rule for a fielder who doesn't have the ball yet?",
+    "playbook_page": 86,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 2,
+      "you": "SS",
+      "ball": {
+        "at": "RCF-gap",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "third",
+          "to": "home",
+          "kind": "run"
+        },
+        {
+          "from": "home",
+          "to": "first",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runners at 1B & 2B, 2 outs: bunt back to the pitcher",
+    "scenario": "Runners on first and second, two outs. The batter bunts it hard right back to you on the mound.",
+    "question": "Where do you throw?",
+    "choices": [
+      "Third base",
+      "Second base",
+      "First base",
+      "Home plate"
+    ],
+    "correct_index": 2,
+    "explanation": "With two outs, any out ends the inning, so take the surest one: first base. With fewer than two outs, a hard bunt like this would go to third for the lead runner.",
+    "hint": "How many outs do you need to end the inning?",
+    "playbook_page": 87,
+    "diagram": {
+      "runners": [
+        "first",
+        "second"
+      ],
+      "outs": 2,
+      "you": "P",
+      "ball": {
+        "at": "bunt-P",
+        "type": "bunt"
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runners at 1B & 2B, 2 outs: grounder that carries you toward second",
+    "scenario": "Runners on first and second, two outs. You're the second baseman, and a ground ball takes you toward the second-base bag as you field it.",
+    "question": "What's the best play?",
+    "choices": [
+      "Spin and throw to first",
+      "Throw to third",
+      "Run it to first yourself",
+      "Get the ball to the shortstop covering second"
+    ],
+    "correct_index": 3,
+    "explanation": "When the ball pulls you toward second, the force there is the shortest, easiest out. Feed it to the shortstop on the bag to end the inning.",
+    "hint": "Which out is closest to where your momentum is taking you?",
+    "playbook_page": 88,
+    "diagram": {
+      "runners": [
+        "first",
+        "second"
+      ],
+      "outs": 2,
+      "you": "2B",
+      "ball": {
+        "at": "2B",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Bases loaded, 2 outs: shortstop on a ball in the left-center gap",
+    "scenario": "Bases loaded, two outs. A ground ball splits the left-center gap and all three runners are moving. You're the shortstop.",
+    "question": "Where do you line up?",
+    "choices": [
+      "As the cut to home",
+      "As the cut to second",
+      "As the cut to third",
+      "Cover second base"
+    ],
+    "correct_index": 0,
+    "explanation": "With everyone running on contact, the play that matters is at the plate. Go out and line up between the outfielder and home; the first baseman sets up as a second cut behind you.",
+    "hint": "Which runner is the most dangerous on this hit?",
+    "playbook_page": 95,
+    "diagram": {
+      "runners": [
+        "first",
+        "second",
+        "third"
+      ],
+      "outs": 2,
+      "you": "SS",
+      "ball": {
+        "at": "LCF-gap",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runners at 1B & 3B, 2 outs: shortstop on a bunt",
+    "scenario": "Runners on first and third, two outs. The batter bunts to the pitcher. You're the shortstop.",
+    "question": "Where do you go?",
+    "choices": [
+      "Cover third base",
+      "Cover second base",
+      "Cover first base",
+      "Back up the pitcher"
+    ],
+    "correct_index": 1,
+    "explanation": "With no one on second, the third baseman returns to her own bag after charging. Your base is second, where the runner from first is headed.",
+    "hint": "Which base is empty, and which runner is heading there?",
+    "playbook_page": 97,
+    "diagram": {
+      "runners": [
+        "first",
+        "third"
+      ],
+      "outs": 2,
+      "you": "SS",
+      "ball": {
+        "at": "bunt-P",
+        "type": "bunt"
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runners at 1B & 3B, 2 outs: second baseman on a single to right",
+    "scenario": "Runners on first and third, two outs. Ground ball single into right field. The runner from third will score, and the runner from first is trying for third. You're the second baseman.",
+    "question": "What's your job?",
+    "choices": [
+      "Fill in at first base",
+      "Cover second base",
+      "Go out and be the cut to third",
+      "Back up the right fielder"
+    ],
+    "correct_index": 2,
+    "explanation": "The runner you can still stop is the one going from first to third. Get out between the right fielder and third so her throw has a target.",
+    "hint": "Which runner can you still get, and where is she going?",
+    "playbook_page": 100,
+    "diagram": {
+      "runners": [
+        "first",
+        "third"
+      ],
+      "outs": 2,
+      "you": "2B",
+      "ball": {
+        "at": "RF",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "third",
+          "to": "home",
+          "kind": "run"
+        },
+        {
+          "from": "first",
+          "to": "second",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runners at 2B & 3B, 2 outs: left fielder's backup after the play at third",
+    "scenario": "Runners on second and third, two outs. Single to right field. You're the left fielder and you've run behind third to back it up, but both runners score and there's no play at third.",
+    "question": "What should you do next?",
+    "choices": [
+      "Stay behind third base",
+      "Run in to cover home",
+      "Jog back to left field",
+      "Shift over to back up second base"
+    ],
+    "correct_index": 3,
+    "explanation": "Backing up third comes first, but don't stop there. If nothing happens at third, slide over behind second in case the batter tries to take it on a throw.",
+    "hint": "Once one base is settled, where could the batter-runner still go?",
+    "playbook_page": 105,
+    "diagram": {
+      "runners": [
+        "second",
+        "third"
+      ],
+      "outs": 2,
+      "you": "LF",
+      "ball": {
+        "at": "RF",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "third",
+          "to": "home",
+          "kind": "run"
+        },
+        {
+          "from": "second",
+          "to": "third",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Cuts: how far out to go",
+    "scenario": "Runners on second and third, two outs. Single to left, and you're the shortstop going out as the cut to home.",
+    "question": "What should decide how far out you go?",
+    "choices": [
+      "Your left fielder's arm strength",
+      "Always stop at the edge of the infield dirt",
+      "How fast the runner is",
+      "Wherever the catcher points"
+    ],
+    "correct_index": 0,
+    "explanation": "A cut is there to shorten the throw. Know your outfielder's arm: go farther out for a weaker arm and stay closer for a strong one.",
+    "hint": "The cut exists to make a long throw shorter for someone.",
+    "playbook_page": 2,
+    "diagram": {
+      "runners": [
+        "second",
+        "third"
+      ],
+      "outs": 2,
+      "you": "SS",
+      "ball": {
+        "at": "LF",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "second",
+          "to": "third",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 1B, 2 outs: second baseman on a ball in the right-center gap",
+    "scenario": "Runner on first, two outs. A ground ball splits the right-center gap. You're the second baseman.",
+    "question": "What's your job?",
+    "choices": [
+      "Cover second base",
+      "Go out as the first cut",
+      "Cover first base",
+      "Back up the center fielder"
+    ],
+    "correct_index": 1,
+    "explanation": "The ball is hit to your half of the outfield, so you go out as the lead cut toward third or home. The shortstop takes second and the first baseman sets up as a second cut to the plate.",
+    "hint": "Which infielder is closest to that gap?",
+    "playbook_page": 78,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 2,
+      "you": "2B",
+      "ball": {
+        "at": "RCF-gap",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "first",
+          "to": "second",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runners at 1B & 3B, 2 outs: helping the catcher on a bunt",
+    "scenario": "Runners on first and third, two outs. The batter bunts a few feet in front of the plate. You charge from first, but the catcher calls you off and fields it.",
+    "question": "What should you do?",
+    "choices": [
+      "Run back to cover first",
+      "Cover home plate",
+      "Call out where she should throw",
+      "Back up the catcher"
+    ],
+    "correct_index": 2,
+    "explanation": "When the catcher makes the play, the corners help her by calling the base, loud and early. The second baseman is already covering first.",
+    "hint": "When someone else fields it, what can you still give her?",
+    "playbook_page": 3,
+    "diagram": {
+      "runners": [
+        "first",
+        "third"
+      ],
+      "outs": 2,
+      "you": "1B",
+      "ball": {
+        "at": "bunt-C",
+        "type": "bunt"
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 2B, 2 outs: single to left, throw home",
+    "scenario": "Runner on second, two outs. A ground ball single goes into left field, and the runner, who was running on contact, is rounding third. You're the left fielder.",
+    "question": "Where does your throw go?",
+    "choices": [
+      "Second base",
+      "Third base",
+      "First base",
+      "Through the cut to home"
+    ],
+    "correct_index": 3,
+    "explanation": "With two outs the runner was going on contact, so the play is at the plate. Hit your cut in line with home and let the catcher make the call.",
+    "hint": "Which runner can score, and where do you stop her?",
+    "playbook_page": 81,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 2,
+      "you": "LF",
+      "ball": {
+        "at": "LF",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "second",
+          "to": "third",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runner at 2B, <2 outs: first baseman on a fly to center",
+    "scenario": "Runner on second, one out. Fly ball to center field, and the runner tags to go to third. You're the first baseman.",
+    "question": "Where do you go?",
+    "choices": [
+      "Back up second base",
+      "Stay on first base",
+      "Go out as the cut to third",
+      "Cover home plate"
+    ],
+    "correct_index": 0,
+    "explanation": "The batter is out on the catch, so nothing is happening at first. Get behind second in case a throw there gets loose while the play goes to third.",
+    "hint": "The batter's already out. Which bag could still see a stray throw?",
+    "playbook_page": 27,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 1,
+      "you": "1B",
+      "ball": {
+        "at": "CF",
+        "type": "fly"
+      },
+      "arrows": [
+        {
+          "from": "second",
+          "to": "third",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 1B & 2B, <2 outs: hard single right at the left fielder",
+    "scenario": "Runners on first and second, one out. A hard ground ball single comes right at you in left field, and you get to it fast.",
+    "question": "Where do you throw?",
+    "choices": [
+      "Through the cut to home",
+      "Third base",
+      "Second base",
+      "First base"
+    ],
+    "correct_index": 1,
+    "explanation": "A hard ball right at you is in your glove before the lead runner can think about scoring, so throw to third and stop her there. On a slower ball you have to charge, the throw would go through the cut to home.",
+    "hint": "How fast did the ball get to you, and how far can the lead runner get?",
+    "playbook_page": 41,
+    "diagram": {
+      "runners": [
+        "first",
+        "second"
+      ],
+      "outs": 1,
+      "you": "LF",
+      "ball": {
+        "at": "LF",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 1B & 2B, <2 outs: hard grounder to short",
+    "scenario": "Runners on first and second, one out. A hard ground ball is hit right at you at shortstop.",
+    "question": "Where do you throw?",
+    "choices": [
+      "First base",
+      "Home plate",
+      "Third base",
+      "Run at the runner from second"
+    ],
+    "correct_index": 2,
+    "explanation": "A hard-hit ball gives you time to get the lead runner, and she's forced. Throw to the third baseman for the force on the runner from second.",
+    "hint": "Which forced runner is closest to scoring?",
+    "playbook_page": 40,
+    "diagram": {
+      "runners": [
+        "first",
+        "second"
+      ],
+      "outs": 1,
+      "you": "SS",
+      "ball": {
+        "at": "SS",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 1B & 2B, <2 outs: slow roller to the pitcher",
+    "scenario": "Runners on first and second, nobody out. A slow, chopping ground ball comes toward you on the mound, and you have to charge hard to get it.",
+    "question": "Where do you throw?",
+    "choices": [
+      "Third base",
+      "Second base",
+      "Home plate",
+      "First base"
+    ],
+    "correct_index": 3,
+    "explanation": "A slow ball eats up the time you'd need to beat the lead runner. Take the sure out at first, and save the throw to third for a ball hit hard back to you.",
+    "hint": "Did the slow ball leave you enough time for the lead runner?",
+    "playbook_page": 39,
+    "diagram": {
+      "runners": [
+        "first",
+        "second"
+      ],
+      "outs": 0,
+      "you": "P",
+      "ball": {
+        "at": "P",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Bases loaded, <2 outs: shortstop on a grounder to third",
+    "scenario": "Bases loaded, one out, infield in. Ground ball to the third baseman, who fields it and throws home. You're the shortstop.",
+    "question": "What's your job on this play?",
+    "choices": [
+      "Back her up, then cover third for a possible throw from the catcher",
+      "Cover second base",
+      "Run toward home to back up the catcher",
+      "Cover first base"
+    ],
+    "correct_index": 0,
+    "explanation": "Start by backing up the ground ball. Once the third baseman throws home, her bag is empty, so get there: the catcher may come back to third for a second out.",
+    "hint": "After the third baseman throws, which bag has nobody on it?",
+    "playbook_page": 49,
+    "diagram": {
+      "runners": [
+        "first",
+        "second",
+        "third"
+      ],
+      "outs": 1,
+      "you": "SS",
+      "ball": {
+        "at": "3B",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Bases loaded, <2 outs: grounder to the first baseman",
+    "scenario": "Bases loaded, one out, infield in. Ground ball to you at first base, a step off the bag.",
+    "question": "Where's your play?",
+    "choices": [
+      "Step on first",
+      "Throw home to the catcher",
+      "Throw to second",
+      "Throw to third"
+    ],
+    "correct_index": 1,
+    "explanation": "Stepping on first gets an out but lets the run score. With fewer than two outs, cut the run down at the plate; it's a force, so the catcher only has to touch home.",
+    "hint": "Which out also keeps a run off the board?",
+    "playbook_page": 48,
+    "diagram": {
+      "runners": [
+        "first",
+        "second",
+        "third"
+      ],
+      "outs": 1,
+      "you": "1B",
+      "ball": {
+        "at": "1B",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Bases loaded, <2 outs: catcher after the force at home",
+    "scenario": "Bases loaded, nobody out. Comebacker to the pitcher, who throws to you at home. You catch it with your foot on the plate for the force.",
+    "question": "What should you do next?",
+    "choices": [
+      "Hold the ball and call time",
+      "Tag the runner who just slid in",
+      "Look for a second out at first or third",
+      "Chase the runner back toward third"
+    ],
+    "correct_index": 2,
+    "explanation": "The force at home is the first out, not the end of the play. Set your feet and look to throw to first or third for a second one.",
+    "hint": "One out is good. Is there another one available?",
+    "playbook_page": 47,
+    "diagram": {
+      "runners": [
+        "first",
+        "second",
+        "third"
+      ],
+      "outs": 0,
+      "you": "C",
+      "ball": {
+        "at": "P",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 1B & 3B, <2 outs: ball up the middle to the shortstop",
+    "scenario": "Runners on first and third, one out. The shortstop fields a ground ball up the middle near second base, and the runner on third holds. You're the second baseman covering second.",
+    "question": "What's your job?",
+    "choices": [
+      "Let her make the throw to first",
+      "Run to back up first base",
+      "Cover third base",
+      "Call for the ball at second, then throw to first"
+    ],
+    "correct_index": 3,
+    "explanation": "When the ball takes the shortstop toward the bag, the play at second is right in front of her. Demand the ball, take the force, and finish with a throw to first.",
+    "hint": "When the ball pulls her toward your bag, what's the shortest throw?",
+    "playbook_page": 57,
+    "diagram": {
+      "runners": [
+        "first",
+        "third"
+      ],
+      "outs": 1,
+      "you": "2B",
+      "ball": {
+        "at": "SS",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 1B & 3B, <2 outs: center fielder on a bunt",
+    "scenario": "Runners on first and third, nobody out. The batter bunts to the pitcher. You're the center fielder.",
+    "question": "What's your job?",
+    "choices": [
+      "Back up second base",
+      "Run in and cover second base",
+      "Back up third base",
+      "Stay in center"
+    ],
+    "correct_index": 0,
+    "explanation": "With runners on first and third, the shortstop covers second on a bunt, so the bag is taken. Your job is to get behind it in case a throw there gets away.",
+    "hint": "Someone in the infield already has the bag. What's left for you?",
+    "playbook_page": 54,
+    "diagram": {
+      "runners": [
+        "first",
+        "third"
+      ],
+      "outs": 0,
+      "you": "CF",
+      "ball": {
+        "at": "bunt-P",
+        "type": "bunt"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 1B & 3B, <2 outs: catcher on a bunt with the runner off third",
+    "scenario": "Runners on first and third, one out. Bunt in front of the plate that only you can reach. As you pick it up, you see the runner on third has wandered way off her bag.",
+    "question": "What should you do?",
+    "choices": [
+      "Throw to first like always",
+      "Go after the runner off third",
+      "Throw to second",
+      "Hold the ball and step on home"
+    ],
+    "correct_index": 1,
+    "explanation": "Normally you'd take the out at first, but a lead runner caught far off third is the bigger prize. Go after her before she can get back.",
+    "hint": "Which runner is in the most trouble right now?",
+    "playbook_page": 54,
+    "diagram": {
+      "runners": [
+        "first",
+        "third"
+      ],
+      "outs": 1,
+      "you": "C",
+      "ball": {
+        "at": "bunt-C",
+        "type": "bunt"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 2B & 3B, <2 outs: third baseman when the catcher fields a bunt",
+    "scenario": "Runners on second and third, nobody out. The batter bunts a few feet in front of the plate, and only the catcher can get to it. You charged in from third, but she calls you off.",
+    "question": "Where do you go?",
+    "choices": [
+      "Back to third base",
+      "Cover first base",
+      "Cover home plate",
+      "Back up the catcher"
+    ],
+    "correct_index": 2,
+    "explanation": "The catcher left the plate to field the ball, so home is empty with a runner on third. You're the closest player, so take the plate; the shortstop is already covering third.",
+    "hint": "Which base is empty and also the most important to protect?",
+    "playbook_page": 63,
+    "diagram": {
+      "runners": [
+        "second",
+        "third"
+      ],
+      "outs": 0,
+      "you": "3B",
+      "ball": {
+        "at": "bunt-C",
+        "type": "bunt"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 2B & 3B, <2 outs: hard bunt to first",
+    "scenario": "Runners on second and third, nobody out. The batter bunts it hard right to you at first, and both runners stay put. The batter-runner is coming straight up the line at you.",
+    "question": "What's your best play?",
+    "choices": [
+      "Throw to the second baseman covering first",
+      "Throw home",
+      "Throw to third",
+      "Tag the batter-runner yourself"
+    ],
+    "correct_index": 3,
+    "explanation": "A hard bunt reaches you quickly, so the batter is still close. Tag her yourself; you stay facing the runners on base instead of turning away to throw.",
+    "hint": "Is the batter-runner close enough that you don't need to throw?",
+    "playbook_page": 63,
+    "diagram": {
+      "runners": [
+        "second",
+        "third"
+      ],
+      "outs": 0,
+      "you": "1B",
+      "ball": {
+        "at": "bunt-1B",
+        "type": "bunt"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 2B & 3B, <2 outs: runner breaks on a grounder to second",
+    "scenario": "Runners on second and third, one out. Ground ball to you at second base, and the runner on third breaks for home as you field it.",
+    "question": "Where do you throw?",
+    "choices": [
+      "Home to the catcher",
+      "First base",
+      "Third base",
+      "Second base"
+    ],
+    "correct_index": 0,
+    "explanation": "With fewer than two outs, stopping the run matters more than the out at first. She has committed, so get the ball to the catcher and save the run.",
+    "hint": "Which runner has already committed, and where is she going?",
+    "playbook_page": 65,
+    "diagram": {
+      "runners": [
+        "second",
+        "third"
+      ],
+      "outs": 1,
+      "you": "2B",
+      "ball": {
+        "at": "2B",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 1B & 2B, 2 outs: grounder in the hole at short",
+    "scenario": "Runners on first and second, two outs. A ground ball takes you to your right, deep in the hole toward third. You're the shortstop.",
+    "question": "Where's your best play?",
+    "choices": [
+      "Long throw to first",
+      "Third base",
+      "Second base",
+      "Home plate"
+    ],
+    "correct_index": 1,
+    "explanation": "Moving toward third, the force there is your shortest throw, and any out ends the inning. Don't make the long throw across the diamond when an easy force is right in front of you.",
+    "hint": "Which bag is the shortest throw from where you fielded it?",
+    "playbook_page": 89,
+    "diagram": {
+      "runners": [
+        "first",
+        "second"
+      ],
+      "outs": 2,
+      "you": "SS",
+      "ball": {
+        "at": "SS",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 1B & 2B, 2 outs: first baseman on a single to left",
+    "scenario": "Runners on first and second, two outs. Ground ball single to left field, and the runner from second is heading home. You're the first baseman.",
+    "question": "What's your job?",
+    "choices": [
+      "Go out as the cut to home",
+      "Back up home plate",
+      "Cover first base and help call where the throw goes",
+      "Cover second base"
+    ],
+    "correct_index": 2,
+    "explanation": "On a ball to left, the cut to home comes from the left side of the infield, not from you. Stay at first, ready if the batter rounds too far, and help the outfield with your voice.",
+    "hint": "Who is closer to the line between left field and home?",
+    "playbook_page": 89,
+    "diagram": {
+      "runners": [
+        "first",
+        "second"
+      ],
+      "outs": 2,
+      "you": "1B",
+      "ball": {
+        "at": "LF",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "second",
+          "to": "third",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Bases loaded, 2 outs: grounder to the first baseman",
+    "scenario": "Bases loaded, two outs. Ground ball to you at first base, a step from the bag.",
+    "question": "What's your play?",
+    "choices": [
+      "Throw home",
+      "Throw to second",
+      "Throw to third",
+      "Step on first base"
+    ],
+    "correct_index": 3,
+    "explanation": "With two outs, the closest out ends the inning and no runs count. Take the bag yourself; with fewer than two outs, you'd be throwing home instead.",
+    "hint": "How many outs do you need, and which one is closest?",
+    "playbook_page": 93,
+    "diagram": {
+      "runners": [
+        "first",
+        "second",
+        "third"
+      ],
+      "outs": 2,
+      "you": "1B",
+      "ball": {
+        "at": "1B",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Bases loaded, 2 outs: first baseman on a single to center",
+    "scenario": "Bases loaded, two outs. Ground ball single up the middle into center, and the runner from second is coming around third. You're the first baseman.",
+    "question": "What's your job?",
+    "choices": [
+      "Line up as the cut between center field and home",
+      "Stay on first base",
+      "Cover second base",
+      "Back up the catcher"
+    ],
+    "correct_index": 0,
+    "explanation": "On a ball to center with a run on the line, you're the cut to the plate. Line up on the throw from the center fielder to home so the catcher can have you cut it or let it through.",
+    "hint": "With the throw headed to the plate, which infielder has an open path to help?",
+    "playbook_page": 95,
+    "diagram": {
+      "runners": [
+        "first",
+        "second",
+        "third"
+      ],
+      "outs": 2,
+      "you": "1B",
+      "ball": {
+        "at": "CF",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "second",
+          "to": "third",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 1B & 3B, 2 outs: third baseman after charging a bunt",
+    "scenario": "Runners on first and third, two outs. The batter bunts toward the mound. You charge in from third, but the pitcher fields it.",
+    "question": "Where do you go?",
+    "choices": [
+      "Keep coming to back up the pitcher",
+      "Get back to third base",
+      "Cover home plate",
+      "Cover second base"
+    ],
+    "correct_index": 1,
+    "explanation": "With runners on first and third, the shortstop goes to second on a bunt, not third. Nobody else is heading to your bag, so get back there once the pitcher has the ball.",
+    "hint": "Check where the shortstop goes with runners on first and third.",
+    "playbook_page": 97,
+    "diagram": {
+      "runners": [
+        "first",
+        "third"
+      ],
+      "outs": 2,
+      "you": "3B",
+      "ball": {
+        "at": "bunt-P",
+        "type": "bunt"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 2B & 3B, 2 outs: pitcher's backup when there's no play at home",
+    "scenario": "Runners on second and third, two outs. Ground ball into the left-center gap. You run to back up home, but both runners score easily and there's no play at the plate. You're the pitcher.",
+    "question": "What should you do now?",
+    "choices": [
+      "Stay behind home plate",
+      "Go back to the mound",
+      "Move over to back up third base",
+      "Cover first base"
+    ],
+    "correct_index": 2,
+    "explanation": "Backing up home is your first job, but once there's no play there, the next throw is likely headed to third as the batter tries to stretch the hit. Slide over behind third.",
+    "hint": "With the runs in, where will the batter-runner try to go?",
+    "playbook_page": 105,
+    "diagram": {
+      "runners": [
+        "second",
+        "third"
+      ],
+      "outs": 2,
+      "you": "P",
+      "ball": {
+        "at": "LCF-gap",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "third",
+          "to": "home",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 2B & 3B, 2 outs: when the third baseman is the cut",
+    "scenario": "Runners on second and third, two outs. Single to left field. On this play your team uses the third baseman as the cut to home. You're the shortstop.",
+    "question": "Where do you go?",
+    "choices": [
+      "Go out as a second cut",
+      "Cover second base",
+      "Back up home",
+      "Fill in at third base"
+    ],
+    "correct_index": 3,
+    "explanation": "If the third baseman becomes the cut, her bag is left open. Slide over and take third so nobody gets that base for free.",
+    "hint": "When a player leaves her base to be the cut, who takes her spot?",
+    "playbook_page": 104,
+    "diagram": {
+      "runners": [
+        "second",
+        "third"
+      ],
+      "outs": 2,
+      "you": "SS",
+      "ball": {
+        "at": "LF",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "third",
+          "to": "home",
+          "kind": "run"
+        }
+      ]
+    }
+  }
+]

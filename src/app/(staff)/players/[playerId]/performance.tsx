@@ -80,7 +80,7 @@ export function PerformanceSummary({ summary }: { summary: Summary }) {
 }
 
 /** Hexagon badge: solid neon with a check when earned, outlined with the % done while locked. */
-function HexBadge({ unlocked, pct }: { unlocked: boolean; pct: number }) {
+export function HexBadge({ unlocked, pct }: { unlocked: boolean; pct: number }) {
   return (
     <svg viewBox="0 0 40 44" aria-hidden className="h-11 w-10 shrink-0">
       <path

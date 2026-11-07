@@ -1,13 +1,18 @@
 import Link from "next/link";
 import { OutlineText, SpeedStripes } from "@/components/athletic";
-import { GOAL_METHOD_LABEL, batsThrows, type Player } from "@/lib/softball";
+import { GOAL_METHOD_LABEL, batsThrows, playerName, type Player } from "@/lib/softball";
 import {
   currentRostering, firstName, possessive,
   type ActivityRow, type HaradaChart, type IqData, type MentalPlan, type MetricOption, type Performance, type PopReport,
   type SmartGoal, type TwisWeek,
 } from "./data";
 import { GoalsDetail, GoalsSummary } from "./goals";
-import { IqDetail, IqSummary, buildQuizzes } from "./iq";
+import { IqDetail, IqSummary, buildLibrary, buildPositions, buildQuizzes, buildTracks } from "./iq";
+import { TrophyRoomDetail, TrophyRoomSummary, buildTrophyRoom } from "./trophy-room";
+import { StolenBasePlaque } from "@/components/stolen-base-plaque";
+import { WorldSeriesTrophy } from "@/components/world-series-trophy";
+import { RingCase } from "@/components/rings";
+import { GoldenGlove } from "@/components/golden-glove";
 import { MentalDetail, MentalSummary } from "./mental";
 import { MenuBoard, type MenuSection } from "./menu";
 import { PerformanceDetail, PerformanceSummary, summarizePerformance } from "./performance";
@@ -49,7 +54,12 @@ export function PlayerMenu({
   const positions = [player.primary_position, ...player.secondary_positions].filter((p): p is NonNullable<typeof p> => Boolean(p));
   const training = summarizePerformance(performance, positions, today);
   const quizzes = buildQuizzes(iq, positions);
+  const iqTracks = buildTracks(iq);
+  const iqPositions = buildPositions(iq, positions);
   const team = currentRostering(pop);
+  const plate = { name: playerName(player), number: team?.jersey_number ?? null }; // engraved on awards
+  const library = buildLibrary(iq);
+  const room = buildTrophyRoom(iq, iqPositions, training.achievements, plate);
 
   // The menu. Add a section here (and a board variant in ./menu.tsx if it needs a new look).
   const sections: MenuSection[] = [
@@ -104,11 +114,31 @@ export function PlayerMenu({
     {
       key: "iq",
       title: "IQ Test",
-      subtitle: "Game scenarios · Hitting IQ · Pitching IQ",
+      subtitle: "Defense IQ · Baserunning IQ · Position IQ · Extra Credit",
       variant: "outlinePink",
       wide: true,
-      summary: <IqSummary quizzes={quizzes} />,
-      detail: <IqDetail playerId={player.id} quizzes={quizzes} iq={iq} canEdit={editor} />,
+      summary: <IqSummary quizzes={quizzes} tracks={iqTracks} positions={iqPositions} plate={plate} rings={iq.rings} />,
+      detail: (
+        <IqDetail
+          playerId={player.id}
+          quizzes={quizzes}
+          tracks={iqTracks}
+          positions={iqPositions}
+          library={library}
+          plate={plate}
+          iq={iq}
+          canEdit={editor}
+        />
+      ),
+    },
+    {
+      key: "trophies",
+      title: `${possessive(name)} Trophy Room`,
+      subtitle: "Trophies · rings · Golden Gloves · MVP badges · achievements",
+      variant: "trophy",
+      wide: true,
+      summary: <TrophyRoomSummary room={room} />,
+      detail: <TrophyRoomDetail room={room} />,
     },
   ];
 
@@ -142,6 +172,18 @@ export function PlayerMenu({
             {name} <span className="text-ink">{player.last_name}</span>
           </h1>
           {tagline && <p className="mx-auto mt-4 max-w-2xl font-mono text-sm text-muted">{tagline}</p>}
+          {(iq.rings.length > 0 || iq.gloves.length > 0 || room.worldSeriesOn) && (
+            <div className="mt-6 flex flex-wrap items-end justify-center gap-6" aria-label="Trophies, rings and Golden Gloves">
+              {room.worldSeriesOn && <WorldSeriesTrophy size={56} />}
+              {room.plaqueOn && <StolenBasePlaque name={plate.name} number={plate.number} engrave={false} size={52} />}
+              {iq.rings.length > 0 && <RingCase earned={iq.rings} size={44} />}
+              {iqPositions
+                .filter((p) => p.earnedOn)
+                .map((p) => (
+                  <GoldenGlove key={p.position} name={plate.name} number={plate.number} position={p.label} engrave={false} size={72} />
+                ))}
+            </div>
+          )}
         </div>
       </header>
 

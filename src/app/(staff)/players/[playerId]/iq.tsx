@@ -1,17 +1,24 @@
 import { Disclosure, secondaryButtonClass } from "@/components/ui";
-import { POSITION_LABEL, type Position } from "@/lib/softball";
+import { FIELD_POSITIONS, POSITION_LABEL, type Position } from "@/lib/softball";
 import { setIqQuestionActive } from "./actions";
 import type { IqData, IqQuestion } from "./data";
-import { IqQuestionForm, QuizRunner, type QuizInfo } from "./iq-client";
+import { RingCase, TRACK_LABEL, type RingTrack } from "@/components/rings";
+import { GoldenGlove } from "@/components/golden-glove";
+import { formatLongDate } from "@/lib/dates";
+import {
+  IqQuestionForm, IqTests, QuizRunner, type LevelInfo, type LibraryInfo, type Nameplate, type PositionInfo, type QuizInfo,
+  type TrackInfo,
+} from "./iq-client";
 import { DetailHeading, MenuItem } from "./menu";
 
-const QUIZ_POSITIONS: Position[] = ["P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"];
+const QUIZ_POSITIONS: readonly Position[] = FIELD_POSITIONS;
 
 /** The quizzes this player gets: General, Hitting, Pitching, and one per position they play. */
 export function buildQuizzes(iq: IqData, positions: Position[]): QuizInfo[] {
-  const active = iq.questions.filter((q) => q.active);
+  // Practice quizzes use the free-standing questions; playbook level questions are tested in their levels.
+  const active = iq.questions.filter((q) => q.active && !q.track);
   const latest = new Map<string, boolean>(); // question -> was the most recent answer right?
-  for (const a of iq.answers) latest.set(a.question_id, a.is_correct);
+  for (const a of iq.answers) if (!a.attempt_id && !a.review_of) latest.set(a.question_id, a.is_correct);
 
   const sections: { key: string; label: string; match: (q: IqQuestion) => boolean }[] = [
     { key: "general", label: "General IQ", match: (q) => q.topic === "general" },
@@ -25,7 +32,7 @@ export function buildQuizzes(iq: IqData, positions: Position[]): QuizInfo[] {
   return sections.map(({ key, label, match }) => {
     const questions = active.filter(match);
     const ids = new Set(questions.map((q) => q.id));
-    const answers = iq.answers.filter((a) => ids.has(a.question_id));
+    const answers = iq.answers.filter((a) => ids.has(a.question_id) && !a.attempt_id && !a.review_of);
     const rank = (q: IqQuestion) => (!latest.has(q.id) ? 0 : latest.get(q.id) ? 2 : 1); // new, missed, mastered
     return {
       key,
@@ -43,28 +50,163 @@ export function buildQuizzes(iq: IqData, positions: Position[]): QuizInfo[] {
   });
 }
 
-export function IqSummary({ quizzes }: { quizzes: QuizInfo[] }) {
-  const answered = quizzes.reduce((n, q) => n + q.stats.answered, 0);
+const TRACK_BLURB: Record<RingTrack, string> = {
+  defense: "Where to go with the ball, coverage and backups, from the Softball IQ Defensive Playbook.",
+  baserunning: "Reads, leads, tags and running decisions, from the Softball IQ Baserunning Playbook.",
+};
+
+/** Best score, the open test's progress, and the last finished test's misses, for one test. */
+function testState(iq: IqData, attempts: IqData["attempts"], questionCount: number) {
+  // attempts are newest first
+  const finished = attempts.filter((a) => a.finished_at && a.total);
+  const best = finished.reduce<{ correct: number; total: number } | null>(
+    (b, a) => (!b || a.correct! / a.total! > b.correct / b.total ? { correct: a.correct!, total: a.total! } : b),
+    null,
+  );
+
+  const open = attempts.find((a) => !a.finished_at);
+  const inProgress = open
+    ? { answered: iq.answers.filter((x) => x.attempt_id === open.id).length, total: open.question_order?.length ?? questionCount }
+    : null;
+
+  const last = finished[0];
+  let lastFinished: LevelInfo["lastFinished"] = null;
+  if (last) {
+    const right = new Set(iq.answers.filter((x) => x.attempt_id === last.id && x.is_correct).map((x) => x.question_id));
+    const missedIds = (last.question_order ?? []).filter((id) => !right.has(id));
+    const reviewed = new Set(iq.answers.filter((x) => x.review_of === last.id && missedIds.includes(x.question_id)).map((x) => x.question_id));
+    lastFinished = { attemptId: last.id, missed: missedIds.length, reviewed: reviewed.size, reviewedAt: last.reviewed_at };
+  }
+  return { questionCount, best, inProgress, lastFinished };
+}
+
+/** Level status for each playbook track: earned, open (next to take), or locked. */
+export function buildTracks(iq: IqData): TrackInfo[] {
+  return (["defense", "baserunning"] as RingTrack[]).map((track) => ({
+    track,
+    label: TRACK_LABEL[track],
+    blurb: TRACK_BLURB[track],
+    levels: [1, 2, 3].map((level) => {
+      const ring = iq.rings.find((r) => r.track === track && r.level === level);
+      const prevRing = level === 1 || iq.rings.some((r) => r.track === track && r.level === level - 1);
+      const questionCount = iq.questions.filter((q) => q.active && q.track === track && q.level === level).length;
+      return {
+        level,
+        status: ring ? "earned" : prevRing ? "open" : "locked",
+        earnedOn: ring ? formatLongDate(ring.earned_on) : null,
+        ...testState(iq, iq.attempts.filter((a) => a.track === track && a.level === level), questionCount),
+      };
+    }),
+  }));
+}
+
+/** Position tests (one level each) and Golden Gloves, for every position on the field. `mine` starts with her primary position. */
+export function buildPositions(iq: IqData, mine: Position[]): PositionInfo[] {
+  return FIELD_POSITIONS.map((position) => {
+    const glove = iq.gloves.find((g) => g.position === position);
+    const questionCount = iq.questions.filter((q) => q.active && q.track === "position" && q.position === position).length;
+    return {
+      position,
+      label: POSITION_LABEL[position],
+      mine: mine.includes(position),
+      primary: mine[0] === position,
+      earnedOn: glove ? formatLongDate(glove.earned_on) : null,
+      earnedYear: glove ? glove.earned_on.slice(0, 4) : null,
+      ...testState(iq, iq.attempts.filter((a) => a.track === "position" && a.position === position), questionCount),
+    };
+  });
+}
+
+/** The Extra Credit Library: shelves, her runs, and the World Series Trophy. */
+export function buildLibrary(iq: IqData): LibraryInfo {
+  const questions = iq.questions.filter((q) => q.active && q.track === "extra");
+  const shelves = new Map<string, number>();
+  for (const q of questions) shelves.set(q.section ?? "Library", (shelves.get(q.section ?? "Library") ?? 0) + 1);
+  return {
+    shelves: [...shelves].map(([name, count]) => ({ name, count })).sort((a, b) => a.name.localeCompare(b.name)),
+    trophyEarnedOn: iq.worldSeries ? formatLongDate(iq.worldSeries.earned_on) : null,
+    ...testState(iq, iq.attempts.filter((a) => a.track === "extra"), questions.length),
+  };
+}
+
+/** Earned Golden Gloves, each engraved with her name and number. */
+export function GloveCase({ positions, plate, size = 220 }: { positions: PositionInfo[]; plate: Nameplate; size?: number }) {
+  const earned = positions.filter((p) => p.earnedOn);
+  if (!earned.length) return null;
   return (
-    <div>
-      <div className="grid gap-x-10 gap-y-4 sm:grid-cols-2">
-        {quizzes.map((q) => (
-          <MenuItem
-            key={q.key}
-            name={q.label}
-            value={q.stats.pct === null ? "New" : `${q.stats.pct}%`}
-            note={`${q.stats.mastered}/${q.stats.total} scenarios mastered`}
-          />
-        ))}
-      </div>
-      <p className="mt-5 font-mono text-xs tracking-wider text-muted uppercase">
-        {answered ? `${answered} answers so far` : "Game scenarios, multiple choice"}
-      </p>
+    <div className="flex flex-wrap justify-center gap-6">
+      {earned.map((p) => (
+        <figure key={p.position} className="flex flex-col items-center gap-2">
+          <GoldenGlove name={plate.name} number={plate.number} position={p.label} year={p.earnedYear} size={size} />
+          <figcaption className="font-mono text-[11px] tracking-wider text-muted uppercase">
+            {p.label} · {p.earnedOn}
+          </figcaption>
+        </figure>
+      ))}
     </div>
   );
 }
 
+export function IqSummary({
+  quizzes,
+  tracks,
+  positions,
+  plate,
+  rings,
+}: {
+  quizzes: QuizInfo[];
+  tracks: TrackInfo[];
+  positions: PositionInfo[];
+  plate: Nameplate;
+  rings: IqData["rings"];
+}) {
+  const gloves = positions.filter((p) => p.earnedOn);
+  return (
+    <div>
+      <div className="grid gap-x-10 gap-y-4 sm:grid-cols-3">
+        {tracks.map((t) => {
+          const earned = t.levels.filter((l) => l.status === "earned").length;
+          const next = t.levels.find((l) => l.status === "open");
+          return (
+            <MenuItem
+              key={t.track}
+              name={t.label}
+              value={`${earned}/3`}
+              note={earned === 3 ? "All three rings earned" : next ? `Level ${next.level} is next` : "Locked"}
+            />
+          );
+        })}
+        <MenuItem
+          name="Position IQ"
+          value={gloves.length}
+          note={gloves.length ? `Golden Glove: ${gloves.map((g) => g.position).join(", ")}` : "Earn a Golden Glove at any position"}
+        />
+      </div>
+      <div className="mt-5 flex flex-wrap items-end justify-center gap-6">
+        <RingCase earned={rings} size={40} showLabels={false} />
+        {gloves.map((g) => (
+          <GoldenGlove key={g.position} name={plate.name} number={plate.number} position={g.label} engrave={false} size={64} />
+        ))}
+      </div>
+      <PracticeLine quizzes={quizzes} />
+    </div>
+  );
+}
+
+function PracticeLine({ quizzes }: { quizzes: QuizInfo[] }) {
+  const answered = quizzes.reduce((n, q) => n + q.stats.answered, 0);
+  return (
+    <p className="mt-4 font-mono text-xs tracking-wider text-muted uppercase">
+      Practice: {quizzes.map((q) => q.label.replace(" IQ", "")).join(" · ")}
+      {answered ? ` · ${answered} answered` : ""}
+    </p>
+  );
+}
+
 function topicLabel(q: IqQuestion) {
+  if (q.track === "position" && q.position) return `${POSITION_LABEL[q.position]} · Golden Glove test`;
+  if (q.track === "extra") return `Extra Credit · ${q.section ?? "Library"}`;
+  if (q.track === "defense" || q.track === "baserunning") return `${TRACK_LABEL[q.track]} · Level ${q.level}`;
   if (q.topic === "position" && q.position) return `${POSITION_LABEL[q.position]} IQ`;
   return { general: "General IQ", hitting: "Hitting IQ", pitching: "Pitching IQ", position: "Position IQ" }[q.topic];
 }
@@ -72,30 +214,54 @@ function topicLabel(q: IqQuestion) {
 export function IqDetail({
   playerId,
   quizzes,
+  tracks,
+  positions,
+  library,
+  plate,
   iq,
   canEdit,
 }: {
   playerId: string;
   quizzes: QuizInfo[];
+  tracks: TrackInfo[];
+  positions: PositionInfo[];
+  library: LibraryInfo;
+  plate: Nameplate;
   iq: IqData;
   canEdit: boolean;
 }) {
   const byId = new Map(iq.questions.map((q) => [q.id, q]));
-  const missed = [...new Map(iq.answers.map((a) => [a.question_id, a])).values()]
+  // Practice misses only: level-test misses have their own review (with hints) in Playbook tests.
+  const practice = iq.answers.filter((a) => !a.attempt_id && !a.review_of);
+  const missed = [...new Map(practice.map((a) => [a.question_id, a])).values()]
     .filter((a) => !a.is_correct)
     .map((a) => byId.get(a.question_id))
-    .filter((q): q is IqQuestion => Boolean(q?.active));
+    .filter((q): q is IqQuestion => Boolean(q?.active && !q.track));
 
   return (
     <div className="flex flex-col gap-8">
       <section>
-        <DetailHeading>Take a quiz</DetailHeading>
+        <DetailHeading>Championship rings</DetailHeading>
+        <RingCase earned={iq.rings} size={72} />
+      </section>
+
+      {positions.some((p) => p.earnedOn) && (
+        <section>
+          <DetailHeading>Golden Gloves</DetailHeading>
+          <GloveCase positions={positions} plate={plate} />
+        </section>
+      )}
+
+      <IqTests playerId={playerId} tracks={tracks} positions={positions} library={library} plate={plate} canEdit={canEdit} />
+
+      <section>
+        <DetailHeading>Practice quizzes</DetailHeading>
         <QuizRunner playerId={playerId} quizzes={quizzes} canEdit={canEdit} />
       </section>
 
       {missed.length > 0 && (
         // Collapsed so the answers don't show while a quiz is running.
-        <Disclosure summary={`Review missed questions (${missed.length}) · shows the answers`}>
+        <Disclosure summary={`Review missed practice questions (${missed.length}) · shows the answers`}>
           <ul className="grid gap-3 md:grid-cols-2">
             {missed.map((q) => (
               <li key={q.id} className="rounded-xl border border-pink/50 p-3 text-sm">

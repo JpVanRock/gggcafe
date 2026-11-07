@@ -1,0 +1,2355 @@
+[
+  {
+    "level": 1,
+    "topic": "No runners, <2 outs: ground ball to SS",
+    "scenario": "Nobody on, no outs. You hit a routine ground ball to the shortstop.",
+    "question": "How do you run it out?",
+    "choices": [
+      "Sprint hard straight through first base",
+      "Round first and look for second in case of a bad throw",
+      "Slide headfirst into first to beat the throw",
+      "Ease up and stop right on the bag so you don't overrun it"
+    ],
+    "correct_index": 0,
+    "explanation": "On an infield grounder the only play is at first, so run through the bag at full speed and break down past it. Stopping on the base or sliding into it only slows you down.",
+    "hint": "Where is the only play the defense can make on this ball?",
+    "playbook_page": 3,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter",
+      "ball": {
+        "at": "SS",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "No runners, 2 outs: single to LF",
+    "scenario": "Two outs, nobody on. You hit a clean single on the ground through the left side into left field.",
+    "question": "What do you do at first base?",
+    "choices": [
+      "Run straight through first, like on an infield grounder",
+      "Make a hard turn at first and put pressure on the left fielder",
+      "Stop on first so you don't take chances with two outs",
+      "Head straight for second no matter what"
+    ],
+    "correct_index": 1,
+    "explanation": "A hard, aggressive turn makes the left fielder hurry. If she bobbles it or lobs it back in, you're already in position to take second; running straight through gives that chance away.",
+    "hint": "What could a bobble or a lazy throw back to the infield give you?",
+    "playbook_page": 16,
+    "diagram": {
+      "runners": [],
+      "outs": 2,
+      "you": "batter",
+      "ball": {
+        "at": "LF",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 1B, <2 outs: ground ball to the infield",
+    "scenario": "One out, you're on first. The batter hits a ground ball to the third baseman.",
+    "question": "What do you do?",
+    "choices": [
+      "Hold at first until you see where the throw goes",
+      "Run halfway to second and stop to avoid a double play",
+      "Run hard to second and slide",
+      "Run to second standing up and round the bag toward third"
+    ],
+    "correct_index": 2,
+    "explanation": "You're forced to move on any ground ball, so get to second fast. Slide in, because the defense may go for the lead out at second.",
+    "hint": "Does the batter running behind you leave you a choice?",
+    "playbook_page": 4,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 1,
+      "you": "runner-first",
+      "ball": {
+        "at": "3B",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 2B, <2 outs: ground ball to SS",
+    "scenario": "No outs, you're on second and the other bases are empty. The batter hits a ground ball to the shortstop.",
+    "question": "What's your move?",
+    "choices": [
+      "Run straight to third as soon as the ball is hit",
+      "Stay glued to second no matter where the throw goes",
+      "Head for third only after the batter is called safe at first",
+      "Get a good jump, then take third once she throws to first"
+    ],
+    "correct_index": 3,
+    "explanation": "A ball hit in front of you on the left side puts the shortstop in easy throwing range of third. Get off the bag ready to go, let her commit her throw to first, then take third. On a grounder to the right side you'd simply run.",
+    "hint": "Is the ball in front of you or behind you?",
+    "playbook_page": 5,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 0,
+      "you": "runner-second",
+      "ball": {
+        "at": "SS",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 3B, <2 outs: fly ball to CF",
+    "scenario": "One out, you're on third. The batter hits a fly ball to medium-deep center field.",
+    "question": "What do you do?",
+    "choices": [
+      "Go halfway down the line and wait to see if it's caught",
+      "Run home as soon as the ball is hit",
+      "Tag up and sprint home the moment it's caught",
+      "Stay on third so you don't risk the run with one out"
+    ],
+    "correct_index": 2,
+    "explanation": "With fewer than two outs, a fly ball to the outfield is a tag-up. Get on the bag, leave on the catch, and score; the exception is a short fly that pulls the fielder way in.",
+    "hint": "When a fly is caught, when are you allowed to leave third?",
+    "playbook_page": 7,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 1,
+      "you": "runner-third",
+      "ball": {
+        "at": "CF",
+        "type": "fly"
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 3B, 2 outs: pop-up to the infield",
+    "scenario": "Two outs, you're on third. The batter pops the ball up to the shortstop.",
+    "question": "What do you do?",
+    "choices": [
+      "Run straight home as soon as it's hit",
+      "Stay close to third in case she drops it",
+      "Tag up and go home on the catch",
+      "Go halfway home and read the catch"
+    ],
+    "correct_index": 0,
+    "explanation": "With two outs, a catch ends the inning, so there's nothing to protect by staying. Run on contact; if she drops it, you're already most of the way home.",
+    "hint": "With two outs, what does a catch do to the inning?",
+    "playbook_page": 20,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 2,
+      "you": "runner-third",
+      "ball": {
+        "at": "SS",
+        "type": "popup"
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 1B, 2 outs: fly ball to CF",
+    "scenario": "Two outs, you're on first. The batter hits a fly ball to center field.",
+    "question": "What do you do?",
+    "choices": [
+      "Go halfway to second and wait to see if it's caught",
+      "Tag up at first and go on the catch",
+      "Stay on first until the ball is caught or drops",
+      "Run on contact, round second, and be ready to take third if it's dropped"
+    ],
+    "correct_index": 3,
+    "explanation": "With two outs, a catch ends the inning, so you run on contact. Rounding second puts you in position to take third if the center fielder drops it; going halfway is the play with fewer than two outs.",
+    "hint": "With two outs, does it matter where you are if she catches it?",
+    "playbook_page": 17,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 2,
+      "you": "runner-first",
+      "ball": {
+        "at": "CF",
+        "type": "fly"
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Rules: force out vs. tag out",
+    "scenario": "One out, you're on first. The batter hits a ground ball to the shortstop, who throws to the second baseman covering second.",
+    "question": "What does the second baseman need to do to get you out?",
+    "choices": [
+      "Tag you with the ball before you reach the bag",
+      "Have the ball and touch second before you get there",
+      "Tag you and touch the bag at the same time",
+      "Catch the ball while standing anywhere near second"
+    ],
+    "correct_index": 1,
+    "explanation": "You're forced to run because the batter is coming behind you, so it's a force play: the fielder only needs the ball and a foot on the base before you arrive. A tag is needed when a runner isn't forced.",
+    "hint": "When the ball is hit on the ground, are you allowed to stay on first?",
+    "playbook_page": 2,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 1,
+      "you": "runner-first",
+      "ball": {
+        "at": "SS",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "SS",
+          "to": "second",
+          "kind": "throw"
+        }
+      ]
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Leads: timing off the bag",
+    "scenario": "No outs, you're on first. You want a good lead without leaving early.",
+    "question": "When do you start moving off the bag?",
+    "choices": [
+      "As soon as the pitcher steps onto the rubber",
+      "When the pitcher begins her windup",
+      "When her arm hits the peak of her pitching motion, so your foot comes off the base on the release",
+      "After the ball crosses home plate"
+    ],
+    "correct_index": 2,
+    "explanation": "Start moving at the peak of her motion so you come off the base right as she lets the ball go. Too early and you can be called for leaving early; too late and your lead is wasted.",
+    "hint": "Where is the pitcher's arm a split second before she lets go?",
+    "playbook_page": 30,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 0,
+      "you": "runner-first"
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Line drive in the infield: freeze",
+    "scenario": "No outs, you're on first. The batter rips a line drive right at the shortstop.",
+    "question": "What's your first reaction?",
+    "choices": [
+      "Freeze, then react once you see if it's caught or gets through",
+      "Run hard to second because you're forced on a batted ball",
+      "Go halfway to second, like on a fly ball to the outfield",
+      "Take a big lead to try to draw a throw"
+    ],
+    "correct_index": 0,
+    "explanation": "A line drive is either caught or past the infielder in a split second. If you're already running and it's caught, you get doubled off, so freeze first and react to what happens.",
+    "hint": "How long does a line drive take to be caught or get through?",
+    "playbook_page": 29,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 0,
+      "you": "runner-first",
+      "ball": {
+        "at": "SS",
+        "type": "line"
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 2B, <2 outs: fly ball to RF",
+    "scenario": "One out, you're on second and the other bases are empty. The batter hits a fly ball to medium-deep right field.",
+    "question": "What do you do?",
+    "choices": [
+      "Go halfway to third and wait for the catch",
+      "Tag up and take third once it's caught",
+      "Stay on second, because you never tag from second",
+      "Run on contact and try to score"
+    ],
+    "correct_index": 1,
+    "explanation": "A fly to right is behind you and the throw from right field to third is a long one, so tag and go on the catch. On a fly to left, where the throw to third is short, you'd go partway and read it instead.",
+    "hint": "How long is the throw from right field to third?",
+    "playbook_page": 6,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 1,
+      "you": "runner-second",
+      "ball": {
+        "at": "RF",
+        "type": "fly"
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 2B, 2 outs: single to LF (reading the 3B coach)",
+    "scenario": "Two outs, you're on second. The batter hits a single on the ground into left field.",
+    "question": "As you run to third, what decides whether you score?",
+    "choices": [
+      "Your own look back at the left fielder",
+      "Nothing; with two outs you always score from second on a single",
+      "Your first-base coach's call",
+      "Your third-base coach, who tells you to slide, stay up on the bag, round it, or go home"
+    ],
+    "correct_index": 3,
+    "explanation": "Run hard to third and find your third-base coach; she sees the fielder, the throw, and the plate all at once. Follow her call instead of slowing down to look for the ball yourself.",
+    "hint": "Who can see the fielder, the throw and the plate all at once while you run?",
+    "playbook_page": 18,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 2,
+      "you": "runner-second",
+      "ball": {
+        "at": "LF",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runners at 1B & 3B, 2 outs: batter on a single to LF",
+    "scenario": "Two outs, runners on first and third. You single into left field, and the left fielder throws to third trying to get the runner from first.",
+    "question": "What do you do?",
+    "choices": [
+      "Take second on the throw to third",
+      "Stay on first, because you never advance on a throw to another base",
+      "Go to second only if the throw to third is wild",
+      "Run straight through first and walk back to the bag"
+    ],
+    "correct_index": 0,
+    "explanation": "Once the left fielder commits her throw to third, nobody is in position to stop you at second. Round first with your eyes on the ball and take the free base.",
+    "hint": "Where is the left fielder's throw going, and what does that leave open?",
+    "playbook_page": 25,
+    "diagram": {
+      "runners": [
+        "first",
+        "third"
+      ],
+      "outs": 2,
+      "you": "batter",
+      "ball": {
+        "at": "LF",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "first",
+          "to": "second",
+          "kind": "run"
+        },
+        {
+          "from": "second",
+          "to": "third",
+          "kind": "run"
+        },
+        {
+          "from": "LF",
+          "to": "third",
+          "kind": "throw"
+        }
+      ]
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runners at 2B & 3B, 2 outs: ground ball to SS",
+    "scenario": "Two outs, runners on second and third. You're on second, and the batter hits a ground ball to the shortstop, who is fielding it in your path to third.",
+    "question": "What do you do?",
+    "choices": [
+      "Hold at second until she throws to first",
+      "Run straight through her path, since it's her job to get out of your way",
+      "Run to third on contact, but go around her while she fields the ball",
+      "Freeze, because the ball is hit in front of you"
+    ],
+    "correct_index": 2,
+    "explanation": "With two outs you run on contact, but a fielder making a play on a batted ball has the right of way. Run into her and it's interference, and you can be called out, so steer around her.",
+    "hint": "Who has the right of way when a fielder is making a play on the ball?",
+    "playbook_page": 26,
+    "diagram": {
+      "runners": [
+        "second",
+        "third"
+      ],
+      "outs": 2,
+      "you": "runner-second",
+      "ball": {
+        "at": "SS",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 3B, <2 outs: ground ball back to the pitcher",
+    "scenario": "One out, you're on third and the other bases are empty. The batter hits a ground ball right back to the pitcher.",
+    "question": "What do you do?",
+    "choices": [
+      "Run home as soon as it's hit",
+      "Freeze and stay close to third",
+      "Go halfway home and wait to see where she throws",
+      "Tag up on third, then run home"
+    ],
+    "correct_index": 1,
+    "explanation": "The pitcher fields it a few steps from the plate and is looking right at you, so breaking for home is an easy out. Hold third and let the batter take first.",
+    "hint": "How far is the pitcher from home when she fields it?",
+    "playbook_page": 7,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 1,
+      "you": "runner-third",
+      "ball": {
+        "at": "P",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 3B, <2 outs: shallow fly (draw a throw)",
+    "scenario": "One out, you're on third. The batter hits a short fly ball that pulls the left fielder way in, and she's set to catch it in shallow left.",
+    "question": "What's your best play?",
+    "choices": [
+      "Tag up and go home on the catch no matter what",
+      "Go halfway down the line and read it",
+      "Stay on the bag and don't move after the catch",
+      "Tag up, then take a hard lead after the catch to try to draw a throw"
+    ],
+    "correct_index": 3,
+    "explanation": "A shallow catch leaves the fielder a short, strong throw home, so scoring is unlikely. Still tag, then break hard off the bag after the catch to bait a throw; a hurried or wild one can give you the run.",
+    "hint": "If scoring isn't realistic, can you still tempt the fielder into a mistake?",
+    "playbook_page": 29,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 1,
+      "you": "runner-third",
+      "ball": {
+        "at": "LF",
+        "type": "fly"
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Leads: taking a lead at third base",
+    "scenario": "One out, you're on third and the pitcher is about to deliver.",
+    "question": "How should you take your lead?",
+    "choices": [
+      "Take a later lead, going off in foul territory and coming back in fair territory",
+      "Take a big, early lead in fair territory",
+      "Go off in fair territory and come back in foul territory",
+      "Don't lead at all; stay on the bag until the ball is hit"
+    ],
+    "correct_index": 0,
+    "explanation": "A later lead at third keeps you from getting doubled off on a line drive. Coming back on the fair side of the line puts your body in the catcher's throwing lane, which makes a pickoff throw harder.",
+    "hint": "Where could you stand to make the catcher's pickoff throw harder?",
+    "playbook_page": 30,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 1,
+      "you": "runner-third"
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Steal tips: scouting before you steal second",
+    "scenario": "One out, you're on first, and you might get the steal sign this inning.",
+    "question": "What should you watch to decide how you'll slide into second?",
+    "choices": [
+      "How deep the outfielders are playing",
+      "Only how hard the pitcher throws",
+      "Who covers second, whether she gets there on time, and how accurate the catcher's throws have been",
+      "Whether the batter is ahead or behind in the count"
+    ],
+    "correct_index": 2,
+    "explanation": "Knowing who covers, whether she's early or late, and where the catcher's throws have been going tells you where the tag will come from. That's how you decide to slide straight in or to one side of the bag.",
+    "hint": "Where the tag comes from depends on who catches the throw and where it's thrown.",
+    "playbook_page": 31,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 1,
+      "you": "runner-first"
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Foul pop-up: tag up",
+    "scenario": "One out, you're on second. The batter pops a ball up foul behind home plate toward the third-base side, and the catcher and third baseman both chase it.",
+    "question": "What do you do?",
+    "choices": [
+      "Run to third on contact, since a foul ball doesn't count",
+      "Tag up at second and watch whether third base is left uncovered",
+      "Go halfway to third and wait",
+      "Stay off the bag, because a foul ball is always dead"
+    ],
+    "correct_index": 1,
+    "explanation": "A caught foul pop is a live ball you can tag up on. With two fielders chasing it and nobody covering third, a good tag can turn into a free base after the catch.",
+    "hint": "Is a caught foul ball live or dead?",
+    "playbook_page": 29,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 1,
+      "you": "runner-second",
+      "ball": {
+        "at": "popup-C",
+        "type": "popup"
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Gap hit: when you can't push for two",
+    "scenario": "One out, nobody on. You hit a ball into the left-center gap.",
+    "question": "Gap hits usually mean thinking two bases. Which of these is a good reason to hold at first?",
+    "choices": [
+      "There's already one out",
+      "It went to left-center instead of right-center",
+      "It's early in the game",
+      "It was hit so hard that it reached the outfielder almost instantly"
+    ],
+    "correct_index": 3,
+    "explanation": "The standard plays assume normal conditions. A rocket that gets to the outfielder fast, a slower runner, or a great defensive play can take away the extra base, so adjust instead of running into an out.",
+    "hint": "What normal conditions is 'think two bases' built on?",
+    "playbook_page": 1,
+    "diagram": {
+      "runners": [],
+      "outs": 1,
+      "you": "batter",
+      "ball": {
+        "at": "LCF-gap",
+        "type": "line"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "First & third: 75% steal, catcher throws through",
+    "scenario": "One out, runners on first and third. Your coach calls the 75% steal, and you're the runner on first. As you head for second, the catcher throws all the way through to second.",
+    "question": "What do you do?",
+    "choices": [
+      "Kick into full speed and slide into second",
+      "Turn and sprint straight back to first",
+      "Stop, get into a rundown, and stay alive so the runner on third can score",
+      "Stop where you are and let them tag you to avoid a collision"
+    ],
+    "correct_index": 2,
+    "explanation": "On the 75% play you take second only if they give it to you. If they throw through, get caught in a rundown and keep it going; every throw gives the runner on third a chance to score.",
+    "hint": "If you can't reach second, how can you still help the runner on third?",
+    "playbook_page": 31,
+    "diagram": {
+      "runners": [
+        "first",
+        "third"
+      ],
+      "outs": 1,
+      "you": "runner-first",
+      "arrows": [
+        {
+          "from": "first",
+          "to": "second",
+          "kind": "steal"
+        },
+        {
+          "from": "C",
+          "to": "second",
+          "kind": "throw"
+        }
+      ]
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Delayed steal: when to go",
+    "scenario": "One out, you're on first and the other bases are empty. Your coach puts on the delayed steal.",
+    "question": "When do you take off for second?",
+    "choices": [
+      "On the catcher's return throw to the pitcher",
+      "On the pitcher's release, like a straight steal",
+      "When the pitcher starts her windup",
+      "After the pitcher gets the ball back and steps on the rubber"
+    ],
+    "correct_index": 0,
+    "explanation": "A delayed steal counts on the defense relaxing after the pitch: take your normal lead, then go as the catcher tosses it back to the circle. Scout it first: does the catcher look you back, does the pitcher glance your way, and which way does she turn as she catches the return?",
+    "hint": "When does the defense tend to relax after a pitch?",
+    "playbook_page": 31,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 1,
+      "you": "runner-first"
+    }
+  },
+  {
+    "level": 3,
+    "topic": "First & third: runner at 3B on a steal of second",
+    "scenario": "No outs, runners on first and third. You're on third, and the runner on first takes off for second on the pitch.",
+    "question": "When do you break for home?",
+    "choices": [
+      "As soon as the catcher catches the pitch",
+      "As soon as the catcher stands up to throw",
+      "Never; stay on third no matter what",
+      "Only once you see the throw is going all the way through to second"
+    ],
+    "correct_index": 3,
+    "explanation": "If you leave early, a fake, a short throw, or a cut-off can trap you between third and home. Read the throw, and only go once the ball is clearly headed through to second.",
+    "hint": "What could happen to you if the catcher only fakes the throw?",
+    "playbook_page": 31,
+    "diagram": {
+      "runners": [
+        "first",
+        "third"
+      ],
+      "outs": 0,
+      "you": "runner-third",
+      "arrows": [
+        {
+          "from": "first",
+          "to": "second",
+          "kind": "steal"
+        }
+      ]
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Bases loaded, <2 outs: ground ball (runner at 3B)",
+    "scenario": "Bases loaded, one out. You're on third, and the batter hits a ground ball to the shortstop.",
+    "question": "What do you do?",
+    "choices": [
+      "Freeze unless the infield is playing back",
+      "Sprint home and slide",
+      "Hold until the defense throws to first, then go",
+      "Go back and tag third before running"
+    ],
+    "correct_index": 1,
+    "explanation": "With the bases loaded you're forced, so the usual reads at third don't apply; you have to go. Run hard and slide, because the defense may come home for the force.",
+    "hint": "With every base filled, do you have a choice?",
+    "playbook_page": 10,
+    "diagram": {
+      "runners": [
+        "first",
+        "second",
+        "third"
+      ],
+      "outs": 1,
+      "you": "runner-third",
+      "ball": {
+        "at": "SS",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 2B & 3B, <2 outs: ground ball to SS (trail runner)",
+    "scenario": "No outs, runners on second and third. You're on second. The batter hits a ground ball to the shortstop, and the runner on third holds.",
+    "question": "What do you do?",
+    "choices": [
+      "Run to third, because you're forced on a ground ball",
+      "Run to third so the lead runner has to go home",
+      "Hold at second, because the runner ahead of you didn't go",
+      "Get into a rundown to help the runner on third score"
+    ],
+    "correct_index": 2,
+    "explanation": "You're the trail runner and you aren't forced, so you can only take third after the runner in front of you leaves it. Get a good jump, but if she stays, you stay.",
+    "hint": "Can two runners share third base?",
+    "playbook_page": 14,
+    "diagram": {
+      "runners": [
+        "second",
+        "third"
+      ],
+      "outs": 0,
+      "you": "runner-second",
+      "ball": {
+        "at": "SS",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 1B & 2B, 2 outs: bunt with the play at first",
+    "scenario": "Two outs, runners on first and second. You're on second and you're one of the fastest players on the team. The batter bunts, and the pitcher fields it and throws to first.",
+    "question": "What do you do?",
+    "choices": [
+      "Round third hard and be ready to score if the first baseman drops the throw",
+      "Stop on third and stay there",
+      "Score no matter what happens at first",
+      "Go back to second in case of a double play"
+    ],
+    "correct_index": 0,
+    "explanation": "The defense is going for the third out at first. If you've already rounded third, you can score when the first baseman drops it; if she catches it, the inning is over anyway and the run wouldn't count.",
+    "hint": "If the throw to first gets away, where do you want to already be?",
+    "playbook_page": 21,
+    "diagram": {
+      "runners": [
+        "first",
+        "second"
+      ],
+      "outs": 2,
+      "you": "runner-second",
+      "ball": {
+        "at": "bunt-P",
+        "type": "bunt"
+      },
+      "arrows": [
+        {
+          "from": "P",
+          "to": "first",
+          "kind": "throw"
+        }
+      ]
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Infield fly rule: ball dropped",
+    "scenario": "One out, runners on first and second. The batter pops up to the shortstop, the umpire calls infield fly, and the shortstop drops it. You're on second.",
+    "question": "What do you have to do?",
+    "choices": [
+      "Run to third, because once the ball hits the ground you're forced",
+      "Run to third, because the batter is now safe at first and pushes you along",
+      "Go to third, because a dropped infield fly awards every runner a base",
+      "Nothing; the batter is already out, so you're not forced and can stay at second"
+    ],
+    "correct_index": 3,
+    "explanation": "Once infield fly is called, the batter is out whether the ball is caught or not, which takes away the force. You can stay where you are and only advance if you can take the base safely.",
+    "hint": "Once infield fly is called, is the batter still a runner?",
+    "playbook_page": 9,
+    "diagram": {
+      "runners": [
+        "first",
+        "second"
+      ],
+      "outs": 1,
+      "you": "runner-second",
+      "ball": {
+        "at": "SS",
+        "type": "popup"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Rules: obstruction",
+    "scenario": "One out, you're on second. The batter hits a ball into the left-center gap. As you run to third, the third baseman, who doesn't have the ball and isn't fielding it, steps into your path and you have to swerve around her.",
+    "question": "What is this called?",
+    "choices": [
+      "Interference, and you're out",
+      "Obstruction on the defense",
+      "Nothing, because fielders can stand wherever they want",
+      "Running out of the baseline, and you're out"
+    ],
+    "correct_index": 1,
+    "explanation": "Obstruction is a fielder without the ball, and not making a play, getting in a runner's way. Interference is the reverse: the runner blocking or running into a fielder who is making a play. Keep running hard and let the umpire make the call.",
+    "hint": "Which call goes against the defense, and which against the runner?",
+    "playbook_page": 2,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 1,
+      "you": "runner-second",
+      "ball": {
+        "at": "LCF-gap",
+        "type": "line"
+      },
+      "arrows": [
+        {
+          "from": "second",
+          "to": "third",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Bases loaded, 2 outs: pop-up to the infield",
+    "scenario": "Bases loaded, two outs. You're on first, and the batter pops up to the second baseman.",
+    "question": "What do you do?",
+    "choices": [
+      "Run straight to second on contact",
+      "Stay near first, because the infield fly rule protects you",
+      "Tag up at first and go on the catch",
+      "Go halfway to second and read it"
+    ],
+    "correct_index": 0,
+    "explanation": "The infield fly rule only applies with fewer than two outs. With two outs a catch ends the inning, so everyone runs on contact; if it's dropped, you need to beat the force at second.",
+    "hint": "With two outs, what are you protecting by staying near first?",
+    "playbook_page": 24,
+    "diagram": {
+      "runners": [
+        "first",
+        "second",
+        "third"
+      ],
+      "outs": 2,
+      "you": "runner-first",
+      "ball": {
+        "at": "2B",
+        "type": "popup"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 1B & 3B, <2 outs: bunt with no squeeze on",
+    "scenario": "One out, runners on first and third. No squeeze is on, but the batter bunts toward first base. You're on third.",
+    "question": "What's your read?",
+    "choices": [
+      "Break for home the moment the ball is bunted, like a squeeze",
+      "Stay on third no matter what, since no squeeze means no run",
+      "Read the fielder and break for home when she throws to first",
+      "Go back and tag third before you run"
+    ],
+    "correct_index": 2,
+    "explanation": "On a squeeze you're already running on the pitch, but without one you have to read the play. When the fielder commits her throw to first, that's your window to score; if the bunt is popped up, freeze and get back.",
+    "hint": "Without a squeeze on, what moment gives you your best chance to score?",
+    "playbook_page": 12,
+    "diagram": {
+      "runners": [
+        "first",
+        "third"
+      ],
+      "outs": 1,
+      "you": "runner-third",
+      "ball": {
+        "at": "bunt-1B",
+        "type": "bunt"
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "No runners, <2 outs: single to RF",
+    "scenario": "Nobody on, one out. You hit a ground-ball single through the right side into right field.",
+    "question": "How do you run to first?",
+    "choices": [
+      "Make a big, aggressive turn to pressure the right fielder",
+      "Run hard straight through first base",
+      "Slide into first to be safe",
+      "Take a wide turn and head for second"
+    ],
+    "correct_index": 1,
+    "explanation": "The right fielder plays close to first and can throw behind a runner who turns too far. On a single to right, run hard through the bag and don't give her that chance.",
+    "hint": "Which outfielder is closest to first base?",
+    "playbook_page": 3,
+    "diagram": {
+      "runners": [],
+      "outs": 1,
+      "you": "batter",
+      "ball": {
+        "at": "RF",
+        "type": "ground"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 1,
+    "topic": "No runners, <2 outs: fly ball to CF",
+    "scenario": "Nobody on, no outs. You hit a high fly ball to medium center field.",
+    "question": "How do you run it out?",
+    "choices": [
+      "Jog to first, since it's probably going to be caught",
+      "Run through first and walk back to the bag",
+      "Stop halfway to first and watch",
+      "Round first hard so you're ready to take second if it's dropped"
+    ],
+    "correct_index": 3,
+    "explanation": "Never assume the catch. A hard turn at first means a dropped fly turns into a double instead of a single.",
+    "hint": "If the fielder drops it, where do you want to already be?",
+    "playbook_page": 3,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter",
+      "ball": {
+        "at": "CF",
+        "type": "fly"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 1B, <2 outs: gap hit to RCF",
+    "scenario": "No outs, you're on first. The batter rips a ground ball through the right side that rolls all the way into the right-center gap.",
+    "question": "What's your plan?",
+    "choices": [
+      "Stop at second and wait to see where the ball is",
+      "Round second and be ready to keep going to third",
+      "Go halfway to second until the ball is fielded",
+      "Run to second and slide"
+    ],
+    "correct_index": 1,
+    "explanation": "A ball in the gap gives the outfielders a long chase, so think two bases from the start. Make a good turn at second and be ready to keep running to third.",
+    "hint": "How long will it take an outfielder to run down a ball in the gap?",
+    "playbook_page": 4,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 0,
+      "you": "runner-first",
+      "ball": {
+        "at": "RCF-gap",
+        "type": "ground"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 1B, <2 outs: fly ball to LF",
+    "scenario": "One out, you're on first. The batter hits a fly ball to medium left field.",
+    "question": "What do you do?",
+    "choices": [
+      "Go about halfway to second, ready to go back or keep running",
+      "Tag up and run to second on the catch",
+      "Run hard to second on contact",
+      "Stay on first base"
+    ],
+    "correct_index": 0,
+    "explanation": "With fewer than two outs, a catch sends you back to first and a drop means you need second. Getting a third to halfway down the line lets you do either one.",
+    "hint": "If it's caught you need first; if it drops you need second.",
+    "playbook_page": 4,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 1,
+      "you": "runner-first",
+      "ball": {
+        "at": "LF",
+        "type": "fly"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 2B, <2 outs: ground ball to the right side",
+    "scenario": "One out, you're on second and the other bases are empty. The batter hits a ground ball to the second baseman.",
+    "question": "What's your move?",
+    "choices": [
+      "Hold at second until she throws to first",
+      "Freeze, then go back to second",
+      "Run straight to third",
+      "Wait to see if the batter beats the throw"
+    ],
+    "correct_index": 2,
+    "explanation": "A ball to the right side is behind you, and the second baseman's natural throw is to first, not third. Go right away; the wait-for-the-throw read is for grounders to short or third.",
+    "hint": "How hard is it for the second baseman to throw you out at third?",
+    "playbook_page": 5,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 1,
+      "you": "runner-second",
+      "ball": {
+        "at": "2B",
+        "type": "ground"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 3B, <2 outs: pop-up to the infield",
+    "scenario": "No outs, you're on third and the other bases are empty. The batter pops the ball up to the second baseman.",
+    "question": "What do you do?",
+    "choices": [
+      "Tag up and race home on the catch",
+      "Run home as soon as it's hit",
+      "Stay close to third, and go only if she drops it and it rolls away",
+      "Go halfway home and wait"
+    ],
+    "correct_index": 2,
+    "explanation": "An infielder catches a pop-up close to the plate with a short throw home, so tagging up won't score you. Stay near the bag and only break if the ball hits the ground and rolls away.",
+    "hint": "How short is the throw home from the infield?",
+    "playbook_page": 7,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 0,
+      "you": "runner-third",
+      "ball": {
+        "at": "2B",
+        "type": "popup"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 2B, 2 outs: fly ball to LF",
+    "scenario": "Two outs, you're on second. The batter hits a fly ball to left field.",
+    "question": "What do you do?",
+    "choices": [
+      "Tag up at second and go on the catch",
+      "Go halfway to third and read it",
+      "Stay on second until it comes down",
+      "Run on contact, round third, and be ready to score if it's dropped"
+    ],
+    "correct_index": 3,
+    "explanation": "With two outs a catch ends the inning, so there's nothing to tag up for. Run when it's hit, and if she drops it you're already around third and headed home.",
+    "hint": "With two outs, what are you protecting by staying close to second?",
+    "playbook_page": 19,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 2,
+      "you": "runner-second",
+      "ball": {
+        "at": "LF",
+        "type": "fly"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runners at 1B & 2B, <2 outs: ground ball (runner at 2B)",
+    "scenario": "One out, runners on first and second. You're on second, and the batter hits a ground ball to the shortstop.",
+    "question": "What do you do?",
+    "choices": [
+      "Get a jump, then wait for her throw to first before going",
+      "Run hard to third and slide",
+      "Hold at second because the ball is in front of you",
+      "Jog to third, since the play will be at first"
+    ],
+    "correct_index": 1,
+    "explanation": "The runner behind you has to take second, so you're forced and can't wait on the throw. Run hard and slide, because the defense may try to get the lead runner at third.",
+    "hint": "With a teammate on first, can you stay at second?",
+    "playbook_page": 8,
+    "diagram": {
+      "runners": [
+        "first",
+        "second"
+      ],
+      "outs": 1,
+      "you": "runner-second",
+      "ball": {
+        "at": "SS",
+        "type": "ground"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Rules: a steal is a tag play",
+    "scenario": "One out, you're on first and you steal second. The catcher throws to the shortstop covering the bag.",
+    "question": "What does the shortstop have to do to get you out?",
+    "choices": [
+      "Catch the ball with a foot on second before you arrive",
+      "Tag you with the ball before you touch the base",
+      "Beat you to the bag, with or without the ball",
+      "Touch the bag and then throw to first"
+    ],
+    "correct_index": 1,
+    "explanation": "Nobody is pushing you off first on a steal, so you aren't forced. That makes it a tag play: the ball has to touch you before you touch second.",
+    "hint": "On a steal, is anyone behind you forcing you to run?",
+    "playbook_page": 2,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 1,
+      "you": "runner-first",
+      "arrows": [
+        {
+          "from": "first",
+          "to": "second",
+          "kind": "steal"
+        },
+        {
+          "from": "C",
+          "to": "second",
+          "kind": "throw"
+        }
+      ]
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Rules: who is forced at 1B & 3B",
+    "scenario": "One out, runners on first and third. You're on third, and the batter hits a ground ball to the second baseman.",
+    "question": "Are you forced to run home?",
+    "choices": [
+      "Yes, every runner is forced on a ground ball",
+      "Yes, because the batter is running to first",
+      "Only if the runner from first beats the throw to second",
+      "No, second base was open, so nobody needs third"
+    ],
+    "correct_index": 3,
+    "explanation": "A runner is forced only when every base behind her is filled. Second was empty, so the runner from first moves up there and you're free; any play on you at home would need a tag.",
+    "hint": "Is there a runner directly behind you who needs your base?",
+    "playbook_page": 2,
+    "diagram": {
+      "runners": [
+        "first",
+        "third"
+      ],
+      "outs": 1,
+      "you": "runner-third",
+      "ball": {
+        "at": "2B",
+        "type": "ground"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Leads: first base",
+    "scenario": "No outs, you're on first and the pitcher is about to deliver.",
+    "question": "How big a lead do you take?",
+    "choices": [
+      "About three hard steps, close enough that one step plus a dive gets you back",
+      "One small step, so you can never be picked off",
+      "As far as you can until the catcher looks at you",
+      "Halfway to second on every pitch"
+    ],
+    "correct_index": 0,
+    "explanation": "Three explosive steps gets you a real jump without drifting too far. If the catcher throws over, one step and a dive should get you back.",
+    "hint": "Your lead has to help you, but you also have to get back if the catcher throws.",
+    "playbook_page": 30,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 0,
+      "you": "runner-first",
+      "arrows": []
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Leads: second base",
+    "scenario": "One out, you're on second with first and third empty.",
+    "question": "How big a lead do you take?",
+    "choices": [
+      "Just one step, so the catcher can't pick you off",
+      "No lead, since you're already in scoring position",
+      "Four or five hard steps",
+      "As far as you can get toward third"
+    ],
+    "correct_index": 2,
+    "explanation": "You can take more ground at second than at first: four or five strong steps. That head start is what helps you score on a base hit.",
+    "hint": "How far does the catcher have to throw to reach second compared with first?",
+    "playbook_page": 30,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 1,
+      "you": "runner-second",
+      "arrows": []
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Leads: getting back after the pitch",
+    "scenario": "One out, you're on first. You took a good lead, the batter took the pitch, and the catcher has the ball.",
+    "question": "What now?",
+    "choices": [
+      "Stay where you are until the pitcher has the ball back",
+      "Walk back slowly so you don't look nervous",
+      "Take a couple more steps to tease a throw",
+      "Get back to the bag quickly and with purpose"
+    ],
+    "correct_index": 3,
+    "explanation": "Hanging around off the base after the pitch is how runners get picked off. Go off hard and come back hard, every pitch.",
+    "hint": "Who has the ball now, and how far are you from your base?",
+    "playbook_page": 30,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 1,
+      "you": "runner-first",
+      "arrows": []
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Leads: the first step",
+    "scenario": "No outs, you're on second, getting ready to take your lead.",
+    "question": "What's the best way to start your lead?",
+    "choices": [
+      "Shuffle off slowly so you don't give anything away",
+      "Push off the base and drive your knee for an explosive first step",
+      "Start with your foot a step in front of the bag",
+      "Lean toward third and wait for the ball to be hit"
+    ],
+    "correct_index": 1,
+    "explanation": "Use the bag like a starting block: push off it and drive your knee so your first step is explosive. Starting with your foot already off the base can get you called out for leaving early.",
+    "hint": "What can the base itself do for your first step?",
+    "playbook_page": 30,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 0,
+      "you": "runner-second",
+      "arrows": []
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 1B, <2 outs: pop-up on the right side",
+    "scenario": "One out, you're on first. The batter pops up to the second baseman, who drifts toward first to make the catch.",
+    "question": "What do you do?",
+    "choices": [
+      "Stay on first base",
+      "Go halfway to second",
+      "Run to second on contact",
+      "Take a big lead to bait a throw"
+    ],
+    "correct_index": 0,
+    "explanation": "On a pop-up to the right side the fielder is right next to first, and a quick toss can double you off if you've wandered. Stay on the bag.",
+    "hint": "How far is the fielder from first base?",
+    "playbook_page": 4,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 1,
+      "you": "runner-first",
+      "ball": {
+        "at": "2B",
+        "type": "popup"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 1,
+    "topic": "No runners, <2 outs: blooper to CF",
+    "scenario": "Nobody on, no outs. You hit a soft blooper into shallow center field, and the center fielder is charging hard.",
+    "question": "How do you run it?",
+    "choices": [
+      "Run straight through first",
+      "Head straight for second on contact",
+      "Round first, and go for second only if the ball squirts away after a drop",
+      "Stop on first and watch"
+    ],
+    "correct_index": 2,
+    "explanation": "Turn at first so you're ready, but a drop that stays at her feet isn't a free base. Go for second only if the ball gets past her.",
+    "hint": "What has to happen before second base is really open?",
+    "playbook_page": 3,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter",
+      "ball": {
+        "at": "blooper-CF",
+        "type": "blooper"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Baserunning tips: checking the outfield",
+    "scenario": "One out, you're on second, and the pitcher is about to take her sign.",
+    "question": "What should you check before the pitch?",
+    "choices": [
+      "How deep the outfielders are playing",
+      "Who's warming up in the bullpen",
+      "How fast the pitcher is throwing today",
+      "What the pitch count is"
+    ],
+    "correct_index": 0,
+    "explanation": "Outfield depth tells you how hard to push on a hit and when a fly ball is worth tagging on. A soft hit in front of a deep outfield, for example, is a chance to run.",
+    "hint": "What decides whether a shallow hit can be caught?",
+    "playbook_page": 29,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 1,
+      "you": "runner-second",
+      "arrows": []
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 3B, 2 outs: ground ball to the infield",
+    "scenario": "Two outs, you're on third. The batter hits a ground ball to the second baseman.",
+    "question": "What do you do?",
+    "choices": [
+      "Freeze until she throws to first",
+      "Run home as soon as the ball is hit",
+      "Go halfway and read the throw",
+      "Stay on third so you don't make the third out"
+    ],
+    "correct_index": 1,
+    "explanation": "With two outs the defense will throw to first for the last out. If they throw the batter out, your run wouldn't count anyway, and if they don't, you've scored, so go on contact.",
+    "hint": "With two outs, what does holding at third save you?",
+    "playbook_page": 20,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 2,
+      "you": "runner-third",
+      "ball": {
+        "at": "2B",
+        "type": "ground"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Vocabulary: lead and trail runners",
+    "scenario": "One out, runners on first and second. You're the runner on first.",
+    "question": "In baserunning terms, which runner are you?",
+    "choices": [
+      "The lead runner",
+      "The courtesy runner",
+      "The pinch runner",
+      "The trail runner"
+    ],
+    "correct_index": 3,
+    "explanation": "With a teammate ahead of you, you're the trail runner and she's the lead runner. Trail runners have to watch what the runner ahead does before taking a base.",
+    "hint": "Is there a teammate on a base ahead of you?",
+    "playbook_page": 2,
+    "diagram": {
+      "runners": [
+        "first",
+        "second"
+      ],
+      "outs": 1,
+      "you": "runner-first",
+      "arrows": []
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner at 2B, <2 outs: pop-up on the left side",
+    "scenario": "No outs, you're on second and the other bases are empty. The batter pops up to the shortstop.",
+    "question": "What do you do?",
+    "choices": [
+      "Take a few steps toward third in case she drops it",
+      "Run to third on contact",
+      "Tag up and go on the catch",
+      "Stay close to second"
+    ],
+    "correct_index": 3,
+    "explanation": "The shortstop is close to second, and a quick throw would double you off if you've strayed. With the ball in front of you and that close, stay near the bag.",
+    "hint": "How long would it take the shortstop to get the ball to second?",
+    "playbook_page": 6,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 0,
+      "you": "runner-second",
+      "ball": {
+        "at": "SS",
+        "type": "popup"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 1B, <2 outs: fly ball to RF",
+    "scenario": "One out, you're on first. The batter lifts a fly ball to medium right field.",
+    "question": "How far off first do you go?",
+    "choices": [
+      "About halfway to second",
+      "Just a few steps, then react to the catch or the drop",
+      "Run to second on contact",
+      "Tag up and go on the catch"
+    ],
+    "correct_index": 1,
+    "explanation": "The right fielder's throw back to first is short, so drifting halfway gets you doubled off. A few steps is plenty: you can still reach second on a drop and get back on a catch.",
+    "hint": "Which outfielder has the shortest throw back to first?",
+    "playbook_page": 4,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 1,
+      "you": "runner-first",
+      "ball": {
+        "at": "RF",
+        "type": "fly"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 2B, <2 outs: blooper to CF",
+    "scenario": "No outs, you're on second. The batter hits a soft blooper toward shallow center, and the center fielder is racing in.",
+    "question": "What do you do?",
+    "choices": [
+      "Get a few steps off second, ready to take third on a drop or get back on a catch",
+      "Tag up at second and go on the catch",
+      "Run to third on contact",
+      "Go halfway to third and wait"
+    ],
+    "correct_index": 0,
+    "explanation": "A blooper is caught close to the infield, so you can't stray far from second. A few steps gives you a head start on a drop and keeps you safe on a catch.",
+    "hint": "How far is a shallow catch from second base?",
+    "playbook_page": 6,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 0,
+      "you": "runner-second",
+      "ball": {
+        "at": "blooper-CF",
+        "type": "blooper"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 2B, <2 outs: single to RF (rounding third)",
+    "scenario": "One out, you're on second. The batter hits a ground-ball single into right field.",
+    "question": "How do you handle third base?",
+    "choices": [
+      "Run straight into third and stop on the bag",
+      "Slow down at third to find the ball yourself",
+      "Round third and pick up your coach's call to go home or hold",
+      "Stop at third no matter what, since it's only a single"
+    ],
+    "correct_index": 2,
+    "explanation": "A ball in right is behind you and a long way from third, so a hard turn costs you nothing. Round third aggressively and let your coach decide whether you score or go back.",
+    "hint": "How far is the right fielder from third base?",
+    "playbook_page": 5,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 1,
+      "you": "runner-second",
+      "ball": {
+        "at": "RF",
+        "type": "ground"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 1B: bunt with third base open",
+    "scenario": "No outs, you're on first. The batter bunts toward third, and the third baseman charges in, fields it and throws to first.",
+    "question": "What do you do as you reach second?",
+    "choices": [
+      "Stop on second; you only get one base on a bunt",
+      "Go back to first in case the throw is wild",
+      "Slide into second and stay down",
+      "Peek at third, and keep going if nobody is covering it"
+    ],
+    "correct_index": 3,
+    "explanation": "When the third baseman charges a bunt, third base can be left empty. Run hard to second, glance at third and your coach, and take the extra base if nobody is there.",
+    "hint": "Who covers third when the third baseman charges in?",
+    "playbook_page": 4,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 0,
+      "you": "runner-first",
+      "ball": {
+        "at": "bunt-3B",
+        "type": "bunt"
+      },
+      "arrows": [
+        {
+          "from": "3B",
+          "to": "first",
+          "kind": "throw"
+        }
+      ]
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Draw a throw: when the throw goes to the next base",
+    "scenario": "One out, you're on second. The batter hits a short fly that pulls the center fielder way in. You tag, take a hard lead toward third after the catch, and the center fielder fires the ball to third.",
+    "question": "What do you do?",
+    "choices": [
+      "Stay a few steps off second, ready to run if the throw gets past third",
+      "Dive back into second right away",
+      "Sprint for third to beat the throw",
+      "Jog back to second; the play is over"
+    ],
+    "correct_index": 0,
+    "explanation": "You've drawn the throw you wanted. Stay a few steps off the bag instead of retreating, so if the ball skips past the third baseman you're already on your way.",
+    "hint": "What could happen to a throw aimed at third, and where do you want to be if it does?",
+    "playbook_page": 29,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 1,
+      "you": "runner-second",
+      "ball": {
+        "at": "CF",
+        "type": "fly"
+      },
+      "arrows": [
+        {
+          "from": "CF",
+          "to": "third",
+          "kind": "throw"
+        }
+      ]
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 3B, <2 outs: ground ball with the infield back",
+    "scenario": "One out, you're on third and the other bases are empty. The infield is playing back, and the batter hits a ground ball to the second baseman.",
+    "question": "What do you do?",
+    "choices": [
+      "Freeze, since the ball is on the ground in front of you",
+      "Hold until she throws to first, then go",
+      "Run home as soon as it's hit",
+      "Go halfway and read the fielder"
+    ],
+    "correct_index": 2,
+    "explanation": "With the infield playing back, the defense is trading the run for an out at first and is too deep to cut you down at the plate. Break on contact.",
+    "hint": "Where are the infielders standing, and how long is their throw home?",
+    "playbook_page": 7,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 1,
+      "you": "runner-third",
+      "ball": {
+        "at": "2B",
+        "type": "ground"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Baserunning tips: reading the ball off the bat",
+    "scenario": "No outs, you're on first. You know you'll be forced to run on any ground ball.",
+    "question": "What skill gets you the best jump?",
+    "choices": [
+      "Watching the pitcher's glove",
+      "Reading the downward angle of the ball as it leaves the bat",
+      "Waiting to hear the sound of the bat",
+      "Watching the catcher's target"
+    ],
+    "correct_index": 1,
+    "explanation": "If you see the ball heading down off the bat, you know it's a grounder before it bounces, and you're gone. It takes practice, so train it.",
+    "hint": "What can the ball's path off the bat tell you before it bounces?",
+    "playbook_page": 29,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 0,
+      "you": "runner-first",
+      "arrows": []
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Baserunning tips: knowing the outfielders' arms",
+    "scenario": "One out, you're on second. Earlier in the game you saw the left fielder's throws come in weak, on several hops. Now the batter singles to left.",
+    "question": "How should that scouting shape your run?",
+    "choices": [
+      "It shouldn't; every single to left is played the same way",
+      "Slow down so you can watch her throw",
+      "Stop at third so you don't run into an out",
+      "Be ready to score, since a weak arm makes the extra base more likely"
+    ],
+    "correct_index": 3,
+    "explanation": "Knowing each outfielder's arm, and whether the defense lines up its cutoffs, tells you when an extra base is really there. A weak arm in left makes it more likely you're scoring, so run like it.",
+    "hint": "What did her earlier throws tell you about this fielder?",
+    "playbook_page": 29,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 1,
+      "you": "runner-second",
+      "ball": {
+        "at": "LF",
+        "type": "ground"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Baserunning tips: blooper in front of a deep outfield",
+    "scenario": "One out, you're on second. Before the pitch you noticed the outfield playing deep. The batter loops a soft blooper into shallow left, and it's obvious no one can get there in time.",
+    "question": "What do you do?",
+    "choices": [
+      "Take off for third right away",
+      "Get a few steps off second and wait to see if it's caught",
+      "Tag up at second",
+      "Go halfway and freeze"
+    ],
+    "correct_index": 0,
+    "explanation": "Normally a blooper means short steps and a read. But if you saw the outfield playing deep and the ball clearly can't be caught, run hard and take third.",
+    "hint": "Where were the outfielders playing before the pitch?",
+    "playbook_page": 29,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 1,
+      "you": "runner-second",
+      "ball": {
+        "at": "blooper-LF",
+        "type": "blooper"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 2B, <2 outs: fly ball to LF",
+    "scenario": "One out, you're on second and the other bases are empty. The batter hits a fly ball to medium left field.",
+    "question": "What do you do?",
+    "choices": [
+      "Tag up and take third on the catch",
+      "Stay on second until it comes down",
+      "Go a third to halfway toward third, then react",
+      "Run on contact"
+    ],
+    "correct_index": 2,
+    "explanation": "The left fielder's throw to third is short, so tagging and running usually loses. Get partway down the line: take third on a drop, get back on a catch.",
+    "hint": "Compare the left fielder's throw to third with the right fielder's.",
+    "playbook_page": 6,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 1,
+      "you": "runner-second",
+      "ball": {
+        "at": "LF",
+        "type": "fly"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 1B, <2 outs: batter on a fly ball to CF",
+    "scenario": "One out, runner on first. You hit a fly ball to medium center field.",
+    "question": "How do you run it out?",
+    "choices": [
+      "Round first hard and plan to take second if it's dropped",
+      "Jog, since it will probably be caught",
+      "Stop halfway to first and watch",
+      "Run hard straight through first base"
+    ],
+    "correct_index": 3,
+    "explanation": "The runner on first is only partway to second, so if the ball drops she takes second and you need first. Run hard through the bag; the big turn is for when second will be empty.",
+    "hint": "If the ball drops, who is headed to second base?",
+    "playbook_page": 4,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 1,
+      "you": "batter",
+      "ball": {
+        "at": "CF",
+        "type": "fly"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 2B, <2 outs: pop-up on the right side",
+    "scenario": "No outs, you're on second and the other bases are empty. The batter pops up to the first baseman.",
+    "question": "What do you do?",
+    "choices": [
+      "Stay glued to second",
+      "Ease a few steps toward third, and go only if it rolls away from her",
+      "Run to third on contact",
+      "Tag up and go on the catch"
+    ],
+    "correct_index": 1,
+    "explanation": "The ball is on the far side of the field, so you can afford a few steps. You aren't forced, so even on a drop, only go if the ball rolls away from her.",
+    "hint": "How far is the first baseman from second base?",
+    "playbook_page": 6,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 0,
+      "you": "runner-second",
+      "ball": {
+        "at": "1B",
+        "type": "popup"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Foul pop-up: diving catch",
+    "scenario": "One out, you're on second. The batter pops one up foul behind home plate, and you tag up. The catcher chases it toward the backstop and makes a diving catch, ending up on the ground.",
+    "question": "What do you do?",
+    "choices": [
+      "Stay put; you can't advance on a foul ball",
+      "Go halfway and wait for her to get up",
+      "Leave on the catch and take third",
+      "Wait for the umpire to award you a base"
+    ],
+    "correct_index": 2,
+    "explanation": "A caught foul ball is live, so you can tag and advance. With the catcher sprawled on the ground, she can't make a quick throw to third, so go.",
+    "hint": "How quickly can a fielder lying on the ground make a throw?",
+    "playbook_page": 29,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 1,
+      "you": "runner-second",
+      "ball": {
+        "at": "popup-C",
+        "type": "popup"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Pushing the outfield: throw behind the batter-runner",
+    "scenario": "Nobody on, one out. You single to center and make a hard turn at first. The center fielder throws behind you to first, hoping to catch you off the bag.",
+    "question": "What do you do?",
+    "choices": [
+      "Dive back into first",
+      "Take off for second as soon as she lets it go",
+      "Stop and wait between the bases",
+      "Stay where you are and ask for time"
+    ],
+    "correct_index": 1,
+    "explanation": "This is exactly why you turn hard. A throw behind you to first leaves second wide open, so go right away and make them throw again.",
+    "hint": "When the ball goes to the base behind you, which base is open?",
+    "playbook_page": 29,
+    "diagram": {
+      "runners": [],
+      "outs": 1,
+      "you": "batter",
+      "ball": {
+        "at": "CF",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "CF",
+          "to": "first",
+          "kind": "throw"
+        }
+      ]
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 3B, <2 outs: line-drive single",
+    "scenario": "One out, you're on third. The batter hits a line drive just over the shortstop's head into left field.",
+    "question": "When do you head home?",
+    "choices": [
+      "The instant it leaves the bat",
+      "Only after the left fielder throws",
+      "Only if the left fielder bobbles it",
+      "As soon as you see it's past the infield"
+    ],
+    "correct_index": 3,
+    "explanation": "A liner can be snagged by a leaping infielder, and if you've already left you'll be doubled off. Hold for that split second, and once it's clearly through the infield, score.",
+    "hint": "What happens if an infielder leaps and snags it after you've left?",
+    "playbook_page": 7,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 1,
+      "you": "runner-third",
+      "ball": {
+        "at": "LF",
+        "type": "line"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runners at 2B & 3B, <2 outs: fly ball to LF (runner at 2B)",
+    "scenario": "One out, runners on second and third. The batter flies out to medium left field, and you're back on second after the catch. The runner on third tags and heads home, and the left fielder throws home.",
+    "question": "What now?",
+    "choices": [
+      "Stay at second; you already went back once",
+      "Go halfway and freeze",
+      "Take off for third on the throw home",
+      "Run home right behind the lead runner"
+    ],
+    "correct_index": 2,
+    "explanation": "When the left fielder throws home, the ball is heading away from third. You've retouched second after the catch, so take the extra base.",
+    "hint": "Once the left fielder throws home, who is left to cover third?",
+    "playbook_page": 15,
+    "diagram": {
+      "runners": [
+        "second",
+        "third"
+      ],
+      "outs": 1,
+      "you": "runner-second",
+      "ball": {
+        "at": "LF",
+        "type": "fly"
+      },
+      "arrows": [
+        {
+          "from": "third",
+          "to": "home",
+          "kind": "run"
+        },
+        {
+          "from": "LF",
+          "to": "home",
+          "kind": "throw"
+        }
+      ]
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runner at 1B, <2 outs: batter on a single to LF",
+    "scenario": "One out, runner on first. You hit a ground-ball single into left field.",
+    "question": "What do you do at first base?",
+    "choices": [
+      "Round first and watch what the runner ahead of you does",
+      "Run straight through first, like on a grounder to the infield",
+      "Head straight for second no matter what",
+      "Stop on first and wait for the coach"
+    ],
+    "correct_index": 0,
+    "explanation": "Your next move depends on the runner ahead of you. If she stops at second you hold, but if she pushes for third and draws the throw, second can open up.",
+    "hint": "Can you take second if the runner ahead of you is still standing on it?",
+    "playbook_page": 4,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 1,
+      "you": "batter",
+      "ball": {
+        "at": "LF",
+        "type": "ground"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 3,
+    "topic": "First & third: 'no steal' call",
+    "scenario": "One out, runners on first and third. You're on first and the call is 'no steal.' You take an aggressive lead on the pitch, and the catcher throws to third trying to pick off the runner there.",
+    "question": "What do you do?",
+    "choices": [
+      "Get back to first right away",
+      "Take second while the ball goes to third",
+      "Freeze where you are and wait",
+      "Head for second only if the throw gets past third"
+    ],
+    "correct_index": 1,
+    "explanation": "On 'no steal' your job is to look like you're going and see where the ball goes. A throw to third leaves second open, so take it.",
+    "hint": "Which base did the catcher's throw leave unguarded?",
+    "playbook_page": 31,
+    "diagram": {
+      "runners": [
+        "first",
+        "third"
+      ],
+      "outs": 1,
+      "you": "runner-first",
+      "arrows": [
+        {
+          "from": "C",
+          "to": "third",
+          "kind": "throw"
+        }
+      ]
+    }
+  },
+  {
+    "level": 3,
+    "topic": "First & third: 100% steal",
+    "scenario": "No outs, runners on first and third. You're on first, and your coach calls the 100% steal.",
+    "question": "What's your job?",
+    "choices": [
+      "Run at about three-quarter speed and stop if they throw through",
+      "Fake a steal and watch for a throw",
+      "Steal second on the release, running all-out",
+      "Wait for the catcher's throw back to the pitcher, then go"
+    ],
+    "correct_index": 2,
+    "explanation": "The 100% call is a straight steal: go on the release and run all-out to take second. Easing up to bait a rundown is the 75% play, not this one.",
+    "hint": "What does '100%' tell you about how hard you're running?",
+    "playbook_page": 31,
+    "diagram": {
+      "runners": [
+        "first",
+        "third"
+      ],
+      "outs": 0,
+      "you": "runner-first",
+      "arrows": []
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Delayed steal: scouting the battery",
+    "scenario": "One out, you're on first and the other bases are empty. You're watching the pitcher and catcher for a few pitches before trying a delayed steal.",
+    "question": "Which of these is the best sign the delayed steal will work?",
+    "choices": [
+      "The catcher looks you back before every return throw",
+      "The pitcher turns toward you as she catches the return throw",
+      "The pitcher stares at you before she takes the ball back",
+      "The catcher tosses the ball back without ever checking you"
+    ],
+    "correct_index": 3,
+    "explanation": "A delayed steal works when the defense relaxes after the pitch. If the catcher never checks you and the pitcher turns away for the return throw, nobody is watching when you go.",
+    "hint": "On a delayed steal, who needs to be not paying attention to you?",
+    "playbook_page": 31,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 1,
+      "you": "runner-first",
+      "arrows": []
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Bases loaded, <2 outs: pop-up to the infield",
+    "scenario": "Bases loaded, one out. You're on first, and the batter pops the ball high above the shortstop.",
+    "question": "What do you do?",
+    "choices": [
+      "Stay close to first",
+      "Take off for second in case it's dropped",
+      "Go halfway to second",
+      "Tag up and run to second on the catch"
+    ],
+    "correct_index": 0,
+    "explanation": "With first and second filled and fewer than two outs, the umpire should call infield fly, so the batter is out and a drop doesn't force you. Stay close to the bag.",
+    "hint": "What special call can the umpire make on a pop-up with first and second filled?",
+    "playbook_page": 11,
+    "diagram": {
+      "runners": [
+        "first",
+        "second",
+        "third"
+      ],
+      "outs": 1,
+      "you": "runner-first",
+      "ball": {
+        "at": "SS",
+        "type": "popup"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 1B & 3B, <2 outs: pop-up to SS (no infield fly)",
+    "scenario": "Runners on first and third, one out. You're on first, and the batter pops up to the shortstop.",
+    "question": "What do you do?",
+    "choices": [
+      "Stay on the bag, since the infield fly rule protects you",
+      "Get a few steps off first in case she drops it",
+      "Run to second on contact",
+      "Tag up and go on the catch"
+    ],
+    "correct_index": 1,
+    "explanation": "The infield fly rule needs runners on first and second, so it doesn't apply here. If she drops it the batter becomes a runner and you're forced, so give yourself a few steps' head start.",
+    "hint": "Which bases have to be filled for the infield fly rule to apply?",
+    "playbook_page": 13,
+    "diagram": {
+      "runners": [
+        "first",
+        "third"
+      ],
+      "outs": 1,
+      "you": "runner-first",
+      "ball": {
+        "at": "SS",
+        "type": "popup"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Squeeze: when the runner at 3B goes",
+    "scenario": "One out, you're on third and the other bases are empty. Your coach puts on the squeeze.",
+    "question": "When do you break for home?",
+    "choices": [
+      "When the fielder throws to first",
+      "Only if the bunt rolls toward first",
+      "As the pitcher releases the pitch",
+      "After the catcher catches the pitch"
+    ],
+    "correct_index": 2,
+    "explanation": "On a squeeze you're stealing home, and the batter has to bunt whatever pitch comes. Leave on the release so you're nearly home by the time the ball is fielded.",
+    "hint": "If you wait to see the bunt, how far from home will you be when it's fielded?",
+    "playbook_page": 7,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 1,
+      "you": "runner-third",
+      "arrows": []
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Bases loaded, <2 outs: fly ball to CF (runner at 2B)",
+    "scenario": "Bases loaded, one out. The batter hits a fly ball to medium-deep center field. You're on second.",
+    "question": "What do you do?",
+    "choices": [
+      "Tag up, and take third only if the runner ahead of you goes home",
+      "Go halfway to third and read it",
+      "Run on contact",
+      "Tag up and go to third on the catch no matter what"
+    ],
+    "correct_index": 0,
+    "explanation": "Tag at second, but third isn't yours until the lead runner leaves it. If she tags and scores you move up; if she holds, you hold.",
+    "hint": "Can you move up to a base that's still occupied?",
+    "playbook_page": 11,
+    "diagram": {
+      "runners": [
+        "first",
+        "second",
+        "third"
+      ],
+      "outs": 1,
+      "you": "runner-second",
+      "ball": {
+        "at": "CF",
+        "type": "fly"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runner at 2B, <2 outs: batter on a dropped blooper",
+    "scenario": "One out, runner on second. You hit a blooper to shallow left, the left fielder drops it, and the ball rolls a few feet away. You've rounded first.",
+    "question": "What decides whether you go to second?",
+    "choices": [
+      "How far the ball rolled, no matter what the runner ahead does",
+      "Your first-base coach's guess",
+      "Nothing; always take second on a dropped ball",
+      "Whether the runner ahead of you has moved up to third"
+    ],
+    "correct_index": 3,
+    "explanation": "You're the trail runner, so second only opens once the lead runner has left it. Make sure she's moving up before you commit, or you'll end up with two runners on one base.",
+    "hint": "What has to happen ahead of you before second is free?",
+    "playbook_page": 6,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 1,
+      "you": "batter",
+      "ball": {
+        "at": "blooper-LF",
+        "type": "blooper"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 3,
+    "topic": "First & third: 75% steal, no throw",
+    "scenario": "One out, runners on first and third. Your coach calls the 75% steal and you're on first. As you run, the catcher looks the runner on third back and holds onto the ball.",
+    "question": "What do you do?",
+    "choices": [
+      "Stop and get into a rundown",
+      "Keep going and take second",
+      "Go back to first",
+      "Stop halfway and wait for a throw"
+    ],
+    "correct_index": 1,
+    "explanation": "The 75% play is about taking what the defense gives you. If the catcher won't throw, second is free, so finish the steal.",
+    "hint": "Is the defense trying to stop you at all?",
+    "playbook_page": 31,
+    "diagram": {
+      "runners": [
+        "first",
+        "third"
+      ],
+      "outs": 1,
+      "you": "runner-first",
+      "arrows": []
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runner at 2B, <2 outs: bunt",
+    "scenario": "No outs, you're on second and the other bases are empty. The batter lays down a bunt toward third, and the third baseman charges in to field it.",
+    "question": "When do you go?",
+    "choices": [
+      "Hold until she throws to first, like on a grounder to short",
+      "Run straight to third as soon as it's down",
+      "Stay at second, since you're not forced",
+      "Go halfway and read the fielder"
+    ],
+    "correct_index": 1,
+    "explanation": "Unlike a hard grounder to the left side, a bunt pulls the infielders in toward the plate. Don't wait around: run straight to third once it's down.",
+    "hint": "Where are the infielders moving when a bunt is laid down?",
+    "playbook_page": 5,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 0,
+      "you": "runner-second",
+      "ball": {
+        "at": "bunt-3B",
+        "type": "bunt"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 1B & 2B, <2 outs: fly ball to RF (runner at 1B)",
+    "scenario": "One out, runners on first and second, and you're on first. A fly ball to medium right is caught and you retouch first, while the runner on second tags and takes off for third. The right fielder throws to third to get her.",
+    "question": "What do you do?",
+    "choices": [
+      "Take second on the throw to third",
+      "Stay at first, since you only went a few steps",
+      "Go to second only if the throw is wild",
+      "Go halfway and freeze"
+    ],
+    "correct_index": 0,
+    "explanation": "The right fielder can't throw to two bases at once. With her throw headed to third and you back on first after the catch, move up to second.",
+    "hint": "Can the right fielder throw to two bases at once?",
+    "playbook_page": 9,
+    "diagram": {
+      "runners": [
+        "first",
+        "second"
+      ],
+      "outs": 1,
+      "you": "runner-first",
+      "ball": {
+        "at": "RF",
+        "type": "fly"
+      },
+      "arrows": [
+        {
+          "from": "second",
+          "to": "third",
+          "kind": "run"
+        },
+        {
+          "from": "RF",
+          "to": "third",
+          "kind": "throw"
+        }
+      ]
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Rules: when it isn't obstruction",
+    "scenario": "One out, you're on first. The batter hits a ball into the right-center gap. As you approach third, the third baseman has already caught the relay throw and is standing in front of the bag, waiting to tag you.",
+    "question": "Is this obstruction?",
+    "choices": [
+      "Yes, a fielder can never block the base",
+      "Yes, and you're automatically awarded home",
+      "No, because she has the ball",
+      "No, because you left the baseline"
+    ],
+    "correct_index": 2,
+    "explanation": "Obstruction is a fielder getting in your way without the ball. Once she has it, she can stand there and make the tag, so it's on you to beat it.",
+    "hint": "What does the definition of obstruction say about the ball?",
+    "playbook_page": 2,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 1,
+      "you": "runner-first",
+      "ball": {
+        "at": "RCF-gap",
+        "type": "line"
+      },
+      "arrows": [
+        {
+          "from": "first",
+          "to": "second",
+          "kind": "run"
+        },
+        {
+          "from": "second",
+          "to": "third",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Squeeze: the batter's job",
+    "scenario": "One out, runner on third, and the squeeze is on. You're the batter, and the pitch comes in high and a little outside.",
+    "question": "What do you do?",
+    "choices": [
+      "Pull the bat back and take the pitch",
+      "Swing away to protect the runner",
+      "Step out of the box",
+      "Do everything you can to bunt it"
+    ],
+    "correct_index": 3,
+    "explanation": "Your runner is already sprinting home, so if you take the pitch she's an easy out at the plate. On a squeeze you have to try to bunt it, wherever it is.",
+    "hint": "Where is your runner while the pitch is on its way?",
+    "playbook_page": 2,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 1,
+      "you": "batter",
+      "arrows": [
+        {
+          "from": "third",
+          "to": "home",
+          "kind": "steal"
+        }
+      ]
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runner at 1B, 2 outs: batter on a fly ball to CF",
+    "scenario": "Two outs, runner on first. You hit a fly ball to center field.",
+    "question": "How do you run it out?",
+    "choices": [
+      "Run hard straight through first",
+      "Jog, since a catch ends the inning",
+      "Stop at first and watch the runner ahead",
+      "Round first hard so you're ready to take second if it's dropped"
+    ],
+    "correct_index": 3,
+    "explanation": "With two outs the runner on first goes on contact and should be around second by the time the ball comes down. That frees second for you, so make a hard turn and be ready to go on a drop.",
+    "hint": "With two outs, where will the runner ahead of you be when the ball comes down?",
+    "playbook_page": 17,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 2,
+      "you": "batter",
+      "ball": {
+        "at": "CF",
+        "type": "fly"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runner at 3B, <2 outs: bunt popped up",
+    "scenario": "One out, you're on third and no squeeze is on. The batter pops the bunt up in the air toward the pitcher.",
+    "question": "What do you do?",
+    "choices": [
+      "Freeze and get back to third",
+      "Break for home since it's a bunt",
+      "Go halfway home and read the catch",
+      "Tag up and run home on the catch"
+    ],
+    "correct_index": 0,
+    "explanation": "A popped-up bunt will probably be caught, and the pitcher is close enough to double you off third. Freeze, then get back to the bag.",
+    "hint": "If she catches it, how quickly can she throw to third?",
+    "playbook_page": 7,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 1,
+      "you": "runner-third",
+      "ball": {
+        "at": "bunt-P",
+        "type": "popup"
+      },
+      "arrows": []
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runners at 2B & 3B, <2 outs: squeeze (runner at 2B)",
+    "scenario": "One out, runners on second and third, and the squeeze is on. You're on second.",
+    "question": "What do you do?",
+    "choices": [
+      "Stay at second, since the squeeze is only for the runner on third",
+      "Hold until the bunt is fielded and thrown to first",
+      "Move up to third once the lead runner leaves it",
+      "Break for third before the pitch to draw a throw"
+    ],
+    "correct_index": 2,
+    "explanation": "As the trail runner, third opens the moment the runner ahead leaves for home. Move up behind her.",
+    "hint": "What happens to third base the moment the squeeze starts?",
+    "playbook_page": 14,
+    "diagram": {
+      "runners": [
+        "second",
+        "third"
+      ],
+      "outs": 1,
+      "you": "runner-second",
+      "arrows": []
+    }
+  }
+]

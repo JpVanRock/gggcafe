@@ -1,7 +1,8 @@
 import "server-only";
 import type { createClient } from "@/lib/supabase/server";
 import { addDays, formatTime, isoWeekday, weekDates } from "@/lib/dates";
-import type { Player, Position } from "@/lib/softball";
+import type { FieldPosition, Player, Position } from "@/lib/softball";
+import type { DiamondSpec } from "@/components/diamond";
 import { MENTAL_FIELDS, type MentalPlan } from "./shared";
 import { TRAINING_CATEGORY_LABEL, type Check, type Routine, type TrainingCategory } from "@/lib/achievements";
 
@@ -339,10 +340,18 @@ export async function loadPerformance(supabase: Supabase, playerId: string): Pro
 
 export type IqTopic = "general" | "hitting" | "pitching" | "position";
 
+/** Playbook tracks (Levels 1-3, rings) and the position track (one level per position, Golden Gloves). */
+export type IqTrack = "defense" | "baserunning" | "position" | "extra";
+
 export type IqQuestion = {
   id: string;
   topic: IqTopic;
   position: Position | null;
+  track: IqTrack | null;
+  level: number | null;
+  /** Extra Credit Library shelf */
+  section: string | null;
+  diagram: DiamondSpec | null;
   scenario: string;
   question: string;
   choices: string[];
@@ -352,27 +361,66 @@ export type IqQuestion = {
   active: boolean;
 };
 
-export type IqAnswer = { question_id: string; is_correct: boolean; answered_on: string; created_at: string };
+export type IqAnswer = {
+  question_id: string;
+  is_correct: boolean;
+  answered_on: string;
+  created_at: string;
+  attempt_id: string | null;
+  review_of: string | null;
+};
 
 export async function loadIq(supabase: Supabase, playerId: string) {
   const [questionsResult, answersResult] = await Promise.all([
     supabase
       .from("iq_questions")
-      .select("id, topic, position, scenario, question, choices, correct_index, explanation, difficulty, active")
+      .select("id, topic, position, track, level, section, diagram, scenario, question, choices, correct_index, explanation, difficulty, active")
       .order("topic")
       .order("position", { nullsFirst: true })
       .order("created_at"),
     supabase
       .from("iq_answers")
-      .select("question_id, is_correct, answered_on, created_at")
+      .select("question_id, is_correct, answered_on, created_at, attempt_id, review_of")
       .eq("player_id", playerId)
-      .order("created_at"),
+      // newest first so the API's row cap drops the oldest answers, then put back in time order
+      .order("created_at", { ascending: false })
+      .limit(1000),
+  ]);
+  const [ringsResult, glovesResult, mvpResult, trophyResult, attemptsResult] = await Promise.all([
+    supabase.from("player_rings").select("track, level, earned_on").eq("player_id", playerId),
+    supabase.from("player_golden_gloves").select("position, earned_on").eq("player_id", playerId),
+    supabase.from("player_mvp_badges").select("track, level, position, earned_on").eq("player_id", playerId).order("earned_on"),
+    supabase.from("player_world_series_trophies").select("earned_on").eq("player_id", playerId).maybeSingle(),
+    supabase
+      .from("iq_level_attempts")
+      .select("id, track, level, position, correct, total, passed, started_at, finished_at, reviewed_at, question_order")
+      .eq("player_id", playerId)
+      .order("started_at", { ascending: false }),
   ]);
   return {
     questions: (questionsResult.data ?? []) as IqQuestion[],
-    answers: (answersResult.data ?? []) as IqAnswer[],
+    answers: ((answersResult.data ?? []) as IqAnswer[]).reverse(),
+    rings: (ringsResult.data ?? []) as { track: "defense" | "baserunning"; level: number; earned_on: string }[],
+    gloves: (glovesResult.data ?? []) as { position: FieldPosition; earned_on: string }[],
+    mvps: (mvpResult.data ?? []) as { track: IqTrack; level: number; position: FieldPosition | null; earned_on: string }[],
+    worldSeries: (trophyResult.data ?? null) as { earned_on: string } | null,
+    attempts: (attemptsResult.data ?? []) as IqAttempt[],
   };
 }
+
+export type IqAttempt = {
+  id: string;
+  track: IqTrack;
+  level: number;
+  position: FieldPosition | null;
+  correct: number | null;
+  total: number | null;
+  passed: boolean | null;
+  started_at: string;
+  finished_at: string | null;
+  reviewed_at: string | null;
+  question_order: string[] | null;
+};
 
 export type IqData = Awaited<ReturnType<typeof loadIq>>;
 
@@ -397,7 +445,7 @@ export type Rostering = {
   id: string;
   jersey_number: string | null;
   active: boolean;
-  team: { id: string; name: string; short_name: string | null; is_own_team: boolean } | null;
+  team: { id: string; name: string; short_name: string | null; is_own_team: boolean; logo_url: string | null } | null;
   season: { name: string; start_date: string | null } | null;
 };
 
@@ -426,7 +474,7 @@ export async function loadPopReport(supabase: Supabase, playerId: string): Promi
   const [rosterResult, metricsResult, evalResult] = await Promise.all([
     supabase
       .from("roster_entries")
-      .select("id, jersey_number, active, team:teams(id, name, short_name, is_own_team), season:seasons(name, start_date)")
+      .select("id, jersey_number, active, team:teams(id, name, short_name, is_own_team, logo_url), season:seasons(name, start_date)")
       .eq("player_id", playerId),
     supabase.from("player_metric_progress").select("*").eq("player_id", playerId).order("metric_name"),
     supabase

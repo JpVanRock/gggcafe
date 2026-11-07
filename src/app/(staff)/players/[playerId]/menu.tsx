@@ -32,6 +32,13 @@ const BOARD = {
     cta: "text-neon",
     numeral: "rgb(233 250 5 / 0.35)",
   },
+  trophy: {
+    board:
+      "border-2 border-neon bg-linear-to-b from-navy-800 to-navy-950 text-ink shadow-[0_0_36px_rgba(254,32,122,0.18)] [--menu-value:var(--color-neon)] [--menu-note:var(--color-muted)]",
+    subtitle: "text-pink-soft",
+    cta: "text-neon",
+    numeral: "rgb(254 32 122 / 0.45)",
+  },
   outlinePink: {
     board: "border-2 border-pink bg-navy-900 text-ink [--menu-value:var(--color-pink-soft)] [--menu-note:var(--color-muted)]",
     subtitle: "text-neon",

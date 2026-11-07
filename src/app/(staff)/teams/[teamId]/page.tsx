@@ -14,6 +14,7 @@ import {
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { addDays, formatDay, formatTime, todayISO } from "@/lib/dates";
 import { deleteTeamEvent, removeFromRoster } from "../actions";
+import { LogoUpload } from "./logo-upload";
 import {
   ExistingRosterPlayerForm, GameForm, NewRosterPlayerForm, RosterEntryEditor, SeasonForm, TeamEventForm, TeamForm,
 } from "../forms";
@@ -287,6 +288,17 @@ async function TeamContent({
                 <GameForm teamId={team.id} seasonId={season?.id ?? null} opponents={opponents} />
               </Disclosure>
             </div>
+          )}
+        </Card>
+      )}
+
+      {team.is_own_team && (
+        <Card title="Team logo">
+          {editor ? (
+            <LogoUpload teamId={team.id} logoUrl={team.logo_url} />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element -- remote Storage URL
+            <img src={team.logo_url ?? "/brand/ggg-cafe-logo.webp"} alt="Team logo" className="size-20 rounded-full object-contain" />
           )}
         </Card>
       )}

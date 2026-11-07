@@ -61,6 +61,43 @@ tests/unit/              node --test unit tests (npm run test:unit)
 - IQ Test: shared `iq_questions` bank (topic general/hitting/pitching/position) with a starter
   set seeded by migration; `iq_answers` per player. Correct answers are checked server-side
   (`answerIqQuestion`) so quiz questions are sent to the browser without them.
+- IQ playbook levels: tracks `defense` and `baserunning`, Levels 1–3, up to 30 questions each (the
+  user's cap; a level may hold fewer when the playbook runs out of distinct decisions), written from
+  the user's Softball IQ Defensive / Baserunning Playbooks (original wording, page refs in
+  `playbook_ref`), each with a `hint` that points the way without giving the answer.
+- Position IQ (Golden Glove): track `position`, one level, 21 questions per fielding position
+  (`iq_questions.position`); the player picks her position from a list (defaults to her primary).
+  80%+ earns that position's Golden Glove (`player_golden_gloves`).
+- Extra Credit Library (track `extra`): questions on what the playbooks teach that no test asks,
+  on shelves (`iq_questions.section`, e.g. "Defense · Vocabulary"). One run deals the whole
+  library; she answers in any order (shelf chips), with a hint on any question (`hint_used`), and
+  progress saves. A run is graded only once every question is answered (`finish_iq_level` raises
+  P0003 before that); 80%+ earns the GGG World Series Trophy (`player_world_series_trophies`).
+- MVP badge (`player_mvp_badges`, one per test): earned when `iq_review_status` finds every missed
+  question answered again, or outright for a perfect score. Drawn by `src/components/mvp-badge.tsx`.
+- Stolen Base Leader plaque: comes with the Baserunning IQ Level 3 ring (all three levels passed);
+  no table. `src/components/stolen-base-plaque.tsx` engraves name and number on the gold bar.
+- Trophy Room (`trophy-room.tsx`, last menu board, `trophy` board variant): World Series Trophy,
+  plaque, rings, Golden Gloves, MVP badges and Performance Training achievements; unearned ones dim.
+- Question source of truth: `supabase/iq/{defense,baserunning,positions,extra}.json`. After editing,
+  generate a NEW migration with `scripts/iq/build-playbook-migration.py` (validates everything,
+  slugs each question `{track}-{level}-{nn}` / `position-{pos}-{nn}` and upserts on the slug, so
+  append rather than insert mid-level; questions dropped from the files are hidden, not deleted).
+- Test flow (both kinds share it): `start_iq_level` enforces unlocking and deals the questions in a
+  saved random order (`question_order`), resuming the open test if there is one (one open test per
+  level/position; restart discards it). Answers save as they go, so a player can stop and pick up
+  later; the UI shows a progress bar. `finish_iq_level` grades against the dealt questions
+  (unanswered = wrong, 80% passes) and awards the ring (`player_rings`) or Golden Glove. After a
+  test, "Review missed" re-asks each missed question once (`iq_answers.review_of`, `hint_used`
+  when she asked for the hint); `iq_review_status` sets `reviewed_at` once all are done.
+- Award art is the user's own renders, cut out to transparent WebP in `public/awards/`:
+  `world-series-trophy.webp`, `stolen-base-plaque.webp` (acrylic made see-through),
+  `championship-ring.webp` (the GGG championship ring, reflection removed; every ring uses it,
+  unearned ones dimmed gray; `src/components/rings.tsx`) and `golden-glove.webp` (trophy;
+  `src/components/golden-glove.tsx` engraves her name, number, position and year on the gold plate
+  as SVG text over the image). Team logos (`teams.logo_url`, `team-logos` bucket) are no longer on
+  the ring. Every test question has a `diagram` drawn by `src/components/diamond.tsx`: it shows
+  the situation only, never the answer.
 - Coaches/admins fill dashboards in for now; player logins are a planned follow-up.
 
 ## Softball conventions
