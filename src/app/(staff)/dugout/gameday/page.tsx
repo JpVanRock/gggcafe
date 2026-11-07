@@ -11,7 +11,7 @@ import { loadOwnTeams } from "../data";
 import { TeamPicker } from "../team-picker";
 import { CardsForm, NewLineupForm } from "./forms";
 
-export const metadata: Metadata = { title: "GameDay Prep · Coaches Dugout · GGG.Cafe" };
+export const metadata: Metadata = { title: "GameDay · Coaches Dugout · GGG.Cafe" };
 
 export default function GamedayPage({ searchParams }: PageProps<"/dugout/gameday">) {
   return (

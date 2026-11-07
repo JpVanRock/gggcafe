@@ -16,7 +16,7 @@ import { ShareButton } from "../../plans/[planId]/share-button";
 import { deleteLineup, reopenLineup, shareLineup } from "../actions";
 import { LineupBuilder } from "./builder";
 
-export const metadata: Metadata = { title: "Lineup · GameDay Prep · GGG.Cafe" };
+export const metadata: Metadata = { title: "Lineup · GameDay · GGG.Cafe" };
 
 export default function LineupPage({ params, searchParams }: PageProps<"/dugout/gameday/[lineupId]">) {
   return (
@@ -47,7 +47,7 @@ async function LineupView({ params, searchParams }: Pick<PageProps<"/dugout/game
   return (
     <div className="flex flex-col gap-6">
       <Link href={`/dugout/gameday?team=${lineup.team.id}`} className="text-sm text-muted hover:text-ink">
-        ← GameDay Prep · {lineup.team.name}
+        ← GameDay · {lineup.team.name}
       </Link>
       {typeof shared === "string" && lineup.status === "final" && (
         <p role="status" className="rounded-xl border border-neon/60 bg-neon/10 px-4 py-3 text-sm font-semibold">

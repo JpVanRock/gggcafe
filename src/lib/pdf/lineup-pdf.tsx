@@ -142,7 +142,7 @@ function LineupDocument({ lineup, roster }: { lineup: Lineup; roster: GamedayPla
         </View>
 
         <View style={s.footer} fixed>
-          <Text>GGG.Cafe · Coaches Dugout · GameDay Prep</Text>
+          <Text>GGG.Cafe · Coaches Dugout · GameDay</Text>
           <Text render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`} />
         </View>
       </Page>

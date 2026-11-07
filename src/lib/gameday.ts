@@ -1,4 +1,4 @@
-// GameDay Prep reference values and lineup checks. No imports, so it runs in
+// GameDay reference values and lineup checks. No imports, so it runs in
 // server and client code and in unit tests (npm run test:unit). Codes match the
 // checks in the movement_hitting_gameday migration.
 

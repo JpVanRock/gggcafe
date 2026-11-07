@@ -4,11 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const TABS = [
-  { href: "/dugout", label: "Standards & Culture", match: (p: string) => p === "/dugout" },
+  { href: "/dugout", label: "Culture", match: (p: string) => p === "/dugout" },
   { href: "/dugout/roster", label: "Roster", match: (p: string) => p.startsWith("/dugout/roster") },
   { href: "/dugout/calendar", label: "Calendar", match: (p: string) => p.startsWith("/dugout/calendar") },
   { href: "/dugout/plans", label: "Practice Plans", match: (p: string) => p.startsWith("/dugout/plans") },
-  { href: "/dugout/gameday", label: "GameDay Prep", match: (p: string) => p.startsWith("/dugout/gameday") },
+  { href: "/dugout/gameday", label: "GameDay", match: (p: string) => p.startsWith("/dugout/gameday") },
   { href: "/dugout/drills", label: "Drill Library", match: (p: string) => p.startsWith("/dugout/drills") },
   { href: "/dugout/budget", label: "Team Budget", match: (p: string) => p.startsWith("/dugout/budget") },
   { href: "/dugout/parents", label: "Parents", match: (p: string) => p.startsWith("/dugout/parents") },

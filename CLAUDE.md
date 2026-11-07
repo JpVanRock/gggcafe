@@ -181,10 +181,10 @@ tests/unit/              node --test unit tests (npm run test:unit)
 - DB tests: `tests/db/players.test.sql`.
 
 ## Coaches Dugout (`/dugout`, nav "Coaches Dugout")
-- Header tabs (`dugout/tabs.tsx`): Standards & Culture (`/dugout`), Roster (`/dugout/roster`), Calendar (`/dugout/calendar`),
-  Practice Plans (`/dugout/plans`), GameDay Prep (`/dugout/gameday`), Drill Library (`/dugout/drills`),
+- Header tabs (`dugout/tabs.tsx`): Culture (`/dugout`; Team Standards + Team Culture), Roster (`/dugout/roster`), Calendar (`/dugout/calendar`),
+  Practice Plans (`/dugout/plans`), GameDay (`/dugout/gameday`), Drill Library (`/dugout/drills`),
   Team Budget (`/dugout/budget`), Parents (`/dugout/parents`).
-- GameDay Prep (from the user's Lineup + Defensive Rotations tabs): season player cards
+- GameDay (tab renamed from "GameDay Prep"; from the user's Lineup + Defensive Rotations tabs): season player cards
   (`gameday_profiles`: hitting type power/contact/gap, base running pure/intelligent/average, typed
   AVG/OBP/K% used only until box scores exist, `batting_season` wins) and game lineups
   (`gameday_lineups`: batting order uuid[], `defense` {rotation: {player: P..RF|Sub}}, `pitching`
