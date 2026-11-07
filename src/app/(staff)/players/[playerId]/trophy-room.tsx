@@ -1,6 +1,6 @@
 // The Trophy Room: every accolade a player has earned, in one place.
 //  - GGG World Series Trophy (Extra Credit Library run at 80%+)
-//  - Stolen Base Leader plaque (all three Baserunning IQ levels passed)
+//  - Stolen Base Leader plaques (one per Baserunning IQ level passed)
 //  - championship rings (playbook levels), Golden Gloves (position tests)
 //  - MVP badges (every miss on a test reviewed, or a perfect score)
 //  - Performance Training achievements
@@ -20,7 +20,8 @@ import { HexBadge } from "./performance";
 export type TrophyRoom = {
   plate: Nameplate;
   worldSeriesOn: string | null;
-  plaqueOn: string | null;
+  /** one Stolen Base Leader plaque per Baserunning IQ level */
+  plaques: { level: number; earnedOn: string | null }[];
   rings: IqData["rings"];
   positions: PositionInfo[];
   mvps: { key: string; label: string; earnedOn: string }[];
@@ -34,11 +35,13 @@ function mvpLabel(m: IqData["mvps"][number]) {
 }
 
 export function buildTrophyRoom(iq: IqData, positions: PositionInfo[], achievements: AchievementProgress[], plate: Nameplate): TrophyRoom {
-  const plaque = iq.rings.find((r) => r.track === "baserunning" && r.level === 3);
   return {
     plate,
     worldSeriesOn: iq.worldSeries ? formatLongDate(iq.worldSeries.earned_on) : null,
-    plaqueOn: plaque ? formatLongDate(plaque.earned_on) : null,
+    plaques: [1, 2, 3].map((level) => {
+      const ring = iq.rings.find((r) => r.track === "baserunning" && r.level === level);
+      return { level, earnedOn: ring ? formatLongDate(ring.earned_on) : null };
+    }),
     rings: iq.rings,
     positions,
     mvps: iq.mvps.map((m) => ({
@@ -52,12 +55,13 @@ export function buildTrophyRoom(iq: IqData, positions: PositionInfo[], achieveme
 
 export function TrophyRoomSummary({ room }: { room: TrophyRoom }) {
   const gloves = room.positions.filter((p) => p.earnedOn);
-  const nothing = !room.worldSeriesOn && !room.plaqueOn && !room.rings.length && !gloves.length && !room.mvps.length && !room.achievements.length;
+  const plaques = room.plaques.filter((p) => p.earnedOn);
+  const nothing = !room.worldSeriesOn && !plaques.length && !room.rings.length && !gloves.length && !room.mvps.length && !room.achievements.length;
   return (
     <div>
       <div className="grid gap-x-10 gap-y-4 sm:grid-cols-3">
         <MenuItem name="World Series Trophy" value={room.worldSeriesOn ? "✓" : "–"} note={room.worldSeriesOn ? `Won ${room.worldSeriesOn}` : "Extra Credit Library"} />
-        <MenuItem name="Stolen Base Leader" value={room.plaqueOn ? "✓" : "–"} note={room.plaqueOn ? `Plaque earned ${room.plaqueOn}` : "All three Baserunning IQ levels"} />
+        <MenuItem name="Stolen Base Leader" value={`${plaques.length}/3`} note="A plaque for each Baserunning IQ level" />
         <MenuItem name="Championship rings" value={`${room.rings.length}/6`} />
         <MenuItem name="Golden Gloves" value={`${gloves.length}/9`} note={gloves.length ? gloves.map((g) => g.position).join(", ") : undefined} />
         <MenuItem name="MVP badges" value={room.mvps.length} />
@@ -68,7 +72,9 @@ export function TrophyRoomSummary({ room }: { room: TrophyRoom }) {
       ) : (
         <div className="mt-6 flex flex-wrap items-end justify-center gap-5">
           {room.worldSeriesOn && <WorldSeriesTrophy size={70} />}
-          {room.plaqueOn && <StolenBasePlaque name={room.plate.name} number={room.plate.number} engrave={false} size={62} />}
+          {plaques.map((p) => (
+            <StolenBasePlaque key={p.level} name={room.plate.name} number={room.plate.number} level={p.level} engrave={false} size={58} />
+          ))}
           {room.rings.length > 0 && <RingCase earned={room.rings} size={36} showLabels={false} />}
           {gloves.map((g) => (
             <GoldenGlove key={g.position} name={room.plate.name} number={room.plate.number} position={g.label} engrave={false} size={70} />
@@ -96,24 +102,27 @@ export function TrophyRoomDetail({ room }: { room: TrophyRoom }) {
   const gloves = room.positions.filter((p) => p.earnedOn);
   return (
     <div className="flex flex-col gap-6">
-      <div className="grid gap-6 md:grid-cols-2">
-        <Shelf
-          title="GGG World Series Trophy"
-          note={room.worldSeriesOn ? `Won ${room.worldSeriesOn}` : "Answer every Extra Credit Library question in one run with 80% or better."}
-        >
-          <div className="flex justify-center">
-            <WorldSeriesTrophy earned={Boolean(room.worldSeriesOn)} size={220} />
-          </div>
-        </Shelf>
-        <Shelf
-          title="Stolen Base Leader"
-          note={room.plaqueOn ? `Earned ${room.plaqueOn}` : "Pass all three Baserunning IQ levels."}
-        >
-          <div className="flex justify-center">
-            <StolenBasePlaque name={room.plate.name} number={room.plate.number} earned={Boolean(room.plaqueOn)} size={230} />
-          </div>
-        </Shelf>
-      </div>
+      <Shelf
+        title="GGG World Series Trophy"
+        note={room.worldSeriesOn ? `Won ${room.worldSeriesOn}` : "Answer every Extra Credit Library question in one run with 80% or better."}
+      >
+        <div className="flex justify-center">
+          <WorldSeriesTrophy earned={Boolean(room.worldSeriesOn)} size={220} />
+        </div>
+      </Shelf>
+
+      <Shelf title="Stolen Base Leader plaques" note="One for each Baserunning IQ level passed with 80%+.">
+        <ul className="flex flex-wrap justify-center gap-6">
+          {room.plaques.map((p) => (
+            <li key={p.level} className="flex flex-col items-center gap-2">
+              <StolenBasePlaque name={room.plate.name} number={room.plate.number} level={p.level} earned={Boolean(p.earnedOn)} size={200} />
+              <span className="font-mono text-[11px] tracking-wider text-muted uppercase">
+                Level {p.level} · {p.earnedOn ?? "not earned yet"}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </Shelf>
 
       <Shelf title="Championship rings" note={`${room.rings.length} of 6 · one per playbook level passed with 80%+`}>
         <RingCase earned={room.rings} size={76} />
@@ -125,7 +134,7 @@ export function TrophyRoomDetail({ room }: { room: TrophyRoom }) {
         ) : (
           <div className="flex items-center gap-4">
             <GoldenGlove name={room.plate.name} position="Any position" earned={false} engrave={false} size={110} />
-            <p className="text-sm text-muted">Pick a position in the IQ Test and score 80% or better to earn its Golden Glove.</p>
+            <p className="text-sm text-muted">Pick a position in Softball IQ and score 80% or better to earn its Golden Glove.</p>
           </div>
         )}
       </Shelf>

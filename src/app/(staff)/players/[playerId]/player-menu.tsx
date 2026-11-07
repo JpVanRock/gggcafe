@@ -113,7 +113,7 @@ export function PlayerMenu({
     },
     {
       key: "iq",
-      title: "IQ Test",
+      title: "Softball IQ",
       subtitle: "Defense IQ · Baserunning IQ · Position IQ · Extra Credit",
       variant: "outlinePink",
       wide: true,
@@ -175,7 +175,11 @@ export function PlayerMenu({
           {(iq.rings.length > 0 || iq.gloves.length > 0 || room.worldSeriesOn) && (
             <div className="mt-6 flex flex-wrap items-end justify-center gap-6" aria-label="Trophies, rings and Golden Gloves">
               {room.worldSeriesOn && <WorldSeriesTrophy size={56} />}
-              {room.plaqueOn && <StolenBasePlaque name={plate.name} number={plate.number} engrave={false} size={52} />}
+              {room.plaques
+                .filter((p) => p.earnedOn)
+                .map((p) => (
+                  <StolenBasePlaque key={p.level} name={plate.name} number={plate.number} level={p.level} engrave={false} size={48} />
+                ))}
               {iq.rings.length > 0 && <RingCase earned={iq.rings} size={44} />}
               {iqPositions
                 .filter((p) => p.earnedOn)

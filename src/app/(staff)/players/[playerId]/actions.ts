@@ -402,7 +402,7 @@ async function awardAchievements(supabase: Awaited<ReturnType<typeof createClien
 }
 
 // ---------------------------------------------------------------------------
-// IQ Test
+// Softball IQ (practice quizzes, level and position tests, Extra Credit)
 // ---------------------------------------------------------------------------
 
 const IQ_TOPICS = ["general", "hitting", "pitching", "position"] as const;

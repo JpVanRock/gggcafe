@@ -335,7 +335,7 @@ export async function loadPerformance(supabase: Supabase, playerId: string): Pro
 }
 
 // ---------------------------------------------------------------------------
-// IQ Test
+// Softball IQ (practice quizzes, level and position tests, Extra Credit)
 // ---------------------------------------------------------------------------
 
 export type IqTopic = "general" | "hitting" | "pitching" | "position";

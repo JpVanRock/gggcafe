@@ -741,10 +741,10 @@ export function IqTests({
             )}
           </div>
         )}
-        {result.passed && result.awardEarned && session.track === "baserunning" && session.level === 3 && (
+        {result.passed && result.awardEarned && session.track === "baserunning" && (
           <div className="mt-4 flex flex-col items-center gap-2">
-            <StolenBasePlaque name={plate.name} number={plate.number} size={220} />
-            <p className="text-sm font-bold text-neon">All three Baserunning IQ levels passed: Stolen Base Leader plaque earned.</p>
+            <StolenBasePlaque name={plate.name} number={plate.number} level={session.level} size={220} />
+            <p className="text-sm font-bold text-neon">Stolen Base Leader plaque earned for Baserunning IQ Level {session.level}.</p>
           </div>
         )}
         <p className="mt-3 text-4xl font-bold text-neon tabular-nums">

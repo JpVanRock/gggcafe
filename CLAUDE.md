@@ -44,7 +44,7 @@ tests/unit/              node --test unit tests (npm run test:unit)
 - Add a future section: one entry in the `sections` array (summary + detail components); add a
   board color in `menu.tsx` `BOARD` if needed (brand palette only).
 - Section names (user's wording): "{Name}'s Goals" (Harada Method), "{Name}'s Pop Report",
-  "Mental GP". Pop Report fields are placeholders until the user specifies them.
+  "Mental GP", "Softball IQ" (renamed from "IQ Test"), "{Name}'s Trophy Room". Pop Report fields are placeholders until the user specifies them.
 - TWIS = This Week in Softball: team practices/events (`team_events`) and games for the player's
   active teams, plus `player_activities`; check-offs in `twis_checks`. Weeks start Monday;
   "today" uses `APP_TIME_ZONE` (default America/New_York) in `src/lib/dates.ts`.
@@ -58,7 +58,7 @@ tests/unit/              node --test unit tests (npm run test:unit)
   `drills` library. They appear in TWIS; check-offs drive consistency and achievements.
   Rules live in `src/lib/achievements.ts` (no imports; unit-tested with `npm run test:unit`).
   Earned achievements are stored in `player_achievements` when a box is ticked and never removed.
-- IQ Test: shared `iq_questions` bank (topic general/hitting/pitching/position) with a starter
+- Softball IQ (board formerly "IQ Test"): shared `iq_questions` bank (topic general/hitting/pitching/position) with a starter
   set seeded by migration; `iq_answers` per player. Correct answers are checked server-side
   (`answerIqQuestion`) so quiz questions are sent to the browser without them.
 - IQ playbook levels: tracks `defense` and `baserunning`, Levels 1–3, up to 30 questions each (the
@@ -75,8 +75,9 @@ tests/unit/              node --test unit tests (npm run test:unit)
   P0003 before that); 80%+ earns the GGG World Series Trophy (`player_world_series_trophies`).
 - MVP badge (`player_mvp_badges`, one per test): earned when `iq_review_status` finds every missed
   question answered again, or outright for a perfect score. Drawn by `src/components/mvp-badge.tsx`.
-- Stolen Base Leader plaque: comes with the Baserunning IQ Level 3 ring (all three levels passed);
-  no table. `src/components/stolen-base-plaque.tsx` engraves name and number on the gold bar.
+- Stolen Base Leader plaques: one per Baserunning IQ level, earned with that level's ring (no table).
+  `src/components/stolen-base-plaque.tsx` engraves name and number on the gold bar, with
+  "BASERUNNING IQ · LEVEL n · {Rookie|Varsity|All-American}" beneath.
 - Trophy Room (`trophy-room.tsx`, last menu board, `trophy` board variant): World Series Trophy,
   plaque, rings, Golden Gloves, MVP badges and Performance Training achievements; unearned ones dim.
 - Question source of truth: `supabase/iq/{defense,baserunning,positions,extra}.json`. After editing,
