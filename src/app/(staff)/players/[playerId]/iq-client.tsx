@@ -65,7 +65,7 @@ export function QuizRunner({ playerId, quizzes, canEdit }: { playerId: string; q
               }}
               className={buttonClass}
             >
-              {quiz.questions.length === 0 ? "No questions yet" : `Start · ${Math.min(quiz.questions.length, QUIZ_LENGTH)} questions`}
+              {quiz.questions.length === 0 ? "No questions yet" : `Start · ${plural(Math.min(quiz.questions.length, QUIZ_LENGTH), "question", "questions")}`}
             </button>
           </div>
         ))}

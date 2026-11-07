@@ -151,7 +151,9 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   { key: "workhorse", title: "Workhorse", description: "20 workouts done.", rule: { kind: "total", count: 20, category: "workout" } },
   { key: "loose_and_ready", title: "Loose & Ready", description: "20 stretching routines done.", rule: { kind: "total", count: 20, category: "stretching" } },
   { key: "barrel_buster", title: "Barrel Buster", description: "25 hitting drills done.", rule: { kind: "total", count: 25, category: "hitting" } },
-  { key: "golden_glove", title: "Golden Glove", description: "25 fielding drills done.", rule: { kind: "total", count: 25, category: "fielding" } },
+  // key kept as "golden_glove" so achievements already earned stay attached; the title changed
+  // because "Golden Glove" is now the position-test award
+  { key: "golden_glove", title: "Prep Step", description: "25 fielding drills done.", rule: { kind: "total", count: 25, category: "fielding" } },
   { key: "ace", title: "Ace", description: "25 pitching drills done.", position: "P", rule: { kind: "total", count: 25, category: "pitching" } },
   { key: "brick_wall", title: "Brick Wall", description: "25 catching drills done.", position: "C", rule: { kind: "total", count: 25, category: "catching" } },
 ];
