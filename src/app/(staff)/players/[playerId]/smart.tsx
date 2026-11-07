@@ -88,12 +88,8 @@ function SmartGoalCard({
           <h4 className={`text-lg font-semibold ${done ? "text-muted" : "text-ink"}`}>{goal.title}</h4>
           <p className="mt-0.5 font-mono text-xs tracking-wider text-muted uppercase">{SKILL_AREA_LABEL[goal.area as SkillArea]}</p>
         </div>
-        <span
-          className={`rounded px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase ${
-            done ? "bg-neon text-on-accent" : "border border-pink text-pink-soft"
-          }`}
-        >
-          {done ? `Achieved${goal.achieved_on ? ` ${short(goal.achieved_on)}` : ""}` : "In progress"}
+        <span className={`font-mono text-[11px] font-bold tracking-wider uppercase ${done ? "text-highlight" : "text-pink-soft"}`}>
+          {done ? `✓ Achieved${goal.achieved_on ? ` ${short(goal.achieved_on)}` : ""}` : "In progress"}
         </span>
       </header>
 

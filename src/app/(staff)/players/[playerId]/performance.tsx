@@ -69,11 +69,11 @@ export function PerformanceSummary({ summary }: { summary: Summary }) {
           {unlocked.length}/{summary.achievements.length} achievements
           {summary.streak.current > 0 && ` · ${summary.streak.current}-week streak`}
         </span>
-        {latest.map((a) => (
-          <span key={a.def.key} className="rounded-md border border-neon/60 px-2 py-0.5 font-mono text-[11px] font-bold tracking-wider text-highlight uppercase">
-            {a.def.title}
+        {latest.length > 0 && (
+          <span className="font-mono text-xs font-bold tracking-wider text-highlight uppercase">
+            · Latest: {latest.map((a) => a.def.title).join(", ")}
           </span>
-        ))}
+        )}
       </div>
     </div>
   );

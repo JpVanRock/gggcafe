@@ -16,8 +16,8 @@ export default function LoginPage() {
           <Logo size={168} priority className="h-[8.4rem] w-[8.4rem] shadow-[0_0_40px_rgba(254,31,124,0.3)]" />
         </Link>
         {/* The tagline sits apart from the logo, never as a lockup (brand kit rule) */}
-        {/* keep-night: in Day Game the tagline sits on a navy panel (brand kit: artwork over navy) */}
-        <h1 className="keep-night mt-6 rounded-xl bg-navy-950 px-4 py-2">
+        {/* yellow at night, navy by day; kept apart from the logo (no lockup) */}
+        <h1 className="mt-8">
           <Tagline width={280} />
         </h1>
         <span aria-hidden className="mt-2 block h-0.5 w-12 rounded-full bg-pink" />
