@@ -50,3 +50,17 @@ test("a plan needs drills with time limits to finalize", () => {
   assert.deepEqual(finalizeProblems([{ name: "A", minutes: null }, { name: "B", minutes: 0 }]), ["Set a time limit for 2 drills."]);
   assert.deepEqual(finalizeProblems([{ name: "A", minutes: 10 }]), []);
 });
+
+test("calendar months run Monday to Sunday in whole weeks", async () => {
+  const { monthGrid, monthLabel, monthOf, shiftMonth } = await import("../../src/lib/dugout.ts");
+  const nov = monthGrid("2026-11"); // Nov 1, 2026 is a Sunday
+  assert.equal(nov[0], "2026-10-26");
+  assert.equal(nov.at(-1), "2026-12-06");
+  assert.equal(nov.length % 7, 0);
+  assert.equal(monthGrid("2027-02")[0], "2027-02-01"); // starts on a Monday
+  assert.equal(monthLabel("2026-11"), "November 2026");
+  assert.equal(shiftMonth("2026-01", -1), "2025-12");
+  assert.equal(shiftMonth("2026-12", 1), "2027-01");
+  assert.equal(monthOf("2026-13", "2026-11-07"), "2026-11");
+  assert.equal(monthOf("2027-03", "2026-11-07"), "2027-03");
+});

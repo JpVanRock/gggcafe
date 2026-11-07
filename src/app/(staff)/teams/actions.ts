@@ -3,6 +3,7 @@
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { editorCheck } from "@/lib/auth";
+import { readEventForm, timeOf, weeklyDates } from "@/lib/team-events";
 import { createClient } from "@/lib/supabase/server";
 import {
   checkbox, friendlyDbError, isoDate, oneOf, text, wholeNumber, type FormState,
@@ -187,52 +188,26 @@ export async function removeFromRoster(fd: FormData): Promise<void> {
 // Team schedule (shown in each player's TWIS)
 // ---------------------------------------------------------------------------
 
-const EVENT_KINDS = ["practice", "workout", "lesson", "meeting", "other"] as const;
 const GAME_TYPES = ["league", "tournament_pool", "tournament_bracket", "showcase", "scrimmage", "exhibition"] as const;
-const TIME = /^\d{2}:\d{2}$/;
 
-function timeOf(fd: FormData, name: string) {
-  const value = text(fd, name);
-  return value && TIME.test(value) ? value : null;
-}
-
-/** Adds a practice or other team event, optionally repeating weekly. */
+/** Adds a practice or other team event, optionally repeating weekly (one series). */
 export async function addTeamEvent(_prev: FormState, fd: FormData): Promise<FormState> {
   const denied = await editorCheck();
   if (denied) return { error: denied };
 
   const teamId = text(fd, "team_id");
   if (!isUuid(teamId)) return { error: "Unknown team." };
-  const eventDate = isoDate(fd, "event_date");
-  if (!eventDate) return { error: "Pick a date." };
-  const start_time = timeOf(fd, "start_time");
-  const end_time = timeOf(fd, "end_time");
-  if (start_time && end_time && end_time <= start_time) return { error: "The end time is before the start time." };
-
+  const event = readEventForm(fd);
+  if (event.error !== null) return { error: event.error };
   const repeatUntil = isoDate(fd, "repeat_until");
-  if (repeatUntil && repeatUntil < eventDate) return { error: "“Repeat until” is before the first date." };
+  if (repeatUntil && repeatUntil < event.event_date) return { error: "“Repeat until” is before the first date." };
 
-  // Weekly repeats, capped at 30 so a typo can't flood the schedule.
-  const dates = [eventDate];
-  while (repeatUntil && dates.length < 30) {
-    const next = new Date(`${dates[dates.length - 1]}T00:00:00Z`);
-    next.setUTCDate(next.getUTCDate() + 7);
-    const iso = next.toISOString().slice(0, 10);
-    if (iso > repeatUntil) break;
-    dates.push(iso);
-  }
-
-  const base = {
-    team_id: teamId,
-    kind: oneOf(fd, "kind", EVENT_KINDS) ?? "practice",
-    title: text(fd, "title"),
-    start_time,
-    end_time,
-    location: text(fd, "location"),
-    notes: text(fd, "notes"),
-  };
+  const dates = weeklyDates(event.event_date, repeatUntil);
+  const series_id = dates.length > 1 ? crypto.randomUUID() : null;
   const supabase = await createClient();
-  const { error } = await supabase.from("team_events").insert(dates.map((event_date) => ({ ...base, event_date })));
+  const { error } = await supabase
+    .from("team_events")
+    .insert(dates.map((event_date) => ({ ...event.values, team_id: teamId, event_date, series_id })));
   if (error) return { error: friendlyDbError(error) };
 
   refresh();

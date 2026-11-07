@@ -77,9 +77,10 @@ async function Dashboard() {
       </Card>
 
       <Card title="Coaches Dugout">
-        <ul className="grid gap-3 sm:grid-cols-3">
+        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {[
             { href: "/dugout", label: "Standards & Culture", note: "What your team stands for" },
+            { href: "/dugout/calendar", label: "Calendar", note: "Dates that show in TWIS" },
             { href: "/dugout/plans", label: "Practice Plans", note: "Build, print and share" },
             { href: "/dugout/drills", label: "Drill Library", note: "Every drill, tagged" },
           ].map((item) => (

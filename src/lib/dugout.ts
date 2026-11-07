@@ -180,3 +180,50 @@ export const FIELD_SHAPES = {
   plate: "M193 331 h14 v5 l-7 6 l-7 -6 Z",
   circle: { cx: 200, cy: 248, r: 18 },
 };
+
+// ---------------------------------------------------------------------------
+// Calendar (team events shown in each player's TWIS)
+// ---------------------------------------------------------------------------
+export const EVENT_KINDS = ["practice", "workout", "lesson", "meeting", "other"] as const;
+export type EventKind = (typeof EVENT_KINDS)[number];
+export const EVENT_KIND_LABEL: Record<EventKind, string> = {
+  practice: "Practice",
+  workout: "Workout",
+  lesson: "Lesson",
+  meeting: "Team meeting",
+  other: "Team event",
+};
+
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+/** "2026-11" for a month string, or the month of `fallback` (yyyy-mm-dd) when it isn't valid. */
+export function monthOf(value: unknown, fallback: string) {
+  return typeof value === "string" && /^\d{4}-(0[1-9]|1[0-2])$/.test(value) ? value : fallback.slice(0, 7);
+}
+
+/** "November 2026" */
+export function monthLabel(month: string) {
+  const [y, m] = month.split("-").map(Number);
+  return `${MONTHS[m - 1]} ${y}`;
+}
+
+/** The month before or after: shiftMonth("2026-01", -1) = "2025-12". */
+export function shiftMonth(month: string, by: number) {
+  const [y, m] = month.split("-").map(Number);
+  const d = new Date(Date.UTC(y, m - 1 + by, 1));
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
+}
+
+/** Every date shown for a month: whole weeks, Monday to Sunday (like TWIS). */
+export function monthGrid(month: string) {
+  const [y, m] = month.split("-").map(Number);
+  const first = new Date(Date.UTC(y, m - 1, 1));
+  const last = new Date(Date.UTC(y, m, 0));
+  const start = new Date(first);
+  start.setUTCDate(first.getUTCDate() - ((first.getUTCDay() + 6) % 7)); // back to Monday
+  const end = new Date(last);
+  end.setUTCDate(last.getUTCDate() + ((7 - last.getUTCDay()) % 7)); // on to Sunday
+  const days: string[] = [];
+  for (const d = new Date(start); d <= end; d.setUTCDate(d.getUTCDate() + 1)) days.push(d.toISOString().slice(0, 10));
+  return days;
+}

@@ -765,9 +765,14 @@ export function PlanBuilder({
         return;
       }
       const url = `/dugout/plans/${plan.id}/pdf`;
-      if (tab) tab.location.href = url;
-      else window.open(url, "_blank");
-      router.refresh();
+      if (tab) {
+        tab.location.href = url;
+        router.refresh();
+      } else {
+        // the new tab was blocked: open the PDF (a file, not a page) in this tab
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+        window.location.assign(url);
+      }
     } catch {
       tab?.close();
       setActionError("Couldn't reach the server. Check your connection and try again.");

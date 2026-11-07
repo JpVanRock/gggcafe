@@ -122,8 +122,15 @@ tests/unit/              node --test unit tests (npm run test:unit)
   before upload; replaced photos are deleted. Photo and walk-up songs show in the dashboard header.
 
 ## Coaches Dugout (`/dugout`, nav "Dugout")
-- Header tabs (`dugout/tabs.tsx`): Standards & Culture (`/dugout`), Practice Plans (`/dugout/plans`),
-  Drill Library (`/dugout/drills`). Team pills (`?team=`) appear when there is more than one own team.
+- Header tabs (`dugout/tabs.tsx`): Standards & Culture (`/dugout`), Calendar (`/dugout/calendar`),
+  Practice Plans (`/dugout/plans`), Drill Library (`/dugout/drills`). Team pills (`?team=`) appear when
+  there is more than one own team.
+- Calendar: month grid Monday–Sunday (`?month=2026-11`; day-by-day list on phones) of `team_events`
+  plus games (read-only; games are managed on the team page). These are the same events TWIS shows,
+  so anything entered here appears in each player's TWIS. Only coaches/admins add, change or remove
+  them (RLS on team_events; the UI is read-only for viewers). Weekly repeats share `series_id`
+  ("This and later weeks" removes the rest); `updated_by` is set by trigger and shown as "Changed by".
+  Event form parsing is shared with the team page in `src/lib/team-events.ts`.
 - Team Standards (ordered list, title + optional detail) and Team Culture (optional headline +
   description, blank line = new paragraph) per team; saved together by the `save_team_dugout` RPC.
   Players see them in the "From the Dugout" strip above TWIS (`components/dugout-strip.tsx`): Team

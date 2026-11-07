@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 const TABS = [
   { href: "/dugout", label: "Standards & Culture", match: (p: string) => p === "/dugout" },
+  { href: "/dugout/calendar", label: "Calendar", match: (p: string) => p.startsWith("/dugout/calendar") },
   { href: "/dugout/plans", label: "Practice Plans", match: (p: string) => p.startsWith("/dugout/plans") },
   { href: "/dugout/drills", label: "Drill Library", match: (p: string) => p.startsWith("/dugout/drills") },
 ] as const;
@@ -17,7 +18,7 @@ export function DugoutTabs() {
 /** The tabs for a given path; with no path (while the URL streams in) none is current. */
 export function TabList({ path = "" }: { path?: string }) {
   return (
-    <nav aria-label="Coaches Dugout" className="-mx-4 overflow-x-auto px-4">
+    <nav aria-label="Coaches Dugout" className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none]">
       <ul className="flex min-w-max gap-6 border-b border-navy-700">
         {TABS.map((tab) => {
           const active = tab.match(path);

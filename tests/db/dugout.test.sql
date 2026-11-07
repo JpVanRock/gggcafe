@@ -144,6 +144,33 @@ exception when insufficient_privilege then null;
 end $$;
 reset role;
 
+-- Calendar (team events): coaches add and change them; viewers can't
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"22222222-0000-0000-0000-000000000001"}', false);
+insert into public.team_events (id, team_id, kind, event_date, series_id) values
+  ('00000000-0000-0000-0000-00000000ec01', '00000000-0000-0000-0000-0000000000b1', 'practice', '2026-12-01', '00000000-0000-0000-0000-00000000ee01'),
+  ('00000000-0000-0000-0000-00000000ec02', '00000000-0000-0000-0000-0000000000b1', 'practice', '2026-12-08', '00000000-0000-0000-0000-00000000ee01');
+update public.team_events set title = 'Bunt defense' where id = '00000000-0000-0000-0000-00000000ec01';
+select pg_temp.expect('coach edit records updated_by',
+  (select title || ' ' || updated_by from public.team_events where id = '00000000-0000-0000-0000-00000000ec01'),
+  'Bunt defense 22222222-0000-0000-0000-000000000001');
+reset role;
+
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"22222222-0000-0000-0000-000000000002"}', false);
+update public.team_events set event_date = '2027-01-01' where series_id = '00000000-0000-0000-0000-00000000ee01';
+delete from public.team_events where series_id = '00000000-0000-0000-0000-00000000ee01';
+do $$ begin
+  insert into public.team_events (team_id, event_date) values ('00000000-0000-0000-0000-0000000000b1', '2026-12-15');
+  raise exception 'FAIL: viewer could add a calendar event';
+exception when insufficient_privilege then null;
+end $$;
+reset role;
+select pg_temp.expect('viewer could not move or delete calendar events',
+  (select string_agg(event_date::text, ',' order by event_date) from public.team_events
+    where series_id = '00000000-0000-0000-0000-00000000ee01'), '2026-12-01,2026-12-08');
+delete from public.team_events where series_id = '00000000-0000-0000-0000-00000000ee01';
+
 -- Signed-out visitors can't call the staff email list
 do $$ begin
   if has_function_privilege('anon', 'public.coaching_staff()', 'execute') then
