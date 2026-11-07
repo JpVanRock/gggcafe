@@ -3,24 +3,22 @@ import { OutlineText, SpeedStripes } from "@/components/athletic";
 import { GOAL_METHOD_LABEL, batsThrows, playerName, type Player } from "@/lib/softball";
 import {
   currentRostering, firstName, possessive,
-  type ActivityRow, type HaradaChart, type IqData, type MentalPlan, type MetricOption, type Performance, type PopReport,
+  type HaradaChart, type IqData, type MentalPlan, type Performance, type PopReport,
   type SmartGoal, type StyleVersion, type TeamDugout, type TwisWeek,
 } from "./data";
 import { DugoutStrip } from "@/components/dugout-strip";
-import type { MoveSeason, MoveTeam } from "../move-form";
-import { GoalsDetail, GoalsSummary } from "./goals";
-import { IqDetail, IqSummary, buildLibrary, buildPositions, buildQuizzes, buildTracks } from "./iq";
-import { TrophyRoomDetail, TrophyRoomSummary, buildTrophyRoom } from "./trophy-room";
+import { GoalsSummary } from "./goals";
+import { IqSummary, buildPositions, buildQuizzes, buildTracks } from "./iq";
+import { TrophyRoomSummary, buildTrophyRoom } from "./trophy-room";
 import { StolenBasePlaque } from "@/components/stolen-base-plaque";
 import { ChampionsTrophy } from "@/components/champions-trophy";
 import { RingCase } from "@/components/rings";
 import { GoldenGlove } from "@/components/golden-glove";
-import { MentalDetail, MentalSummary } from "./mental";
+import { MentalSummary } from "./mental";
 import { MenuBoard, type MenuSection } from "./menu";
-import { PerformanceDetail, PerformanceSummary, summarizePerformance } from "./performance";
-import { PopDetail, PopSummary } from "./pop-report";
-import { SmartGoalsPanel, SmartSummary } from "./smart";
-import { GoalMethodSwitch } from "./smart-client";
+import { PerformanceSummary, summarizePerformance } from "./performance";
+import { PopSummary } from "./pop-report";
+import { SmartSummary } from "./smart";
 import { TwisBoard } from "./twis";
 
 /** The cafe-menu player dashboard: header, TWIS, then the menu boards. */
@@ -30,14 +28,11 @@ export function PlayerMenu({
   chart,
   mental,
   pop,
-  activities,
   smartGoals,
-  metricOptions,
   performance,
   iq,
   dugout,
   photoUrl,
-  move = null,
   styles,
   today,
   canEdit: editor,
@@ -48,16 +43,13 @@ export function PlayerMenu({
   twis: TwisWeek;
   chart: HaradaChart | null;
   smartGoals: SmartGoal[];
-  metricOptions: MetricOption[];
   performance: Performance;
   iq: IqData;
   dugout: TeamDugout[];
   photoUrl: string | null;
-  move?: { teams: MoveTeam[]; seasons: MoveSeason[] } | null;
   styles: { movement: StyleVersion[]; hitting: StyleVersion[] };
   mental: MentalPlan | null;
   pop: PopReport;
-  activities: ActivityRow[];
   today: string;
   /** coach/admin or the player herself */
   canEdit: boolean;
@@ -75,10 +67,10 @@ export function PlayerMenu({
   const iqPositions = buildPositions(iq, positions);
   const team = currentRostering(pop);
   const plate = { name: playerName(player), number: team?.jersey_number ?? null }; // engraved on awards
-  const library = buildLibrary(iq);
   const room = buildTrophyRoom(iq, iqPositions, training.achievements, plate);
 
   // The menu. Add a section here (and a board variant in ./menu.tsx if it needs a new look).
+  const base = `/players/${player.id}`;
   const sections: MenuSection[] = [
     {
       key: "goals",
@@ -87,29 +79,14 @@ export function PlayerMenu({
       variant: "neon",
       wide: true,
       summary: method === "smart" ? <SmartSummary goals={smartGoals} metrics={pop.metrics} /> : <GoalsSummary chart={chart} />,
-      detail: (
-        <div className="flex flex-col gap-8">
-          <GoalMethodSwitch playerId={player.id} method={method} canEdit={editor} />
-          {method === "smart" ? (
-            <SmartGoalsPanel
-              playerId={player.id}
-              goals={smartGoals}
-              metrics={pop.metrics}
-              metricOptions={metricOptions}
-              canEdit={editor}
-            />
-          ) : (
-            <GoalsDetail playerId={player.id} chart={chart} canEdit={editor} />
-          )}
-        </div>
-      ),
+      href: `${base}/goals`,
     },
     {
       key: "pop",
       title: `${possessive(name)} Pop Report`,
       variant: "pink",
       summary: <PopSummary player={player} pop={pop} styles={styles} />,
-      detail: <PopDetail player={player} pop={pop} canEdit={canManage} canAct={editor} photoUrl={photoUrl} move={move} styles={styles} />,
+      href: `${base}/pop`,
     },
     {
       key: "mental",
@@ -117,7 +94,7 @@ export function PlayerMenu({
       subtitle: "Mental Game Plan",
       variant: "navy",
       summary: <MentalSummary plan={mental} />,
-      detail: <MentalDetail playerId={player.id} plan={mental} canEdit={editor} />,
+      href: `${base}/mental`,
     },
     {
       key: "performance",
@@ -126,7 +103,7 @@ export function PlayerMenu({
       variant: "outlineNeon",
       wide: true,
       summary: <PerformanceSummary summary={training} />,
-      detail: <PerformanceDetail playerId={player.id} perf={performance} summary={training} today={today} canEdit={editor} />,
+      href: `${base}/training`,
     },
     {
       key: "iq",
@@ -135,19 +112,7 @@ export function PlayerMenu({
       variant: "outlinePink",
       wide: true,
       summary: <IqSummary quizzes={quizzes} tracks={iqTracks} positions={iqPositions} plate={plate} rings={iq.rings} />,
-      detail: (
-        <IqDetail
-          playerId={player.id}
-          quizzes={quizzes}
-          tracks={iqTracks}
-          positions={iqPositions}
-          library={library}
-          plate={plate}
-          iq={iq}
-          canEdit={editor}
-          canManage={canManage}
-        />
-      ),
+      href: `${base}/iq`,
     },
     {
       key: "trophies",
@@ -156,7 +121,7 @@ export function PlayerMenu({
       variant: "trophy",
       wide: true,
       summary: <TrophyRoomSummary room={room} />,
-      detail: <TrophyRoomDetail room={room} />,
+      href: `${base}/trophies`,
     },
   ];
 
@@ -237,13 +202,11 @@ export function PlayerMenu({
       </header>
 
       <div className="flex flex-col gap-3">
-        <DugoutStrip teams={dugout} canEdit={canManage} />
+        <DugoutStrip teams={dugout} canEdit={canManage} teamHref={`${base}/team`} />
         <TwisBoard
           playerId={player.id}
           week={twis}
           today={today}
-          activities={activities.filter((a) => !a.category)}
-          pillars={(chart?.pillars ?? []).map((p) => ({ id: p.id, title: p.title }))}
           canEdit={editor}
         />
       </div>

@@ -8,6 +8,7 @@ import { signOut } from "@/app/auth/actions";
 import { Logo } from "@/components/brand";
 import { SpeedStripes } from "@/components/athletic";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { MainNav } from "@/components/main-nav";
 import { Card, Loading, PageHeader, inputClass, secondaryButtonClass } from "@/components/ui";
 import { isUuid } from "@/lib/softball";
 import { ClaimForm } from "./claim-form";
@@ -18,11 +19,13 @@ export default function MePage({ searchParams }: PageProps<"/me">) {
   return (
     <div className="flex flex-1 flex-col">
       <header className="sticky top-0 z-10 border-b border-pink/40 bg-navy-950/90 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-3xl items-center gap-4 px-4 py-2.5">
+        <div className="mx-auto flex w-full max-w-3xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-2.5">
           <Link href="/me" aria-label="GGG.Cafe" className="shrink-0">
             <Logo size={44} className="h-11 w-11" />
           </Link>
-          <span className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">Player</span>
+          <Suspense fallback={<span className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">Player</span>}>
+            <MainNav fallback={<span className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">Player</span>} />
+          </Suspense>
           <div className="ml-auto flex items-center gap-4">
             <ThemeToggle />
             <form action={signOut}>

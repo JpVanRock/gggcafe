@@ -25,6 +25,8 @@ src/lib/form.ts          FormData readers + friendlyDbError for server actions
 src/lib/softball.ts      positions, bats/throws, formats, row types (must match DB enums)
 src/lib/supabase/        server.ts (Server Components/Actions), client.ts (browser),
                          env.ts, database.types.ts (generated: npm run db:types)
+src/components/main-nav.tsx  top menu: staff get Dashboard/Coaches Dugout/Teams/Players on every page,
+                         including /me and /family; players get "My profile"
 src/proxy.ts             refreshes the Supabase auth session each request (Next 16 "proxy", formerly middleware)
 supabase/migrations/     schema, applied in filename order
 supabase/seed.sql        fictional sample data — local tests only, never pushed
@@ -44,10 +46,17 @@ tests/unit/              node --test unit tests (npm run test:unit)
 - Never print or commit `.env.local`. The database password lives only there.
 
 ## Player dashboard (`/players/[playerId]`, cafe-menu design)
-- Layout in `src/app/(staff)/players/[playerId]/player-menu.tsx`: menu header, TWIS board, then
-  menu boards. Each board shows a summary and opens a large pop-up (`components/modal.tsx`).
-- Add a future section: one entry in the `sections` array (summary + detail components); add a
-  board color in `menu.tsx` `BOARD` if needed (brand palette only).
+- Layout in `src/app/(staff)/players/[playerId]/player-menu.tsx`: menu header, "From the Dugout"
+  strip, TWIS board, then menu boards. Each board shows a summary and LINKS to the section's own page
+  (user, 2026-11-07: pages, not pop-ups): `/players/[id]/{goals,pop,mental,training,iq,trophies}`, plus
+  `/team` (Team Standards & Culture, #standards / #culture) and `/activities` (TWIS "Manage
+  activities"). They live in the `(section)` route group, whose layout gives every section page a
+  "← Back to {Name}'s menu" link and a section menu bar (`(section)/section-nav.tsx`); pages wrap
+  their content in `SectionShell` and check access with `requirePlayerPage()`.
+- Add a future section: a page under `(section)/`, an entry in `SECTIONS` (section-nav.tsx) and in
+  the menu's `sections` array (summary + href); add a board color in `menu.tsx` `BOARD` if needed.
+- Pop-ups are only for small things: confirmations, Share, calendar event editing, and the Team
+  Budget's line-item Details and "Parent view" (user kept those as pop-ups). Big views get pages.
 - Section names (user's wording): "{Name}'s Goals" (Harada Method), "{Name}'s Pop Report",
   "Mental GP", "Softball IQ" (renamed from "IQ Test"), "{Name}'s Trophy Room". Pop Report fields are placeholders until the user specifies them.
 - TWIS = This Week in Softball: team practices/events (`team_events`) and games for the player's
@@ -144,7 +153,7 @@ tests/unit/              node --test unit tests (npm run test:unit)
 ## Dugout Roster tab (`/dugout/roster`)
 - "Waiting for approval" first (player claims + parent requests for the team, approve/decline in place),
   then the season's roster with each player's account status (Claimed / Waiting) and approved parents,
-  then player accounts (remove access). Player intake button. The Roster tab, the Dugout nav link and
+  then player accounts (remove access). Player intake button. The Roster tab, the Coaches Dugout nav link and
   the dashboard card show the waiting count (`pending_approvals()`). Shared pieces:
   `src/lib/approvals.ts` (loadTeamApprovals) and `dugout/approvals.tsx` (also used by the team page and
   the Parents tab).
@@ -171,7 +180,7 @@ tests/unit/              node --test unit tests (npm run test:unit)
   wrappers that check `private.can_act_for()`. Players can't write answers or awards directly.
 - DB tests: `tests/db/players.test.sql`.
 
-## Coaches Dugout (`/dugout`, nav "Dugout")
+## Coaches Dugout (`/dugout`, nav "Coaches Dugout")
 - Header tabs (`dugout/tabs.tsx`): Standards & Culture (`/dugout`), Roster (`/dugout/roster`), Calendar (`/dugout/calendar`),
   Practice Plans (`/dugout/plans`), GameDay Prep (`/dugout/gameday`), Drill Library (`/dugout/drills`),
   Team Budget (`/dugout/budget`), Parents (`/dugout/parents`).

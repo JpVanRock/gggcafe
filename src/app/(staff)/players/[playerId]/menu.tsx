@@ -1,6 +1,6 @@
 // Cafe-menu building blocks for the player dashboard.
 import type { ReactNode } from "react";
-import { Modal } from "@/components/modal";
+import Link from "next/link";
 import { OutlineText } from "@/components/athletic";
 
 /**
@@ -57,11 +57,12 @@ export type MenuSection = {
   /** spans both columns on wide screens */
   wide?: boolean;
   summary: ReactNode;
-  detail: ReactNode;
+  /** the section's own page */
+  href: string;
 };
 
 /**
- * A menu board: shows the summary; clicking anywhere on it opens the full details.
+ * A menu board: shows the summary; clicking anywhere on it opens the section's page.
  * Boards are numbered like menu sections (01, 02...), shown as a large outlined numeral.
  */
 export function MenuBoard({ section, number }: { section: MenuSection; number: number }) {
@@ -80,16 +81,12 @@ export function MenuBoard({ section, number }: { section: MenuSection; number: n
         <p aria-hidden className={`absolute bottom-5 left-6 font-mono text-xs tracking-widest uppercase sm:left-8 ${style.cta}`}>
           Full details →
         </p>
-        {/* The whole board opens the pop-up */}
-        <Modal
-          title={section.title}
-          subtitle={section.subtitle}
-          triggerLabel={`Open ${section.title}`}
-          triggerClassName="absolute inset-0 rounded-2xl transition hover:bg-white/5 focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-pink"
-          trigger={<span className="sr-only">Open {section.title}</span>}
-        >
-          {section.detail}
-        </Modal>
+        {/* The whole board opens the section's page */}
+        <Link
+          href={section.href}
+          aria-label={`Open ${section.title}`}
+          className="absolute inset-0 rounded-2xl transition hover:bg-white/5 focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-pink"
+        />
       </div>
     </article>
   );

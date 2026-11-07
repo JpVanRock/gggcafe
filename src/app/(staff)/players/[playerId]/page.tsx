@@ -7,12 +7,11 @@ import { isISODate, todayISO, weekStart } from "@/lib/dates";
 import { isUuid, type Player } from "@/lib/softball";
 import { Loading } from "@/components/ui";
 import {
-  loadActivities, loadHarada, loadIq, loadMentalPlan, loadMetricOptions, loadPerformance, loadPopReport, loadSmartGoals,
+  loadHarada, loadIq, loadMentalPlan, loadPerformance, loadPopReport, loadSmartGoals,
   loadMovementAndHitting, loadTeamDugout, loadTwisWeek,
 } from "./data";
 import { PlayerMenu } from "./player-menu";
 import { signedPhotoUrls } from "@/lib/player-photos";
-import type { MoveSeason, MoveTeam } from "../move-form";
 
 export const metadata: Metadata = { title: "Player · GGG.Cafe" };
 
@@ -38,26 +37,17 @@ async function PlayerDashboard({ params, searchParams }: Pick<PageProps<"/player
 
   const today = todayISO();
   const monday = weekStart(isISODate(week) ? week : today);
-  const [twis, chart, mental, pop, activities, smartGoals, metricOptions, performance, iq, dugout, styles] = await Promise.all([
+  const [twis, chart, mental, pop, smartGoals, performance, iq, dugout, styles] = await Promise.all([
     loadTwisWeek(supabase, player.id, monday),
     loadHarada(supabase, player.id),
     loadMentalPlan(supabase, player.id),
     loadPopReport(supabase, player.id),
-    loadActivities(supabase, player.id, monday, "9999-12-31"),
     loadSmartGoals(supabase, player.id),
-    loadMetricOptions(supabase),
     loadPerformance(supabase, player.id),
     loadIq(supabase, player.id),
     loadTeamDugout(supabase, player.id),
     loadMovementAndHitting(supabase, player.id),
   ]);
-  // Coaches can move her to another team.
-  const move = access.canManage
-    ? await Promise.all([
-        supabase.from("teams").select("id, name, organization, age_group, is_own_team").order("is_own_team", { ascending: false }).order("name"),
-        supabase.from("seasons").select("id, name").order("start_date", { ascending: false, nullsFirst: false }).order("created_at", { ascending: false }),
-      ]).then(([t, s]) => ({ teams: (t.data ?? []) as MoveTeam[], seasons: (s.data ?? []) as MoveSeason[] }))
-    : null;
   const photoUrl = player.photo_path ? ((await signedPhotoUrls(supabase, [player.photo_path])).get(player.photo_path) ?? null) : null;
 
   return (
@@ -67,14 +57,11 @@ async function PlayerDashboard({ params, searchParams }: Pick<PageProps<"/player
       chart={chart}
       mental={mental}
       pop={pop}
-      activities={activities}
       smartGoals={smartGoals}
-      metricOptions={metricOptions}
       performance={performance}
       iq={iq}
       dugout={dugout}
       photoUrl={photoUrl}
-      move={move}
       styles={styles}
       today={today}
       canEdit={access.canAct}

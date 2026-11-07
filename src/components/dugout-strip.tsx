@@ -19,7 +19,18 @@ function TeamHeading({ name }: { name: string }) {
   return <h3 className="mb-4 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">{name}</h3>;
 }
 
-export function DugoutStrip({ teams, canEdit, label = "From the Dugout" }: { teams: DugoutTeam[]; canEdit: boolean; label?: string }) {
+export function DugoutStrip({
+  teams,
+  canEdit,
+  label = "From the Dugout",
+  teamHref,
+}: {
+  teams: DugoutTeam[];
+  canEdit: boolean;
+  label?: string;
+  /** the player's Team page: the buttons go there instead of opening pop-ups */
+  teamHref?: string;
+}) {
   if (teams.length === 0) return null;
   const names = teams.map((t) => t.team.name).join(" · ");
   const several = teams.length > 1;
@@ -42,6 +53,16 @@ export function DugoutStrip({ teams, canEdit, label = "From the Dugout" }: { tea
         <p className="font-mono text-[0.75rem] leading-4 tracking-[0.25em] text-pink-soft uppercase">{label}</p>
         <p className="mt-0.5 truncate text-sm font-semibold text-ink">{names}</p>
       </div>
+      {teamHref ? (
+        <div className="flex flex-wrap gap-2">
+          <Link href={`${teamHref}#standards`} className={`${pill} bg-neon text-on-accent hover:bg-neon-bright`}>
+            Team Standards
+          </Link>
+          <Link href={`${teamHref}#culture`} className={`${pill} border border-pink text-ink hover:bg-pink hover:text-on-accent`}>
+            Team Culture
+          </Link>
+        </div>
+      ) : (
       <div className="flex flex-wrap gap-2">
         <Modal
           title="Team Standards"
@@ -95,6 +116,7 @@ export function DugoutStrip({ teams, canEdit, label = "From the Dugout" }: { tea
           </div>
         </Modal>
       </div>
+      )}
     </section>
   );
 }

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Modal } from "@/components/modal";
 import { EmptyState, secondaryButtonClass } from "@/components/ui";
 import { WEEKDAYS, addDays, formatDay, formatWeekRange, isoWeekday, weekStart } from "@/lib/dates";
 import { deleteActivity, endActivity } from "./actions";
@@ -14,15 +13,11 @@ export function TwisBoard({
   playerId,
   week,
   today,
-  activities,
-  pillars,
   canEdit,
 }: {
   playerId: string;
   week: TwisWeek;
   today: string;
-  activities: ActivityRow[];
-  pillars: { id: string; title: string }[];
   canEdit: boolean;
 }) {
   const thisMonday = weekStart(today);
@@ -78,63 +73,78 @@ export function TwisBoard({
           Practices and games come from the team schedule. Training routines are set up in Performance Training.
         </p>
         {canEdit && (
-          <Modal
-            title="TWIS activities"
-            subtitle="What the player has chosen to do"
-            triggerClassName={secondaryButtonClass}
-            trigger="Manage activities"
-          >
-            <div className="flex flex-col gap-8">
-              <section>
-                <DetailHeading>Current and upcoming</DetailHeading>
-                {activities.length === 0 ? (
-                  <EmptyState>No activities yet. Add the first one below.</EmptyState>
-                ) : (
-                  <ul className="divide-y divide-navy-700">
-                    {activities.map((a) => (
-                      <li key={a.id} className="flex flex-wrap items-start justify-between gap-3 py-3">
-                        <div className="min-w-0">
-                          <p className="font-medium">{a.title}</p>
-                          <p className="mt-0.5 text-xs text-muted">
-                            {a.days.length ? a.days.map((d) => WEEKDAYS[d - 1].short).join(", ") : "Once a week"}
-                            {" · "}
-                            {a.ends_on ? `${formatDay(a.starts_on)} to ${formatDay(a.ends_on)}` : `From ${formatDay(a.starts_on)}, ongoing`}
-                            {a.pillar && ` · ${a.pillar.title}`}
-                          </p>
-                          {a.details && <p className="mt-1 text-sm text-ink/80">{a.details}</p>}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {(!a.ends_on || a.ends_on >= today) && (
-                            <form action={endActivity}>
-                              <input type="hidden" name="id" value={a.id} />
-                              <button type="submit" className={secondaryButtonClass}>
-                                End
-                              </button>
-                            </form>
-                          )}
-                          <form action={deleteActivity}>
-                            <input type="hidden" name="id" value={a.id} />
-                            <ConfirmSubmit
-                              message={`Delete “${a.title}” and all its check-offs? Use End instead to keep the history.`}
-                              className="text-xs text-danger hover:underline"
-                            >
-                              Delete
-                            </ConfirmSubmit>
-                          </form>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </section>
-              <section>
-                <DetailHeading>Add an activity</DetailHeading>
-                <ActivityForm playerId={playerId} defaultStart={week.monday} pillars={pillars} />
-              </section>
-            </div>
-          </Modal>
+          <Link href={`/players/${playerId}/activities?week=${week.monday}`} className={secondaryButtonClass}>
+            Manage activities →
+          </Link>
         )}
       </footer>
     </section>
+  );
+}
+
+
+/** The player's own activities: what's current, end or delete them, add new ones. */
+export function ActivitiesManager({
+  playerId,
+  activities,
+  today,
+  defaultStart,
+  pillars,
+}: {
+  playerId: string;
+  activities: ActivityRow[];
+  today: string;
+  defaultStart: string;
+  pillars: { id: string; title: string }[];
+}) {
+  return (
+    <div className="flex flex-col gap-8">
+      <section>
+        <DetailHeading>Current and upcoming</DetailHeading>
+        {activities.length === 0 ? (
+          <EmptyState>No activities yet. Add the first one below.</EmptyState>
+        ) : (
+          <ul className="divide-y divide-navy-700">
+            {activities.map((a) => (
+              <li key={a.id} className="flex flex-wrap items-start justify-between gap-3 py-3">
+                <div className="min-w-0">
+                  <p className="font-medium">{a.title}</p>
+                  <p className="mt-0.5 text-xs text-muted">
+                    {a.days.length ? a.days.map((d) => WEEKDAYS[d - 1].short).join(", ") : "Once a week"}
+                    {" · "}
+                    {a.ends_on ? `${formatDay(a.starts_on)} to ${formatDay(a.ends_on)}` : `From ${formatDay(a.starts_on)}, ongoing`}
+                    {a.pillar && ` · ${a.pillar.title}`}
+                  </p>
+                  {a.details && <p className="mt-1 text-sm text-ink/80">{a.details}</p>}
+                </div>
+                <div className="flex items-center gap-2">
+                  {(!a.ends_on || a.ends_on >= today) && (
+                    <form action={endActivity}>
+                      <input type="hidden" name="id" value={a.id} />
+                      <button type="submit" className={secondaryButtonClass}>
+                        End
+                      </button>
+                    </form>
+                  )}
+                  <form action={deleteActivity}>
+                    <input type="hidden" name="id" value={a.id} />
+                    <ConfirmSubmit
+                      message={`Delete “${a.title}” and all its check-offs? Use End instead to keep the history.`}
+                      className="text-xs text-danger hover:underline"
+                    >
+                      Delete
+                    </ConfirmSubmit>
+                  </form>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+      <section>
+        <DetailHeading>Add an activity</DetailHeading>
+        <ActivityForm playerId={playerId} defaultStart={defaultStart} pillars={pillars} />
+      </section>
+    </div>
   );
 }

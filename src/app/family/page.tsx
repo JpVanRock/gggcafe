@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/auth/actions";
 import { Logo } from "@/components/brand";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { MainNav } from "@/components/main-nav";
 import { BudgetSummary, type BudgetSummaryData } from "@/components/budget-summary";
 import { Card, Disclosure, Loading, PageHeader, secondaryButtonClass } from "@/components/ui";
 import { JoinForm } from "./join-form";
@@ -17,11 +18,13 @@ export default function FamilyPage({ searchParams }: PageProps<"/family">) {
   return (
     <div className="flex flex-1 flex-col">
       <header className="sticky top-0 z-10 border-b border-pink/40 bg-navy-950/90 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-5xl items-center gap-4 px-4 py-2.5">
+        <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-2.5">
           <Link href="/family" aria-label="GGG.Cafe family home" className="shrink-0">
             <Logo size={44} className="h-11 w-11" />
           </Link>
-          <span className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">Family</span>
+          <Suspense fallback={<span className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">Family</span>}>
+            <MainNav fallback={<span className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">Family</span>} />
+          </Suspense>
           <div className="ml-auto flex items-center gap-4">
             <ThemeToggle />
             <form action={signOut}>
