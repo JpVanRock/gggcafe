@@ -111,7 +111,7 @@ export function PlayerMenu({
       subtitle: "Defense IQ · Baserunning IQ · Position IQ · Extra Credit",
       variant: "outlinePink",
       wide: true,
-      summary: <IqSummary quizzes={quizzes} tracks={iqTracks} positions={iqPositions} plate={plate} rings={iq.rings} />,
+      summary: <IqSummary quizzes={quizzes} tracks={iqTracks} positions={iqPositions} plate={plate} rings={iq.rings} bookDone={iq.managerAwards.length} />,
       href: `${base}/iq`,
     },
     {

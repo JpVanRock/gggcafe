@@ -343,7 +343,7 @@ export async function loadPerformance(supabase: Supabase, playerId: string): Pro
 export type IqTopic = "general" | "hitting" | "pitching" | "position";
 
 /** Playbook tracks (Levels 1-3, rings) and the position track (one level per position, Golden Gloves). */
-export type IqTrack = "defense" | "baserunning" | "position" | "extra";
+export type IqTrack = "defense" | "baserunning" | "position" | "extra" | "scorebook";
 
 export type IqQuestion = {
   id: string;
@@ -394,7 +394,7 @@ export async function loadIq(supabase: Supabase, playerId: string) {
   const key = new Map(
     ((keyResult.data ?? []) as { question_id: string; correct_index: number; explanation: string | null }[]).map((k) => [k.question_id, k]),
   );
-  const [ringsResult, glovesResult, mvpResult, trophyResult, attemptsResult] = await Promise.all([
+  const [ringsResult, glovesResult, mvpResult, trophyResult, attemptsResult, managerResult, courseResult] = await Promise.all([
     supabase.from("player_rings").select("track, level, earned_on").eq("player_id", playerId),
     supabase.from("player_golden_gloves").select("position, earned_on").eq("player_id", playerId),
     supabase.from("player_mvp_badges").select("track, level, position, earned_on").eq("player_id", playerId).order("earned_on"),
@@ -405,6 +405,9 @@ export async function loadIq(supabase: Supabase, playerId: string) {
       .select("id, track, level, position, correct, total, passed, started_at, finished_at, reviewed_at, question_order")
       .eq("player_id", playerId)
       .order("started_at", { ascending: false }),
+    // How to Keep the Book: Manager of the Year awards and lesson progress
+    supabase.from("player_manager_awards").select("chapter, earned_on").eq("player_id", playerId).order("chapter"),
+    supabase.from("player_scorebook_progress").select("chapter, step, completed_at").eq("player_id", playerId),
   ]);
   return {
     questions: ((questionsResult.data ?? []) as Omit<IqQuestion, "correct_index" | "explanation">[]).map((q) => ({
@@ -418,6 +421,12 @@ export async function loadIq(supabase: Supabase, playerId: string) {
     mvps: (mvpResult.data ?? []) as { track: IqTrack; level: number; position: FieldPosition | null; earned_on: string }[],
     championsTrophy: (trophyResult.data ?? null) as { earned_on: string } | null,
     attempts: (attemptsResult.data ?? []) as IqAttempt[],
+    managerAwards: (managerResult.data ?? []) as { chapter: number; earned_on: string }[],
+    scorebookProgress: ((courseResult.data ?? []) as { chapter: number; step: number; completed_at: string | null }[]).map((p) => ({
+      chapter: p.chapter,
+      step: p.step,
+      completedAt: p.completed_at,
+    })),
   };
 }
 

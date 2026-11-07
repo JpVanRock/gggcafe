@@ -17,13 +17,13 @@ export type DiamondSpec = {
 
 // Field geometry (viewBox 0 0 400 370). Bases are 60 ft apart; the pitching
 // plate is 43 ft from home, on the line to second base.
-const BASE: Record<Base, [number, number]> = {
+export const BASE: Record<Base, [number, number]> = {
   home: [200, 335],
   first: [295, 240],
   second: [200, 145],
   third: [105, 240],
 };
-const FIELDER: Record<Fielder, [number, number]> = {
+export const FIELDER: Record<Fielder, [number, number]> = {
   P: [200, 238],
   C: [200, 358],
   "1B": [282, 212],

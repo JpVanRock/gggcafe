@@ -8,9 +8,13 @@ Reads
   supabase/iq/positions.json                  position (Golden Glove) tests: exactly 21 per position
   supabase/iq/extra.json                      Extra Credit Library: any number, each with a "book"
                                               (defense/baserunning) and a "section" (library shelf)
+  supabase/iq/scorebook.json                  How to Keep the Book chapter quizzes: exactly 5 per chapter
+                                              (1-6), each with the guide "page" (or null) and an optional
+                                              scorebook picture (box, sheet or field; see src/lib/scorebook.ts)
 
 Every question gets a stable slug: {track}-{level}-{nn} for the playbook tracks,
-position-{pos}-{nn} for positions and extra-{book}-{nn} for the library, numbered in file
+position-{pos}-{nn} for positions, extra-{book}-{nn} for the library and scorebook-{chapter}-{nn}
+for the course quizzes, numbered in file
 order within its level, position or book.
 The migration upserts on that slug, so the files can be edited and a new migration
 generated: changed questions update in place, new ones are added, players' past answers
@@ -34,6 +38,11 @@ ARROW_KINDS = {"run", "steal", "throw"}
 MAX_PER_LEVEL = 30   # the user's cap for each playbook level
 MIN_PER_LEVEL = 20   # below this a level is too thin to test
 PER_POSITION = 21    # the user's count for each position test
+SCOREBOOK_CHAPTERS = 6
+PER_CHAPTER = 5      # a short quiz at the end of each course chapter
+BOX_KEYS = {"kind", "balls", "strikes", "reached", "hit", "path", "fresh", "play", "out", "rbi", "lastOut", "notes", "highlight"}
+SHEET_KEYS = {"kind", "innings", "rows", "names", "stats", "cells", "highlight", "squiggle", "arrow", "tag"}
+FIELD_KEYS = {"kind", "labels", "highlight", "ball", "throws"}
 
 
 def check_question(where, q):
@@ -130,6 +139,69 @@ def check_extra(questions):
     return errors + duplicate_scenarios("extra", questions)
 
 
+def check_box_marks(where, marks):
+    errors = []
+    unknown = set(marks) - BOX_KEYS
+    if unknown:
+        errors.append(f"{where}: unknown box keys {sorted(unknown)}")
+    if marks.get("reached") not in (None, "BB", "HP", "SAC"):
+        errors.append(f"{where}: reached must be BB, HP or SAC")
+    if marks.get("hit") not in (None, 1, 2, 3, 4):
+        errors.append(f"{where}: hit must be 1-4")
+    if marks.get("path") not in (None, 0, 1, 2, 3, 4):
+        errors.append(f"{where}: path must be 0-4")
+    if marks.get("out") not in (None, 1, 2, 3):
+        errors.append(f"{where}: out must be 1-3")
+    return errors
+
+
+def check_scorebook(questions):
+    errors = []
+    by_chapter = collections.Counter()
+    for i, q in enumerate(questions):
+        where = f"scorebook #{i + 1} (ch {q.get('chapter')} {q.get('question', '')[:30]})"
+        if q.get("chapter") not in range(1, SCOREBOOK_CHAPTERS + 1):
+            errors.append(f"{where}: chapter must be 1-{SCOREBOOK_CHAPTERS}")
+        by_chapter[q.get("chapter")] += 1
+        if q.get("page") is not None and not isinstance(q.get("page"), int):
+            errors.append(f"{where}: page must be a page number or null")
+        # the shared checks want a playbook page and a diamond; scorebook pictures are checked below
+        errors += check_question(where, {**q, "playbook_page": 0, "diagram": {"outs": 0, "you": "batter"}})
+        d = q.get("diagram")
+        if d is None:
+            continue
+        kind = d.get("kind")
+        if kind == "box":
+            errors += check_box_marks(where, d)
+        elif kind == "sheet":
+            unknown = set(d) - SHEET_KEYS
+            if unknown:
+                errors.append(f"{where}: unknown sheet keys {sorted(unknown)}")
+            rows, innings = d.get("rows", 9), d.get("innings")
+            if not isinstance(innings, int) or not 1 <= innings <= 6:
+                errors.append(f"{where}: sheet innings must be 1-6")
+            for key, marks in (d.get("cells") or {}).items():
+                r, _, n = key.partition("-")
+                if not (r.isdigit() and n.isdigit() and 1 <= int(r) <= rows and 1 <= int(n) <= (innings or 0)):
+                    errors.append(f"{where}: cell {key} is off the sheet")
+                errors += check_box_marks(f"{where} cell {key}", {"kind": "box", **marks})
+        elif kind == "field":
+            unknown = set(d) - FIELD_KEYS
+            if unknown:
+                errors.append(f"{where}: unknown field keys {sorted(unknown)}")
+            if d.get("labels", "numbers") not in ("numbers", "letters"):
+                errors.append(f"{where}: labels must be numbers or letters")
+            ball = d.get("ball")
+            if ball is not None and (ball.get("to") not in range(1, 10) or ball.get("type", "ground") not in ("ground", "fly", "line")):
+                errors.append(f"{where}: ball needs a fielder 1-9 and a type")
+        else:
+            errors.append(f"{where}: diagram kind must be box, sheet or field")
+    for ch in range(1, SCOREBOOK_CHAPTERS + 1):
+        if by_chapter[ch] != PER_CHAPTER:
+            errors.append(f"scorebook: chapter {ch} has {by_chapter[ch]} questions, needs {PER_CHAPTER}")
+    return errors + duplicate_scenarios("scorebook", questions)
+
+
 def slugged(questions, group, prefix):
     """[(slug, question)]: numbered in file order within each group (level or position)."""
     seen = collections.Counter()
@@ -153,7 +225,9 @@ def main():
     tracks = {t: json.loads((IQ / f"{t}.json").read_text()) for t in ("defense", "baserunning")}
     positions = json.loads((IQ / "positions.json").read_text())
     extra = json.loads((IQ / "extra.json").read_text())
+    scorebook = json.loads((IQ / "scorebook.json").read_text())
     errors = [e for t, qs in tracks.items() for e in check_track(t, qs)] + check_positions(positions) + check_extra(extra)
+    errors += check_scorebook(scorebook)
     if errors:
         print("\n".join(errors), file=sys.stderr)
         sys.exit(1)
@@ -168,11 +242,16 @@ def main():
     for slug, q in slugged(extra, lambda q: q["book"], lambda q: f"extra-{q['book']}"):
         shelf = f"{'Defense' if q['book'] == 'defense' else 'Baserunning'} · {q['section'].strip()}"
         items.append((slug, "extra", 1, None, "general", shelf, q))
+    for slug, q in slugged(scorebook, lambda q: q["chapter"], lambda q: f"scorebook-{q['chapter']}"):
+        items.append((slug, "scorebook", q["chapter"], None, "general", None, q))
 
     rows, backfill = [], []
     for slug, track, level, position, topic, section, q in items:
-        book = "Baserunning" if track == "baserunning" or q.get("book") == "baserunning" else "Defensive"
-        ref = f"{book} Playbook p.{q['playbook_page']}" + (f" · {q['topic']}" if q.get("topic") else "")
+        if track == "scorebook":
+            ref = f"How to Keep the Book · Chapter {level}" + (f" · scorekeeping guide p.{q['page']}" if q.get("page") else "")
+        else:
+            book = "Baserunning" if track == "baserunning" or q.get("book") == "baserunning" else "Defensive"
+            ref = f"{book} Playbook p.{q['playbook_page']}" + (f" · {q['topic']}" if q.get("topic") else "")
         rows.append(
             "  ({slug}, {topic}, {position}, {track}, {level}, {section}, {scenario}, {question}, {choices}, {correct}, {explanation}, {hint}, {difficulty}, {diagram}::jsonb, {ref})".format(
                 slug=sql_text(slug),
@@ -187,7 +266,7 @@ def main():
                 correct=q["correct_index"],
                 explanation=sql_text(q["explanation"].strip()),
                 hint=sql_text(q["hint"].strip()),
-                difficulty=level if track in ("defense", "baserunning") else 2,
+                difficulty=level if track in ("defense", "baserunning") else 1 if track == "scorebook" else 2,
                 diagram=sql_text(json.dumps(q["diagram"], separators=(",", ":"))) if q.get("diagram") is not None else "null",
                 ref=sql_text(ref),
             )
@@ -201,8 +280,9 @@ def main():
     lines = [
         "-- =============================================================================",
         "-- GGG.Cafe — IQ test questions (generated; do not edit by hand)",
-        "-- Source: supabase/iq/defense.json, baserunning.json, positions.json and extra.json, written",
-        "-- for GGG.Cafe from the Softball IQ Defensive and Baserunning Playbooks.",
+        "-- Source: supabase/iq/defense.json, baserunning.json, positions.json, extra.json and",
+        "-- scorebook.json, written for GGG.Cafe from the Softball IQ Defensive and Baserunning",
+        "-- Playbooks and the user's scorekeeping guide.",
         "-- Regenerate: python3 scripts/iq/build-playbook-migration.py <new migration file>",
         "-- =============================================================================",
         "",
@@ -231,6 +311,7 @@ def main():
     counts = {t: dict(collections.Counter(q["level"] for q in qs)) for t, qs in tracks.items()}
     counts["positions"] = dict(collections.Counter(q["position"] for q in positions))
     counts["extra"] = dict(collections.Counter(q["book"] for q in extra))
+    counts["scorebook"] = dict(collections.Counter(q["chapter"] for q in scorebook))
     print(f"wrote {out} ({len(rows)} questions): {counts}")
 
 

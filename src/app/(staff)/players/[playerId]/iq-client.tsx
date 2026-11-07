@@ -11,6 +11,7 @@ import { MvpBadge } from "@/components/mvp-badge";
 import { ChampionsTrophy } from "@/components/champions-trophy";
 import { StolenBasePlaque } from "@/components/stolen-base-plaque";
 import { DetailHeading } from "./menu";
+import { ProgressBar } from "@/components/progress-bar";
 import { useRouter } from "next/navigation";
 import {
   answerIqLevelQuestion, answerIqQuestion, answerIqReviewQuestion, finishIqLevel, getIqHint, saveIqQuestion, startIqLevel,
@@ -340,28 +341,6 @@ function needed(total: number) {
   return Math.ceil((total * PASS_PCT) / 100);
 }
 
-function ProgressBar({ value, max, label }: { value: number; max: number; label: string }) {
-  const pct = max ? Math.round((value / max) * 100) : 0;
-  return (
-    <div>
-      <div
-        className="h-2.5 overflow-hidden rounded-full bg-navy-800"
-        role="progressbar"
-        aria-valuemin={0}
-        aria-valuemax={max}
-        aria-valuenow={value}
-        aria-label={label}
-      >
-        <div className="h-full rounded-full bg-linear-to-r from-pink to-neon transition-all" style={{ width: `${pct}%` }} />
-      </div>
-      <p className="mt-1.5 flex justify-between font-mono text-[11px] tracking-wider text-muted uppercase">
-        <span>{label}</span>
-        <span className="tabular-nums">{pct}%</span>
-      </p>
-    </div>
-  );
-}
-
 function plural(n: number, one: string, many: string) {
   return `${n} ${n === 1 ? one : many}`;
 }
@@ -605,6 +584,7 @@ export function IqTests({
   library,
   plate,
   canEdit,
+  course,
 }: {
   playerId: string;
   tracks: TrackInfo[];
@@ -612,6 +592,8 @@ export function IqTests({
   library: LibraryInfo;
   plate: Nameplate;
   canEdit: boolean;
+  /** How to Keep the Book, shown above the Extra Credit Library */
+  course?: React.ReactNode;
 }) {
   const router = useRouter();
   const [session, setSession] = useState<Session | null>(null);
@@ -965,6 +947,12 @@ export function IqTests({
         <DetailHeading>Position IQ · Golden Glove</DetailHeading>
         <PositionPicker positions={positions} plate={plate} actions={actions} />
       </section>
+      {course && (
+        <section>
+          <DetailHeading>How to Keep the Book · Manager of the Year</DetailHeading>
+          {course}
+        </section>
+      )}
       <section>
         <DetailHeading>Extra Credit Library · GGG Champions Trophy</DetailHeading>
         <LibraryPicker library={library} actions={actions} />

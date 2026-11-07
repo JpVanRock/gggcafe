@@ -88,17 +88,30 @@ tests/unit/              node --test unit tests (npm run test:unit)
   progress saves. A run is graded only once every question is answered (`finish_iq_level` raises
   P0003 before that); 80%+ earns the GGG Champions Trophy (table `player_world_series_trophies`, named for its
   original "World Series" name; the user renamed it).
+- How to Keep the Book (user, 2026-11-07): interactive scorekeeping course on the Softball IQ page,
+  above the Extra Credit Library, from the user's scorekeeping guide for first-timers (original
+  wording, adapted to fastpitch; Chapter 6 adds what the guide skips). Six chapters, each its own page
+  `/players/[id]/iq/scorebook/[n]`: step-through lessons with a progress bar, quick checks, tap-to-
+  explore pictures and tap-the-fielders exercises (content and the pictures' specs in
+  `src/lib/scorebook.ts`, no imports, unit-tested; drawings in `src/components/scorebook.tsx`: one
+  box, a page of the book, the field with position numbers). Lesson progress in
+  `player_scorebook_progress` (players keep their own; `completed_at` opens the quiz). Each chapter
+  ends with a 5-question quiz (track `scorebook`, level = chapter) run through the shared test flow;
+  `start_iq_level` raises P0005 until the lessons are done and P0001 until the previous chapter is
+  complete. 80%+ earns that chapter's Manager of the Year (`player_manager_awards`, written only by
+  `finish_iq_level`). Course quizzes earn no MVP badges.
 - MVP badge (`player_mvp_badges`, one per test): earned when `iq_review_status` finds every missed
   question answered again, or outright for a perfect score. Drawn by `src/components/mvp-badge.tsx`.
 - Stolen Base Leader plaques: one per Baserunning IQ level, earned with that level's ring (no table).
   `src/components/stolen-base-plaque.tsx` engraves name and number on the gold bar, with
   "BASERUNNING IQ · LEVEL n · {Rookie|Varsity|All-American}" beneath.
 - Trophy Room (`trophy-room.tsx`, last menu board, `trophy` board variant), shelves top to bottom:
-  championship rings, Stolen Base Leader plaques, Golden Gloves, MVP badges, Performance Training
-  achievements, then the GGG Champions Trophy at the bottom (user's order). Unearned ones dim.
-- Question source of truth: `supabase/iq/{defense,baserunning,positions,extra}.json`. After editing,
-  generate a NEW migration with `scripts/iq/build-playbook-migration.py` (validates everything,
-  slugs each question `{track}-{level}-{nn}` / `position-{pos}-{nn}` and upserts on the slug, so
+  championship rings, Stolen Base Leader plaques, Golden Gloves, MVP badges, Manager of the Year (one
+  per course chapter, all six shown), Performance Training achievements, then the GGG Champions
+  Trophy at the bottom (user's order). Unearned ones dim.
+- Question source of truth: `supabase/iq/{defense,baserunning,positions,extra,scorebook}.json`. After
+  editing, generate a NEW migration with `scripts/iq/build-playbook-migration.py` (validates everything,
+  slugs each question `{track}-{level}-{nn}` / `position-{pos}-{nn}` / `scorebook-{chapter}-{nn}` and upserts on the slug, so
   append rather than insert mid-level; questions dropped from the files are hidden, not deleted).
 - Test flow (both kinds share it): `start_iq_level` enforces unlocking and deals the questions in a
   saved random order (`question_order`), resuming the open test if there is one (one open test per
@@ -112,9 +125,11 @@ tests/unit/              node --test unit tests (npm run test:unit)
   `championship-ring.webp` (the GGG championship ring, reflection removed; every ring uses it,
   unearned ones dimmed gray; `src/components/rings.tsx`) and `golden-glove.webp` (trophy;
   `src/components/golden-glove.tsx` engraves her name, number, position and year on the gold plate
-  as SVG text over the image). Team logos (`teams.logo_url`, `team-logos` bucket) are no longer on
-  the ring. Every test question has a `diagram` drawn by `src/components/diamond.tsx`: it shows
-  the situation only, never the answer.
+  as SVG text over the image) and `manager-of-the-year.webp` (shield plaque cut out of its dark studio
+  background, floor reflection removed; `src/components/manager-award.tsx` engraves the year and her
+  name and number on the plate's YEAR and NAME lines). Team logos (`teams.logo_url`, `team-logos` bucket) are no longer on
+  the ring. Every test question has a `diagram` drawn by `src/components/diamond.tsx` (course quizzes:
+  a scorebook box, page or field, `{"kind": ...}`): it shows the situation only, never the answer.
 - Coaches/admins fill dashboards in; players with an approved claim can open and edit their own (see
   Player accounts below).
 

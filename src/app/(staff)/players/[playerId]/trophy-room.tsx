@@ -4,6 +4,7 @@
 //  - Stolen Base Leader plaques (one per Baserunning IQ level passed)
 //  - Golden Gloves (position tests)
 //  - MVP badges (every miss on a test reviewed, or a perfect score)
+//  - Manager of the Year (one per How to Keep the Book chapter)
 //  - Performance Training achievements
 //  - GGG Champions Trophy (Extra Credit Library run at 80%+)
 import { RingCase } from "@/components/rings";
@@ -11,6 +12,8 @@ import { GoldenGlove } from "@/components/golden-glove";
 import { MvpBadge } from "@/components/mvp-badge";
 import { StolenBasePlaque } from "@/components/stolen-base-plaque";
 import { ChampionsTrophy } from "@/components/champions-trophy";
+import { ManagerAward } from "@/components/manager-award";
+import { CHAPTERS } from "@/lib/scorebook";
 import { formatLongDate } from "@/lib/dates";
 import type { AchievementProgress } from "@/lib/achievements";
 import type { IqData } from "./data";
@@ -27,6 +30,8 @@ export type TrophyRoom = {
   rings: IqData["rings"];
   positions: PositionInfo[];
   mvps: { key: string; label: string; earnedOn: string }[];
+  /** Manager of the Year, one per How to Keep the Book chapter */
+  managers: { chapter: number; label: string; earnedOn: string | null; year: string | null }[];
   achievements: AchievementProgress[];
 };
 
@@ -51,6 +56,15 @@ export function buildTrophyRoom(iq: IqData, positions: PositionInfo[], achieveme
       label: mvpLabel(m),
       earnedOn: formatLongDate(m.earned_on),
     })),
+    managers: CHAPTERS.map((c) => {
+      const award = iq.managerAwards.find((a) => a.chapter === c.n);
+      return {
+        chapter: c.n,
+        label: `Chapter ${c.n} · ${c.short}`,
+        earnedOn: award ? formatLongDate(award.earned_on) : null,
+        year: award ? award.earned_on.slice(0, 4) : null,
+      };
+    }),
     achievements: achievements.filter((a) => a.unlockedOn),
   };
 }
@@ -58,7 +72,9 @@ export function buildTrophyRoom(iq: IqData, positions: PositionInfo[], achieveme
 export function TrophyRoomSummary({ room }: { room: TrophyRoom }) {
   const gloves = room.positions.filter((p) => p.earnedOn);
   const plaques = room.plaques.filter((p) => p.earnedOn);
-  const nothing = !room.championsOn && !plaques.length && !room.rings.length && !gloves.length && !room.mvps.length && !room.achievements.length;
+  const managers = room.managers.filter((m) => m.earnedOn);
+  const nothing =
+    !room.championsOn && !plaques.length && !room.rings.length && !gloves.length && !room.mvps.length && !managers.length && !room.achievements.length;
   return (
     <div>
       <div className="grid gap-x-10 gap-y-4 sm:grid-cols-3">
@@ -66,6 +82,7 @@ export function TrophyRoomSummary({ room }: { room: TrophyRoom }) {
         <MenuItem name="Stolen Base Leader" value={`${plaques.length}/3`} note="A plaque for each Baserunning IQ level" />
         <MenuItem name="Golden Gloves" value={`${gloves.length}/9`} note={gloves.length ? gloves.map((g) => g.position).join(", ") : undefined} />
         <MenuItem name="MVP badges" value={room.mvps.length} />
+        <MenuItem name="Manager of the Year" value={`${managers.length}/${room.managers.length}`} note="One for each How to Keep the Book chapter" />
         <MenuItem name="Training achievements" value={room.achievements.length} />
         <MenuItem name="Champions Trophy" value={room.championsOn ? "✓" : "–"} note={room.championsOn ? `Won ${room.championsOn}` : "Extra Credit Library"} />
       </div>
@@ -82,6 +99,9 @@ export function TrophyRoomSummary({ room }: { room: TrophyRoom }) {
           ))}
           {room.mvps.slice(0, 6).map((m) => (
             <MvpBadge key={m.key} label={m.label} size={52} />
+          ))}
+          {managers.map((m) => (
+            <ManagerAward key={m.chapter} name={room.plate.name} chapter={m.label} engrave={false} size={48} />
           ))}
           {room.championsOn && <ChampionsTrophy size={56} />}
         </div>
@@ -102,6 +122,7 @@ function Shelf({ title, note, children }: { title: string; note?: string; childr
 
 export function TrophyRoomDetail({ room }: { room: TrophyRoom }) {
   const gloves = room.positions.filter((p) => p.earnedOn);
+  const managers = room.managers.filter((m) => m.earnedOn);
   return (
     <div className="flex flex-col gap-6">
       <Shelf title="Championship rings" note={`${room.rings.length} of 6 · one per playbook level passed with 80%+`}>
@@ -148,6 +169,31 @@ export function TrophyRoomDetail({ room }: { room: TrophyRoom }) {
             <p className="text-sm text-muted">Finish a test, then go back through every question she missed.</p>
           </div>
         )}
+      </Shelf>
+
+      <Shelf
+        title="Manager of the Year"
+        note={`${managers.length} of ${room.managers.length} · one for each How to Keep the Book chapter: finish the lessons, then score 80%+ on the quiz.`}
+      >
+        <ul className="grid grid-cols-2 justify-items-center gap-x-4 gap-y-6 sm:grid-cols-3">
+          {room.managers.map((m) => (
+            <li key={m.chapter} className="flex flex-col items-center gap-2">
+              <ManagerAward
+                name={room.plate.name}
+                number={room.plate.number}
+                year={m.year}
+                chapter={m.label}
+                earned={Boolean(m.earnedOn)}
+                size={140}
+              />
+              <span className="text-center font-mono text-[10px] tracking-wider text-muted uppercase">
+                {m.label}
+                <br />
+                {m.earnedOn ?? "not earned yet"}
+              </span>
+            </li>
+          ))}
+        </ul>
       </Shelf>
 
       <Shelf title="Training achievements" note="From Performance Training: consistency earns these.">

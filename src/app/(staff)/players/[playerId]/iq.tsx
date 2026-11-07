@@ -10,6 +10,7 @@ import {
   type TrackInfo,
 } from "./iq-client";
 import { DetailHeading, MenuItem } from "./menu";
+import { CourseCard, buildCourse } from "./scorebook";
 
 const QUIZ_POSITIONS: readonly Position[] = FIELD_POSITIONS;
 
@@ -153,17 +154,20 @@ export function IqSummary({
   positions,
   plate,
   rings,
+  bookDone = 0,
 }: {
   quizzes: QuizInfo[];
   tracks: TrackInfo[];
   positions: PositionInfo[];
   plate: Nameplate;
   rings: IqData["rings"];
+  /** chapters of How to Keep the Book complete */
+  bookDone?: number;
 }) {
   const gloves = positions.filter((p) => p.earnedOn);
   return (
     <div>
-      <div className="grid gap-x-10 gap-y-4 sm:grid-cols-3">
+      <div className="grid gap-x-10 gap-y-4 sm:grid-cols-2">
         {tracks.map((t) => {
           const earned = t.levels.filter((l) => l.status === "earned").length;
           const next = t.levels.find((l) => l.status === "open");
@@ -180,6 +184,11 @@ export function IqSummary({
           name="Position IQ"
           value={gloves.length}
           note={gloves.length ? `Golden Glove: ${gloves.map((g) => g.position).join(", ")}` : "Earn a Golden Glove at any position"}
+        />
+        <MenuItem
+          name="Keep the Book"
+          value={`${bookDone}/6`}
+          note={bookDone === 6 ? "Every chapter complete" : "Manager of the Year for each chapter"}
         />
       </div>
       <div className="mt-5 flex flex-wrap items-end justify-center gap-6">
@@ -206,6 +215,7 @@ function PracticeLine({ quizzes }: { quizzes: QuizInfo[] }) {
 function topicLabel(q: IqQuestion) {
   if (q.track === "position" && q.position) return `${POSITION_LABEL[q.position]} · Golden Glove test`;
   if (q.track === "extra") return `Extra Credit · ${q.section ?? "Library"}`;
+  if (q.track === "scorebook") return `How to Keep the Book · Chapter ${q.level} quiz`;
   if (q.track === "defense" || q.track === "baserunning") return `${TRACK_LABEL[q.track]} · Level ${q.level}`;
   if (q.topic === "position" && q.position) return `${POSITION_LABEL[q.position]} IQ`;
   return { general: "General IQ", hitting: "Hitting IQ", pitching: "Pitching IQ", position: "Position IQ" }[q.topic];
@@ -255,7 +265,15 @@ export function IqDetail({
         </section>
       )}
 
-      <IqTests playerId={playerId} tracks={tracks} positions={positions} library={library} plate={plate} canEdit={canEdit} />
+      <IqTests
+        playerId={playerId}
+        tracks={tracks}
+        positions={positions}
+        library={library}
+        plate={plate}
+        canEdit={canEdit}
+        course={<CourseCard playerId={playerId} course={buildCourse(iq)} plate={plate} />}
+      />
 
       <section>
         <DetailHeading>Practice quizzes</DetailHeading>

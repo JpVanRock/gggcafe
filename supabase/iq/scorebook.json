@@ -1,0 +1,360 @@
+[
+  {
+    "chapter": 1,
+    "scenario": "Your coach hands you the batting order before the game.",
+    "question": "Where does it go?",
+    "choices": ["The lineup column on your team's page", "The top of the 1st inning column", "The totals along the bottom", "On the other team's page"],
+    "correct_index": 0,
+    "explanation": "The lineup column down the left side of your team's page holds the batting order: spot, jersey number and name.",
+    "hint": "One column lists every batter in the order they hit.",
+    "page": 8,
+    "diagram": {"kind": "sheet", "innings": 3, "names": false}
+  },
+  {
+    "chapter": 1,
+    "scenario": "It's the 4th inning and you want to check every play from the 3rd, in the order they happened.",
+    "question": "Where do you look?",
+    "choices": ["Across the leadoff batter's row", "Down the 3rd inning column", "In the stat columns on the right", "In the lineup column"],
+    "correct_index": 1,
+    "explanation": "Each inning has its own column. Reading down it shows the inning batter by batter.",
+    "hint": "Innings run one direction on the page and batters run the other.",
+    "page": 9,
+    "diagram": null
+  },
+  {
+    "chapter": 1,
+    "scenario": "A parent asks how #11 did at the plate today.",
+    "question": "Where's the fastest place to find all of her at-bats?",
+    "choices": ["Down the 1st inning column", "Across #11's row", "Along the bottom of the page", "On the other team's page"],
+    "correct_index": 1,
+    "explanation": "Every batter has her own row. Reading across it shows each trip she made to the plate, inning by inning.",
+    "hint": "You want one batter, not one inning.",
+    "page": 10,
+    "diagram": null
+  },
+  {
+    "chapter": 1,
+    "scenario": "Three outs end the top of the 1st, and the other team comes up to bat.",
+    "question": "What do you do?",
+    "choices": ["Keep writing in the same column", "Turn to the other team's page and score their at-bats there", "Start a new column on your team's page", "Stop until your team bats again"],
+    "correct_index": 1,
+    "explanation": "Each team has its own page. When the half-inning flips, so do you.",
+    "hint": "How many pages does one game use?",
+    "page": 11,
+    "diagram": null
+  },
+  {
+    "chapter": 1,
+    "scenario": "You're new to keeping the book and the game is moving fast.",
+    "question": "Which part can wait until after the game?",
+    "choices": ["Writing each batter's result in her box", "Marking the outs", "Adding up the at-bats, runs and hits columns", "Following the batting order"],
+    "correct_index": 2,
+    "explanation": "The stat columns and totals are counted once the game is over. During the game, focus on the lineup and the boxes.",
+    "hint": "Which part is math you can do from the boxes later?",
+    "page": 7,
+    "diagram": {"kind": "sheet", "innings": 2, "stats": true}
+  },
+  {
+    "chapter": 2,
+    "scenario": "The game starts before you get the other team's lineup.",
+    "question": "What do you write as each batter steps in?",
+    "choices": ["Her jersey number", "Nothing until the lineup arrives", "Her fielding position", "The pitcher's number"],
+    "correct_index": 0,
+    "explanation": "Write the number as she comes up and fill in the names later. Numbers are what you track all game.",
+    "hint": "What can you read off a player from the stands?",
+    "page": 14,
+    "diagram": null
+  },
+  {
+    "chapter": 2,
+    "scenario": "Here's your page. The last out of the 2nd inning was made by your 9th batter.",
+    "question": "Who leads off the 3rd, and where does her at-bat go?",
+    "choices": ["The 9th batter, in the 3rd inning column", "The 1st batter, in the 3rd inning column", "The 1st batter, in the 2nd inning column", "The 2nd batter, in the 3rd inning column"],
+    "correct_index": 1,
+    "explanation": "The order picks up right after the batter who made the last out, so the 1st batter leads off, in the next inning's column.",
+    "hint": "Two steps: who's next in the order, then which column.",
+    "page": 17,
+    "diagram": {
+      "kind": "sheet",
+      "innings": 3,
+      "cells": {
+        "1-1": {"hit": 1, "path": 1},
+        "2-1": {"play": "F8", "out": 1},
+        "3-1": {"play": "6-3", "out": 2},
+        "4-1": {"play": "K", "out": 3, "lastOut": true},
+        "5-2": {"play": "4-3", "out": 1},
+        "6-2": {"hit": 2, "path": 2},
+        "7-2": {"play": "F7", "out": 2},
+        "8-2": {"reached": "BB", "path": 1},
+        "9-2": {"play": "5-3", "out": 3, "lastOut": true}
+      },
+      "squiggle": {"inning": 1, "fromRow": 5}
+    }
+  },
+  {
+    "chapter": 2,
+    "scenario": "The third out of the inning is a fly ball caught in center field.",
+    "question": "After writing F8 and the 3 in her box, what else marks the end of the inning?",
+    "choices": ["Circle her row number", "A slash across the lower-right corner of her box", "Shade her diamond", "Write the score in her box"],
+    "correct_index": 1,
+    "explanation": "A short slash across the corner of the last batter's box shows exactly where the inning ended.",
+    "hint": "It's a quick mark in the out corner.",
+    "page": 16,
+    "diagram": null
+  },
+  {
+    "chapter": 2,
+    "scenario": "Your leadoff batter grounds out to start the game.",
+    "question": "Which box does her at-bat go in?",
+    "choices": ["The top box of the inning 1 column", "The bottom box of the inning 1 column", "Any open box in her row", "The space next to her name"],
+    "correct_index": 0,
+    "explanation": "The first batter of the game takes the first box: her row, inning 1. Each batter after her takes the next box down.",
+    "hint": "Her row, and the first inning.",
+    "page": 15,
+    "diagram": {"kind": "sheet", "innings": 3}
+  },
+  {
+    "chapter": 2,
+    "scenario": "In the 4th inning your whole lineup bats, and your leadoff batter comes up again before the third out.",
+    "question": "Where does her second at-bat of the inning go?",
+    "choices": ["In the same box, over her first at-bat", "In the next column over, with the inning number written above it", "In the totals at the bottom", "Nowhere, it isn't recorded"],
+    "correct_index": 1,
+    "explanation": "Her 4th inning box is already used, so her second trip goes in the next column, marked with the inning so the story stays in order.",
+    "hint": "Every trip to the plate needs a box of its own.",
+    "page": null,
+    "diagram": null
+  },
+  {
+    "chapter": 3,
+    "scenario": "Here's the count marked in a batter's box.",
+    "question": "What's the count?",
+    "choices": ["3 balls, 2 strikes", "2 balls, 3 strikes", "3 balls, 1 strike", "Ball four: she walked"],
+    "correct_index": 0,
+    "explanation": "The top row is balls and the bottom row is strikes. Three and two filled is a full count.",
+    "hint": "Which row is for balls?",
+    "page": 21,
+    "diagram": {"kind": "box", "balls": 3, "strikes": 2}
+  },
+  {
+    "chapter": 3,
+    "scenario": "Here's a batter's box after her at-bat.",
+    "question": "How did she get to first?",
+    "choices": ["A single", "A walk", "She was hit by a pitch", "A sacrifice"],
+    "correct_index": 2,
+    "explanation": "HP is circled: hit by pitch. A single would circle the 1, and a walk would circle BB.",
+    "hint": "Look at what's circled in the lower-left corner.",
+    "page": 22,
+    "diagram": {"kind": "box", "balls": 1, "reached": "HP", "path": 1}
+  },
+  {
+    "chapter": 3,
+    "scenario": "Here's another batter's box.",
+    "question": "What did she do?",
+    "choices": ["Hit a single", "Hit a double", "Walked", "Reached on an error"],
+    "correct_index": 1,
+    "explanation": "The 2 is circled and her line runs from home to first to second: a double.",
+    "hint": "Check the numbers across the top and how far her line goes.",
+    "page": 25,
+    "diagram": {"kind": "box", "hit": 2, "path": 2}
+  },
+  {
+    "chapter": 3,
+    "scenario": "Jordan, #21, singles and drives in Avery from second. This is Avery's box.",
+    "question": "What goes in the triangle under home plate?",
+    "choices": ["A 2, for the base Avery scored from", "21", "A 1, for the single", "Avery's own number"],
+    "correct_index": 1,
+    "explanation": "The triangle credits the RBI, so it gets the jersey number of the batter who drove her in: 21.",
+    "hint": "Who gets credit for driving her in?",
+    "page": 23,
+    "diagram": {"kind": "box", "hit": 1, "path": 4}
+  },
+  {
+    "chapter": 3,
+    "scenario": "The first batter of the inning grounds out.",
+    "question": "What number goes in the out corner of her box?",
+    "choices": ["0", "1", "3", "Nothing: the corner is for runs"],
+    "correct_index": 1,
+    "explanation": "The corner shows which out of the inning she made. She made the first one.",
+    "hint": "Count the outs so far, including hers.",
+    "page": 26,
+    "diagram": null
+  },
+  {
+    "chapter": 4,
+    "scenario": "A ground ball to the third baseman, who throws to first for the out.",
+    "question": "How do you score it?",
+    "choices": ["3-5", "5-3", "6-3", "F5"],
+    "correct_index": 1,
+    "explanation": "Fielder first, then the fielder who caught the throw: third base is 5 and first base is 3, so 5-3.",
+    "hint": "Write the fielders in the order they handled the ball.",
+    "page": 34,
+    "diagram": {"kind": "field", "labels": "letters", "ball": {"to": 5, "type": "ground"}}
+  },
+  {
+    "chapter": 4,
+    "scenario": "The left fielder catches a fly ball for the out.",
+    "question": "How do you score it?",
+    "choices": ["F9", "F7", "7-3", "L8"],
+    "correct_index": 1,
+    "explanation": "Caught in the air is F, and left field is 7: F7.",
+    "hint": "The outfield is numbered left to right.",
+    "page": 32,
+    "diagram": {"kind": "field", "labels": "letters", "ball": {"to": 7, "type": "fly"}}
+  },
+  {
+    "chapter": 4,
+    "scenario": "The first baseman fields a ground ball and runs to the bag herself for the out.",
+    "question": "How do you score it?",
+    "choices": ["3-1", "1-3", "3U", "F3"],
+    "correct_index": 2,
+    "explanation": "One fielder made the out alone, so it's her number with a U for unassisted: 3U.",
+    "hint": "Nobody else touched the ball.",
+    "page": 32,
+    "diagram": {"kind": "field", "labels": "letters", "ball": {"to": 3, "type": "ground"}}
+  },
+  {
+    "chapter": 4,
+    "scenario": "You're writing down a play made by the shortstop.",
+    "question": "What number is the shortstop?",
+    "choices": ["4", "5", "6", "7"],
+    "correct_index": 2,
+    "explanation": "The shortstop is 6, even though she plays between third base (5) and second base (4).",
+    "hint": "It's the number that seems out of order.",
+    "page": 32,
+    "diagram": null
+  },
+  {
+    "chapter": 4,
+    "scenario": "The second baseman snags a line drive for the out.",
+    "question": "How do you score it?",
+    "choices": ["F4", "L4", "4-3", "L6"],
+    "correct_index": 1,
+    "explanation": "A line drive caught is L plus the fielder's number. Second base is 4: L4.",
+    "hint": "A liner gets its own letter, and the second baseman isn't 6.",
+    "page": 32,
+    "diagram": {"kind": "field", "labels": "letters", "ball": {"to": 4, "type": "line"}}
+  },
+  {
+    "chapter": 5,
+    "scenario": "Lena is on first. Rory, #9, doubles and Lena scores. This is Lena's box.",
+    "question": "What goes in the triangle?",
+    "choices": ["15", "9", "2", "Nothing: a double doesn't earn an RBI"],
+    "correct_index": 1,
+    "explanation": "Rory drove Lena in, so Rory's number, 9, goes in Lena's triangle. Lena's diamond gets shaded too.",
+    "hint": "Whose hit brought her home?",
+    "page": 39,
+    "diagram": {"kind": "box", "reached": "BB", "path": 4}
+  },
+  {
+    "chapter": 5,
+    "scenario": "Runner on third, one out. The batter flies out to right field and the runner tags up and scores.",
+    "question": "What goes in the batter's box?",
+    "choices": ["F9 with a 2 in the out corner, and SAC circled", "9-2 with a 1 in the out corner", "A circled 1 and a line to first", "F9 and a shaded diamond"],
+    "correct_index": 0,
+    "explanation": "The catch in right is F9. There was one out already, so this is the second. It scored a run, so it's a sacrifice fly: circle SAC.",
+    "hint": "How many outs were there before the catch, and what did the fly ball do for the runner?",
+    "page": 40,
+    "diagram": null
+  },
+  {
+    "chapter": 5,
+    "scenario": "Here's the top of the 1st on your team's page.",
+    "question": "How many runs scored?",
+    "choices": ["1", "2", "3", "4"],
+    "correct_index": 2,
+    "explanation": "Count the shaded diamonds: three runners made it all the way around.",
+    "hint": "Runs are the diamonds that are filled in.",
+    "page": 39,
+    "diagram": {
+      "kind": "sheet",
+      "innings": 2,
+      "rows": 7,
+      "cells": {
+        "1-1": {"hit": 1, "path": 4, "rbi": "7"},
+        "2-1": {"reached": "BB", "path": 4, "rbi": "7"},
+        "3-1": {"hit": 3, "path": 4, "rbi": "22"},
+        "4-1": {"play": "F8", "out": 1, "reached": "SAC"},
+        "5-1": {"hit": 1, "path": 2},
+        "6-1": {"play": "6-3", "out": 2},
+        "7-1": {"play": "K", "out": 3, "lastOut": true}
+      }
+    }
+  },
+  {
+    "chapter": 5,
+    "scenario": "Runners on first and second. The batter singles and both runners move up one base.",
+    "question": "Whose boxes do you write in?",
+    "choices": ["Only the batter's", "The batter's and both runners'", "Only the runners'", "The pitcher's"],
+    "correct_index": 1,
+    "explanation": "The batter gets her single, and each runner's line is extended in her own box to the base she reached.",
+    "hint": "Everyone who moved needs her line updated.",
+    "page": 38,
+    "diagram": null
+  },
+  {
+    "chapter": 5,
+    "scenario": "Your 4th batter strikes out swinging for the third out.",
+    "question": "What's in her box when you're done?",
+    "choices": ["K, a 3 in the out corner and a slash across the corner", "SO and a 3", "K and a shaded diamond", "F2 and a 3"],
+    "correct_index": 0,
+    "explanation": "K for the strikeout, 3 for the third out, and the slash marks the end of the inning.",
+    "hint": "Three things: the play, the out number, and the end-of-inning mark.",
+    "page": 42,
+    "diagram": null
+  },
+  {
+    "chapter": 6,
+    "scenario": "She takes ball four.",
+    "question": "What do you mark?",
+    "choices": ["Circle 1 and draw a line to first", "Circle BB and draw a line to first", "Write E2", "Write FC"],
+    "correct_index": 1,
+    "explanation": "A walk is BB, base on balls. It isn't a hit, so the 1 stays uncircled.",
+    "hint": "A walk has its own letters in the corner.",
+    "page": null,
+    "diagram": null
+  },
+  {
+    "chapter": 6,
+    "scenario": "The shortstop bobbles a routine ground ball and the batter is safe at first.",
+    "question": "How do you score it?",
+    "choices": ["Circle 1: it's a single", "E6, with a line to first", "6-3", "FC"],
+    "correct_index": 1,
+    "explanation": "She reached on the shortstop's error: E plus the fielder's number. An error is never a hit.",
+    "hint": "Did she earn first base, or did the defense give it to her?",
+    "page": null,
+    "diagram": {"kind": "field", "labels": "letters", "ball": {"to": 6, "type": "ground"}}
+  },
+  {
+    "chapter": 6,
+    "scenario": "She watches a called third strike go by.",
+    "question": "What goes in her box?",
+    "choices": ["K", "A backwards K", "F2", "SO"],
+    "correct_index": 1,
+    "explanation": "A called third strike is a backwards K. A forward K means she struck out swinging.",
+    "hint": "Swinging and looking are written differently.",
+    "page": null,
+    "diagram": null
+  },
+  {
+    "chapter": 6,
+    "scenario": "Runner on first. A ground ball to short, who throws to second for the force, and the throw goes on to first to get the batter too.",
+    "question": "What goes in the batter's box?",
+    "choices": ["6-4-3 DP with the out number", "FC", "6-3", "E4"],
+    "correct_index": 0,
+    "explanation": "Two outs on one play: the batter's box gets the whole play, shortstop to second to first, and DP.",
+    "hint": "List every fielder who handled the ball, then note that two outs were made.",
+    "page": null,
+    "diagram": {"kind": "field", "labels": "letters", "ball": {"to": 6, "type": "ground"}}
+  },
+  {
+    "chapter": 6,
+    "scenario": "The runner on first steals second.",
+    "question": "How do you show it in the runner's box?",
+    "choices": ["Circle the 2", "Extend her line to second and write SB beside it", "Write SB in the batter's box", "Shade her diamond"],
+    "correct_index": 1,
+    "explanation": "Her line goes to second in her own box, labeled SB so it's clear how she got there.",
+    "hint": "Runner moves go in the runner's box, not the batter's.",
+    "page": null,
+    "diagram": {"kind": "box", "hit": 1, "path": 1}
+  }
+]

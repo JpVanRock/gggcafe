@@ -12,6 +12,7 @@ import {
 import type { TwisKind } from "./data";
 import { MENTAL_FIELDS } from "./shared";
 import { HITTING, HITTING_KEYS, MOVEMENT, MOVEMENT_KEYS, changes, cleanValues, type Values } from "@/lib/movement";
+import { CHAPTERS } from "@/lib/scorebook";
 
 // ---------------------------------------------------------------------------
 // TWIS check-offs
@@ -522,7 +523,7 @@ export async function setIqQuestionActive(fd: FormData): Promise<void> {
 // IQ playbook levels (Defense IQ, Baserunning IQ) and rings
 // ---------------------------------------------------------------------------
 
-const IQ_TRACKS = ["defense", "baserunning", "position", "extra"] as const;
+const IQ_TRACKS = ["defense", "baserunning", "position", "extra", "scorebook"] as const;
 
 /** A test question as sent to the browser: no answer. `section` is the library shelf (Extra Credit only). */
 export type LevelQuestion = { id: string; scenario: string; question: string; choices: string[]; diagram: unknown; section: string | null };
@@ -548,11 +549,12 @@ export async function startIqLevel(input: {
   const denied = await actForCheck(input.playerId);
   if (denied) return { error: denied };
   const positionTest = input.track === "position";
+  const course = input.track === "scorebook";
   const position = input.position ?? null;
   if (
     !isUuid(input.playerId) ||
     !(IQ_TRACKS as readonly string[]).includes(input.track) ||
-    ![1, 2, 3].includes(input.level) ||
+    !(course ? CHAPTERS.some((c) => c.n === input.level) : [1, 2, 3].includes(input.level)) ||
     (positionTest ? input.level !== 1 || !(FIELD_POSITIONS as readonly string[]).includes(position ?? "") : position !== null) ||
     (input.track === "extra" && input.level !== 1)
   ) {
@@ -568,6 +570,8 @@ export async function startIqLevel(input: {
     p_position: position,
   });
   if (error) {
+    if (course && error.code === "P0001") return { error: `Chapter ${input.level} unlocks once Chapter ${input.level - 1} is complete.` };
+    if (error.code === "P0005") return { error: "Finish the chapter's lessons first, then take the quiz." };
     if (error.code === "P0001") return { error: `Level ${input.level} unlocks after passing Level ${input.level - 1} with 80% or better.` };
     if (error.code === "P0002") return { error: positionTest ? "This position has no questions yet." : "This test has no questions yet." };
     return { error: friendlyDbError(error) };
@@ -627,6 +631,58 @@ export async function finishIqLevel(input: {
 
   refresh();
   return { error: null, correct: row.correct, total: row.total, passed: row.passed, awardEarned: row.award_earned };
+}
+
+// ---------------------------------------------------------------------------
+// How to Keep the Book: lesson progress (the quizzes use the test flow above)
+// ---------------------------------------------------------------------------
+
+/** Saves the furthest lesson step she has reached in a chapter (never moves backward). */
+export async function saveScorebookStep(input: { playerId: string; chapter: number; step: number }): Promise<{ error: string | null }> {
+  const denied = await actForCheck(input.playerId);
+  if (denied) return { error: denied };
+  const chapter = CHAPTERS.find((c) => c.n === input.chapter);
+  if (!isUuid(input.playerId) || !chapter || !Number.isInteger(input.step) || input.step < 0 || input.step >= chapter.steps.length) {
+    return { error: "That step couldn't be saved." };
+  }
+  const supabase = await createClient();
+  const { data: current } = await supabase
+    .from("player_scorebook_progress")
+    .select("step")
+    .eq("player_id", input.playerId)
+    .eq("chapter", chapter.n)
+    .maybeSingle();
+  if (current && (current.step as number) >= input.step) return { error: null };
+  const { error } = await supabase
+    .from("player_scorebook_progress")
+    .upsert({ player_id: input.playerId, chapter: chapter.n, step: input.step, updated_at: new Date().toISOString() }, { onConflict: "player_id,chapter" });
+  return { error: error ? friendlyDbError(error) : null };
+}
+
+/** Marks a chapter's lessons finished, which opens its quiz. */
+export async function finishScorebookLessons(input: { playerId: string; chapter: number }): Promise<{ error: string | null }> {
+  const denied = await actForCheck(input.playerId);
+  if (denied) return { error: denied };
+  const chapter = CHAPTERS.find((c) => c.n === input.chapter);
+  if (!isUuid(input.playerId) || !chapter) return { error: "Unknown chapter." };
+  const supabase = await createClient();
+  const { data: current } = await supabase
+    .from("player_scorebook_progress")
+    .select("completed_at")
+    .eq("player_id", input.playerId)
+    .eq("chapter", chapter.n)
+    .maybeSingle();
+  if (current?.completed_at) return { error: null };
+  const now = new Date().toISOString();
+  const { error } = await supabase
+    .from("player_scorebook_progress")
+    .upsert(
+      { player_id: input.playerId, chapter: chapter.n, step: chapter.steps.length - 1, completed_at: now, updated_at: now },
+      { onConflict: "player_id,chapter" },
+    );
+  if (error) return { error: friendlyDbError(error) };
+  refresh();
+  return { error: null };
 }
 
 // ---------------------------------------------------------------------------
