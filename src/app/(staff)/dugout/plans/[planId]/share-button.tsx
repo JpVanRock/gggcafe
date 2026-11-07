@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 import { inputClass, pillButtonClass, pillQuietClass } from "@/components/ui";
 import type { StaffContact } from "@/lib/practice-plans";
-import { sharePracticePlan } from "../actions";
+import type { ShareResult } from "../actions";
 
 /**
  * "Finalize & Share": pick which coaches get the plan (all by default), add an
@@ -13,6 +13,8 @@ import { sharePracticePlan } from "../actions";
  */
 export function ShareButton({
   planId,
+  action,
+  returnPath,
   staff,
   label,
   className,
@@ -20,7 +22,12 @@ export function ShareButton({
   emailReady,
   beforeSend,
 }: {
+  /** the practice plan or lineup to share */
   planId: string;
+  /** server action that finalizes and shares it */
+  action: (id: string, recipientIds: string[], note: string) => Promise<ShareResult>;
+  /** page to show afterwards (gets ?shared=) */
+  returnPath: string;
   staff: StaffContact[];
   label: string;
   className: string;
@@ -47,7 +54,7 @@ export function ShareButton({
       }
       let result;
       try {
-        result = await sharePracticePlan(planId, picked, note);
+        result = await action(planId, picked, note);
       } catch {
         setError("Couldn't reach the server. Check your connection and try again.");
         return;
@@ -59,9 +66,9 @@ export function ShareButton({
       dialog.current?.close();
       if (result.mailto) {
         window.location.href = result.mailto;
-        router.replace(`/dugout/plans/${planId}?shared=app`);
+        router.replace(`${returnPath}?shared=app`);
       } else {
-        router.replace(`/dugout/plans/${planId}?shared=${result.sent ?? 0}`);
+        router.replace(`${returnPath}?shared=${result.sent ?? 0}`);
       }
     });
   }
@@ -73,7 +80,7 @@ export function ShareButton({
       </button>
       <dialog
         ref={dialog}
-        aria-label="Share the practice plan"
+        aria-label="Share with coaches"
         onClick={(e) => {
           if (e.target === dialog.current && !pending) dialog.current?.close();
         }}

@@ -5,7 +5,7 @@ import { Card, EmptyState, pillButtonClass, pillOutlineClass, pillQuietClass } f
 import { formatLongDate } from "@/lib/dates";
 import { PRACTICE_SETTING_LABEL, durationLabel, equipmentChecklist, planTimeline, practiceRange, type PlanPosition } from "@/lib/dugout";
 import type { PracticePlan, RosterPlayer, StaffContact } from "@/lib/practice-plans";
-import { deletePracticePlan, reopenPracticePlan } from "../actions";
+import { deletePracticePlan, reopenPracticePlan, sharePracticePlan } from "../actions";
 import { ShareButton } from "./share-button";
 
 /** A finalized plan (or any plan, for viewers): read-only, with Print and Share. */
@@ -57,7 +57,7 @@ export function PlanSheet({
             Print / PDF
           </a>
           {canEdit && final && (
-            <ShareButton planId={plan.id} staff={staff} label={plan.shared_at ? "Share again" : "Share"} className={pillOutlineClass} emailReady={emailReady} />
+            <ShareButton planId={plan.id} action={sharePracticePlan} returnPath={`/dugout/plans/${plan.id}`} staff={staff} label={plan.shared_at ? "Share again" : "Share"} className={pillOutlineClass} emailReady={emailReady} />
           )}
           {canEdit && final && (
             <form action={reopenPracticePlan}>
@@ -101,6 +101,11 @@ export function PlanSheet({
                   <p className="font-semibold">{b.name}</p>
                   <DrillTags tags={b.tags} className="mt-1" />
                   {b.description && <p className="mt-1.5 text-sm text-muted">{b.description}</p>}
+                  {b.video_url && (
+                    <a href={b.video_url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block text-xs font-semibold text-pink hover:underline">
+                      ▶ Watch the drill
+                    </a>
+                  )}
                   <p className="mt-2 text-sm">
                     {b.coaches.length > 0 && <span className="mr-4">Coach: {b.coaches.join(", ")}</span>}
                     {b.equipment && <span className="text-muted">Equipment: {b.equipment}</span>}

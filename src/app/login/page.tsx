@@ -31,7 +31,7 @@ export default function LoginPage() {
           Forgot your password?
         </Link>
         <p>
-          Parents:{" "}
+          Players and parents:{" "}
           <Link href="/register" className="text-pink-soft underline hover:text-ink">
             create an account
           </Link>

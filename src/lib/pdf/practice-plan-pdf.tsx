@@ -1,7 +1,7 @@
 import "server-only";
 import path from "node:path";
 import {
-  Circle, Document, Font, Image, Page, Path, Rect, StyleSheet, Svg, Text, View, renderToBuffer,
+  Circle, Document, Font, Image, Link, Page, Path, Rect, StyleSheet, Svg, Text, View, renderToBuffer,
 } from "@react-pdf/renderer";
 import {
   DRILL_TAG_LABEL, FIELD_H, FIELD_SHAPES, FIELD_SPOT, FIELD_W, PLAN_POSITIONS, PRACTICE_SETTING_LABEL,
@@ -11,18 +11,18 @@ import { formatLongDate } from "@/lib/dates";
 import type { PracticePlan, RosterPlayer } from "@/lib/practice-plans";
 
 // Brand kit colors, on white paper so it prints cleanly.
-const NAVY = "#000A2D";
-const NEON = "#E7FB06";
-const PINK = "#FE1F7C";
-const MUTED = "#4A5578";
-const LINE = "#D3D9E8";
-const SOFT = "#F4F6FB";
+export const NAVY = "#000A2D";
+export const NEON = "#E7FB06";
+export const PINK = "#FE1F7C";
+export const MUTED = "#4A5578";
+export const LINE = "#D3D9E8";
+export const SOFT = "#F4F6FB";
 
 // Fonts and logo ship with the app (next.config.ts traces this folder into the
 // server bundle). DM Sans for text, Jost for titles and numbers, like the site.
-const DIR = path.join(process.cwd(), "src/lib/pdf");
+export const DIR = path.join(process.cwd(), "src/lib/pdf");
 let fontsReady = false;
-function registerFonts() {
+export function registerFonts() {
   if (fontsReady) return;
   Font.register({
     family: "DM Sans",
@@ -193,6 +193,11 @@ function PlanDocument({ plan, roster }: { plan: PracticePlan; roster: RosterPlay
               <Text style={s.drillName}>{b.name}</Text>
               {b.tags.length > 0 && <Text style={s.tags}>{b.tags.map((t) => DRILL_TAG_LABEL[t]).join(" · ")}</Text>}
               {b.description && <Text style={s.desc}>{b.description}</Text>}
+              {b.video_url && (
+                <Link src={b.video_url} style={{ fontSize: 7.5, color: PINK, marginTop: 2, textDecoration: "none" }}>
+                  Watch the drill: {b.video_url.replace(/^https:\/\//, "").slice(0, 60)}
+                </Link>
+              )}
             </View>
             <Text style={s.cMin}>{b.minutes ?? "–"}</Text>
             <Text style={s.cCoach}>{b.coaches.join(", ") || "–"}</Text>

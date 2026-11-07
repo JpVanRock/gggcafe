@@ -23,7 +23,7 @@ import {
 import type { PlanBlock, PlanSpot, PracticePlan, RosterPlayer, StaffContact } from "@/lib/practice-plans";
 import { TagFilter } from "../../drills/library";
 import { SettingPills } from "../new-plan-form";
-import { deletePracticePlan, finalizePracticePlan, savePracticePlan } from "../actions";
+import { deletePracticePlan, finalizePracticePlan, savePracticePlan, sharePracticePlan } from "../actions";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { formatLongDate } from "@/lib/dates";
 import { ShareButton } from "./share-button";
@@ -292,6 +292,11 @@ function BlockCard({
             <p className="mt-0.5 text-base leading-snug font-semibold">{block.name}</p>
             <DrillTags tags={block.tags} className="mt-1" />
             {block.description && <p className="mt-1.5 line-clamp-2 text-sm text-muted" title={block.description}>{block.description}</p>}
+            {block.video_url && (
+              <a href={block.video_url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block text-xs font-semibold text-pink hover:underline">
+                ▶ Watch the drill
+              </a>
+            )}
           </div>
           <button
             type="button"
@@ -607,7 +612,7 @@ export function PlanBuilder({
         ...setup,
         drills: blocks.map((b): PlanBlock => ({
           drill_id: b.drill_id, name: b.name, description: b.description, tags: b.tags,
-          minutes: b.minutes, coaches: b.coaches, equipment: b.equipment,
+          minutes: b.minutes, coaches: b.coaches, equipment: b.equipment, video_url: b.video_url,
         })),
         positions: spots,
       }),
@@ -681,13 +686,14 @@ export function PlanBuilder({
       minutes: null,
       coaches: [],
       equipment: drill.equipment,
+      video_url: drill.video_url,
     };
     setBlocks((list) => [...list.slice(0, at), block, ...list.slice(at)]);
     setFocusKey(key);
   };
   const addCustom = (name: string) => {
     const key = newKey();
-    setBlocks((list) => [...list, { key, drill_id: null, name, description: null, tags: [], minutes: null, coaches: [], equipment: null }]);
+    setBlocks((list) => [...list, { key, drill_id: null, name, description: null, tags: [], minutes: null, coaches: [], equipment: null, video_url: null }]);
     setFocusKey(key);
   };
   const updateBlock = (key: string, patch: Partial<Block>) => setBlocks((list) => list.map((b) => (b.key === key ? { ...b, ...patch } : b)));
@@ -934,6 +940,8 @@ export function PlanBuilder({
           </button>
           <ShareButton
             planId={plan.id}
+            action={sharePracticePlan}
+            returnPath={`/dugout/plans/${plan.id}`}
             staff={staff}
             label="Finalize & Share"
             className={pillOutlineClass}

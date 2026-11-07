@@ -3,6 +3,8 @@
 // exactly what approved parents see (team totals only: player payments appear
 // as daily totals with no names), and the top of the coaches' budget page.
 // Server-safe. Data comes from the team_budget_summary() database function.
+import type { ReactNode } from "react";
+import { Modal } from "@/components/modal";
 import { formatDay } from "@/lib/dates";
 import { money, runningLedger, toCents, type EntryKind } from "@/lib/budget";
 
@@ -20,9 +22,22 @@ export type BudgetSummaryData = {
   entries: { date: string; kind: EntryKind; category: string | null; description: string | null; amount: number }[];
 };
 
-function Stat({ label, value, note, tone = "ink" }: { label: string; value: string; note?: string; tone?: "ink" | "highlight" | "danger" }) {
+function Stat({
+  label,
+  value,
+  note,
+  tone = "ink",
+  action,
+}: {
+  label: string;
+  value: string;
+  note?: string;
+  tone?: "ink" | "highlight" | "danger";
+  action?: ReactNode;
+}) {
   return (
-    <div className="rounded-xl border border-navy-700 bg-navy-900/70 p-4">
+    <div className="relative rounded-xl border border-navy-700 bg-navy-900/70 p-4">
+      {action && <div className="absolute top-3 right-3">{action}</div>}
       <p className="font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">{label}</p>
       <p
         className={`mt-1 font-display text-2xl font-bold tabular-nums ${
@@ -33,6 +48,57 @@ function Stat({ label, value, note, tone = "ink" }: { label: string; value: stri
       </p>
       {note && <p className="mt-0.5 text-xs text-muted">{note}</p>}
     </div>
+  );
+}
+
+type Entry = BudgetSummaryData["entries"][number];
+
+/** "Details": every expense (or income) line item in a pop-up, grouped by category with subtotals. */
+function LineItems({ title, kind, entries, team }: { title: string; kind: "expense" | "income"; entries: Entry[]; team: string }) {
+  const items = entries.filter((e) => e.kind === kind).sort((a, b) => a.date.localeCompare(b.date));
+  if (items.length === 0) return null;
+  const groups = new Map<string, Entry[]>();
+  for (const e of items) {
+    const key = e.category || "Other";
+    groups.set(key, [...(groups.get(key) ?? []), e]);
+  }
+  const total = items.reduce((sum, e) => sum + toCents(e.amount), 0);
+  return (
+    <Modal
+      title={title}
+      subtitle={`${team} · ${items.length} item${items.length === 1 ? "" : "s"} · ${money(total)}`}
+      trigger="Details"
+      triggerLabel={`${title}: see each line item`}
+      triggerClassName="rounded-full border border-navy-600 px-2.5 py-0.5 text-xs font-semibold text-muted transition hover:border-pink hover:text-ink"
+    >
+      <div className="flex flex-col gap-6">
+        {[...groups.entries()]
+          .sort((a, b) => a[0].localeCompare(b[0]))
+          .map(([category, rows]) => (
+            <section key={category}>
+              <div className="mb-2 flex items-baseline justify-between gap-3 border-b border-navy-700 pb-1.5">
+                <h3 className="font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">{category}</h3>
+                <span className="font-display text-sm font-bold tabular-nums">{money(rows.reduce((sum, e) => sum + toCents(e.amount), 0))}</span>
+              </div>
+              <ul className="flex flex-col">
+                {rows.map((e, i) => (
+                  <li key={i} className="flex items-baseline justify-between gap-4 border-b border-navy-800 py-2 text-sm last:border-0">
+                    <span className="min-w-0">
+                      <span className="mr-3 whitespace-nowrap text-muted">{formatDay(e.date)}</span>
+                      {e.description || category}
+                    </span>
+                    <span className="shrink-0 font-semibold tabular-nums">{money(toCents(e.amount))}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        <p className="flex justify-between border-t-2 border-navy-600 pt-3 font-semibold">
+          <span>Total</span>
+          <span className="font-display tabular-nums">{money(total)}</span>
+        </p>
+      </div>
+    </Modal>
   );
 }
 
@@ -68,8 +134,18 @@ export function BudgetSummary({ summary, showLedger = true }: { summary: BudgetS
           </p>
         </div>
         <Stat label="Still owed" value={money(t.owed)} note="Registration not yet paid" />
-        <Stat label="Other income" value={money(t.other)} note="Sponsors, fundraisers, donations" />
-        <Stat label="Expenses" value={money(t.spent)} />
+        <Stat
+          label="Other income"
+          value={money(t.other)}
+          note="Sponsors, fundraisers, donations"
+          action={<LineItems title="Other income" kind="income" entries={summary.entries} team={summary.team} />}
+        />
+        <Stat
+          label="Expenses"
+          value={money(t.spent)}
+          note={summary.entries.some((e) => e.kind === "expense") ? "Tap Details for each item" : undefined}
+          action={<LineItems title="Expenses" kind="expense" entries={summary.entries} team={summary.team} />}
+        />
         <Stat label="Balance" value={money(t.balance)} note="Money in minus money out" tone={t.balance < 0 ? "danger" : "highlight"} />
       </div>
 

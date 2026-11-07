@@ -140,6 +140,8 @@ export type LibraryDrill = {
   description: string | null;
   tags: DrillTag[];
   equipment: string | null;
+  /** a video of the drill being run (https), when there is one */
+  video_url: string | null;
 };
 
 /** Library drills matching a search and a tag ("all" for every tag). */

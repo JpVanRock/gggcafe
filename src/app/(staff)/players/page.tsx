@@ -5,9 +5,8 @@ import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { AGE_GROUPS, POSITION_LABEL, ageGroupOf, batsThrows, playerName, type AgeGroup, type Player } from "@/lib/softball";
 import {
-  Card, Disclosure, EmptyState, Loading, PageHeader, buttonClass, inputClass, tableClass, tdClass, thClass,
+  Card, EmptyState, Loading, PageHeader, buttonClass, inputClass, tableClass, tdClass, thClass,
 } from "@/components/ui";
-import { IntakeForm, type IntakeTeam } from "./intake-form";
 
 export const metadata: Metadata = { title: "Players · GGG.Cafe" };
 
@@ -88,10 +87,6 @@ async function PlayersContent({ searchParams }: Pick<PageProps<"/players">, "sea
   if (error) throw new Error(error.message);
 
   const editor = canEdit(user.staff.role);
-  const { data: teamData } = editor
-    ? await supabase.from("teams").select("id, name, age_group").eq("is_own_team", true).order("name")
-    : { data: [] };
-  const intakeTeams = (teamData ?? []) as IntakeTeam[];
 
   const all = ((data ?? []) as PlayerRow[]).map((p) => {
     const entry = currentEntry(p.roster_entries);
@@ -108,20 +103,10 @@ async function PlayersContent({ searchParams }: Pick<PageProps<"/players">, "sea
   return (
     <div className="flex flex-col gap-6">
       {editor && (
-        <Disclosure summary="Player intake form" open={all.length === 0}>
-          {intakeTeams.length ? (
-            <>
-              <p className="mb-5 text-sm text-muted">
-                For a player joining one of our teams. Opponents you scout are added on their team&apos;s page.
-              </p>
-              <IntakeForm teams={intakeTeams} />
-            </>
-          ) : (
-            <EmptyState>
-              Add your team on the <Link href="/teams" className="text-pink hover:underline">Teams</Link> page first.
-            </EmptyState>
-          )}
-        </Disclosure>
+        <p className="text-sm text-muted">
+          To add players, open a team on the <Link href="/teams" className="text-pink hover:underline">Teams</Link> page and use{" "}
+          <span className="font-semibold text-ink">Player intake</span>.
+        </p>
       )}
 
       <AgeTabs counts={counts} current={ageTab} query={query} />

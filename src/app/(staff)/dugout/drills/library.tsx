@@ -83,6 +83,9 @@ function DrillForm({ drill, onDone }: { drill?: LibraryDrill; onDone?: () => voi
       <Field label="Usual equipment (optional)" hint="Copied into a plan when the drill is added; separate items with commas">
         <input name="equipment" maxLength={500} defaultValue={drill?.equipment ?? ""} placeholder="Cones, bucket of balls" className={inputClass} />
       </Field>
+      <Field label="Video link (optional)" hint="A video of the drill being run: YouTube, Hudl, Google Drive…">
+        <input name="video_url" type="url" maxLength={500} defaultValue={drill?.video_url ?? ""} placeholder="https://" className={inputClass} />
+      </Field>
       <div className="flex flex-wrap items-center gap-3">
         <button type="submit" disabled={pending} className={buttonClass}>
           {pending ? "Saving…" : drill ? "Save drill" : "Add to library"}
@@ -112,6 +115,16 @@ function DrillCard({ drill, canEdit }: { drill: LibraryDrill; canEdit: boolean }
       <p className="text-lg leading-snug font-semibold text-ink">{drill.name}</p>
       <DrillTags tags={drill.tags} className="mt-1.5" />
       {drill.description && <p className="mt-3 text-sm whitespace-pre-line text-muted">{drill.description}</p>}
+      {drill.video_url && (
+        <a
+          href={drill.video_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 inline-flex items-center gap-1.5 self-start rounded-full border border-pink px-3 py-1 text-xs font-semibold text-ink transition hover:bg-pink hover:text-on-accent"
+        >
+          ▶ Watch the drill
+        </a>
+      )}
       {drill.equipment && (
         <p className="mt-3 text-sm">
           <span className="font-mono text-[10px] font-bold tracking-wider text-pink-soft uppercase">Equipment </span>

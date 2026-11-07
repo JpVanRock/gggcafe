@@ -220,6 +220,7 @@ export function IqDetail({
   plate,
   iq,
   canEdit,
+  canManage = canEdit,
 }: {
   playerId: string;
   quizzes: QuizInfo[];
@@ -229,6 +230,8 @@ export function IqDetail({
   plate: Nameplate;
   iq: IqData;
   canEdit: boolean;
+  /** coaches/admins: the shared question bank (shows answers) */
+  canManage?: boolean;
 }) {
   const byId = new Map(iq.questions.map((q) => [q.id, q]));
   // Practice misses only: level-test misses have their own review (with hints) in Playbook tests.
@@ -276,7 +279,7 @@ export function IqDetail({
         </Disclosure>
       )}
 
-      {canEdit && (
+      {canManage && (
         <Disclosure summary={`Question bank · ${iq.questions.filter((q) => q.active).length} active (shared by every player)`}>
           <div className="flex flex-col gap-6">
             <Disclosure summary="Add a question">

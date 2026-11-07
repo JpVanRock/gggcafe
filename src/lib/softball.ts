@@ -44,6 +44,8 @@ export type Team = {
   home_field: string | null;
   notes: string | null;
   logo_url: string | null;
+  /** shown to players when they claim their profile on this team */
+  welcome_message: string | null;
 };
 
 export type Season = {

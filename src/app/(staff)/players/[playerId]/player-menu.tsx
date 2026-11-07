@@ -4,9 +4,10 @@ import { GOAL_METHOD_LABEL, batsThrows, playerName, type Player } from "@/lib/so
 import {
   currentRostering, firstName, possessive,
   type ActivityRow, type HaradaChart, type IqData, type MentalPlan, type MetricOption, type Performance, type PopReport,
-  type SmartGoal, type TeamDugout, type TwisWeek,
+  type SmartGoal, type StyleVersion, type TeamDugout, type TwisWeek,
 } from "./data";
 import { DugoutStrip } from "@/components/dugout-strip";
+import type { MoveSeason, MoveTeam } from "../move-form";
 import { GoalsDetail, GoalsSummary } from "./goals";
 import { IqDetail, IqSummary, buildLibrary, buildPositions, buildQuizzes, buildTracks } from "./iq";
 import { TrophyRoomDetail, TrophyRoomSummary, buildTrophyRoom } from "./trophy-room";
@@ -36,8 +37,12 @@ export function PlayerMenu({
   iq,
   dugout,
   photoUrl,
+  move = null,
+  styles,
   today,
   canEdit: editor,
+  canManage = editor,
+  isSelf = false,
 }: {
   player: Player;
   twis: TwisWeek;
@@ -48,11 +53,18 @@ export function PlayerMenu({
   iq: IqData;
   dugout: TeamDugout[];
   photoUrl: string | null;
+  move?: { teams: MoveTeam[]; seasons: MoveSeason[] } | null;
+  styles: { movement: StyleVersion[]; hitting: StyleVersion[] };
   mental: MentalPlan | null;
   pop: PopReport;
   activities: ActivityRow[];
   today: string;
+  /** coach/admin or the player herself */
   canEdit: boolean;
+  /** coach/admin only: profile edits, question bank, Dugout links */
+  canManage?: boolean;
+  /** the signed-in player viewing her own dashboard */
+  isSelf?: boolean;
 }) {
   const name = firstName(player);
   const method = player.goal_method ?? "harada";
@@ -96,8 +108,8 @@ export function PlayerMenu({
       key: "pop",
       title: `${possessive(name)} Pop Report`,
       variant: "pink",
-      summary: <PopSummary player={player} pop={pop} />,
-      detail: <PopDetail player={player} pop={pop} canEdit={editor} photoUrl={photoUrl} />,
+      summary: <PopSummary player={player} pop={pop} styles={styles} />,
+      detail: <PopDetail player={player} pop={pop} canEdit={canManage} canAct={editor} photoUrl={photoUrl} move={move} styles={styles} />,
     },
     {
       key: "mental",
@@ -133,6 +145,7 @@ export function PlayerMenu({
           plate={plate}
           iq={iq}
           canEdit={editor}
+          canManage={canManage}
         />
       ),
     },
@@ -160,9 +173,11 @@ export function PlayerMenu({
   return (
     <div className="flex flex-col gap-12">
       <header className="relative overflow-hidden pt-2 text-center">
-        <Link href="/players" className="relative z-10 text-sm text-muted hover:text-ink sm:absolute sm:top-0 sm:left-0">
-          ← Players
-        </Link>
+        {!isSelf && (
+          <Link href="/players" className="relative z-10 text-sm text-muted hover:text-ink sm:absolute sm:top-0 sm:left-0">
+            ← Players
+          </Link>
+        )}
         {/* Jersey number behind the name, media-day style */}
         <OutlineText className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[11rem] tracking-tighter sm:text-[15rem]">
           {team?.jersey_number ?? player.primary_position ?? ""}
@@ -222,7 +237,7 @@ export function PlayerMenu({
       </header>
 
       <div className="flex flex-col gap-3">
-        <DugoutStrip teams={dugout} canEdit={editor} />
+        <DugoutStrip teams={dugout} canEdit={canManage} />
         <TwisBoard
           playerId={player.id}
           week={twis}

@@ -50,7 +50,7 @@ async function Plan({ params, searchParams }: Pick<PageProps<"/dugout/plans/[pla
   const [roster, libraryResult, coachNames, staff] = await Promise.all([
     loadPlanRoster(supabase, plan.team.id, plan.spots.map((s) => s.player_id)),
     building
-      ? supabase.from("practice_drills").select("id, name, description, tags, equipment").order("name")
+      ? supabase.from("practice_drills").select("id, name, description, tags, equipment, video_url").order("name")
       : Promise.resolve({ data: [] }),
     building ? loadCoachNames(supabase) : Promise.resolve([]),
     editor ? loadCoachingStaff(supabase) : Promise.resolve([]),

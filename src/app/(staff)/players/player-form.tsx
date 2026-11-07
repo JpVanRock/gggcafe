@@ -25,7 +25,10 @@ export function PlayerForm({ player, photoUrl }: { player: Player; photoUrl?: st
         <Field label="Notes">
           <textarea name="notes" rows={3} defaultValue={player.notes ?? ""} className={inputClass} />
         </Field>
-        <p className="text-xs text-muted">Team and jersey number are set on the team&apos;s page.</p>
+        <p className="text-xs text-muted">
+          Team and jersey number are set on the team&apos;s page. Notes are hidden on her dashboard, but a player with an account could
+          still reach them, so keep them coach-appropriate.
+        </p>
       </fieldset>
 
       <div className="flex items-center gap-4 sm:col-span-6">

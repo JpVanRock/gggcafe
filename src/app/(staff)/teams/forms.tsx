@@ -67,6 +67,18 @@ export function TeamForm({ team }: { team?: Team }) {
           <textarea name="notes" rows={3} defaultValue={team?.notes ?? ""} className={inputClass} />
         </Field>
       </div>
+      <div className="sm:col-span-2">
+        <Field label="Welcome message for players" hint="Our teams only. Players see it when they sign up and claim their spot each season.">
+          <textarea
+            name="welcome_message"
+            rows={4}
+            maxLength={1000}
+            defaultValue={team?.welcome_message ?? ""}
+            placeholder="Welcome to the team! We work hard, play for each other and have fun doing it."
+            className={inputClass}
+          />
+        </Field>
+      </div>
 
       <div className="flex items-center gap-4 sm:col-span-2">
         <button type="submit" disabled={pending} className={buttonClass}>
@@ -78,11 +90,12 @@ export function TeamForm({ team }: { team?: Team }) {
   );
 }
 
-export function SeasonForm({ teamId }: { teamId: string }) {
+export function SeasonForm({ teamId, next }: { teamId: string; next?: "intake" }) {
   const [state, action, pending] = useActionState(createSeason, initialFormState);
   return (
     <form action={action} className="grid gap-4 sm:grid-cols-3">
       <input type="hidden" name="team_id" value={teamId} />
+      {next && <input type="hidden" name="next" value={next} />}
       <Field label="Season name">
         <input name="name" required placeholder="Spring 2027" className={inputClass} />
       </Field>

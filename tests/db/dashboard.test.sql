@@ -7,6 +7,12 @@ begin
   end if;
 end $$;
 
+-- The IQ functions check the caller is a coach/admin or the player herself,
+-- so these checks run as a signed-in coach (removed at the end).
+insert into auth.users (id, email) values ('55555555-0000-0000-0000-000000000001', 'dashboard-coach@example.test');
+insert into public.staff (user_id, display_name, role) values ('55555555-0000-0000-0000-000000000001', 'Dashboard Coach', 'coach');
+select set_config('request.jwt.claims', '{"sub":"55555555-0000-0000-0000-000000000001"}', false);
+
 -- Seeded chart: 2 pillars; "Hitting power" has 3 actions, 1 done
 select pg_temp.expect('pillars saved',
   (select count(*) from public.harada_pillars p join public.harada_plans h on h.id = p.plan_id
@@ -436,3 +442,7 @@ begin
   perform pg_temp.expect('hint used on a library answer is recorded',
     (select count(*) from public.iq_answers where attempt_id = x and hint_used), 1::bigint);
 end $$;
+
+select set_config('request.jwt.claims', '', false);
+delete from public.staff where user_id = '55555555-0000-0000-0000-000000000001';
+delete from auth.users where id = '55555555-0000-0000-0000-000000000001';

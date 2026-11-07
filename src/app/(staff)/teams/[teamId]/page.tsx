@@ -9,13 +9,13 @@ import {
   type Player, type Season, type Team,
 } from "@/lib/softball";
 import {
-  Card, Disclosure, EmptyState, Loading, PageHeader, secondaryButtonClass, tableClass, tdClass, thClass,
+  Card, Disclosure, EmptyState, Loading, PageHeader, pillButtonClass, secondaryButtonClass, tableClass, tdClass, thClass,
 } from "@/components/ui";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { addDays, formatDay, formatTime, todayISO } from "@/lib/dates";
 import { deleteTeamEvent, removeFromRoster } from "../actions";
 import { LogoUpload } from "./logo-upload";
-import { IntakeForm } from "../../players/intake-form";
+import { ClaimsCard, type ClaimRow, type SpotOption } from "./claims";
 import {
   ExistingRosterPlayerForm, GameForm, NewRosterPlayerForm, RosterEntryEditor, SeasonForm, TeamEventForm, TeamForm,
 } from "../forms";
@@ -90,6 +90,25 @@ async function TeamContent({
       .filter((p) => !onRoster.has(p.id))
       .map((p) => ({ id: p.id, label: `${p.last_name}, ${p.preferred_name || p.first_name}` }));
   }
+
+  // Players' account claims (coaches only, our teams)
+  let claims: ClaimRow[] = [];
+  let spots: SpotOption[] = [];
+  if (editor && team.is_own_team) {
+    const [claimsResult, spotsResult] = await Promise.all([
+      supabase.rpc("team_player_claims", { p_team_id: team.id }),
+      supabase
+        .from("roster_entries")
+        .select("id, season_id, jersey_number, player:players(first_name, last_name, preferred_name)")
+        .eq("team_id", team.id),
+    ]);
+    claims = (claimsResult.data ?? []) as ClaimRow[];
+    spots = ((spotsResult.data ?? []) as unknown as { id: string; season_id: string; jersey_number: string | null; player: Pick<Player, "first_name" | "last_name" | "preferred_name"> | null }[])
+      .filter((r) => r.player)
+      .map((r) => ({ id: r.id, season_id: r.season_id, label: `${r.jersey_number ? `#${r.jersey_number} ` : ""}${playerName(r.player!)}` }))
+      .sort((a, b) => a.label.localeCompare(b.label, undefined, { numeric: true }));
+  }
+  const claimOf = new Map(claims.filter((c) => c.roster_entry_id && c.status !== "declined").map((c) => [c.roster_entry_id!, c.status]));
 
   // Schedule: the next 8 weeks of practices/events and games
   const today = todayISO();
@@ -176,9 +195,21 @@ async function TeamContent({
       </Card>
 
       {season && (
-        <Card title={`${season.name} roster (${roster.length})`}>
+        <Card
+          title={`${season.name} roster (${roster.length})`}
+          actions={
+            editor && team.is_own_team ? (
+              <Link href={`/teams/${team.id}/intake?season=${season.id}`} className={pillButtonClass}>
+                Player intake →
+              </Link>
+            ) : undefined
+          }
+        >
           {roster.length === 0 ? (
-            <EmptyState>No players on this roster yet.{editor && " Add them below."}</EmptyState>
+            <EmptyState>
+              No players on this roster yet.
+              {editor && (team.is_own_team ? " Use Player intake to build it." : " Add them below.")}
+            </EmptyState>
           ) : (
             <div className="overflow-x-auto">
               <table className={tableClass}>
@@ -201,6 +232,15 @@ async function TeamContent({
                           {playerName(r.player)}
                         </Link>
                         {r.player.is_slapper && <span className="ml-2 text-xs text-muted">slapper</span>}
+                        {claimOf.get(r.id) && (
+                          <span
+                            className={`ml-2 rounded px-1.5 py-px font-mono text-[10px] font-bold tracking-wider uppercase ${
+                              claimOf.get(r.id) === "approved" ? "bg-neon text-on-accent" : "border border-pink text-pink-soft"
+                            }`}
+                          >
+                            {claimOf.get(r.id) === "approved" ? "Claimed" : "Claim waiting"}
+                          </span>
+                        )}
                         {!r.active && <span className="ml-2 text-xs">inactive</span>}
                       </td>
                       <td className={tdClass} title={r.player.primary_position ? POSITION_LABEL[r.player.primary_position] : undefined}>
@@ -233,14 +273,12 @@ async function TeamContent({
 
           {editor && (
             <div className="mt-4 flex flex-col gap-3">
-              <Disclosure summary={team.is_own_team ? "Player intake form" : "Add a new player"} open={roster.length === 0}>
-                {team.is_own_team ? (
-                  <IntakeForm teams={[]} fixedTeam={{ id: team.id, seasonId: season.id }} />
-                ) : (
+              {!team.is_own_team && (
+                <Disclosure summary="Add a new player" open={roster.length === 0}>
                   <NewRosterPlayerForm teamId={team.id} seasonId={season.id} />
-                )}
-              </Disclosure>
-              {otherPlayers.length > 0 && (
+                </Disclosure>
+              )}
+              {!team.is_own_team && otherPlayers.length > 0 && (
                 <Disclosure summary="Add an existing player">
                   <ExistingRosterPlayerForm teamId={team.id} seasonId={season.id} players={otherPlayers} />
                 </Disclosure>
@@ -249,6 +287,8 @@ async function TeamContent({
           )}
         </Card>
       )}
+
+      {editor && team.is_own_team && <ClaimsCard claims={claims} spots={spots} />}
 
       {team.is_own_team && (
         <Card title="Schedule (next 8 weeks)">

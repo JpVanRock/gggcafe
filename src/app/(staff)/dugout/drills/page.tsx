@@ -19,6 +19,6 @@ export default function DrillLibraryPage() {
 async function Library() {
   const user = await requireStaffPage();
   const supabase = await createClient();
-  const { data } = await supabase.from("practice_drills").select("id, name, description, tags, equipment").order("name");
+  const { data } = await supabase.from("practice_drills").select("id, name, description, tags, equipment, video_url").order("name");
   return <DrillLibrary drills={(data ?? []) as LibraryDrill[]} canEdit={canEdit(user.staff.role)} />;
 }

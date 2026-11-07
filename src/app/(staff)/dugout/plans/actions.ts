@@ -96,6 +96,7 @@ function cleanPlan(body: string) {
         ? [...new Set(d.coaches.map((c) => str(c, 60)).filter((c): c is string => Boolean(c)))].slice(0, 10)
         : [],
       equipment: str(d.equipment, 500),
+      video_url: typeof d.video_url === "string" && /^https:\/\/\S+$/.test(d.video_url) ? d.video_url.slice(0, 500) : null,
     });
   }
 

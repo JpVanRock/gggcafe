@@ -4,6 +4,7 @@ import { addDays, formatTime, isoWeekday, weekDates } from "@/lib/dates";
 import type { FieldPosition, Player, Position } from "@/lib/softball";
 import type { DiamondSpec } from "@/components/diamond";
 import type { TeamCulture, TeamStandard } from "@/components/team-standards";
+import { HITTING_KEYS, MOVEMENT_KEYS, type Values } from "@/lib/movement";
 import { MENTAL_FIELDS, type MentalPlan } from "./shared";
 import { TRAINING_CATEGORY_LABEL, type Check, type Routine, type TrainingCategory } from "@/lib/achievements";
 
@@ -356,6 +357,7 @@ export type IqQuestion = {
   scenario: string;
   question: string;
   choices: string[];
+  /** from iq_answer_key(): every question for staff; for a player, only ones she has answered (else -1) */
   correct_index: number;
   explanation: string | null;
   difficulty: number;
@@ -372,10 +374,10 @@ export type IqAnswer = {
 };
 
 export async function loadIq(supabase: Supabase, playerId: string) {
-  const [questionsResult, answersResult] = await Promise.all([
+  const [questionsResult, answersResult, keyResult] = await Promise.all([
     supabase
       .from("iq_questions")
-      .select("id, topic, position, track, level, section, diagram, scenario, question, choices, correct_index, explanation, difficulty, active")
+      .select("id, topic, position, track, level, section, diagram, scenario, question, choices, difficulty, active")
       .order("topic")
       .order("position", { nullsFirst: true })
       .order("created_at"),
@@ -386,7 +388,12 @@ export async function loadIq(supabase: Supabase, playerId: string) {
       // newest first so the API's row cap drops the oldest answers, then put back in time order
       .order("created_at", { ascending: false })
       .limit(1000),
+    // Answer keys aren't readable directly; this returns what the viewer may see.
+    supabase.rpc("iq_answer_key", { p_player_id: playerId }),
   ]);
+  const key = new Map(
+    ((keyResult.data ?? []) as { question_id: string; correct_index: number; explanation: string | null }[]).map((k) => [k.question_id, k]),
+  );
   const [ringsResult, glovesResult, mvpResult, trophyResult, attemptsResult] = await Promise.all([
     supabase.from("player_rings").select("track, level, earned_on").eq("player_id", playerId),
     supabase.from("player_golden_gloves").select("position, earned_on").eq("player_id", playerId),
@@ -400,7 +407,11 @@ export async function loadIq(supabase: Supabase, playerId: string) {
       .order("started_at", { ascending: false }),
   ]);
   return {
-    questions: (questionsResult.data ?? []) as IqQuestion[],
+    questions: ((questionsResult.data ?? []) as Omit<IqQuestion, "correct_index" | "explanation">[]).map((q) => ({
+      ...q,
+      correct_index: key.get(q.id)?.correct_index ?? -1,
+      explanation: key.get(q.id)?.explanation ?? null,
+    })),
     answers: ((answersResult.data ?? []) as IqAnswer[]).reverse(),
     rings: (ringsResult.data ?? []) as { track: "defense" | "baserunning"; level: number; earned_on: string }[],
     gloves: (glovesResult.data ?? []) as { position: FieldPosition; earned_on: string }[],
@@ -553,4 +564,32 @@ export async function loadTeamDugout(supabase: Supabase, playerId: string): Prom
         standards: standards.filter((s) => s.team_id === team.id).map(({ title, detail }) => ({ title, detail })),
       };
     });
+}
+
+// ---------------------------------------------------------------------------
+// Movement Preferences and Preferred Hitting Style (versioned: newest first)
+// ---------------------------------------------------------------------------
+
+export type StyleVersion = { id: string; recorded_at: string; by: string; values: Values };
+
+export async function loadMovementAndHitting(supabase: Supabase, playerId: string) {
+  const [movementResult, hittingResult] = await Promise.all([
+    supabase.from("movement_preferences").select("*").eq("player_id", playerId).order("recorded_at", { ascending: false }).limit(50),
+    supabase.from("hitting_styles").select("*").eq("player_id", playerId).order("recorded_at", { ascending: false }).limit(50),
+  ]);
+  type Row = Record<string, string | null> & { id: string; recorded_at: string; recorded_by: string | null };
+  const movementRows = (movementResult.data ?? []) as Row[];
+  const hittingRows = (hittingResult.data ?? []) as Row[];
+  const authorIds = [...new Set([...movementRows, ...hittingRows].map((r) => r.recorded_by).filter((id): id is string => Boolean(id)))];
+  const { data: authors } = authorIds.length
+    ? await supabase.rpc("change_authors", { p_user_ids: authorIds })
+    : { data: [] };
+  const names = new Map(((authors ?? []) as { user_id: string; name: string }[]).map((a) => [a.user_id, a.name]));
+  const version = (keys: string[]) => (r: Row): StyleVersion => ({
+    id: r.id,
+    recorded_at: r.recorded_at,
+    by: (r.recorded_by && names.get(r.recorded_by)) || "Coach",
+    values: Object.fromEntries(keys.map((k) => [k, r[k] ?? null])),
+  });
+  return { movement: movementRows.map(version(MOVEMENT_KEYS)), hitting: hittingRows.map(version(HITTING_KEYS)) };
 }

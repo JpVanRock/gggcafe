@@ -13,6 +13,7 @@ export type PlanBlock = {
   minutes: number | null;
   coaches: string[];
   equipment: string | null;
+  video_url: string | null;
 };
 
 export type PlanSpot = { position: PlanPosition; player_id: string };
@@ -47,7 +48,7 @@ export async function loadPracticePlan(supabase: Supabase, planId: string): Prom
     .from("practice_plans")
     .select(
       "id, practice_date, start_time, setting, total_minutes, location, focus, status, finalized_at, shared_at, team:teams(id, name), " +
-        "blocks:practice_plan_drills(drill_id, name, description, tags, minutes, coaches, equipment, position), " +
+        "blocks:practice_plan_drills(drill_id, name, description, tags, minutes, coaches, equipment, video_url, position), " +
         "spots:practice_plan_positions(position, player_id, sort)",
     )
     .eq("id", planId)
@@ -62,7 +63,7 @@ export async function loadPracticePlan(supabase: Supabase, planId: string): Prom
     start_time: row.start_time ? row.start_time.slice(0, 5) : null,
     blocks: [...row.blocks]
       .sort((a, b) => a.position - b.position)
-      .map((b) => ({ drill_id: b.drill_id, name: b.name, description: b.description, tags: b.tags, minutes: b.minutes, coaches: b.coaches, equipment: b.equipment })),
+      .map((b) => ({ drill_id: b.drill_id, name: b.name, description: b.description, tags: b.tags, minutes: b.minutes, coaches: b.coaches, equipment: b.equipment, video_url: b.video_url })),
     spots: [...row.spots].sort((a, b) => a.sort - b.sort).map(({ position, player_id }) => ({ position, player_id })),
   };
 }

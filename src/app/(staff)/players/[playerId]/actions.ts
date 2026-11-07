@@ -1,7 +1,7 @@
 "use server";
 
 import { refresh } from "next/cache";
-import { editorCheck } from "@/lib/auth";
+import { actForCheck, actorCheck, editorCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { addDays, isISODate, todayISO, weekStart } from "@/lib/dates";
 import { friendlyDbError, isoDate, oneOf, text, type FormState } from "@/lib/form";
@@ -11,6 +11,7 @@ import {
 } from "@/lib/achievements";
 import type { TwisKind } from "./data";
 import { MENTAL_FIELDS } from "./shared";
+import { HITTING, HITTING_KEYS, MOVEMENT, MOVEMENT_KEYS, changes, cleanValues, type Values } from "@/lib/movement";
 
 // ---------------------------------------------------------------------------
 // TWIS check-offs
@@ -23,7 +24,7 @@ export async function setTwisCheck(input: {
   onDate: string;
   checked: boolean;
 }): Promise<{ error: string | null }> {
-  const denied = await editorCheck();
+  const denied = await actForCheck(input.playerId);
   if (denied) return { error: denied };
   const { playerId, kind, refId, onDate, checked } = input;
   if (!isUuid(playerId) || !isUuid(refId) || !isISODate(onDate) || !["game", "event", "activity"].includes(kind)) {
@@ -58,11 +59,13 @@ export async function setTwisCheck(input: {
 // ---------------------------------------------------------------------------
 
 export async function addActivity(_prev: FormState, fd: FormData): Promise<FormState> {
-  const denied = await editorCheck();
+  const denied = await actorCheck();
   if (denied) return { error: denied };
 
   const playerId = text(fd, "player_id");
   if (!isUuid(playerId)) return { error: "Unknown player." };
+  const notHers = await actForCheck(playerId);
+  if (notHers) return { error: notHers };
   const title = text(fd, "title");
   if (!title) return { error: "Name the activity, e.g. “Tee work” or “Long toss”." };
 
@@ -94,7 +97,7 @@ export async function addActivity(_prev: FormState, fd: FormData): Promise<FormS
 
 /** Stop an ongoing activity from today on. Past check-offs stay. */
 export async function endActivity(fd: FormData): Promise<void> {
-  if (await editorCheck()) return;
+  if (await actorCheck()) return;
   const id = text(fd, "id");
   if (!isUuid(id)) return;
   const supabase = await createClient();
@@ -110,7 +113,7 @@ export async function endActivity(fd: FormData): Promise<void> {
 
 /** Remove an activity entirely, with its check-offs (for ones added by mistake). */
 export async function deleteActivity(fd: FormData): Promise<void> {
-  if (await editorCheck()) return;
+  if (await actorCheck()) return;
   const id = text(fd, "id");
   if (!isUuid(id)) return;
   const supabase = await createClient();
@@ -123,11 +126,13 @@ export async function deleteActivity(fd: FormData): Promise<void> {
 // ---------------------------------------------------------------------------
 
 export async function saveGoals(_prev: FormState, fd: FormData): Promise<FormState> {
-  const denied = await editorCheck();
+  const denied = await actorCheck();
   if (denied) return { error: denied };
 
   const playerId = text(fd, "player_id");
   if (!isUuid(playerId)) return { error: "Unknown player." };
+  const notHers = await actForCheck(playerId);
+  if (notHers) return { error: notHers };
   const main_goal = text(fd, "main_goal");
   if (!main_goal) return { error: "Write the main goal first. It sits in the middle of the chart." };
 
@@ -159,7 +164,7 @@ export async function saveGoals(_prev: FormState, fd: FormData): Promise<FormSta
 }
 
 export async function setGoalActionDone(input: { actionId: string; done: boolean }): Promise<{ error: string | null }> {
-  const denied = await editorCheck();
+  const denied = await actorCheck();
   if (denied) return { error: denied };
   if (!isUuid(input.actionId)) return { error: "Unknown action." };
 
@@ -179,11 +184,13 @@ export async function setGoalActionDone(input: { actionId: string; done: boolean
 // ---------------------------------------------------------------------------
 
 export async function saveMentalPlan(_prev: FormState, fd: FormData): Promise<FormState> {
-  const denied = await editorCheck();
+  const denied = await actorCheck();
   if (denied) return { error: denied };
 
   const playerId = text(fd, "player_id");
   if (!isUuid(playerId)) return { error: "Unknown player." };
+  const notHers = await actForCheck(playerId);
+  if (notHers) return { error: notHers };
 
   const values = Object.fromEntries(MENTAL_FIELDS.map((f) => [f.name, text(fd, f.name)]));
   const supabase = await createClient();
@@ -202,12 +209,12 @@ export async function saveMentalPlan(_prev: FormState, fd: FormData): Promise<Fo
 // ---------------------------------------------------------------------------
 
 export async function setGoalMethod(input: { playerId: string; method: GoalMethod }): Promise<{ error: string | null }> {
-  const denied = await editorCheck();
+  const denied = await actForCheck(input.playerId);
   if (denied) return { error: denied };
   if (!isUuid(input.playerId) || !GOAL_METHODS.includes(input.method)) return { error: "Unknown goal method." };
 
   const supabase = await createClient();
-  const { error } = await supabase.from("players").update({ goal_method: input.method }).eq("id", input.playerId);
+  const { error } = await supabase.rpc("set_goal_method", { p_player_id: input.playerId, p_method: input.method });
   if (error) return { error: friendlyDbError(error) };
 
   refresh();
@@ -223,12 +230,14 @@ function decimal(fd: FormData, name: string): number | null | "invalid" {
 
 /** Creates a SMART goal, or updates one when an id is sent. */
 export async function saveSmartGoal(_prev: FormState, fd: FormData): Promise<FormState> {
-  const denied = await editorCheck();
+  const denied = await actorCheck();
   if (denied) return { error: denied };
 
   const playerId = text(fd, "player_id");
   const goalId = text(fd, "id");
   if (!isUuid(playerId)) return { error: "Unknown player." };
+  const notHers = await actForCheck(playerId);
+  if (notHers) return { error: notHers };
   const title = text(fd, "title");
   if (!title) return { error: "Write the goal in a short sentence." };
 
@@ -277,7 +286,7 @@ export async function saveSmartGoal(_prev: FormState, fd: FormData): Promise<For
 }
 
 export async function setSmartGoalStatus(fd: FormData): Promise<void> {
-  if (await editorCheck()) return;
+  if (await actorCheck()) return;
   const id = text(fd, "id");
   const achieved = fd.get("status") === "achieved";
   if (!isUuid(id)) return;
@@ -290,7 +299,7 @@ export async function setSmartGoalStatus(fd: FormData): Promise<void> {
 }
 
 export async function deleteSmartGoal(fd: FormData): Promise<void> {
-  if (await editorCheck()) return;
+  if (await actorCheck()) return;
   const id = text(fd, "id");
   if (!isUuid(id)) return;
   const supabase = await createClient();
@@ -315,11 +324,13 @@ function httpUrl(fd: FormData, name: string): string | null | "invalid" {
 
 /** Adds a training routine (from the drill library, or a new drill) on chosen days. */
 export async function addRoutine(_prev: FormState, fd: FormData): Promise<FormState> {
-  const denied = await editorCheck();
+  const denied = await actorCheck();
   if (denied) return { error: denied };
 
   const playerId = text(fd, "player_id");
   if (!isUuid(playerId)) return { error: "Unknown player." };
+  const notHers = await actForCheck(playerId);
+  if (notHers) return { error: notHers };
   const category = oneOf(fd, "category", TRAINING_CATEGORIES);
   if (!category) return { error: "Unknown training category." };
 
@@ -407,39 +418,53 @@ async function awardAchievements(supabase: Awaited<ReturnType<typeof createClien
 
 const IQ_TOPICS = ["general", "hitting", "pitching", "position"] as const;
 
+type Graded = { correct: boolean; correct_index: number; explanation: string | null };
+
+/** Records and grades one answer in the database (record_iq_answer), so it can't be faked. */
+async function recordAnswer(args: {
+  playerId: string;
+  questionId: string;
+  chosenIndex: number;
+  attemptId?: string;
+  reviewOf?: string;
+  hintUsed?: boolean;
+}): Promise<{ error: string | null; graded?: Graded }> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("record_iq_answer", {
+    p_player_id: args.playerId,
+    p_question_id: args.questionId,
+    p_chosen: args.chosenIndex,
+    p_attempt_id: args.attemptId ?? null,
+    p_review_of: args.reviewOf ?? null,
+    p_hint_used: Boolean(args.hintUsed),
+  });
+  if (error) {
+    if (error.code === "23505") return { error: args.reviewOf ? "That question was already reviewed." : "That question was already answered in this test." };
+    if (error.code === "P0008") return { error: error.message.charAt(0).toUpperCase() + error.message.slice(1) + "." };
+    if (error.code === "P0002") return { error: "That question no longer exists." };
+    if (error.code === "22023") return { error: "Pick one of the choices." };
+    return { error: friendlyDbError(error) };
+  }
+  const row = (Array.isArray(data) ? data[0] : data) as Graded | null;
+  return row ? { error: null, graded: row } : { error: "That answer couldn't be saved." };
+}
+
+
 /** Records a player's answer and returns the right answer with its explanation. */
 export async function answerIqQuestion(input: {
   playerId: string;
   questionId: string;
   chosenIndex: number;
 }): Promise<{ error: string | null; correct?: boolean; correctIndex?: number; explanation?: string | null }> {
-  const denied = await editorCheck();
+  const denied = await actForCheck(input.playerId);
   if (denied) return { error: denied };
   if (!isUuid(input.playerId) || !isUuid(input.questionId) || !Number.isInteger(input.chosenIndex)) {
     return { error: "That answer couldn't be saved." };
   }
-
-  const supabase = await createClient();
-  const { data: q } = await supabase
-    .from("iq_questions")
-    .select("choices, correct_index, explanation")
-    .eq("id", input.questionId)
-    .maybeSingle();
-  if (!q) return { error: "That question no longer exists." };
-  if (input.chosenIndex < 0 || input.chosenIndex >= q.choices.length) return { error: "Pick one of the choices." };
-
-  const correct = input.chosenIndex === q.correct_index;
-  const { error } = await supabase.from("iq_answers").insert({
-    player_id: input.playerId,
-    question_id: input.questionId,
-    chosen_index: input.chosenIndex,
-    is_correct: correct,
-    answered_on: todayISO(),
-  });
-  if (error) return { error: friendlyDbError(error) };
-
+  const result = await recordAnswer(input);
+  if (!result.graded) return { error: result.error };
   refresh();
-  return { error: null, correct, correctIndex: q.correct_index, explanation: q.explanation };
+  return { error: null, correct: result.graded.correct, correctIndex: result.graded.correct_index, explanation: result.graded.explanation };
 }
 
 /** Creates or updates a question in the shared bank. */
@@ -520,7 +545,7 @@ export async function startIqLevel(input: {
   questions?: LevelQuestion[];
   answered?: Record<string, { correct: boolean }>;
 }> {
-  const denied = await editorCheck();
+  const denied = await actForCheck(input.playerId);
   if (denied) return { error: denied };
   const positionTest = input.track === "position";
   const position = input.position ?? null;
@@ -574,44 +599,21 @@ export async function answerIqLevelQuestion(input: {
   /** Extra Credit allows a hint before answering */
   hintUsed?: boolean;
 }): Promise<{ error: string | null; correct?: boolean; correctIndex?: number; explanation?: string | null }> {
-  const denied = await editorCheck();
+  const denied = await actForCheck(input.playerId);
   if (denied) return { error: denied };
   if (!isUuid(input.playerId) || !isUuid(input.attemptId) || !isUuid(input.questionId) || !Number.isInteger(input.chosenIndex)) {
     return { error: "That answer couldn't be saved." };
   }
-
-  const supabase = await createClient();
-  const [{ data: attempt }, { data: q }] = await Promise.all([
-    supabase.from("iq_level_attempts").select("player_id, track, level, finished_at, question_order").eq("id", input.attemptId).maybeSingle(),
-    supabase.from("iq_questions").select("track, level, choices, correct_index, explanation").eq("id", input.questionId).maybeSingle(),
-  ]);
-  if (!attempt || attempt.player_id !== input.playerId) return { error: "That test isn't open." };
-  if (attempt.finished_at) return { error: "That test is already finished." };
-  if (!q || q.track !== attempt.track || q.level !== attempt.level) return { error: "That question isn't part of this test." };
-  if (attempt.question_order && !(attempt.question_order as string[]).includes(input.questionId)) {
-    return { error: "That question isn't part of this test." };
-  }
-  if (input.chosenIndex < 0 || input.chosenIndex >= q.choices.length) return { error: "Pick one of the choices." };
-
-  const correct = input.chosenIndex === q.correct_index;
-  const { error } = await supabase.from("iq_answers").insert({
-    player_id: input.playerId,
-    question_id: input.questionId,
-    chosen_index: input.chosenIndex,
-    is_correct: correct,
-    answered_on: todayISO(),
-    attempt_id: input.attemptId,
-    hint_used: attempt.track === "extra" && Boolean(input.hintUsed),
-  });
-  if (error) return { error: friendlyDbError(error, "That question was already answered in this test.") };
-  return { error: null, correct, correctIndex: q.correct_index, explanation: q.explanation };
+  const result = await recordAnswer(input);
+  if (!result.graded) return { error: result.error };
+  return { error: null, correct: result.graded.correct, correctIndex: result.graded.correct_index, explanation: result.graded.explanation };
 }
 
 /** Grades a test; 80%+ earns the award (ring, Golden Glove, or Champions Trophy). A perfect score earns the MVP badge too. */
 export async function finishIqLevel(input: {
   attemptId: string;
 }): Promise<{ error: string | null; correct?: number; total?: number; passed?: boolean; awardEarned?: boolean }> {
-  const denied = await editorCheck();
+  const denied = await actorCheck();
   if (denied) return { error: denied };
   if (!isUuid(input.attemptId)) return { error: "Unknown test." };
 
@@ -636,7 +638,7 @@ export async function startIqReview(input: {
   playerId: string;
   attemptId: string;
 }): Promise<{ error: string | null; questions?: LevelQuestion[]; reviewed?: Record<string, { correct: boolean }> }> {
-  const denied = await editorCheck();
+  const denied = await actForCheck(input.playerId);
   if (denied) return { error: denied };
   if (!isUuid(input.playerId) || !isUuid(input.attemptId)) return { error: "Unknown test." };
 
@@ -668,7 +670,7 @@ export async function startIqReview(input: {
 
 /** A hint for one question, shown when the player asks for it during review. */
 export async function getIqHint(input: { questionId: string }): Promise<{ error: string | null; hint?: string }> {
-  const denied = await editorCheck();
+  const denied = await actorCheck();
   if (denied) return { error: denied };
   if (!isUuid(input.questionId)) return { error: "Unknown question." };
   const supabase = await createClient();
@@ -690,38 +692,74 @@ export async function answerIqReviewQuestion(input: {
   explanation?: string | null;
   complete?: boolean;
 }> {
-  const denied = await editorCheck();
+  const denied = await actForCheck(input.playerId);
   if (denied) return { error: denied };
   if (!isUuid(input.playerId) || !isUuid(input.attemptId) || !isUuid(input.questionId) || !Number.isInteger(input.chosenIndex)) {
     return { error: "That answer couldn't be saved." };
   }
+  const result = await recordAnswer({ ...input, attemptId: undefined, reviewOf: input.attemptId });
+  if (!result.graded) return { error: result.error };
 
   const supabase = await createClient();
-  const [{ data: attempt }, { data: q }, { data: right }] = await Promise.all([
-    supabase.from("iq_level_attempts").select("player_id, finished_at, question_order").eq("id", input.attemptId).maybeSingle(),
-    supabase.from("iq_questions").select("choices, correct_index, explanation").eq("id", input.questionId).maybeSingle(),
-    supabase.from("iq_answers").select("id").eq("attempt_id", input.attemptId).eq("question_id", input.questionId).eq("is_correct", true),
-  ]);
-  if (!attempt || attempt.player_id !== input.playerId || !attempt.finished_at) return { error: "That test isn't finished yet." };
-  if (!q || !((attempt.question_order ?? []) as string[]).includes(input.questionId) || (right ?? []).length > 0) {
-    return { error: "That question isn't one to review." };
-  }
-  if (input.chosenIndex < 0 || input.chosenIndex >= q.choices.length) return { error: "Pick one of the choices." };
-
-  const correct = input.chosenIndex === q.correct_index;
-  const { error } = await supabase.from("iq_answers").insert({
-    player_id: input.playerId,
-    question_id: input.questionId,
-    chosen_index: input.chosenIndex,
-    is_correct: correct,
-    answered_on: todayISO(),
-    review_of: input.attemptId,
-    hint_used: input.hintUsed,
-  });
-  if (error) return { error: friendlyDbError(error, "That question was already reviewed.") };
-
   const { data: status } = await supabase.rpc("iq_review_status", { p_attempt_id: input.attemptId });
   const row = (Array.isArray(status) ? status[0] : status) as { complete: boolean } | null;
   refresh();
-  return { error: null, correct, correctIndex: q.correct_index, explanation: q.explanation, complete: Boolean(row?.complete) };
+  return {
+    error: null,
+    correct: result.graded.correct,
+    correctIndex: result.graded.correct_index,
+    explanation: result.graded.explanation,
+    complete: Boolean(row?.complete),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Movement Preferences (coaches) and Preferred Hitting Style (player or coach).
+// Every save is a new version, so the history is kept.
+// ---------------------------------------------------------------------------
+
+function formValues(fd: FormData, keys: string[]) {
+  return Object.fromEntries(keys.map((k) => [k, text(fd, k)]));
+}
+
+export async function saveMovement(_prev: FormState, fd: FormData): Promise<FormState> {
+  const denied = await editorCheck();
+  if (denied) return { error: denied };
+  const playerId = text(fd, "player_id");
+  if (!isUuid(playerId)) return { error: "Unknown player." };
+  const values = cleanValues(MOVEMENT, formValues(fd, MOVEMENT_KEYS));
+  const supabase = await createClient();
+  const { data: latest } = await supabase
+    .from("movement_preferences")
+    .select(MOVEMENT_KEYS.join(", "))
+    .eq("player_id", playerId)
+    .order("recorded_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (latest && changes(MOVEMENT, latest as unknown as Values, values).length === 0) return { error: null, saved: true };
+  const { error } = await supabase.from("movement_preferences").insert({ player_id: playerId, ...values });
+  if (error) return { error: friendlyDbError(error) };
+  refresh();
+  return { error: null, saved: true };
+}
+
+export async function saveHittingStyle(_prev: FormState, fd: FormData): Promise<FormState> {
+  const playerId = text(fd, "player_id");
+  if (!isUuid(playerId)) return { error: "Unknown player." };
+  const denied = await actForCheck(playerId);
+  if (denied) return { error: denied };
+  const values = cleanValues(HITTING, formValues(fd, HITTING_KEYS));
+  const supabase = await createClient();
+  const { data: latest } = await supabase
+    .from("hitting_styles")
+    .select(HITTING_KEYS.join(", "))
+    .eq("player_id", playerId)
+    .order("recorded_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (latest && changes(HITTING, latest as unknown as Values, values).length === 0) return { error: null, saved: true };
+  const { error } = await supabase.from("hitting_styles").insert({ player_id: playerId, ...values });
+  if (error) return { error: friendlyDbError(error) };
+  refresh();
+  return { error: null, saved: true };
 }

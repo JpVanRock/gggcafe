@@ -3,8 +3,11 @@ import { Disclosure, EmptyState, tableClass, tdClass, thClass } from "@/componen
 import { formatLongDate } from "@/lib/dates";
 import { BATS_LABEL, POSITION_LABEL, THROWS_LABEL, batsThrows, type Player } from "@/lib/softball";
 import { PlayerForm } from "../player-form";
+import { MoveTeamForm, type MoveSeason, type MoveTeam } from "../move-form";
 import { currentRostering, type MetricProgress, type PopReport } from "./data";
 import { DetailHeading, MenuItem } from "./menu";
+import { HittingSection, MovementSection, movementHeadline } from "./movement";
+import type { StyleVersion } from "./data";
 
 function metricValue(m: MetricProgress, value: number | null) {
   return value === null ? "–" : `${Number(value)} ${m.unit}`;
@@ -18,7 +21,8 @@ function changeLabel(m: MetricProgress) {
   return `${amount} ${m.unit} ${Number(m.improvement) > 0 ? "better" : "worse"}`;
 }
 
-export function PopSummary({ player, pop }: { player: Player; pop: PopReport }) {
+export function PopSummary({ player, pop, styles }: { player: Player; pop: PopReport; styles?: { movement: StyleVersion[] } }) {
+  const moves = styles ? movementHeadline(styles.movement) : null;
   const team = currentRostering(pop);
   const latestMetrics = [...pop.metrics]
     .sort((a, b) => (b.latest_measured_on ?? "").localeCompare(a.latest_measured_on ?? ""))
@@ -32,6 +36,7 @@ export function PopSummary({ player, pop }: { player: Player; pop: PopReport }) 
       />
       <MenuItem name="Bats / Throws" value={batsThrows(player)} note={player.is_slapper ? "Slapper" : undefined} />
       <MenuItem name="Class of" value={player.grad_year ?? "–"} />
+      {moves && <MenuItem name="Movement" note={moves} />}
       <MenuItem
         name="Team"
         value={team?.jersey_number ? `#${team.jersey_number}` : undefined}
@@ -44,7 +49,26 @@ export function PopSummary({ player, pop }: { player: Player; pop: PopReport }) 
   );
 }
 
-export function PopDetail({ player, pop, canEdit, photoUrl }: { player: Player; pop: PopReport; canEdit: boolean; photoUrl?: string | null }) {
+export function PopDetail({
+  player,
+  pop,
+  canEdit,
+  photoUrl,
+  move,
+  styles,
+  canAct = canEdit,
+}: {
+  player: Player;
+  pop: PopReport;
+  canEdit: boolean;
+  /** Movement Preferences and Preferred Hitting Style, newest version first */
+  styles?: { movement: StyleVersion[]; hitting: StyleVersion[] };
+  /** the player herself or a coach: can change her hitting style */
+  canAct?: boolean;
+  photoUrl?: string | null;
+  /** coaches: teams and seasons to move her to */
+  move?: { teams: MoveTeam[]; seasons: MoveSeason[] } | null;
+}) {
   const facts: [string, string][] = [
     ["Position", player.primary_position ? `${player.primary_position} · ${POSITION_LABEL[player.primary_position]}` : "–"],
     ["Also plays", player.secondary_positions.length ? player.secondary_positions.join(", ") : "–"],
@@ -67,8 +91,11 @@ export function PopDetail({ player, pop, canEdit, photoUrl }: { player: Player; 
             </div>
           ))}
         </dl>
-        {player.notes && <p className="mt-4 whitespace-pre-wrap text-sm text-ink/90">{player.notes}</p>}
+        {canEdit && player.notes && <p className="mt-4 whitespace-pre-wrap text-sm text-ink/90">{player.notes}</p>}
       </section>
+
+      {styles && <MovementSection playerId={player.id} versions={styles.movement} canManage={canEdit} />}
+      {styles && <HittingSection playerId={player.id} versions={styles.hitting} canAct={canAct} />}
 
       <section>
         <DetailHeading>Teams</DetailHeading>
@@ -165,6 +192,11 @@ export function PopDetail({ player, pop, canEdit, photoUrl }: { player: Player; 
       {canEdit && (
         <Disclosure summary="Edit profile">
           <PlayerForm player={player} photoUrl={photoUrl} />
+        </Disclosure>
+      )}
+      {canEdit && move && (
+        <Disclosure summary="Move to another team">
+          <MoveTeamForm playerId={player.id} teams={move.teams} seasons={move.seasons} />
         </Disclosure>
       )}
     </div>

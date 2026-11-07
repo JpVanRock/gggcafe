@@ -20,12 +20,14 @@ export async function saveDrill(_prev: FormState, fd: FormData): Promise<FormSta
     description: text(fd, "description"),
     tags: allOf(fd, "tags", DRILL_TAGS),
     equipment: text(fd, "equipment"),
+    video_url: text(fd, "video_url"),
   };
   if (!drill.name) return { error: "Give the drill a name." };
   if (drill.name.length > 120) return { error: "Keep the name to 120 characters." };
   if ((drill.description ?? "").length > 2000) return { error: "Keep the description to 2,000 characters." };
   if ((drill.equipment ?? "").length > 500) return { error: "Keep the equipment list to 500 characters." };
   if (drill.tags.length === 0) return { error: "Pick at least one tag so coaches can find it." };
+  if (drill.video_url && !/^https:\/\/\S+$/.test(drill.video_url)) return { error: "The video link should be a full web address starting with https://" };
 
   const supabase = await createClient();
   if (id) {

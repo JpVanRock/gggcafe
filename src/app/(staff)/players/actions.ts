@@ -158,3 +158,41 @@ export async function updatePlayer(_prev: FormState, fd: FormData): Promise<Form
   refresh();
   return { error: null, saved: true };
 }
+
+/**
+ * Moves a player to another team (any organization): her current roster spots
+ * become inactive, kept as history, and she gets a spot on the new team for the
+ * chosen season. Her profile, stats, goals and awards stay with her. She claims
+ * the new spot from her account like any new season.
+ */
+export async function movePlayer(_prev: FormState, fd: FormData): Promise<FormState> {
+  const denied = await editorCheck();
+  if (denied) return { error: denied };
+  const playerId = text(fd, "player_id");
+  const teamId = text(fd, "team_id");
+  const seasonId = text(fd, "season_id");
+  const jersey = text(fd, "jersey_number");
+  if (!isUuid(playerId)) return { error: "Unknown player." };
+  if (!isUuid(teamId)) return { error: "Choose her new team." };
+  if (!isUuid(seasonId)) return { error: "Choose the season." };
+  if (jersey && !JERSEY.test(jersey)) return { error: "Jersey numbers are 0–99 (00 is fine)." };
+
+  const supabase = await createClient();
+  const { error: moveError } = await supabase
+    .from("roster_entries")
+    .update({ active: false })
+    .eq("player_id", playerId)
+    .eq("active", true)
+    .not("team_id", "eq", teamId);
+  if (moveError) return { error: friendlyDbError(moveError) };
+  const { error } = await supabase
+    .from("roster_entries")
+    .upsert(
+      { team_id: teamId, season_id: seasonId, player_id: playerId, jersey_number: jersey, active: true },
+      { onConflict: "team_id,season_id,player_id" },
+    );
+  if (error) return { error: friendlyDbError(error) };
+
+  refresh();
+  return { error: null, saved: true };
+}

@@ -23,6 +23,7 @@ function teamFields(fd: FormData) {
     is_own_team: fd.get("is_own_team") === "true",
     home_field: text(fd, "home_field"),
     notes: text(fd, "notes"),
+    welcome_message: text(fd, "welcome_message"),
   };
 }
 
@@ -32,12 +33,14 @@ export async function createTeam(_prev: FormState, fd: FormData): Promise<FormSt
 
   const team = teamFields(fd);
   if (!team.name) return { error: "Give the team a name." };
+  if ((team.welcome_message ?? "").length > 1000) return { error: "Keep the welcome message to 1,000 characters." };
 
   const supabase = await createClient();
   const { data, error } = await supabase.from("teams").insert(team).select("id").single();
   if (error) return { error: friendlyDbError(error, DUPLICATE_TEAM) };
 
-  redirect(`/teams/${data.id}`);
+  // Our teams go straight to building the roster.
+  redirect(team.is_own_team ? `/teams/${data.id}/intake` : `/teams/${data.id}`);
 }
 
 export async function updateTeam(_prev: FormState, fd: FormData): Promise<FormState> {
@@ -48,6 +51,7 @@ export async function updateTeam(_prev: FormState, fd: FormData): Promise<FormSt
   if (!isUuid(id)) return { error: "Unknown team." };
   const team = teamFields(fd);
   if (!team.name) return { error: "Give the team a name." };
+  if ((team.welcome_message ?? "").length > 1000) return { error: "Keep the welcome message to 1,000 characters." };
 
   const supabase = await createClient();
   const { data, error } = await supabase.from("teams").update(team).eq("id", id).select("id");
@@ -79,6 +83,7 @@ export async function createSeason(_prev: FormState, fd: FormData): Promise<Form
     .single();
   if (error) return { error: friendlyDbError(error, "A season with that name already exists.") };
 
+  if (isUuid(teamId) && fd.get("next") === "intake") redirect(`/teams/${teamId}/intake?season=${data.id}`);
   redirect(isUuid(teamId) ? `/teams/${teamId}?season=${data.id}` : "/teams");
 }
 
@@ -280,4 +285,39 @@ export async function setTeamLogo(input: { teamId: string; path: string | null }
 
   refresh();
   return { error: null };
+}
+
+// ---------------------------------------------------------------------------
+// Player claims (a player's account claiming her spot on the roster)
+// ---------------------------------------------------------------------------
+
+/** Approves a claim (matched to a spot on that season's roster) or declines it. */
+export async function decidePlayerClaim(fd: FormData) {
+  if (await editorCheck()) return;
+  const id = text(fd, "claim_id");
+  const entry = text(fd, "roster_entry_id");
+  if (!isUuid(id)) return;
+  const approve = fd.get("decision") === "approve";
+  if (approve && !isUuid(entry)) return;
+  const supabase = await createClient();
+  const { data: auth } = await supabase.auth.getClaims();
+  await supabase
+    .from("player_claims")
+    .update({
+      status: approve ? "approved" : "declined",
+      ...(approve ? { roster_entry_id: entry } : {}),
+      decided_by: auth?.claims?.sub ?? null,
+      decided_at: new Date().toISOString(),
+    })
+    .eq("id", id);
+  refresh();
+}
+
+export async function removePlayerClaim(fd: FormData) {
+  if (await editorCheck()) return;
+  const id = text(fd, "claim_id");
+  if (!isUuid(id)) return;
+  const supabase = await createClient();
+  await supabase.from("player_claims").delete().eq("id", id);
+  refresh();
 }

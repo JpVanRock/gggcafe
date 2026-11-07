@@ -15,7 +15,8 @@ HOSTING:  Vercel team "GGG", project `gggcafe`, https://gggcafe.vercel.app. Ever
 
 ## Layout
 ```
-src/app/                 pages (App Router): /, /login and /register are public; /family is the parents' home
+src/app/                 pages (App Router): /, /login and /register are public; /family is the parents' home,
+                         /me the players' home (claims; then her dashboard at /players/[id])
 src/app/(staff)/         signed-in area with shared nav: dashboard, teams, players
                          (each feature folder has page.tsx, actions.ts, client forms)
 src/components/ui.tsx    shared page/form/table building blocks
@@ -105,26 +106,76 @@ tests/unit/              node --test unit tests (npm run test:unit)
   as SVG text over the image). Team logos (`teams.logo_url`, `team-logos` bucket) are no longer on
   the ring. Every test question has a `diagram` drawn by `src/components/diamond.tsx`: it shows
   the situation only, never the answer.
-- Coaches/admins fill dashboards in for now; player logins are a planned follow-up.
+- Coaches/admins fill dashboards in; players with an approved claim can open and edit their own (see
+  Player accounts below).
 
 ## Players page and intake (`/players`)
 - Age-group tabs (All, 8U, 10U, 11U, 12U, 13U, 14U, 15U, 16U, 17U, 18U; `?age=16U`, keeps `?q=`) above the
   search. A player's age group is her current team's age group (user's rule): active roster entry in
   the latest season, `teams.age_group` read by `ageGroupOf()` in `src/lib/softball.ts`. The team form's
   Age group is a dropdown of the same groups so they stay consistent.
-- Player intake form (`players/intake-form.tsx`, Players page and own-team pages; opponents keep the
-  short roster form): name, current team (own teams), date of birth, jersey number, class year,
-  batting/throwing hand, primary position + also plays; optional profile picture and up to three
-  walk-up songs (title, artist, optional link). It creates the player and her roster entry for the
-  latest season. "Edit profile" (Pop Report) uses the same fields (`player-fields.tsx`).
+- Player intake (user, 2026-11-07: on the team, not the Players page): our team's page has a
+  "Player intake →" button to `/teams/[teamId]/intake?season=` (also where a new own team lands right
+  after it's created). New player: `players/intake-form.tsx` (name, date of birth, jersey number, class
+  year, batting/throwing hand, positions; optional profile picture and up to three walk-up songs).
+  Returning player: add her existing profile to this season (keeps history). Opponent teams keep the
+  short roster form. "Edit profile" (Pop Report) uses the same fields (`player-fields.tsx`); coaches can
+  also "Move to another team" (`move-form.tsx`): her active spots go inactive (history) and she gets a
+  spot on the new team/organization.
 - Profile pictures: PRIVATE bucket `player-photos` (photos of minors): staff read, coaches write;
   shown through signed URLs (`src/lib/player-photos.ts`). The browser shrinks photos to 900px JPEG
   before upload; replaced photos are deleted. Photo and walk-up songs show in the dashboard header.
 
+## Movement Preferences and Preferred Hitting Style (Pop Report)
+- Background is the user's movement-preference booklet (2026-11-07): use its ideas, never name it or its
+  company, never show testing steps, and write for a 10-year-old. Categories/choices come from the
+  user's sheet (POP tab, column A); labels and plain-language text live in `src/lib/movement.ts`
+  (`MOVEMENT`, `HITTING`; `coach` = the testing term coaches see in the editor).
+- Movement Preferences: coaches set them (`movement_preferences`, versioned: every save is a new row,
+  newest = current, history shown to coaches); players read. The move dial (`components/move-dial.tsx`,
+  `moveDial()`): both feet, toes up; #1 = her strongest spot (from dial_one, else bouncy+leg = toes /
+  grounded+leg = heel); #4 = heel behind a toes #1, or the other foot's toes for a heel #1; #2/#3 from
+  space + breath (close+in or wide+out = #2 on the heel side), else "2/3". Breath also gives the at-bat
+  focus tip (out = scarlet red, big picture first; in = royal blue, zoom in first).
+- Preferred Hitting Style: the player herself or a coach changes it (`hitting_styles`, versioned; the
+  player can only add rows in her own name; history shows who changed what).
+- Pop Report coach notes (players.notes) are shown to coaches only.
+
+## Player accounts (claims) — user's choices: full edit, find her spot by name + jersey
+- Teams have a coach `welcome_message` (team form). Players sign up at `/register` (Player/Parent toggle;
+  players pick their team from `signup_teams()`), then `/me` shows the welcome message and "Claim my
+  profile" (name + jersey; `request_player_claim()` matches her spot on the team's CURRENT season
+  roster, else the coach matches it). Coaches approve on the team page (`teams/[teamId]/claims.tsx`,
+  `team_player_claims()`); the nav shows a count and the dashboard a "Waiting for your approval" card
+  (`pending_approvals()`, includes parent requests).
+- Claims are per team + season (`player_claims`). A team's current season = its latest season with a
+  roster (`private.team_current_season`). When a new season's roster starts, last season's claim stops
+  giving access until she claims again (/me prompts her); her profile and history stay.
+- An approved player (`private.my_player_ids()`) gets RLS access to her own data: reads her profile,
+  roster history, teams + opponents, schedule, standards, measurements, evaluations, awards; full edit
+  of her activities/routines, TWIS checks, Harada + SMART goals, Mental GP (goal method via
+  `set_goal_method()`); she can't see teammates, coach notes, the Dugout or the staff list. Pages:
+  `requirePlayerPage()` (staff or herself; `canAct` vs coach-only `canManage`), actions:
+  `actForCheck(playerId)` / `actorCheck()` in `src/lib/auth.ts`.
+- Softball IQ integrity: answer keys (`correct_index`, `explanation`) are not column-readable by anyone;
+  `record_iq_answer()` grades and records every answer, `iq_answer_key()` returns keys (all for staff,
+  answered ones for a player); `start_iq_level`/`finish_iq_level`/`iq_review_status` are definer
+  wrappers that check `private.can_act_for()`. Players can't write answers or awards directly.
+- DB tests: `tests/db/players.test.sql`.
+
 ## Coaches Dugout (`/dugout`, nav "Dugout")
 - Header tabs (`dugout/tabs.tsx`): Standards & Culture (`/dugout`), Calendar (`/dugout/calendar`),
-  Practice Plans (`/dugout/plans`), Drill Library (`/dugout/drills`), Team Budget (`/dugout/budget`),
-  Parents (`/dugout/parents`). Team pills (`?team=`) appear when there is more than one own team.
+  Practice Plans (`/dugout/plans`), GameDay Prep (`/dugout/gameday`), Drill Library (`/dugout/drills`),
+  Team Budget (`/dugout/budget`), Parents (`/dugout/parents`).
+- GameDay Prep (from the user's Lineup + Defensive Rotations tabs): season player cards
+  (`gameday_profiles`: hitting type power/contact/gap, base running pure/intelligent/average, typed
+  AVG/OBP/K% used only until box scores exist, `batting_season` wins) and game lineups
+  (`gameday_lineups`: batting order uuid[], `defense` {rotation: {player: P..RF|Sub}}, `pitching`
+  {rotation: primary/secondary/chase[]}, 1-7 rotations). The pitcher of a rotation is whoever plays P.
+  Builder `gameday/[lineupId]/builder.tsx` (autosave, drag order, rotation checks); Finalize & Print
+  (`/dugout/gameday/[id]/pdf`, `src/lib/pdf/lineup-pdf.tsx`, landscape lineup card) / Finalize & Share
+  (`shareLineup`, same email/mailto flow; `ShareButton` takes the action and return path). Helpers in
+  `src/lib/gameday.ts` (no imports; unit-tested). Team pills (`?team=`) appear when there is more than one own team.
 - Team Budget, per team and season (`?season=`): registration costs every player owes (`budget_fees`,
   saved by `save_budget_fees`), per-player discount/extra charge (`budget_adjustments`), and the ledger
   `budget_entries` (kind payment/income/expense). Money math in `src/lib/budget.ts` (cents; no
@@ -136,8 +187,9 @@ tests/unit/              node --test unit tests (npm run test:unit)
   app tables; they get data only through security-definer functions: `parent_home()` (their links)
   and `team_budget_summary()` (staff, or approved parents of that team), which returns team totals,
   expenses/income and player payments as daily totals with no names. `components/budget-summary.tsx`
-  draws it for parents and as the coaches' summary/"Parent view". Non-staff parents signing in are
-  sent from /dashboard to /family.
+  draws it for parents and as the coaches' summary/"Parent view", with "Details" pop-ups listing each
+  expense / income line item by category. Non-staff parents signing in are sent from /dashboard to
+  /family (players to /me).
 - Calendar: month grid Monday–Sunday (`?month=2026-11`; day-by-day list on phones) of `team_events`
   plus games (read-only; games are managed on the team page). These are the same events TWIS shows,
   so anything entered here appears in each player's TWIS. Only coaches/admins add, change or remove
@@ -150,7 +202,8 @@ tests/unit/              node --test unit tests (npm run test:unit)
   Standards / Team Culture pill buttons open pop-ups, one section per active own team.
 - Drill library: `practice_drills` (shared by all teams), tags `drill_tag` (labels in `src/lib/dugout.ts`,
   user's list: infield, outfield, defense, catchers, pitchers, catchers & pitchers, warm-up routine,
-  throwing routine), optional usual equipment that is copied into plans.
+  throwing routine), optional usual equipment and video link (`video_url`, https) copied into plans;
+  "Watch the drill" shows in the library, builder, final plan and PDF.
 - Practice plans: setup (date, start time, indoor/outdoor, total time, location, focus), then the
   builder (`plans/[planId]/builder.tsx`, @dnd-kit): drag library drills into the timeline (or + Add),
   reorder, each drill needs a time limit (required to finalize), coaches (staff coaches/admins or a
