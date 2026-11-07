@@ -1,4 +1,5 @@
 import Image from "next/image";
+import taglineArt from "../../public/brand/elevate-together-yellow.png";
 import Link from "next/link";
 
 /** The GGG.Cafe logo (round badge). */
@@ -36,5 +37,23 @@ export function SiteFooter() {
         <Wordmark className="w-36 sm:w-44" />
       </Link>
     </footer>
+  );
+}
+
+/**
+ * The "Elevate Together" tagline: the brand kit's supplied yellow artwork
+ * (custom lighter Permanent Marker), copied unchanged. Kit rules: use only this
+ * artwork (never retype it in the font), keep it a separate element (never a
+ * lockup with a logo), don't stretch, outline, add effects or recolor.
+ */
+export function Tagline({ width, className = "" }: { width: number; className?: string }) {
+  return (
+    <Image
+      src={taglineArt}
+      alt="Elevate Together"
+      width={width}
+      height={Math.round((width * taglineArt.height) / taglineArt.width)}
+      className={className}
+    />
   );
 }

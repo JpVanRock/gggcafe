@@ -133,6 +133,11 @@ like a sports brand or media-day graphics. Never childish or preschool.
   bottom-right on every page via `<SiteFooter>` in the root layout; keep pages from covering it. The logo lettering is Montecatini Pro
   (Louise Fili, commercial) and only appears as the image.
 - Site font: Jost (next/font/google), chosen to pair with Montecatini Pro; has tabular figures.
+- Brand kit (Edition 03, from the user; not in the repo): colors Navy #000A2D, Neon Yellow #E7FB06,
+  Neon Pink #FE1F7C, White. Tagline "Elevate Together": use ONLY the supplied artwork
+  (`public/brand/elevate-together-yellow.png`, `<Tagline>` in `src/components/brand.tsx`; custom
+  lighter Permanent Marker), never retype it in the font, never lock it up with a logo, don't
+  stretch/outline/add effects/recolor. Sign-in page: logo 8.4rem, tagline, "Good Vibes Only".
 - Always dark. Use the tokens from `src/app/globals.css`, never zinc/gray or `dark:` classes:
   `navy-950` page, `navy-900` cards, `navy-800` hover/inputs, `navy-700/600` borders,
   `ink` text, `muted` secondary text, `neon` (logo yellow) primary buttons/titles/numbers,
