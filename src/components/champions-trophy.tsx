@@ -25,7 +25,7 @@ export function ChampionsTrophy({
       title={label}
       width={size}
       height={Math.round((size * art.height) / art.width)}
-      className={`shrink-0 ${earned ? "drop-shadow-[0_0_18px_rgba(254,32,122,0.28)]" : "opacity-25 grayscale"} ${className}`}
+      className={`shrink-0 ${earned ? "drop-shadow-[0_0_18px_rgba(254,31,124,0.28)]" : "opacity-25 grayscale"} ${className}`}
     />
   );
 }

@@ -70,7 +70,7 @@ export function GoldenGlove({
       aria-label={label}
       title={label}
     >
-      <Image src={gloveImage} alt="" width={size} height={height} className="drop-shadow-[0_8px_20px_rgba(233,250,5,0.14)]" />
+      <Image src={gloveImage} alt="" width={size} height={height} className="drop-shadow-[0_8px_20px_rgba(231,251,6,0.14)]" />
       {earned && engrave && (
         <svg viewBox={`0 0 ${gloveImage.width} ${gloveImage.height}`} className="absolute inset-0 h-full w-full" aria-hidden="true">
           <Engraved y={PLATE.top + 50} size={fit(line1, 40, PLATE.textWidth)} spacing={3}>

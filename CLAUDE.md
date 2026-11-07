@@ -134,7 +134,8 @@ like a sports brand or media-day graphics. Never childish or preschool.
   (Louise Fili, commercial) and only appears as the image.
 - Site font: Jost (next/font/google), chosen to pair with Montecatini Pro; has tabular figures.
 - Brand kit (Edition 03, from the user; not in the repo): colors Navy #000A2D, Neon Yellow #E7FB06,
-  Neon Pink #FE1F7C, White. Tagline "Elevate Together": use ONLY the supplied artwork
+  Neon Pink #FE1F7C, White. The site tokens (`navy-950`, `neon`, `pink`) use exactly these values;
+  hard-coded glows use the same RGB (0 10 45 / 231 251 6 / 254 31 124). Tagline "Elevate Together": use ONLY the supplied artwork
   (`public/brand/elevate-together-yellow.png`, `<Tagline>` in `src/components/brand.tsx`; custom
   lighter Permanent Marker), never retype it in the font, never lock it up with a logo, don't
   stretch/outline/add effects/recolor. Sign-in page: logo 8.4rem, tagline, "Good Vibes Only".

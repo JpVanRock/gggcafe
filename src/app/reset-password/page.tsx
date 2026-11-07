@@ -11,7 +11,7 @@ export default function ResetPasswordPage() {
   return (
     <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-8 px-4 py-16">
       <header className="flex flex-col items-center text-center">
-        <Logo size={128} priority className="h-28 w-28 shadow-[0_0_40px_rgba(254,32,122,0.3)]" />
+        <Logo size={128} priority className="h-28 w-28 shadow-[0_0_40px_rgba(254,31,124,0.3)]" />
         <h1 className="mt-6 text-2xl font-semibold uppercase tracking-[0.12em] text-neon">New password</h1>
         <span aria-hidden className="mt-2 block h-0.5 w-12 rounded-full bg-pink" />
       </header>

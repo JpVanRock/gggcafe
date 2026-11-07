@@ -29,7 +29,7 @@ export function Ring({
       title={label}
       width={size}
       height={Math.round((size * ringImage.height) / ringImage.width)}
-      className={earned ? "drop-shadow-[0_6px_16px_rgba(233,250,5,0.16)]" : "opacity-25 grayscale"}
+      className={earned ? "drop-shadow-[0_6px_16px_rgba(231,251,6,0.16)]" : "opacity-25 grayscale"}
     />
   );
 }

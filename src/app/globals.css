@@ -1,22 +1,23 @@
 @import "tailwindcss";
 
 /*
- * GGG.Cafe brand. Colors are sampled from the logo (public/brand/ggg-cafe-logo.webp).
+ * GGG.Cafe brand. Navy, neon yellow and neon pink are the brand kit's official values
+ * (Edition 03: #000A2D, #E7FB06, #FE1F7C); the other navy shades and soft tints are derived.
  * The logo's lettering is Montecatini Pro (Art Nouveau, Louise Fili); the site text is
  * Jost, a 1920s-style geometric sans that sits quietly beside it and has tabular figures.
  * The site is always dark: the logo is designed for the navy background.
  */
 @theme {
-  --color-navy-950: #01092d; /* logo background: the page */
+  --color-navy-950: #000a2d; /* brand kit navy: the page */
   --color-navy-900: #061137; /* cards */
   --color-navy-800: #0d1a4a; /* inputs, hover rows */
   --color-navy-700: #1b2a63; /* borders */
   --color-navy-600: #2c3d80; /* stronger borders */
   --color-ink: #f1f3fb;      /* main text */
   --color-muted: #a3acd1;    /* secondary text (8:1 on navy) */
-  --color-neon: #e9fa05;     /* logo yellow: primary buttons, headings, numbers */
+  --color-neon: #e7fb06;     /* brand kit neon yellow: primary buttons, headings, numbers */
   --color-neon-bright: #f4ff66;
-  --color-pink: #fe207a;     /* logo pink: links, focus, selected, accents */
+  --color-pink: #fe1f7c;     /* brand kit neon pink: links, focus, selected, accents */
   --color-pink-soft: #ff6aa6;
   --color-danger: #ff7a7a;   /* errors, kept apart from the brand pink */
 

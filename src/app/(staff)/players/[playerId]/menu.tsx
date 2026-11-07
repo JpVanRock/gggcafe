@@ -9,41 +9,41 @@ import { OutlineText } from "@/components/athletic";
  */
 const BOARD = {
   neon: {
-    board: "bg-neon text-navy-950 [--menu-value:var(--color-navy-950)] [--menu-note:rgb(1_9_45/0.75)]",
+    board: "bg-neon text-navy-950 [--menu-value:var(--color-navy-950)] [--menu-note:rgb(0_10_45/0.75)]",
     subtitle: "text-navy-950/70",
     cta: "text-navy-950",
-    numeral: "rgb(1 9 45 / 0.28)",
+    numeral: "rgb(0 10 45 / 0.28)",
   },
   pink: {
-    board: "bg-pink text-navy-950 [--menu-value:var(--color-navy-950)] [--menu-note:rgb(1_9_45/0.8)]",
+    board: "bg-pink text-navy-950 [--menu-value:var(--color-navy-950)] [--menu-note:rgb(0_10_45/0.8)]",
     subtitle: "text-navy-950/75",
     cta: "text-navy-950",
-    numeral: "rgb(1 9 45 / 0.3)",
+    numeral: "rgb(0 10 45 / 0.3)",
   },
   navy: {
     board: "bg-navy-700 text-ink [--menu-value:var(--color-neon)] [--menu-note:var(--color-muted)]",
     subtitle: "text-pink-soft",
     cta: "text-neon",
-    numeral: "rgb(233 250 5 / 0.35)",
+    numeral: "rgb(231 251 6 / 0.35)",
   },
   outlineNeon: {
     board: "border-2 border-neon bg-navy-900 text-ink [--menu-value:var(--color-neon)] [--menu-note:var(--color-muted)]",
     subtitle: "text-pink-soft",
     cta: "text-neon",
-    numeral: "rgb(233 250 5 / 0.35)",
+    numeral: "rgb(231 251 6 / 0.35)",
   },
   trophy: {
     board:
-      "border-2 border-neon bg-linear-to-b from-navy-800 to-navy-950 text-ink shadow-[0_0_36px_rgba(254,32,122,0.18)] [--menu-value:var(--color-neon)] [--menu-note:var(--color-muted)]",
+      "border-2 border-neon bg-linear-to-b from-navy-800 to-navy-950 text-ink shadow-[0_0_36px_rgba(254,31,124,0.18)] [--menu-value:var(--color-neon)] [--menu-note:var(--color-muted)]",
     subtitle: "text-pink-soft",
     cta: "text-neon",
-    numeral: "rgb(254 32 122 / 0.45)",
+    numeral: "rgb(254 31 124 / 0.45)",
   },
   outlinePink: {
     board: "border-2 border-pink bg-navy-900 text-ink [--menu-value:var(--color-pink-soft)] [--menu-note:var(--color-muted)]",
     subtitle: "text-neon",
     cta: "text-pink-soft",
-    numeral: "rgb(254 32 122 / 0.45)",
+    numeral: "rgb(254 31 124 / 0.45)",
   },
 } as const;
 

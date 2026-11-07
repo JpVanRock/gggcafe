@@ -11,7 +11,7 @@ export default function LoginPage() {
       <header className="flex flex-col items-center text-center">
         <Link href="/" aria-label="GGG.Cafe home">
           {/* 20% larger than before (7rem -> 8.4rem) */}
-          <Logo size={168} priority className="h-[8.4rem] w-[8.4rem] shadow-[0_0_40px_rgba(254,32,122,0.3)]" />
+          <Logo size={168} priority className="h-[8.4rem] w-[8.4rem] shadow-[0_0_40px_rgba(254,31,124,0.3)]" />
         </Link>
         {/* The tagline sits apart from the logo, never as a lockup (brand kit rule) */}
         <h1 className="mt-8">

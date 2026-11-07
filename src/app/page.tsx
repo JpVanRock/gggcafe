@@ -18,7 +18,7 @@ export default function Home() {
         <Logo
           size={240}
           priority
-          className="h-48 w-48 shadow-[0_0_60px_rgba(254,32,122,0.35)] sm:h-60 sm:w-60"
+          className="h-48 w-48 shadow-[0_0_60px_rgba(254,31,124,0.35)] sm:h-60 sm:w-60"
         />
         <div>
           <p className="text-lg font-medium uppercase tracking-[0.2em] text-neon sm:text-xl">
@@ -48,7 +48,7 @@ async function AccountLink() {
   return (
     <Link
       href={user ? "/dashboard" : "/login"}
-      className="rounded-md bg-neon px-6 py-3 font-semibold text-navy-950 shadow-[0_0_24px_rgba(233,250,5,0.25)] transition hover:bg-neon-bright"
+      className="rounded-md bg-neon px-6 py-3 font-semibold text-navy-950 shadow-[0_0_24px_rgba(231,251,6,0.25)] transition hover:bg-neon-bright"
     >
       {user ? "Open dashboard" : "Sign in"}
     </Link>
