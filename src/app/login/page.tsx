@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { LoginForm } from "./login-form";
+import { ConfirmNotice } from "./confirm-notice";
 import { Logo, Tagline } from "@/components/brand";
 import { CornerThemeToggle } from "@/components/theme-toggle";
 
@@ -24,6 +26,9 @@ export default function LoginPage() {
         <p className="mt-3 text-sm text-muted">Good Vibes Only</p>
       </header>
 
+      <Suspense fallback={null}>
+        <ConfirmNotice />
+      </Suspense>
       <LoginForm />
 
       <div className="flex flex-col gap-2 text-center text-sm text-muted">

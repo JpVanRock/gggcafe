@@ -58,8 +58,16 @@ export async function registerAccount(_prev: RegisterState, fd: FormData): Promi
     if (error.code === "user_already_exists") return fail("There's already an account with that email. Sign in instead.");
     if (error.code === "weak_password") return fail("Pick a stronger password (mix letters and numbers).");
     if (error.code === "signup_disabled") return fail("Sign-up is closed right now. Ask your coach.");
-    if (error.status === 429) return fail("Too many sign-ups right now. Wait a few minutes and try again.");
-    console.error("Parent sign-up failed:", error);
+    if (error.code === "email_address_invalid") return fail("Check your email address.");
+    // Supabase couldn't send the confirmation email (no email sender set up for the site yet)
+    if (error.code === "email_address_not_authorized" || /confirmation email|sending .*email|send .*email/i.test(error.message)) {
+      console.error("Sign-up confirmation email failed:", error);
+      return fail("We couldn't send your confirmation email, so sign-up can't finish yet. Ask your coach to check the site's email setup.");
+    }
+    if (error.code === "over_email_send_rate_limit" || error.status === 429) {
+      return fail("Too many sign-ups right now. Wait a few minutes and try again.");
+    }
+    console.error("Sign-up failed:", error);
     return fail("Couldn't create the account. Try again in a moment.");
   }
   // Supabase hides whether an email is taken: a known email comes back with no identities.

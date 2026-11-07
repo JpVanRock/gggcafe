@@ -24,7 +24,7 @@ export async function signIn(
       error.code === "invalid_credentials"
         ? "That email and password don't match."
         : error.code === "email_not_confirmed"
-          ? "This account hasn't been confirmed yet. Ask an admin to confirm it."
+          ? "Your email isn't confirmed yet. Open the confirmation link we emailed you (check spam too)."
           : error.status === 429
             ? "Too many attempts. Wait a minute and try again."
             : "Couldn't sign in right now. Try again in a moment.";
