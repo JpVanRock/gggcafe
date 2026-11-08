@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useOptimistic, useState, useTransition } from "react";
 import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
 import { WEEKDAYS } from "@/lib/dates";
@@ -91,6 +92,11 @@ export function TwisChecklist({ playerId, cells, canEdit }: { playerId: string; 
                               {item.tag}
                             </span>
                             {item.detail}
+                            {item.link && (
+                              <Link href={item.link.href} className="font-semibold text-pink-soft hover:underline">
+                                {item.link.label} →
+                              </Link>
+                            )}
                           </span>
                         </span>
                       </label>

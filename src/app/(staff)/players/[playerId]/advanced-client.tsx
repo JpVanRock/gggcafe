@@ -256,10 +256,24 @@ export function ChapterNotes({ playerId, chapter, notes, canEdit, maxLength }: {
   );
 }
 
-export function ChapterDone({ playerId, chapter, done, canEdit }: { playerId: string; chapter: string; done: boolean; canEdit: boolean }) {
+export function ChapterDone({
+  playerId,
+  chapter,
+  done,
+  canEdit,
+  locked,
+}: {
+  playerId: string;
+  chapter: string;
+  done: boolean;
+  canEdit: boolean;
+  /** why it can't be completed yet (e.g. the course isn't finished) */
+  locked?: string;
+}) {
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   if (!canEdit && !done) return null;
+  if (!done && locked) return <p className="text-sm text-muted">{locked}</p>;
   return (
     <div className="flex flex-wrap items-center gap-3">
       {done ? (

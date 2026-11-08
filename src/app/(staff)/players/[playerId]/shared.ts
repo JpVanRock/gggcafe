@@ -11,4 +11,14 @@ export const MENTAL_FIELDS = [
 ] as const;
 
 export type MentalField = (typeof MENTAL_FIELDS)[number]["name"];
-export type MentalPlan = Record<MentalField, string | null> & { updated_at: string };
+export type MentalPlan = Record<MentalField, string | null> & {
+  updated_at: string;
+  /** My signals (green / yellow / red) and her intensity zone */
+  green_signs?: string | null;
+  yellow_signs?: string | null;
+  red_signs?: string | null;
+  yellow_release?: string | null;
+  red_release?: string | null;
+  zone_low?: number | null;
+  zone_high?: number | null;
+};

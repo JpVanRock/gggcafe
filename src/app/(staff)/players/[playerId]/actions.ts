@@ -363,7 +363,7 @@ export async function addRoutine(_prev: FormState, fd: FormData): Promise<FormSt
     if (video_url === "invalid") return { error: "The video link should start with https://" };
     const AREA: Record<string, string> = {
       workout: "strength_conditioning", stretching: "strength_conditioning", hitting: "hitting",
-      fielding: "infield", pitching: "pitching", catching: "catching",
+      fielding: "infield", pitching: "pitching", catching: "catching", mental: "mental",
     };
     const { data, error } = await supabase
       .from("drills")

@@ -72,7 +72,7 @@ test("weeks with nothing planned don't break a streak", () => {
 });
 
 test("pitching and catching only for pitchers and catchers", () => {
-  assert.deepEqual(categoriesFor(["SS"]), ["workout", "stretching", "hitting", "fielding"]);
+  assert.deepEqual(categoriesFor(["SS"]), ["workout", "stretching", "hitting", "fielding", "mental"]);
   assert.ok(categoriesFor(["P"]).includes("pitching"));
   assert.ok(!categoriesFor(["P"]).includes("catching"));
   const keys = (pos: string[]) => evaluateAchievements({ routines: [], checks: [], today: "2026-09-07", positions: pos }).map((r) => r.def.key);

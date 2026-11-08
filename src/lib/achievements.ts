@@ -1,7 +1,9 @@
 // Performance Training: consistency and achievements.
 // Self-contained (no imports) so `npm run test:unit` can run it directly.
 
-export const TRAINING_CATEGORIES = ["workout", "stretching", "hitting", "fielding", "pitching", "catching"] as const;
+// "mental": guided breathing and imagery sessions (Mental GP); streaks and achievements count them,
+// Leaderboard session points don't.
+export const TRAINING_CATEGORIES = ["workout", "stretching", "hitting", "fielding", "pitching", "catching", "mental"] as const;
 export type TrainingCategory = (typeof TRAINING_CATEGORIES)[number];
 
 export const TRAINING_CATEGORY_LABEL: Record<TrainingCategory, { title: string; one: string }> = {
@@ -11,6 +13,7 @@ export const TRAINING_CATEGORY_LABEL: Record<TrainingCategory, { title: string; 
   fielding: { title: "Fielding drills", one: "fielding drill" },
   pitching: { title: "Pitching drills", one: "pitching drill" },
   catching: { title: "Catching drills", one: "catching drill" },
+  mental: { title: "Mental routines", one: "mental routine" },
 };
 
 /** Pitching is for pitchers and catching for catchers; everything else is for everyone. */
@@ -156,6 +159,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   { key: "golden_glove", title: "Prep Step", description: "25 fielding drills done.", rule: { kind: "total", count: 25, category: "fielding" } },
   { key: "ace", title: "Ace", description: "25 pitching drills done.", position: "P", rule: { kind: "total", count: 25, category: "pitching" } },
   { key: "brick_wall", title: "Brick Wall", description: "25 catching drills done.", position: "C", rule: { kind: "total", count: 25, category: "catching" } },
+  { key: "locked_in", title: "Locked In", description: "20 mental routines done.", rule: { kind: "total", count: 20, category: "mental" } },
 ];
 
 export type AchievementProgress = {

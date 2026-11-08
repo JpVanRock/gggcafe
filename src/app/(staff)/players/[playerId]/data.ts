@@ -37,6 +37,8 @@ export type TwisItem = {
   detail: string | null;
   tag: string;
   checked: boolean;
+  /** a shortcut: the practice journal on practice days, the guided session for a mental routine */
+  link?: { href: string; label: string };
 };
 
 export type TwisCell = { key: string; date: string | null; items: TwisItem[] };
@@ -83,6 +85,8 @@ export type ActivityRow = {
   category: TrainingCategory | null;
   /** made by the app (leadership-checkin: a Leadership Plan check-in date) */
   source?: string | null;
+  /** a guided mental session (the routine's library drill) */
+  drill?: { guide: string | null } | null;
 };
 
 export async function loadTwisWeek(supabase: Supabase, playerId: string, monday: string): Promise<TwisWeek> {
@@ -168,11 +172,13 @@ export async function loadTwisWeek(supabase: Supabase, playerId: string, monday:
         detail: [time, e.location].filter(Boolean).join(" · ") || null,
         tag: EVENT_KIND_LABEL[e.kind] ?? "Team",
         checked: checked.has(key),
+        ...(e.kind === "practice" ? { link: { href: `/players/${playerId}/mental/journal?week=${monday}#d-${e.event_date}`, label: "Journal" } } : {}),
       },
     });
   }
 
   for (const a of activitiesResult) {
+    const link = a.drill?.guide ? { href: `/players/${playerId}/mental/session/${a.drill.guide}`, label: "Start" } : undefined;
     const tag =
       a.source === "leadership-checkin"
         ? "Leadership"
@@ -183,7 +189,7 @@ export async function loadTwisWeek(supabase: Supabase, playerId: string, monday:
           : (a.pillar?.title ?? "My activity");
     if (a.days.length === 0) {
       const key = `a:${a.id}:${monday}`;
-      anyDay.push({ key, kind: "activity", refId: a.id, onDate: monday, title: a.title, detail: a.details, tag, checked: checked.has(key) });
+      anyDay.push({ key, kind: "activity", refId: a.id, onDate: monday, title: a.title, detail: a.details, tag, checked: checked.has(key), link });
       continue;
     }
     for (const d of dates) {
@@ -191,7 +197,7 @@ export async function loadTwisWeek(supabase: Supabase, playerId: string, monday:
       const key = `a:${a.id}:${d}`;
       byDate.get(d)?.push({
         sort: `1${a.title}`,
-        item: { key, kind: "activity", refId: a.id, onDate: d, title: a.title, detail: a.details, tag, checked: checked.has(key) },
+        item: { key, kind: "activity", refId: a.id, onDate: d, title: a.title, detail: a.details, tag, checked: checked.has(key), link },
       });
     }
   }
@@ -211,7 +217,7 @@ export async function loadTwisWeek(supabase: Supabase, playerId: string, monday:
 export async function loadActivities(supabase: Supabase, playerId: string, from: string, to: string): Promise<ActivityRow[]> {
   const { data } = await supabase
     .from("player_activities")
-    .select("id, title, details, days, starts_on, ends_on, pillar_id, category, source, pillar:harada_pillars(title)")
+    .select("id, title, details, days, starts_on, ends_on, pillar_id, category, source, pillar:harada_pillars(title), drill:drills(guide)")
     .eq("player_id", playerId)
     .lte("starts_on", to)
     .or(`ends_on.is.null,ends_on.gte.${from}`)
@@ -473,7 +479,7 @@ export type GameRunRow = { id: string; game: number; next_play: number; first_tr
 export async function loadMentalPlan(supabase: Supabase, playerId: string): Promise<MentalPlan | null> {
   const { data } = await supabase
     .from("mental_game_plans")
-    .select(`${MENTAL_FIELDS.map((f) => f.name).join(", ")}, updated_at`)
+    .select(`${MENTAL_FIELDS.map((f) => f.name).join(", ")}, green_signs, yellow_signs, red_signs, yellow_release, red_release, zone_low, zone_high, updated_at`)
     .eq("player_id", playerId)
     .maybeSingle();
   return (data as MentalPlan | null) ?? null;

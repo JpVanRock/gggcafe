@@ -5,10 +5,11 @@ import { Suspense } from "react";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Loading, buttonClass, secondaryButtonClass } from "@/components/ui";
-import { CHAPTERS, MY_HABITS_MAX, MY_HABIT_LENGTH, NOTES_MAX, chapterLabel, visibleChapters } from "@/lib/advanced-book";
+import { CHAPTERS, MY_HABITS_MAX, MY_HABIT_LENGTH, NOTES_MAX, chapterLabel, courseLessons, visibleChapters } from "@/lib/advanced-book";
 import { loadAdvanced } from "../../../advanced-data";
 import { AdvancedNotFoundForAdmin, LEVEL_LABEL, advancedHref } from "../../../advanced";
 import { ChapterDone, ChapterNotes, FoundationHabits, MyHabits } from "../../../advanced-client";
+import { CourseRunner } from "../../../course-client";
 import { firstName, loadPlayer } from "../../../section-data";
 import { SectionShell } from "../../section-shell";
 
@@ -77,6 +78,21 @@ async function Chapter({ params }: Pick<PageProps<"/players/[playerId]/advanced/
           )
         )}
 
+        {chapter.course && (
+          <section>
+            <Heading>The course</Heading>
+            <CourseRunner
+              playerId={player.id}
+              chapter={chapter.slug}
+              steps={chapter.course}
+              lessons={courseLessons(chapter.course)}
+              initialStep={work?.courseStep ?? 0}
+              done={Boolean(work?.courseDoneAt)}
+              canEdit={canEdit}
+            />
+          </section>
+        )}
+
         {chapter.habits && (
           <section>
             <Heading>The foundation</Heading>
@@ -98,7 +114,13 @@ async function Chapter({ params }: Pick<PageProps<"/players/[playerId]/advanced/
         )}
 
         {chapter.kind === "chapter" && !coming && (
-          <ChapterDone playerId={player.id} chapter={chapter.slug} done={Boolean(work?.completedAt)} canEdit={canEdit} />
+          <ChapterDone
+            playerId={player.id}
+            chapter={chapter.slug}
+            done={Boolean(work?.completedAt)}
+            canEdit={canEdit}
+            locked={chapter.course && !work?.courseDoneAt ? "Finish the course above to complete this chapter." : undefined}
+          />
         )}
 
         <nav className="flex flex-wrap items-center justify-between gap-3 border-t border-navy-700 pt-5" aria-label="Chapters">

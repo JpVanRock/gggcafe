@@ -57,11 +57,18 @@ export async function renameAdvancedBook(input: { playerId: string; title: strin
 async function currentWork(supabase: Awaited<ReturnType<typeof createClient>>, playerId: string, chapter: string) {
   const { data } = await supabase
     .from("player_advanced_chapters")
-    .select("owned, mine, notes, completed_at")
+    .select("owned, mine, notes, completed_at, course_step, course_done_at")
     .eq("player_id", playerId)
     .eq("chapter", chapter)
     .maybeSingle();
-  return data as { owned: string[]; mine: string[]; notes: string | null; completed_at: string | null } | null;
+  return data as {
+    owned: string[];
+    mine: string[];
+    notes: string | null;
+    completed_at: string | null;
+    course_step: number;
+    course_done_at: string | null;
+  } | null;
 }
 
 async function saveWork(
@@ -119,7 +126,36 @@ export async function saveAdvancedNotes(input: { playerId: string; chapter: stri
   return saveWork(input.playerId, input.chapter, () => ({ notes: notes || null }));
 }
 
-/** Chapter finished (or reopened). */
+/** Chapter finished (or reopened). A chapter with a course needs the course finished first. */
 export async function setAdvancedChapterDone(input: { playerId: string; chapter: string; done: boolean }): Promise<Result> {
-  return saveWork(input.playerId, input.chapter, () => ({ completed_at: input.done ? new Date().toISOString() : null }), true);
+  const chapter = CHAPTERS.find((c) => c.slug === input.chapter);
+  return saveWork(
+    input.playerId,
+    input.chapter,
+    (current) =>
+      input.done && chapter?.course && !current?.course_done_at
+        ? "Finish the course first."
+        : { completed_at: input.done ? new Date().toISOString() : null },
+    true,
+  );
+}
+
+/** The course: her furthest step (it only moves forward). */
+export async function saveCourseStep(input: { playerId: string; chapter: string; step: number }): Promise<Result> {
+  const chapter = CHAPTERS.find((c) => c.slug === input.chapter);
+  if (!chapter?.course) return { error: "Unknown chapter." };
+  const step = Math.max(0, Math.min(Math.trunc(Number(input.step) || 0), chapter.course.length - 1));
+  return saveWork(input.playerId, input.chapter, (current) => ({ course_step: Math.max(current?.course_step ?? 0, step) }));
+}
+
+/** The course: finished. */
+export async function finishCourse(input: { playerId: string; chapter: string }): Promise<Result> {
+  const chapter = CHAPTERS.find((c) => c.slug === input.chapter);
+  if (!chapter?.course) return { error: "Unknown chapter." };
+  return saveWork(
+    input.playerId,
+    input.chapter,
+    (current) => ({ course_step: chapter.course!.length - 1, course_done_at: current?.course_done_at ?? new Date().toISOString() }),
+    true,
+  );
 }
