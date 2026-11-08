@@ -290,6 +290,11 @@ export type LevelInfo = TestState & {
   earnedOn: string | null;
 };
 export type TrackInfo = { track: RingTrack; label: string; blurb: string; levels: LevelInfo[] };
+/** Offense IQ and Battery IQ: Levels 1-3, passing unlocks the next; the award is the MVP badge (no ring). */
+export type BadgeTrack = "offense" | "battery";
+export const BADGE_TRACK_LABEL: Record<BadgeTrack, string> = { offense: "Offense IQ", battery: "Battery IQ" };
+export type BadgeTrackInfo = { track: BadgeTrack; label: string; blurb: string; levels: (LevelInfo & { mvp: boolean })[] };
+const isBadgeTrack = (t: string): t is BadgeTrack => t === "offense" || t === "battery";
 export type PositionInfo = TestState & {
   position: FieldPosition;
   label: string;
@@ -311,7 +316,7 @@ export type Nameplate = { name: string; number: string | null };
 const PASS_PCT = 80;
 const LEVEL_NAME = ["", "Rookie", "Varsity", "All-American"];
 
-type TestKey = { track: RingTrack | "position" | "extra"; level: number; position: FieldPosition | null };
+type TestKey = { track: RingTrack | BadgeTrack | "position" | "extra"; level: number; position: FieldPosition | null };
 type Answered = Record<string, { correct: boolean }>;
 type TestResult = { correct: number; total: number; passed: boolean; awardEarned: boolean };
 type Session = TestKey & {
@@ -327,6 +332,7 @@ type Session = TestKey & {
 function testName(k: TestKey) {
   if (k.track === "position") return `${POSITION_LABEL[k.position!]} IQ`;
   if (k.track === "extra") return "Extra Credit Library";
+  if (isBadgeTrack(k.track)) return `${BADGE_TRACK_LABEL[k.track]} · Level ${k.level}`;
   return `${TRACK_LABEL[k.track]} · Level ${k.level}`;
 }
 
@@ -334,6 +340,7 @@ function testName(k: TestKey) {
 function mvpLabel(k: TestKey) {
   if (k.track === "position") return `${k.position} · Golden Glove`;
   if (k.track === "extra") return "Extra Credit";
+  if (isBadgeTrack(k.track)) return `${k.track === "offense" ? "Offense" : "Battery"} · L${k.level}`;
   return `${k.track === "defense" ? "Defense" : "Baserunning"} · L${k.level}`;
 }
 
@@ -411,6 +418,62 @@ function TestFollowUps({ test, testKey, actions }: { test: TestState; testKey: T
         </div>
       )}
     </>
+  );
+}
+
+function BadgeTrackPicker({ tracks, actions }: { tracks: BadgeTrackInfo[]; actions: Actions }) {
+  return (
+    <div className="grid gap-4 lg:grid-cols-2">
+      {tracks.map((t) => (
+        <section key={t.track} className="rounded-xl border border-navy-700 bg-navy-950/40 p-4">
+          <h4 className="text-lg font-bold tracking-wide uppercase">{t.label}</h4>
+          <p className="mt-0.5 text-xs text-muted">{t.blurb}</p>
+          <ul className="mt-4 grid gap-2">
+            {t.levels.map((l) => {
+              const key: TestKey = { track: t.track, level: l.level, position: null };
+              const open = l.status !== "locked";
+              return (
+                <li key={l.level} className="rounded-lg border border-navy-700 p-2.5">
+                  <div className="flex items-center gap-3">
+                    <MvpBadge label={`${t.track === "offense" ? "Offense" : "Battery"} · L${l.level}`} earned={l.mvp} size={48} />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-bold">
+                        Level {l.level}
+                        <span className="ml-2 font-mono text-[11px] font-normal tracking-wider text-muted uppercase">
+                          {LEVEL_NAME[l.level]} · {l.questionCount} questions
+                        </span>
+                      </p>
+                      <p className="text-xs text-muted">
+                        {l.status === "locked"
+                          ? `Pass Level ${l.level - 1} with ${PASS_PCT}%+ to unlock`
+                          : l.mvp
+                            ? `MVP badge earned${l.status === "earned" ? ` · passed ${l.earnedOn ?? ""}` : ""}`
+                            : l.status === "earned"
+                              ? `Passed ${l.earnedOn ?? ""}. A perfect score or reviewing every miss earns the MVP badge.`
+                              : l.best
+                                ? `Best ${l.best.correct}/${l.best.total}. Needs ${PASS_PCT}%.`
+                                : `Score ${PASS_PCT}% to pass; a perfect score earns the MVP badge`}
+                      </p>
+                    </div>
+                    {open && !l.inProgress && (
+                      <button
+                        type="button"
+                        disabled={!actions.canEdit || actions.pending || l.questionCount === 0}
+                        onClick={() => actions.start(key)}
+                        className={l.status === "earned" ? secondaryButtonClass : buttonClass}
+                      >
+                        {l.status === "earned" ? "Retake" : "Start"}
+                      </button>
+                    )}
+                  </div>
+                  {open && <TestFollowUps test={l} testKey={key} actions={actions} />}
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ))}
+    </div>
   );
 }
 
@@ -580,6 +643,7 @@ function LibraryPicker({ library, actions }: { library: LibraryInfo; actions: Ac
 export function IqTests({
   playerId,
   tracks,
+  badgeTracks = [],
   positions,
   library,
   plate,
@@ -588,6 +652,8 @@ export function IqTests({
 }: {
   playerId: string;
   tracks: TrackInfo[];
+  /** Offense IQ (and Battery IQ): MVP-badge tracks */
+  badgeTracks?: BadgeTrackInfo[];
   positions: PositionInfo[];
   library: LibraryInfo;
   plate: Nameplate;
@@ -707,12 +773,13 @@ export function IqTests({
     const missed = result.total - result.correct;
     const position = session.track === "position" ? POSITION_LABEL[session.position!] : null;
     const extra = session.track === "extra";
+    const badge = isBadgeTrack(session.track);
     const award = position ? "Golden Glove" : extra ? "GGG Champions Trophy" : "championship ring";
     const perfect = result.total > 0 && result.correct === result.total;
     return (
       <div className={`rounded-xl border p-6 text-center ${result.passed ? "border-neon bg-neon/10" : "border-pink/60 bg-pink/5"}`}>
         <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">{testName(session)}</p>
-        {result.passed && (
+        {result.passed && !badge && (
           <div className="mt-4 flex justify-center">
             {position ? (
               <GoldenGlove name={plate.name} number={plate.number} position={position} year={new Date().getFullYear()} size={300} />
@@ -733,7 +800,11 @@ export function IqTests({
           {result.correct}/{result.total} <span className="text-2xl text-muted">· {pct}%</span>
         </p>
         <p className="mt-2 text-sm">
-          {result.passed
+          {badge
+            ? result.passed
+              ? `Level ${session.level} passed${session.level < 3 ? `. Level ${session.level + 1} is unlocked` : ". Every level passed"}.`
+              : `${PASS_PCT}% passes Level ${session.level} (${needed(result.total)} of ${result.total}).`
+            : result.passed
             ? result.awardEarned
               ? position
                 ? `${position} Golden Glove earned.`
@@ -943,6 +1014,12 @@ export function IqTests({
         <DetailHeading>Playbook tests · score 80% to earn the ring and unlock the next level</DetailHeading>
         <TrackPicker tracks={tracks} actions={actions} />
       </section>
+      {badgeTracks.length > 0 && (
+        <section>
+          <DetailHeading>{badgeTracks.map((t) => t.label).join(" · ")} · score 80% to unlock the next level · MVP badges</DetailHeading>
+          <BadgeTrackPicker tracks={badgeTracks} actions={actions} />
+        </section>
+      )}
       <section>
         <DetailHeading>Position IQ · Golden Glove</DetailHeading>
         <PositionPicker positions={positions} plate={plate} actions={actions} />

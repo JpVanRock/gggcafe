@@ -6,8 +6,8 @@ import { RingCase, TRACK_LABEL, type RingTrack } from "@/components/rings";
 import { GoldenGlove } from "@/components/golden-glove";
 import { formatLongDate } from "@/lib/dates";
 import {
-  IqQuestionForm, IqTests, QuizRunner, type LevelInfo, type LibraryInfo, type Nameplate, type PositionInfo, type QuizInfo,
-  type TrackInfo,
+  BADGE_TRACK_LABEL, IqQuestionForm, IqTests, QuizRunner, type BadgeTrack, type BadgeTrackInfo, type LevelInfo, type LibraryInfo, type Nameplate,
+  type PositionInfo, type QuizInfo, type TrackInfo,
 } from "./iq-client";
 import { DetailHeading, MenuItem } from "./menu";
 import { CourseCard, buildCourse } from "./scorebook";
@@ -101,6 +101,35 @@ export function buildTracks(iq: IqData): TrackInfo[] {
   }));
 }
 
+const BADGE_BLURB: Record<BadgeTrack, string> = {
+  offense: "Counts, situational hitting, the short game and slapping: smart at-bats, written for fastpitch.",
+  battery: "Pitch calling for pitchers and catchers: counts, location, sequencing and sign security.",
+};
+
+/** Offense IQ (and Battery IQ once it has questions): passing a level unlocks the next; each level's award is the MVP badge. */
+export function buildBadgeTracks(iq: IqData): BadgeTrackInfo[] {
+  return (["offense", "battery"] as BadgeTrack[])
+    .filter((track) => iq.questions.some((q) => q.active && q.track === track))
+    .map((track) => ({
+      track,
+      label: BADGE_TRACK_LABEL[track],
+      blurb: BADGE_BLURB[track],
+      levels: [1, 2, 3].map((level) => {
+        const attempts = iq.attempts.filter((a) => a.track === track && a.level === level);
+        const passed = attempts.filter((a) => a.passed && a.finished_at).sort((a, b) => (a.finished_at ?? "").localeCompare(b.finished_at ?? ""))[0];
+        const prevPassed = level === 1 || iq.attempts.some((a) => a.track === track && a.level === level - 1 && a.passed);
+        const questionCount = iq.questions.filter((q) => q.active && q.track === track && q.level === level).length;
+        return {
+          level,
+          status: passed ? "earned" : prevPassed ? "open" : "locked",
+          earnedOn: passed?.finished_at ? formatLongDate(passed.finished_at.slice(0, 10)) : null,
+          mvp: iq.mvps.some((m) => m.track === track && m.level === level),
+          ...testState(iq, attempts, questionCount),
+        } satisfies BadgeTrackInfo["levels"][number];
+      }),
+    }));
+}
+
 /** Position tests (one level each) and Golden Gloves, for every position on the field. `mine` starts with her primary position. */
 export function buildPositions(iq: IqData, mine: Position[]): PositionInfo[] {
   return FIELD_POSITIONS.map((position) => {
@@ -151,6 +180,7 @@ export function GloveCase({ positions, plate, size = 220 }: { positions: Positio
 export function IqSummary({
   quizzes,
   tracks,
+  badgeTracks = [],
   positions,
   plate,
   rings,
@@ -158,6 +188,7 @@ export function IqSummary({
 }: {
   quizzes: QuizInfo[];
   tracks: TrackInfo[];
+  badgeTracks?: BadgeTrackInfo[];
   positions: PositionInfo[];
   plate: Nameplate;
   rings: IqData["rings"];
@@ -177,6 +208,18 @@ export function IqSummary({
               name={t.label}
               value={`${earned}/3`}
               note={earned === 3 ? "All three rings earned" : next ? `Level ${next.level} is next` : "Locked"}
+            />
+          );
+        })}
+        {badgeTracks.map((t) => {
+          const passed = t.levels.filter((l) => l.status === "earned").length;
+          const mvps = t.levels.filter((l) => l.mvp).length;
+          return (
+            <MenuItem
+              key={t.track}
+              name={t.label}
+              value={`${passed}/3`}
+              note={mvps ? `${mvps} MVP badge${mvps === 1 ? "" : "s"}` : passed === 3 ? "Every level passed" : `Level ${passed + 1} is next`}
             />
           );
         })}
@@ -225,6 +268,7 @@ export function IqDetail({
   playerId,
   quizzes,
   tracks,
+  badgeTracks = [],
   positions,
   library,
   plate,
@@ -235,6 +279,7 @@ export function IqDetail({
   playerId: string;
   quizzes: QuizInfo[];
   tracks: TrackInfo[];
+  badgeTracks?: BadgeTrackInfo[];
   positions: PositionInfo[];
   library: LibraryInfo;
   plate: Nameplate;
@@ -268,6 +313,7 @@ export function IqDetail({
       <IqTests
         playerId={playerId}
         tracks={tracks}
+        badgeTracks={badgeTracks}
         positions={positions}
         library={library}
         plate={plate}

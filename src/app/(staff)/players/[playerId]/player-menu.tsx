@@ -8,7 +8,7 @@ import {
 } from "./data";
 import { DugoutStrip } from "@/components/dugout-strip";
 import { GoalsSummary } from "./goals";
-import { IqSummary, buildPositions, buildQuizzes, buildTracks } from "./iq";
+import { IqSummary, buildPositions, buildQuizzes, buildTracks, buildBadgeTracks } from "./iq";
 import { TrophyRoomSummary, buildTrophyRoom } from "./trophy-room";
 import { StolenBasePlaque } from "@/components/stolen-base-plaque";
 import { ChampionsTrophy } from "@/components/champions-trophy";
@@ -89,6 +89,7 @@ export function PlayerMenu({
   const training = summarizePerformance(performance, positions, today);
   const quizzes = buildQuizzes(iq, positions);
   const iqTracks = buildTracks(iq);
+  const iqBadgeTracks = buildBadgeTracks(iq);
   const iqPositions = buildPositions(iq, positions);
   const team = currentRostering(pop);
   const plate = { name: playerName(player), number: team?.jersey_number ?? null }; // engraved on awards
@@ -137,7 +138,7 @@ export function PlayerMenu({
       subtitle: "Defense IQ · Baserunning IQ · Position IQ · Extra Credit",
       variant: "outlinePink",
       wide: true,
-      summary: <IqSummary quizzes={quizzes} tracks={iqTracks} positions={iqPositions} plate={plate} rings={iq.rings} bookDone={iq.managerAwards.length} />,
+      summary: <IqSummary quizzes={quizzes} tracks={iqTracks} badgeTracks={iqBadgeTracks} positions={iqPositions} plate={plate} rings={iq.rings} bookDone={iq.managerAwards.length} />,
       href: `${base}/iq`,
     },
     ...(advanced.unlocked

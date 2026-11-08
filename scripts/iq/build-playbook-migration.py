@@ -5,6 +5,9 @@ Usage: python3 scripts/iq/build-playbook-migration.py <new-migration-file>
 
 Reads
   supabase/iq/defense.json, baserunning.json  playbook levels: Levels 1-3, at most 30 each
+  supabase/iq/offense.json, battery.json      Offense IQ and Battery IQ (written for GGG.Cafe, no playbook
+                                              pages): Levels 1-3, 20-30 each; the award is the MVP badge.
+                                              battery.json is optional until it exists
   supabase/iq/positions.json                  position (Golden Glove) tests: exactly 21 per position
   supabase/iq/extra.json                      Extra Credit Library: any number, each with a "book"
                                               (defense/baserunning) and a "section" (library shelf)
@@ -61,8 +64,9 @@ def check_question(where, q):
         answer = choices[q["correct_index"]].strip().lower().rstrip(".")
         if len(answer) > 12 and answer in q["hint"].lower():
             errors.append(f"{where}: hint gives the answer away")
-    if not isinstance(q.get("playbook_page"), int):
-        errors.append(f"{where}: playbook_page must be a page number")
+    # null: written for GGG.Cafe (not from a playbook page)
+    if q.get("playbook_page") is not None and not isinstance(q.get("playbook_page"), int):
+        errors.append(f"{where}: playbook_page must be a page number or null")
 
     d = q.get("diagram") or {}
     runners = d.get("runners", [])
@@ -81,6 +85,9 @@ def check_question(where, q):
             errors.append(f"{where}: unknown ball location {ball.get('at')!r}")
         if ball.get("type", "ground") not in BALL_TYPES:
             errors.append(f"{where}: unknown ball type {ball.get('type')!r}")
+    count = d.get("count")
+    if count is not None and (count.get("balls") not in (0, 1, 2, 3) or count.get("strikes") not in (0, 1, 2)):
+        errors.append(f"{where}: count needs balls 0-3 and strikes 0-2")
     for a in d.get("arrows", []) or []:
         if a.get("from") not in BASES | set(FIELDERS) or a.get("to") not in BASES | set(FIELDERS):
             errors.append(f"{where}: arrow endpoints must be bases or fielders: {a}")
@@ -222,7 +229,7 @@ def main():
     parser.add_argument("migration")
     out = pathlib.Path(parser.parse_args().migration)
 
-    tracks = {t: json.loads((IQ / f"{t}.json").read_text()) for t in ("defense", "baserunning")}
+    tracks = {t: json.loads((IQ / f"{t}.json").read_text()) for t in ("defense", "baserunning", "offense", "battery") if (IQ / f"{t}.json").exists()}
     positions = json.loads((IQ / "positions.json").read_text())
     extra = json.loads((IQ / "extra.json").read_text())
     scorebook = json.loads((IQ / "scorebook.json").read_text())
@@ -249,6 +256,9 @@ def main():
     for slug, track, level, position, topic, section, q in items:
         if track == "scorebook":
             ref = f"How to Keep the Book · Chapter {level}" + (f" · scorekeeping guide p.{q['page']}" if q.get("page") else "")
+        elif q.get("playbook_page") is None:
+            name = {"offense": "Offense IQ", "battery": "Battery IQ"}.get(track, "Softball IQ")
+            ref = f"GGG.Cafe {name}" + (f" · {q['topic']}" if q.get("topic") else "")
         else:
             book = "Baserunning" if track == "baserunning" or q.get("book") == "baserunning" else "Defensive"
             ref = f"{book} Playbook p.{q['playbook_page']}" + (f" · {q['topic']}" if q.get("topic") else "")
@@ -266,7 +276,7 @@ def main():
                 correct=q["correct_index"],
                 explanation=sql_text(q["explanation"].strip()),
                 hint=sql_text(q["hint"].strip()),
-                difficulty=level if track in ("defense", "baserunning") else 1 if track == "scorebook" else 2,
+                difficulty=level if track in ("defense", "baserunning", "offense", "battery") else 1 if track == "scorebook" else 2,
                 diagram=sql_text(json.dumps(q["diagram"], separators=(",", ":"))) if q.get("diagram") is not None else "null",
                 ref=sql_text(ref),
             )
@@ -280,9 +290,9 @@ def main():
     lines = [
         "-- =============================================================================",
         "-- GGG.Cafe — IQ test questions (generated; do not edit by hand)",
-        "-- Source: supabase/iq/defense.json, baserunning.json, positions.json, extra.json and",
-        "-- scorebook.json, written for GGG.Cafe from the Softball IQ Defensive and Baserunning",
-        "-- Playbooks and the user's scorekeeping guide.",
+        "-- Source: supabase/iq/defense.json, baserunning.json, offense.json, battery.json, positions.json,",
+        "-- extra.json and scorebook.json, written for GGG.Cafe (playbook levels from the user's",
+        "-- Defensive and Baserunning Playbooks, the course from the user's scorekeeping guide).",
         "-- Regenerate: python3 scripts/iq/build-playbook-migration.py <new migration file>",
         "-- =============================================================================",
         "",

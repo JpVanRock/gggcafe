@@ -4,7 +4,7 @@ import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Loading } from "@/components/ui";
 import { loadIq, loadPopReport } from "../../data";
-import { IqDetail, buildLibrary, buildPositions, buildQuizzes, buildTracks } from "../../iq";
+import { IqDetail, buildBadgeTracks, buildLibrary, buildPositions, buildQuizzes, buildTracks } from "../../iq";
 import { loadPlayer, plateFor, positionsOf } from "../../section-data";
 import { SectionShell } from "../section-shell";
 
@@ -26,11 +26,12 @@ async function Iq({ params }: Pick<PageProps<"/players/[playerId]/iq">, "params"
   const [iq, pop] = await Promise.all([loadIq(supabase, player.id), loadPopReport(supabase, player.id)]);
   const positions = positionsOf(player);
   return (
-    <SectionShell title="Softball IQ" subtitle="Defense IQ · Baserunning IQ · Position IQ · Keep the Book · Extra Credit">
+    <SectionShell title="Softball IQ" subtitle="Defense IQ · Baserunning IQ · Offense IQ · Position IQ · Keep the Book · Extra Credit">
       <IqDetail
         playerId={player.id}
         quizzes={buildQuizzes(iq, positions)}
         tracks={buildTracks(iq)}
+        badgeTracks={buildBadgeTracks(iq)}
         positions={buildPositions(iq, positions)}
         library={buildLibrary(iq)}
         plate={plateFor(player, pop)}

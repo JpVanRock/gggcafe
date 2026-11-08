@@ -8,6 +8,7 @@ import { HITTING_KEYS, MOVEMENT_KEYS, type Values } from "@/lib/movement";
 import { MENTAL_FIELDS, type MentalPlan } from "./shared";
 import { TRAINING_CATEGORY_LABEL, type Check, type Routine, type TrainingCategory } from "@/lib/achievements";
 import { phaseOn, phaseWeek } from "@/lib/training-plan";
+import type { HittingZones } from "@/lib/my-zone";
 
 export { MENTAL_FIELDS, type MentalField, type MentalPlan } from "./shared";
 
@@ -374,7 +375,7 @@ export async function loadPerformance(supabase: Supabase, playerId: string): Pro
 export type IqTopic = "general" | "hitting" | "pitching" | "position";
 
 /** Playbook tracks (Levels 1-3, rings) and the position track (one level per position, Golden Gloves). */
-export type IqTrack = "defense" | "baserunning" | "position" | "extra" | "scorebook";
+export type IqTrack = "defense" | "baserunning" | "offense" | "battery" | "position" | "extra" | "scorebook";
 
 export type IqQuestion = {
   id: string;
@@ -624,9 +625,10 @@ export async function loadTeamDugout(supabase: Supabase, playerId: string): Prom
 export type StyleVersion = { id: string; recorded_at: string; by: string; values: Values };
 
 export async function loadMovementAndHitting(supabase: Supabase, playerId: string) {
-  const [movementResult, hittingResult] = await Promise.all([
+  const [movementResult, hittingResult, zoneResult] = await Promise.all([
     supabase.from("movement_preferences").select("*").eq("player_id", playerId).order("recorded_at", { ascending: false }).limit(50),
     supabase.from("hitting_styles").select("*").eq("player_id", playerId).order("recorded_at", { ascending: false }).limit(50),
+    supabase.from("hitting_zones").select("hot, strong, weak, notes").eq("player_id", playerId).maybeSingle(),
   ]);
   type Row = Record<string, string | null> & { id: string; recorded_at: string; recorded_by: string | null };
   const movementRows = (movementResult.data ?? []) as Row[];
@@ -642,5 +644,10 @@ export async function loadMovementAndHitting(supabase: Supabase, playerId: strin
     by: (r.recorded_by && names.get(r.recorded_by)) || "Coach",
     values: Object.fromEntries(keys.map((k) => [k, r[k] ?? null])),
   });
-  return { movement: movementRows.map(version(MOVEMENT_KEYS)), hitting: hittingRows.map(version(HITTING_KEYS)) };
+  return {
+    movement: movementRows.map(version(MOVEMENT_KEYS)),
+    hitting: hittingRows.map(version(HITTING_KEYS)),
+    /** My Zone (Phase 3) */
+    zone: (zoneResult.data as HittingZones | null) ?? null,
+  };
 }

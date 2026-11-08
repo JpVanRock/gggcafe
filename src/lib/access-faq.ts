@@ -22,6 +22,7 @@ export const FEATURE_SECTIONS: { title: string; features: Feature[] }[] = [
       { name: "Messages from her mentors", detail: "Alerts at the top of her menu: notes, photos and drills to try, from mentors her coach assigned.", standard: "yes", advanced: "yes" },
       { name: "This Week in Softball (TWIS)", detail: "Practices, games and her activities for the week, with check-offs.", standard: "yes", advanced: "yes" },
       { name: "Pop Report", detail: "Profile, teams, measurements and her Preferred Hitting Style.", standard: "yes", advanced: "yes" },
+      { name: "My Zone", detail: "Her pitch, what she handles and her weak spots on the strike zone, and the count plan they give (0, 1, 2 strikes).", standard: "yes", advanced: "yes" },
       { name: "Movement Preferences", detail: "Her move dial and at-bat focus tip in the Pop Report, set by her coaches.", standard: "no", advanced: "yes" },
       { name: "Goals", detail: "Harada Method chart or SMART goals.", standard: "yes", advanced: "yes" },
       { name: "Mental GP", detail: "Her Mental Game Plan: focus words, routines, a reset for tough moments.", standard: "yes", advanced: "yes" },
@@ -48,6 +49,7 @@ export const FEATURE_SECTIONS: { title: string; features: Feature[] }[] = [
     title: "Softball IQ",
     features: [
       { name: "Defense and Baserunning IQ", detail: "Playbook tests, Levels 1-3, with hints and review.", standard: "yes", advanced: "yes" },
+      { name: "Offense IQ", detail: "Counts, situational hitting, the short game and slapping: Levels 1-3, each passed level unlocks the next, MVP badges.", standard: "yes", advanced: "yes" },
       { name: "Position IQ", detail: "21 questions per position; 80% earns that Golden Glove.", standard: "yes", advanced: "yes" },
       { name: "Extra Credit Library", detail: "Every shelf in one run; 80% earns the GGG Champions Trophy.", standard: "yes", advanced: "yes" },
       { name: "How to Keep the Book", detail: "Six-chapter scorekeeping course; each chapter earns Manager of the Year.", standard: "yes", advanced: "yes" },
@@ -68,9 +70,10 @@ export const FEATURE_SECTIONS: { title: string; features: Feature[] }[] = [
     features: [
       { name: "Team Yearbook", detail: "The season in photos from coaches and parents, tagged by player: yearbook spreads or thumbnails.", standard: "no", advanced: "yes" },
       { name: "Her book: How to Cook", detail: "How to Compete: It Starts with Good Habits, then the chapters she builds on and completes.", standard: "no", advanced: "yes" },
+      { name: "Hitting Approach chapter", detail: "A course (her routine, count plan, two strikes, the short game, reading the pitcher, a slump reset), her count plan from My Zone, then the habits.", standard: "no", advanced: "yes" },
       { name: "Mental Toughness chapter", detail: "A step-through course (confidence, next pitch, breathing, her zone, signals, imagery, her reset), then the habits.", standard: "no", advanced: "yes" },
       { name: "Position chapters", detail: "First one: Pitching: My Best Is Better.", standard: "no", advanced: "coach", condition: "A coach confirms her position on her book page." },
-      { name: "Coming chapters", detail: "My Position, Hitting Approach (content later).", standard: "no", advanced: "yes" },
+      { name: "Coming chapters", detail: "My Position (content later).", standard: "no", advanced: "yes" },
       { name: "G3 Leadership Guide", detail: "25 lessons, 22 Extra Reps, My Leadership Plan with check-in reminders.", standard: "no", advanced: "coach", condition: "A coach or admin picks her to train as a leader." },
       { name: "Certificate of Leadership and Leader Badge", detail: "Printable certificate and a badge by her name: seen only by coaches, admins and her.", standard: "no", advanced: "coach", condition: "Every lesson done, plan committed, and the coach signs off." },
     ],

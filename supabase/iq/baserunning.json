@@ -2351,5 +2351,184 @@
       "you": "runner-second",
       "arrows": []
     }
+  },
+  {
+    "level": 2,
+    "topic": "The bubble turn",
+    "scenario": "You hit a clean single into left-center field.",
+    "question": "How do you round first base?",
+    "choices": [
+      "Run straight at the bag and make a sharp 90-degree turn",
+      "Swing out a step or two before the bag, touch the inside corner and head straight for second",
+      "Slow down at the bag and look at your coach first",
+      "Run past the bag toward right field"
+    ],
+    "correct_index": 1,
+    "explanation": "A small bubble a few steps before first lets you hit the inside corner of the bag at full speed and come out of the turn already on a line to second.",
+    "hint": "How do you keep your speed through the turn?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter",
+      "ball": {
+        "at": "LCF-gap",
+        "type": "line"
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Ball in the dirt",
+    "scenario": "You're on first, one out. The pitch bounces in the dirt and gets away from the catcher.",
+    "question": "What do you do?",
+    "choices": [
+      "Stay: you can't run on a ball in the dirt",
+      "Read it: if it gets past the catcher, go to second",
+      "Go back to first",
+      "Wait for your coach to call time"
+    ],
+    "correct_index": 1,
+    "explanation": "Once the pitch is released, a ball in the dirt is live. Read the bounce: if it gets past the catcher, take second; if she smothers it in front, hold.",
+    "hint": "Is the ball live after she releases it?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 1,
+      "you": "runner-first"
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Tag on a foul fly",
+    "scenario": "Runner on third, one out. A foul pop drifts toward the fence down the first-base line and the first baseman chases it.",
+    "question": "What do you do?",
+    "choices": [
+      "Stay on the bag, tag up and get ready to score if she catches it moving away from home",
+      "Run home right away",
+      "Take a big lead toward home",
+      "Nothing: you can't advance on a foul ball"
+    ],
+    "correct_index": 0,
+    "explanation": "A caught foul fly is still a catch, so runners can tag and advance. With the fielder moving away from home, a tag-up can score you.",
+    "hint": "Is a caught foul ball any different from a caught fair ball?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 1,
+      "you": "runner-third",
+      "ball": {
+        "at": "1B",
+        "type": "popup"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Never make the first out at third",
+    "scenario": "Nobody out, you're on second. A ground ball goes to the shortstop's right.",
+    "question": "Should you try for third?",
+    "choices": [
+      "Yes, always run on a ground ball",
+      "Only if it's a sure thing: never make the first out at third",
+      "Yes, the shortstop always throws to first",
+      "Go back toward second"
+    ],
+    "correct_index": 1,
+    "explanation": "With nobody out you can score from second on a hit and from third on many outs. Getting thrown out at third wastes a runner in scoring position.",
+    "hint": "Can you already score from second?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 0,
+      "you": "runner-second",
+      "ball": {
+        "at": "SS",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Never make the third out at third",
+    "scenario": "Two outs, you're on second. The batter hits a ground ball into the hole and the shortstop dives for it.",
+    "question": "Do you try to go to third on the play?",
+    "choices": [
+      "Yes, any extra base helps",
+      "No: with two outs you score from second on a hit, so third gains nothing worth the risk",
+      "Yes, if the ball gets to the outfield",
+      "Stay on second no matter what"
+    ],
+    "correct_index": 1,
+    "explanation": "With two outs you're running on contact and a hit scores you from second anyway. Being out at third ends the inning for no reason.",
+    "hint": "Where does a two-out hit score you from?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 2,
+      "you": "runner-second",
+      "ball": {
+        "at": "SS",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Contact read at third",
+    "scenario": "Runner on third, one out. The infield is drawn in and a sharp ground ball goes right to the second baseman.",
+    "question": "What do you do?",
+    "choices": [
+      "Go home on contact no matter what",
+      "Freeze and go back to third: a drawn-in infielder has an easy throw home",
+      "Go halfway and stop",
+      "Run to the dugout"
+    ],
+    "correct_index": 1,
+    "explanation": "With the infield in, a ground ball right at an infielder is an easy out at home. Read the ball: go only if it gets through or your coach has called the contact play.",
+    "hint": "Where are the infielders playing?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 1,
+      "you": "runner-third",
+      "ball": {
+        "at": "2B",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Two outs: go on contact",
+    "scenario": "Two outs, you're on first. The batter swings at a 3-2 pitch.",
+    "question": "When do you go?",
+    "choices": [
+      "On contact only",
+      "As the pitch is released: with two outs and a full count you're running",
+      "After the ball lands",
+      "Only if your coach yells"
+    ],
+    "correct_index": 1,
+    "explanation": "With two outs and a full count, a ball walks you to second and a strike ends the inning, so you run as the pitch is released and get a head start on any hit.",
+    "hint": "What happens to you on ball four, strike three or a hit?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 2,
+      "you": "runner-first"
+    }
   }
 ]

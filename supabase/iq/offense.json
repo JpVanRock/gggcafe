@@ -1,0 +1,1393 @@
+[
+  {
+    "level": 1,
+    "topic": "Hitter's counts",
+    "scenario": "Nobody on. The pitcher has missed with her first two pitches.",
+    "question": "Which of these counts is a hitter's count?",
+    "choices": [
+      "1-2",
+      "2-0",
+      "0-1",
+      "0-2"
+    ],
+    "correct_index": 1,
+    "explanation": "When you're ahead (2-0, 3-1, 2-1) the pitcher has to throw a strike, so you can sit on your pitch and attack it. Behind in the count, she can throw her best pitch off the plate.",
+    "hint": "Who is under pressure to throw a strike?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter",
+      "count": {
+        "balls": 2,
+        "strikes": 0
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Two strikes: battle",
+    "scenario": "You've fallen behind 0-2 to a pitcher with good movement.",
+    "question": "What changes in your approach?",
+    "choices": [
+      "Widen your zone a little, shorten up and fight to put the ball in play",
+      "Take the next pitch no matter what",
+      "Swing as hard as you can at anything she throws",
+      "Nothing, you still only swing at your one pitch"
+    ],
+    "correct_index": 0,
+    "explanation": "With two strikes a close pitch can be called strike three. Expand your zone slightly, shorten your swing (choke up if you like) and foul off tough pitches until you get one you can hit.",
+    "hint": "What happens if a close pitch goes by?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter",
+      "count": {
+        "balls": 0,
+        "strikes": 2
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "The take sign",
+    "scenario": "It's 3-0 with nobody on. Your coach gives you the take sign.",
+    "question": "What do you do?",
+    "choices": [
+      "Swing only if it's right down the middle",
+      "Bunt it",
+      "Step out and ask for a different sign",
+      "Take the pitch, even if it's a strike"
+    ],
+    "correct_index": 3,
+    "explanation": "A take sign means take, no matter where the pitch is. Your coach may want a walk, a look at the pitcher or a runner to move. Trust the call.",
+    "hint": "What did the sign tell you to do?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter",
+      "count": {
+        "balls": 3,
+        "strikes": 0
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "First pitch in your zone",
+    "scenario": "First pitch of your at-bat: a fastball right in your hot zone.",
+    "question": "What's the best approach?",
+    "choices": [
+      "Bunt it to surprise the defense",
+      "Only swing if you already have a strike",
+      "Be ready to attack it: a first-pitch strike in your zone may be the best pitch you see",
+      "Always take the first pitch to see what she has"
+    ],
+    "correct_index": 2,
+    "explanation": "Pitchers like to get ahead with a strike early. If it's your pitch, be on time and drive it. Taking good first pitches puts you in a hole.",
+    "hint": "When will you see her most hittable pitch?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter",
+      "count": {
+        "balls": 0,
+        "strikes": 0
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Runner on third, infield back",
+    "scenario": "Runner on third, one out. The infield is playing back.",
+    "question": "What's your goal at the plate?",
+    "choices": [
+      "Strike out swinging rather than hit a ground ball",
+      "Put the ball in play: a ground ball up the middle or a fly ball to the outfield scores her",
+      "Bunt it back to the pitcher",
+      "Take pitches until you walk"
+    ],
+    "correct_index": 1,
+    "explanation": "With the infield back, the defense is giving up the run for an out. A ground ball to the middle infield or a fly ball deep enough scores her. Putting it in play is what matters.",
+    "hint": "Where does the defense want to get its out?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 1,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Sacrifice bunt",
+    "scenario": "Runner on first, nobody out. Your coach calls the sacrifice bunt.",
+    "question": "What's your job?",
+    "choices": [
+      "Get the bunt down on the ground, even if you're out at first",
+      "Bunt it in the air over the pitcher",
+      "Bunt for a hit so you're safe too",
+      "Swing away if the pitch is good"
+    ],
+    "correct_index": 0,
+    "explanation": "A sacrifice trades your out for moving the runner. Square early enough, bunt a strike and get it on the ground. Being out at first is the plan.",
+    "hint": "What does the word sacrifice tell you?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Where to sacrifice",
+    "scenario": "Runner on first, nobody out, sacrifice bunt on.",
+    "question": "Where should the bunt go?",
+    "choices": [
+      "In the air toward first base",
+      "Hard enough to reach the shortstop",
+      "Hard back at the pitcher",
+      "Down either line on the ground, away from the pitcher"
+    ],
+    "correct_index": 3,
+    "explanation": "Bunts down the first- or third-base line, on the ground, make a corner infielder field the ball and throw to first. A bunt back to the pitcher gives her an easy force at second.",
+    "hint": "Who has the easiest play on a ball right back to the circle?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Two outs, runner on second",
+    "scenario": "Two outs, runner on second.",
+    "question": "Why does a base hit matter so much here?",
+    "choices": [
+      "Only an extra-base hit can score her",
+      "A walk scores her",
+      "She runs on contact with two outs, so a hit to the outfield can score her",
+      "The runner has to stay at second until the ball is caught"
+    ],
+    "correct_index": 2,
+    "explanation": "With two outs runners go on contact because there's no reason to wait. A clean single to the outfield usually scores a runner from second.",
+    "hint": "When do runners go with two outs?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 2,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Dropped third strike",
+    "scenario": "One out, nobody on. You swing through strike three and the ball bounces off the catcher into the dirt.",
+    "question": "What do you do?",
+    "choices": [
+      "Walk back to the dugout: you struck out",
+      "Run to first right away: she has to tag you or throw you out",
+      "Wait for the umpire to tell you to run",
+      "Ask for time"
+    ],
+    "correct_index": 1,
+    "explanation": "On a dropped third strike with first base open (or with two outs) you can run. Sprint to first; the catcher has to tag you or throw to first.",
+    "hint": "Is the out complete if the catcher doesn't catch strike three?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 1,
+      "you": "batter",
+      "count": {
+        "balls": 1,
+        "strikes": 2
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Leadoff hitter",
+    "scenario": "You lead off the inning.",
+    "question": "What's your main job?",
+    "choices": [
+      "Get on base: a walk is as good as a single",
+      "See as many pitches as possible and strike out looking",
+      "Bunt every time",
+      "Hit a home run"
+    ],
+    "correct_index": 0,
+    "explanation": "The leadoff hitter's job is to get on. A walk, a bunt single or a hit all start a rally, and a runner on base puts pressure on the defense.",
+    "hint": "What starts a rally?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Your timing",
+    "scenario": "You keep fouling pitches straight back or late to the right side (you hit right-handed).",
+    "question": "What does that tell you?",
+    "choices": [
+      "You need a heavier bat",
+      "You should bunt",
+      "You're too early",
+      "You're a little late: start your load sooner as she begins her motion"
+    ],
+    "correct_index": 3,
+    "explanation": "Fouls straight back and late swings to the opposite side mean you're just behind the pitch. Start your load earlier so you're ready to swing as the ball leaves her hand.",
+    "hint": "Where does the ball go when you're behind it?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 1,
+    "topic": "The rise ball",
+    "scenario": "You keep swinging under pitches that start at your belt and finish around your chin.",
+    "question": "What's the adjustment?",
+    "choices": [
+      "Close your eyes on the swing",
+      "Swing harder",
+      "Lay off pitches above your hands",
+      "Move to the back of the box"
+    ],
+    "correct_index": 2,
+    "explanation": "That's the rise ball. It looks like a strike, then climbs. Make her bring the ball down: anything that starts at your hands or higher, take.",
+    "hint": "Which pitches can you actually square up?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter",
+      "count": {
+        "balls": 1,
+        "strikes": 1
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "The drop ball",
+    "scenario": "Pitches look like strikes at your knees, then dive into the dirt.",
+    "question": "What's the best adjustment?",
+    "choices": [
+      "Bunt every pitch",
+      "Look for the ball up in the zone and let the low ones go",
+      "Swing at everything at your knees",
+      "Stand closer to the plate"
+    ],
+    "correct_index": 1,
+    "explanation": "That's the drop ball. Raise your eyes: look for pitches from your belt up and let the ones at your knees go, because they'll end up in the dirt.",
+    "hint": "Where do those pitches finish?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 1,
+    "topic": "The change-up",
+    "scenario": "You're way out in front of a slow pitch and roll it over to third.",
+    "question": "What was it, and how do you adjust?",
+    "choices": [
+      "A change-up: stay back and keep your hands back until it gets to you",
+      "A drop ball: swing down",
+      "A curve: stand farther off the plate",
+      "A rise ball: swing up"
+    ],
+    "correct_index": 0,
+    "explanation": "A change-up looks like a fastball out of her hand, then arrives late. Stay back, keep your weight and hands back, and let it come to you.",
+    "hint": "Why were you out in front?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 1,
+    "topic": "On deck",
+    "scenario": "You're on deck while your teammate is batting.",
+    "question": "What should you be doing?",
+    "choices": [
+      "Talking to the fans",
+      "Looking at your phone in the dugout",
+      "Practicing your bunt only",
+      "Timing the pitcher and taking swings on time with her release"
+    ],
+    "correct_index": 3,
+    "explanation": "The on-deck circle is your best look at the pitcher. Time her release, see her pitches and take swings on time so your first pitch isn't your first look.",
+    "hint": "What do you want to know before you step in?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Protect the plate",
+    "scenario": "Bases loaded, two outs, full count.",
+    "question": "What's your approach?",
+    "choices": [
+      "Swing only at a pitch right down the middle",
+      "Take: she might walk you",
+      "Protect the plate: swing at anything close",
+      "Bunt for a hit"
+    ],
+    "correct_index": 2,
+    "explanation": "A close pitch taken could be strike three and end the inning. Swing at anything close and battle. Ball four still walks in a run if she misses badly.",
+    "hint": "What happens if a close pitch goes by?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "first",
+        "second",
+        "third"
+      ],
+      "outs": 2,
+      "you": "batter",
+      "count": {
+        "balls": 3,
+        "strikes": 2
+      }
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Infield in",
+    "scenario": "Runner on third, one out. The infield is playing in.",
+    "question": "What does that mean for you?",
+    "choices": [
+      "The infielders can't catch line drives",
+      "A hard ground ball gets through more easily",
+      "You can't score the runner",
+      "You have to bunt"
+    ],
+    "correct_index": 1,
+    "explanation": "With the infield drawn in, a hard ground ball or line drive has a better chance to get through. Hit the ball hard, on the ground or in the air.",
+    "hint": "What happens when infielders give up range?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 1,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Safety squeeze",
+    "scenario": "Runner on third. Your coach calls the safety squeeze.",
+    "question": "When does the runner break for home?",
+    "choices": [
+      "Only once she sees the bunt go down on the ground",
+      "On the first pitch no matter what",
+      "After the catcher throws to first",
+      "As the pitcher starts her motion"
+    ],
+    "correct_index": 0,
+    "explanation": "On a safety squeeze the runner reads the bunt and goes only when it's down on the ground. Your job is to get a good bunt down away from the pitcher.",
+    "hint": "Which squeeze is safe for the runner?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 1,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Missed sign",
+    "scenario": "You weren't sure what sign your coach just gave.",
+    "question": "What do you do?",
+    "choices": [
+      "Take every pitch",
+      "Guess",
+      "Swing away",
+      "Step out of the box and look again (call time if you need it)"
+    ],
+    "correct_index": 3,
+    "explanation": "Never guess on a sign. Step out with a foot still near the box, look again, or call time. A missed sign can cost an out or a runner.",
+    "hint": "What's worse than asking again?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 1,
+    "topic": "Hit by pitch",
+    "scenario": "A pitch is coming right at your hip.",
+    "question": "How do you protect yourself?",
+    "choices": [
+      "Dive across the plate",
+      "Stand still",
+      "Turn away from the pitch, tuck your hands and let it hit your back side",
+      "Put your hands out to block it"
+    ],
+    "correct_index": 2,
+    "explanation": "Turning away protects your face, hands and the front of your body. Tuck your hands in and let the pitch hit your back side, then take your base.",
+    "hint": "What should never get hit?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter",
+      "count": {
+        "balls": 0,
+        "strikes": 0
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Move the runner from second",
+    "scenario": "Runner on second, nobody out. You hit right-handed.",
+    "question": "What's the most useful thing you can do?",
+    "choices": [
+      "Strike out so you don't hit into an out",
+      "Pull the ball hard to the left side",
+      "Hit the ball to the right side of the infield so she can take third",
+      "Pop up so she stays at second"
+    ],
+    "correct_index": 2,
+    "explanation": "A ground ball to the right side moves her to third with one out, where a fly ball or ground ball can score her. A ground ball to the left side holds her at second.",
+    "hint": "From second, which infielders can she run behind?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Hit-and-run",
+    "scenario": "Runner on first, hit-and-run is on. The pitch is a little outside.",
+    "question": "What do you do?",
+    "choices": [
+      "Take it: it's a ball",
+      "Swing and put it on the ground to protect the runner",
+      "Bunt it foul",
+      "Swing as hard as you can for a home run"
+    ],
+    "correct_index": 1,
+    "explanation": "On a hit-and-run the runner is going, so you have to swing to protect her. Put the ball on the ground, ideally through the hole the middle infielder leaves.",
+    "hint": "What happens to the runner if you take the pitch?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 0,
+      "you": "batter",
+      "count": {
+        "balls": 1,
+        "strikes": 0
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "The slash",
+    "scenario": "You show bunt, and both corner infielders charge hard. Your coach calls the slash.",
+    "question": "What do you do?",
+    "choices": [
+      "Pull the bat back and chop or drive the ball past the charging corners",
+      "Take the pitch",
+      "Bunt it in the air",
+      "Bunt it anyway"
+    ],
+    "correct_index": 0,
+    "explanation": "The slash beats a crashing defense. Show bunt to pull the corners in, pull the bat back and swing down to drive the ball past them.",
+    "hint": "Where are the infielders when you pull the bat back?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Push bunt",
+    "scenario": "The first baseman is charging and the second baseman is playing deep.",
+    "question": "Where's the best bunt for a hit?",
+    "choices": [
+      "Bunt it softly to the first baseman",
+      "Bunt it straight back to the catcher",
+      "Pop it up to third",
+      "Push it firmly past the pitcher toward the second baseman"
+    ],
+    "correct_index": 3,
+    "explanation": "A push bunt is hit firmer than a sacrifice. With the first baseman crashing and the second baseman deep, push it past the pitcher into the gap between them.",
+    "hint": "Which fielder is too far away to get to a firm bunt?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Suicide squeeze",
+    "scenario": "The suicide squeeze is on. The pitch comes in high and outside.",
+    "question": "What do you do?",
+    "choices": [
+      "Step out of the box",
+      "Take it because it's a ball",
+      "Get the bat on it any way you can and bunt it on the ground",
+      "Swing away"
+    ],
+    "correct_index": 2,
+    "explanation": "On a suicide squeeze the runner breaks as the pitch is released. If you miss or take the pitch she's out at home, so get the bat on the ball no matter where it is.",
+    "hint": "Where is the runner when the pitch arrives?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 1,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Bunting with two strikes",
+    "scenario": "You have two strikes and your coach still wants a bunt.",
+    "question": "What happens if your bunt rolls foul?",
+    "choices": [
+      "It's just a foul ball",
+      "It's strike three: you're out",
+      "You get another pitch",
+      "The runner can advance"
+    ],
+    "correct_index": 1,
+    "explanation": "A bunt that goes foul with two strikes is strike three. That's why most coaches bunt earlier in the count.",
+    "hint": "Is a two-strike bunt foul treated like other fouls?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 0,
+      "you": "batter",
+      "count": {
+        "balls": 1,
+        "strikes": 2
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Infield fly",
+    "scenario": "Runners on first and second, one out. You pop up in the infield and the umpire calls the infield fly.",
+    "question": "What does that mean?",
+    "choices": [
+      "You're out automatically, and runners may advance at their own risk",
+      "The ball is dead and everyone returns",
+      "You're safe if the ball drops",
+      "The runners have to run"
+    ],
+    "correct_index": 0,
+    "explanation": "On an infield fly the batter is out whether or not it's caught, so the defense can't drop it for a cheap double play. Runners may advance at their own risk.",
+    "hint": "Why does the rule exist?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "first",
+        "second"
+      ],
+      "outs": 1,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Tiebreaker inning",
+    "scenario": "Extra innings start with a runner on second and nobody out. You lead off.",
+    "question": "What's a common play here?",
+    "choices": [
+      "Take until you walk",
+      "Bunt for a hit toward the pitcher",
+      "Swing for the fences",
+      "Sacrifice bunt to move her to third"
+    ],
+    "correct_index": 3,
+    "explanation": "With a runner on second and nobody out, a sacrifice puts her on third with one out, where a fly ball, a ground ball or a squeeze can score her.",
+    "hint": "How many ways can she score from third with one out?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Sacrifice with a runner on second",
+    "scenario": "Runner on second, nobody out, sacrifice on.",
+    "question": "Where should the bunt go?",
+    "choices": [
+      "Straight to the catcher",
+      "To the first-base side",
+      "Toward third, so the third baseman has to field it",
+      "Back to the pitcher"
+    ],
+    "correct_index": 2,
+    "explanation": "Make the third baseman field the bunt. If she comes in for it, nobody is covering third and the runner moves up safely.",
+    "hint": "Who has to leave third base empty?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Runners on first and second: the bunt",
+    "scenario": "Runners on first and second, nobody out. Your coach calls the sacrifice.",
+    "question": "Where's the best place for the bunt?",
+    "choices": [
+      "In the air to the first baseman",
+      "Toward third, making the third baseman come off the bag",
+      "Back to the pitcher",
+      "Foul, to see what the defense does"
+    ],
+    "correct_index": 1,
+    "explanation": "Bunting to the third-base side forces the third baseman to field it, so she can't take the force at third. The defense ends up taking the out at first.",
+    "hint": "Where is the force play the defense wants?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "first",
+        "second"
+      ],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Lay off her out pitch",
+    "scenario": "She has struck you out twice with a rise ball up at 0-2. You're 0-2 again.",
+    "question": "What do you do?",
+    "choices": [
+      "Lay off pitches above your hands and make her come down",
+      "Bunt with two strikes",
+      "Step out and argue the last call",
+      "Swing at the next high pitch: you're due"
+    ],
+    "correct_index": 0,
+    "explanation": "Pitchers repeat what works. If her strikeout pitch is the rise ball up, know it's coming and take it. Make her throw a strike.",
+    "hint": "What has she thrown you twice in this count?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter",
+      "count": {
+        "balls": 0,
+        "strikes": 2
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Soft slap",
+    "scenario": "You're a left-handed slapper. The third baseman is playing back.",
+    "question": "What's your best option?",
+    "choices": [
+      "Swing away for a home run",
+      "Take the first pitch",
+      "Hard slap at the shortstop",
+      "Soft slap or drag bunt toward third"
+    ],
+    "correct_index": 3,
+    "explanation": "A third baseman playing back can't get to a soft slap or a drag bunt down the line in time to throw out a fast slapper.",
+    "hint": "Who has the longest way to come in?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Hard slap",
+    "scenario": "You're a slapper. The shortstop and third baseman both charge as she starts her motion.",
+    "question": "What's the play?",
+    "choices": [
+      "Pop it up over the pitcher",
+      "Bunt it to third",
+      "Hard slap on the ground past them, through the left side",
+      "Take the pitch"
+    ],
+    "correct_index": 2,
+    "explanation": "When the left side crashes, there's open space behind them. A hard slap on the ground beats charging infielders.",
+    "hint": "Where is the open space when they charge?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Green light at 3-1",
+    "scenario": "3-1 count, runner on first, nobody out. Your coach gives you the green light.",
+    "question": "What's your approach?",
+    "choices": [
+      "Swing at anything",
+      "Look for your pitch in your hot zone; if it's not there, take it",
+      "Bunt it",
+      "Take no matter what"
+    ],
+    "correct_index": 1,
+    "explanation": "A green light at 3-1 means you're hunting one pitch. If it's in your zone, drive it; if not, a walk still puts two on.",
+    "hint": "Who has to throw a strike?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 0,
+      "you": "batter",
+      "count": {
+        "balls": 3,
+        "strikes": 1
+      }
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Pitching around you",
+    "scenario": "Two outs, runner on second, first base open. The batter behind you is struggling.",
+    "question": "What should you expect, and how do you handle it?",
+    "choices": [
+      "She may pitch around you; stay disciplined and take the walk if she won't give you a strike",
+      "Bunt to keep the inning going",
+      "Swing at everything to avoid a walk",
+      "She'll throw you strikes: swing early"
+    ],
+    "correct_index": 0,
+    "explanation": "With first base open and a weaker hitter next, pitchers often work the corners. Don't chase. Take your walk and let your teammate hit with two on.",
+    "hint": "Why might she not want to throw you a strike?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 2,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Bases loaded, nobody out",
+    "scenario": "Bases loaded, nobody out.",
+    "question": "What does the defense want, and what do you want?",
+    "choices": [
+      "They want a fly ball; you want a bunt",
+      "They want a walk; you want a strikeout",
+      "They want a strikeout; you want a walk",
+      "They want a ground ball for a double play; you want a ball hit hard or in the air to the outfield"
+    ],
+    "correct_index": 3,
+    "explanation": "With the bases loaded the defense can turn a double play on a ground ball. A line drive or a fly ball to the outfield scores a run without the double play.",
+    "hint": "Which kind of ball gives the defense two outs?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "first",
+        "second",
+        "third"
+      ],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 2,
+    "topic": "The productive out",
+    "scenario": "Runner on third, one out, early in the game. The infield stays back, willing to trade the run for an out.",
+    "question": "Which out still scores the run?",
+    "choices": [
+      "A strikeout",
+      "A pop-up to the second baseman",
+      "A ground ball to the shortstop or second baseman",
+      "A line drive caught by the third baseman"
+    ],
+    "correct_index": 2,
+    "explanation": "With the infield back, a ground ball to the middle infield scores the runner even though you're out at first. That's a productive out.",
+    "hint": "Where is the defense willing to give up the run?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 1,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 2,
+    "topic": "A tiring pitcher",
+    "scenario": "It's the 7th. Her fastball is slower and her change-up is staying up.",
+    "question": "What's the adjustment?",
+    "choices": [
+      "Take more pitches to tire her out",
+      "Be ready to attack early in the count: pitches are staying up",
+      "Bunt every time",
+      "Move to the back of the box"
+    ],
+    "correct_index": 1,
+    "explanation": "A tired pitcher leaves the ball up. Be on time and aggressive early in the count before she finds her rhythm again.",
+    "hint": "What happens to her pitches when she tires?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Hit behind the runner on the steal",
+    "scenario": "Runner on first, hit-and-run. You see the second baseman break to cover second.",
+    "question": "Where should you hit the ball?",
+    "choices": [
+      "Through the right side, where the second baseman just left",
+      "To the third baseman",
+      "In the air to left field",
+      "Up the middle"
+    ],
+    "correct_index": 0,
+    "explanation": "When the second baseman covers, a hole opens on the right side. Hitting behind the runner there moves her to third.",
+    "hint": "Which spot just opened?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 2,
+    "topic": "Late in a close game",
+    "scenario": "Down one in the 6th. Runner on first, nobody out. Your coach asks you to bunt.",
+    "question": "Why might the coach want the bunt?",
+    "choices": [
+      "To make the pitcher throw more pitches",
+      "To end the inning",
+      "To play for a big inning",
+      "To get the tying run into scoring position"
+    ],
+    "correct_index": 3,
+    "explanation": "Late in a close game, one run matters most. A sacrifice puts the tying run on second, where one hit scores her.",
+    "hint": "Where can a single score her?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Beat the shift",
+    "scenario": "The defense moves the second baseman toward first and the shortstop up the middle every time you hit.",
+    "question": "What's your best adjustment?",
+    "choices": [
+      "Bunt to the pitcher",
+      "Don't swing",
+      "Hit it right at them to prove a point",
+      "Use the open side: let the ball travel and hit it where they aren't"
+    ],
+    "correct_index": 3,
+    "explanation": "A shift takes away your pull side and opens the other side. Let the ball get deeper and drive it where the defense isn't.",
+    "hint": "Which side did they leave open?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Catcher sets up away",
+    "scenario": "The catcher sets up outside on every pitch to you.",
+    "question": "How do you adjust?",
+    "choices": [
+      "Stand farther from the plate",
+      "Crowd the plate and expect inside pitches",
+      "Expect pitches away: let the ball travel and drive it the other way",
+      "Swing at the first pitch no matter what"
+    ],
+    "correct_index": 2,
+    "explanation": "If they're living outside, look away. Let the ball travel and drive it to the opposite field instead of rolling it over.",
+    "hint": "Where is she most likely to throw?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Ahead with a runner in scoring position",
+    "scenario": "Two outs, runner on second, 2-0 count.",
+    "question": "What's your plan?",
+    "choices": [
+      "Take a strike to see a pitch",
+      "Sit on your pitch in your hot zone and drive it if it's there",
+      "Bunt for a hit",
+      "Swing at anything to drive in the run"
+    ],
+    "correct_index": 1,
+    "explanation": "At 2-0 she has to come to you. Look for one pitch in one zone and attack it. If it isn't there, let it go: 3-0 is still your count.",
+    "hint": "Who has to give in at 2-0?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 2,
+      "you": "batter",
+      "count": {
+        "balls": 2,
+        "strikes": 0
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "A tipped pitch",
+    "scenario": "You notice the pitcher's glove flares every time she throws her change-up.",
+    "question": "What do you do with that?",
+    "choices": [
+      "Tell your coach and look for the change when you see it",
+      "Yell it out to the pitcher",
+      "Tell the umpire",
+      "Ignore it"
+    ],
+    "correct_index": 0,
+    "explanation": "Reading a tipped pitch is part of the game. Share it with your coach and teammates, and sit on the change-up when you see the tell.",
+    "hint": "Who should know before your next at-bat?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Corners and the double play",
+    "scenario": "Runners on first and third, one out. The infield is at double-play depth.",
+    "question": "What's your best result short of a hit?",
+    "choices": [
+      "A strikeout so nobody gets doubled up",
+      "A pop-up to the first baseman",
+      "A ground ball to the shortstop",
+      "A fly ball to the outfield: the run scores on the tag and there's no double play"
+    ],
+    "correct_index": 3,
+    "explanation": "At double-play depth a ground ball can end the inning. A fly ball deep enough scores the runner from third and avoids the double play.",
+    "hint": "What does double-play depth tell you they want?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "first",
+        "third"
+      ],
+      "outs": 1,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Drop-ball pitcher",
+    "scenario": "You're facing a pitcher with a sharp drop ball.",
+    "question": "Where in the box can help?",
+    "choices": [
+      "Stand on top of the plate",
+      "Stand as far away as allowed",
+      "Move up in the box to hit the pitch before it drops",
+      "Move to the very back of the box"
+    ],
+    "correct_index": 2,
+    "explanation": "Moving up in the box lets you hit the drop ball before it breaks all the way, when it's still at the bottom of the zone instead of in the dirt.",
+    "hint": "When is a drop ball easiest to hit?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Behind-in-the-count change-ups",
+    "scenario": "This pitcher throws her change-up whenever she falls behind. It's 2-0.",
+    "question": "What do you look for?",
+    "choices": [
+      "Her best fastball",
+      "The change-up: stay back and wait for it",
+      "A pitch in the dirt",
+      "Nothing: take the pitch"
+    ],
+    "correct_index": 1,
+    "explanation": "Pitchers have patterns. If she goes to the change when she's behind, sit on it: stay back, keep your hands back and drive it.",
+    "hint": "What does she do when she's behind?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter",
+      "count": {
+        "balls": 2,
+        "strikes": 0
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Slapper, runner on second",
+    "scenario": "Runner on second, nobody out. You're a slapper and the defense expects the slap.",
+    "question": "What's the best way to move the runner?",
+    "choices": [
+      "Slap or bunt to the third-base side so the third baseman has to come in",
+      "Hard slap at the pitcher",
+      "Pop it up",
+      "Take until you walk"
+    ],
+    "correct_index": 0,
+    "explanation": "Making the third baseman come in to field the ball leaves third base open for the runner from second.",
+    "hint": "Who has to leave third base?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Walk-off chance",
+    "scenario": "Tie game, bottom of the 7th, runner on third, one out. The infield is in.",
+    "question": "What are you looking for?",
+    "choices": [
+      "Only a home run",
+      "A walk",
+      "A bunt back to the pitcher",
+      "A pitch to drive in the air to the outfield or hard on the ground"
+    ],
+    "correct_index": 3,
+    "explanation": "A fly ball deep enough or a hard ground ball through a drawn-in infield wins it. Look for a pitch you can drive and stay on top of high pitches.",
+    "hint": "What kinds of contact score her?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 1,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Down two, leading off",
+    "scenario": "Down two in the last inning. You lead off, nobody on, 3-1 count.",
+    "question": "What's the mindset?",
+    "choices": [
+      "Swing at the first pitch no matter what",
+      "Swing at anything for a home run",
+      "Be selective: you need baserunners, so make her throw a strike",
+      "Bunt for a hit"
+    ],
+    "correct_index": 2,
+    "explanation": "One run doesn't tie it. Baserunners do. Don't help a pitcher who's behind: make her throw a strike, and take the walk if she won't.",
+    "hint": "What does your team need most right now?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter",
+      "count": {
+        "balls": 3,
+        "strikes": 1
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Two outs, tie game",
+    "scenario": "Tie game in the 7th, two outs, nobody on.",
+    "question": "What's your goal?",
+    "choices": [
+      "Bunt for a hit",
+      "Look for a pitch you can drive for extra bases",
+      "Take until you walk",
+      "Strike out swinging"
+    ],
+    "correct_index": 1,
+    "explanation": "With two outs and nobody on, a double puts the winning run in scoring position for one more hit. Hunt a pitch you can drive.",
+    "hint": "How far does the winning run have to get to score on a single?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 2,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 3,
+    "topic": "New pitcher",
+    "scenario": "The other team brings in a new pitcher late in the game.",
+    "question": "What should you do before your first at-bat against her?",
+    "choices": [
+      "Watch her warm-ups from the dugout and on deck: time her, see her pitches",
+      "Talk to the umpire",
+      "Ask the catcher what she throws",
+      "Nothing: just swing"
+    ],
+    "correct_index": 0,
+    "explanation": "Her warm-ups are your scouting report. Time her release and see what moves so your first look isn't in the box.",
+    "hint": "Where can you see her pitches before you hit?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Hard slap at the crash",
+    "scenario": "As a slapper you see the shortstop break in early, before the pitch.",
+    "question": "Where's the hole?",
+    "choices": [
+      "Back to the pitcher",
+      "Down the first-base line",
+      "Over the catcher",
+      "Behind the shortstop, through the left side"
+    ],
+    "correct_index": 3,
+    "explanation": "When the shortstop crashes early, she leaves the left side open behind her. A hard slap through that hole is a hit.",
+    "hint": "Where did she just leave?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Pitch count",
+    "scenario": "The pitcher has thrown 25 pitches in the first inning. You're up with nobody on.",
+    "question": "What helps your team?",
+    "choices": [
+      "Strike out quickly",
+      "Swing at the first pitch",
+      "Work the count: make her throw strikes and keep her pitch count climbing",
+      "Bunt"
+    ],
+    "correct_index": 2,
+    "explanation": "A pitcher who's laboring tires faster. A long at-bat, even an out, keeps her working and helps every hitter after you.",
+    "hint": "What happens to a pitcher who throws too many pitches early?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Sign security",
+    "scenario": "The defense seems to know when your team bunts.",
+    "question": "What should your team do?",
+    "choices": [
+      "Keep the same signs",
+      "Tell your coach so the signs can change or an indicator can be added",
+      "Stop bunting forever",
+      "Bunt every pitch"
+    ],
+    "correct_index": 1,
+    "explanation": "If the defense is reading your signs, your coach can switch to new signs or add an indicator. Tell her what you're seeing.",
+    "hint": "Who can change the signs?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Fake bunt to move the defense",
+    "scenario": "Runner on first, nobody out. The corners are playing back and your coach wants them in.",
+    "question": "What can you do?",
+    "choices": [
+      "Show bunt early on the first pitch to pull them in",
+      "Swing away on the first pitch",
+      "Step out every pitch",
+      "Ask the umpire to move them"
+    ],
+    "correct_index": 0,
+    "explanation": "Showing bunt early brings the corners in. Once they're charging, a slash or a hit past them has more room.",
+    "hint": "What makes the corners come in?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Strike zone this game",
+    "scenario": "The umpire is calling the low pitch a strike today.",
+    "question": "How do you adjust with two strikes?",
+    "choices": [
+      "Complain after each call",
+      "Move back in the box",
+      "Ignore it and keep your normal zone",
+      "Widen your zone down: protect the low pitch"
+    ],
+    "correct_index": 3,
+    "explanation": "Adjust to today's zone. If the low pitch is a strike, you have to protect it with two strikes instead of taking it.",
+    "hint": "Who decides today's strike zone?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter",
+      "count": {
+        "balls": 1,
+        "strikes": 2
+      }
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Runner going on the pitch",
+    "scenario": "Runner on first. She's stealing on this pitch and you get a pitch you don't like.",
+    "question": "What do you do?",
+    "choices": [
+      "Bunt it foul",
+      "Swing at it to distract the catcher",
+      "Take it, and stay in the box without blocking the catcher's throw",
+      "Step across the plate"
+    ],
+    "correct_index": 2,
+    "explanation": "Unless it's a hit-and-run, let your runner steal. Take the pitch and don't step into the catcher's throwing lane.",
+    "hint": "Is this a hit-and-run?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Scouting the defense",
+    "scenario": "Before the game you notice the left fielder plays very shallow.",
+    "question": "How can that help you?",
+    "choices": [
+      "It doesn't matter",
+      "A line drive or fly ball over her head can go for extra bases",
+      "Bunt every time",
+      "Only hit to the right side"
+    ],
+    "correct_index": 1,
+    "explanation": "A shallow outfielder takes away bloopers but leaves the space behind her. A hard line drive or fly ball over her head is extra bases.",
+    "hint": "What space did she give up?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter"
+    }
+  },
+  {
+    "level": 3,
+    "topic": "Two strikes against a rise-ball pitcher",
+    "scenario": "Two strikes against a pitcher who lives up in the zone.",
+    "question": "What's a smart two-strike adjustment?",
+    "choices": [
+      "Shorten up and stay on top of the ball; lay off the high ones",
+      "Bunt",
+      "Take until you walk",
+      "Swing at anything high"
+    ],
+    "correct_index": 0,
+    "explanation": "Shorten your swing and stay on top of the ball. High pitches are her chase pitch; with a short swing you can still fight off strikes.",
+    "hint": "Where does she want you to swing?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "batter",
+      "count": {
+        "balls": 1,
+        "strikes": 2
+      }
+    }
+  }
+]

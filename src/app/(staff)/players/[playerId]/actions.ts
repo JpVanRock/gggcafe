@@ -524,7 +524,7 @@ export async function setIqQuestionActive(fd: FormData): Promise<void> {
 // IQ playbook levels (Defense IQ, Baserunning IQ) and rings
 // ---------------------------------------------------------------------------
 
-const IQ_TRACKS = ["defense", "baserunning", "position", "extra", "scorebook"] as const;
+const IQ_TRACKS = ["defense", "baserunning", "offense", "battery", "position", "extra", "scorebook"] as const;
 
 /** A test question as sent to the browser: no answer. `section` is the library shelf (Extra Credit only). */
 export type LevelQuestion = { id: string; scenario: string; question: string; choices: string[]; diagram: unknown; section: string | null };

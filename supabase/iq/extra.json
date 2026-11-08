@@ -1379,5 +1379,139 @@
       },
       "arrows": []
     }
+  },
+  {
+    "book": "defense",
+    "section": "Situations",
+    "topic": "Outfield priority",
+    "scenario": "A fly ball drops between you in center and the left fielder. You both call for it.",
+    "question": "Who takes it?",
+    "choices": [
+      "The left fielder, because she called it first",
+      "You, the center fielder: center has priority over the corners",
+      "Whoever is closer to the infield",
+      "Let it drop and play it on a hop"
+    ],
+    "correct_index": 1,
+    "explanation": "The center fielder has priority over the corner outfielders. Call it loud and take it; the left fielder peels off and backs you up.",
+    "hint": "Who is the captain of the outfield?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 1,
+      "you": "CF",
+      "ball": {
+        "at": "LCF-gap",
+        "type": "fly"
+      }
+    }
+  },
+  {
+    "book": "defense",
+    "section": "Situations",
+    "topic": "Outfielder over infielder",
+    "scenario": "A short fly ball between you at shortstop and the left fielder. You're going back, she's coming in.",
+    "question": "Who takes it?",
+    "choices": [
+      "You, the shortstop",
+      "The left fielder: she's coming in and has the easier catch",
+      "Whoever is taller",
+      "Neither: let it drop"
+    ],
+    "correct_index": 1,
+    "explanation": "An outfielder coming in has priority over an infielder going back. Coming in, she sees the ball and the play in front of her.",
+    "hint": "Which way is each of you moving?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "SS",
+      "ball": {
+        "at": "blooper-LF",
+        "type": "blooper"
+      }
+    }
+  },
+  {
+    "book": "defense",
+    "section": "Situations",
+    "topic": "Foul fly, winning run on third",
+    "scenario": "Tie game, bottom of the 7th, one out, runner on third. A foul fly drifts toward the line in right and you can catch it moving toward the fence.",
+    "question": "What do you do?",
+    "choices": [
+      "Catch it: an out is an out",
+      "Let it drop foul: catching it lets the winning run tag and score",
+      "Catch it and throw home",
+      "Catch it, then drop it on purpose"
+    ],
+    "correct_index": 1,
+    "explanation": "Late in a tie game with the winning run on third, a catch moving away from home lets her tag up and score. Let the foul ball drop and get another pitch.",
+    "hint": "What can the runner on third do after a catch?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 1,
+      "you": "RF",
+      "ball": {
+        "at": "RF-line",
+        "type": "fly"
+      }
+    }
+  },
+  {
+    "book": "defense",
+    "section": "Situations",
+    "topic": "Just get the out",
+    "scenario": "Runner on second, two outs. A ground ball comes to you at shortstop.",
+    "question": "Where's your throw?",
+    "choices": [
+      "To third, to stop the runner",
+      "First base: the sure out ends the inning",
+      "Home",
+      "Hold the ball"
+    ],
+    "correct_index": 1,
+    "explanation": "With two outs, any out ends the inning. Take the sure out at first instead of a harder throw for the lead runner.",
+    "hint": "How many outs do you need?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 2,
+      "you": "SS",
+      "ball": {
+        "at": "SS",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "book": "defense",
+    "section": "Situations",
+    "topic": "Slapper on the ground",
+    "scenario": "A fast left-handed slapper chops a ground ball toward you at shortstop.",
+    "question": "What do you have to do?",
+    "choices": [
+      "Stay back and wait for a good hop",
+      "Charge it and throw on the run",
+      "Let the third baseman take it",
+      "Throw to second"
+    ],
+    "correct_index": 1,
+    "explanation": "A fast slapper is halfway to first before the ball reaches you. Waiting on the hop gives her the base: charge hard and make the throw on the run.",
+    "hint": "How far up the line is she already?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [],
+      "outs": 0,
+      "you": "SS",
+      "ball": {
+        "at": "SS",
+        "type": "ground"
+      }
+    }
   }
 ]

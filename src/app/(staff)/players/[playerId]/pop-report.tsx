@@ -8,6 +8,8 @@ import { currentRostering, type MetricProgress, type PopReport } from "./data";
 import { DetailHeading, MenuItem } from "./menu";
 import { HittingSection, MovementSection, movementHeadline } from "./movement";
 import type { StyleVersion } from "./data";
+import type { HittingZones } from "@/lib/my-zone";
+import { MyZoneSection } from "./my-zone";
 
 function metricValue(m: MetricProgress, value: number | null) {
   return value === null ? "–" : `${Number(value)} ${m.unit}`;
@@ -64,8 +66,8 @@ export function PopDetail({
   canEdit: boolean;
   /** Movement Preferences is G3 Advanced: "open" with it, "locked" (admins: a note) or "hidden" without */
   movementAccess?: "open" | "locked" | "hidden";
-  /** Movement Preferences and Preferred Hitting Style, newest version first */
-  styles?: { movement: StyleVersion[]; hitting: StyleVersion[] };
+  /** Movement Preferences and Preferred Hitting Style, newest version first; My Zone */
+  styles?: { movement: StyleVersion[]; hitting: StyleVersion[]; zone?: HittingZones | null };
   /** the player herself or a coach: can change her hitting style */
   canAct?: boolean;
   photoUrl?: string | null;
@@ -108,6 +110,7 @@ export function PopDetail({
         </p>
       )}
       {styles && <HittingSection playerId={player.id} versions={styles.hitting} canAct={canAct} />}
+      {styles && <MyZoneSection playerId={player.id} zones={styles.zone ?? null} canAct={canAct} />}
 
       <section>
         <DetailHeading>Teams</DetailHeading>

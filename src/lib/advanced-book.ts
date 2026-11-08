@@ -61,6 +61,8 @@ export type BookChapter = {
   habits?: Habit[];
   /** step-through lessons before the foundation; she finishes them to complete the chapter */
   course?: CourseStep[];
+  /** her own tools shown on the chapter page: "count-plan" = her count plan from My Zone (Pop Report) */
+  tools?: "count-plan"[];
 };
 
 export const CHAPTERS: BookChapter[] = [
@@ -222,9 +224,137 @@ export const CHAPTERS: BookChapter[] = [
   {
     slug: "hitting-approach",
     kind: "chapter",
-    status: "coming",
+    status: "ready",
     title: "Hitting Approach",
-    summary: "Your plan at the plate. Coming soon.",
+    question: "Do I step in with a plan, or just hope for a good pitch?",
+    summary: "Your plan at the plate: a routine from the dugout to the box, a count plan, two strikes, the short game and a slump reset.",
+    why: [
+      "The best hitters aren't guessing. They know what they're looking for, where they want it and what changes with two strikes. From 43 feet you don't have time to decide in the box, so decide before you get there.",
+      "Your plan starts in the dugout: what this pitcher throws, what she's thrown you, what the situation needs. By the time you dig in, the at-bat is about executing a decision you've already made.",
+    ],
+    tools: ["count-plan"],
+    habits: [
+      { key: "ha-dugout", text: "I scout from the dugout.", detail: "Her pitches, what she throws ahead and behind, where the catcher sets up." },
+      { key: "ha-on-deck", text: "I time her on deck.", detail: "Swings on time with her release, not just warm-up swings." },
+      { key: "ha-one-job", text: "I step in with one job.", detail: "The count, the situation and the pitch I'm hunting." },
+      { key: "ha-my-pitch", text: "I hunt my pitch early.", detail: "Ahead in the count, I let everything else go." },
+      { key: "ha-two-strikes", text: "With two strikes I battle.", detail: "Shorter swing, wider zone, fight off tough pitches." },
+      { key: "ha-situation", text: "I know the situation before every pitch.", detail: "Outs, runners, the sign, and what moves a runner." },
+      { key: "ha-leave-it", text: "One at-bat doesn't follow me.", detail: "Learn from it, then leave it at the plate." },
+    ],
+    course: [
+      {
+        lesson: "The Routine",
+        title: "It starts in the dugout",
+        body: [
+          "Your at-bat starts long before you're on deck. Watch the pitcher from the dugout: what she throws, which pitch she trusts when she's behind, what she goes to with two strikes, where the catcher sets up.",
+          "Talk with your teammates after their at-bats. What did she start them with? What did she get them out with? That's free scouting.",
+        ],
+        check: {
+          question: "When should you start learning about this pitcher?",
+          choices: ["On deck", "In the box, on the first pitch", "From the dugout, every inning", "After your first at-bat"],
+          answer: 2,
+          why: "The dugout is your best seat for scouting. Every pitch she throws to your teammates is information for your at-bat.",
+        },
+      },
+      {
+        lesson: "The Routine",
+        title: "In the hole and on deck",
+        body: [
+          "In the hole: gear on, check the situation (outs, runners, score) and think about what your team might need from you.",
+          "On deck: time her. Swing with her release, not just to loosen up. Watch where the catcher sets up and how the defense plays the hitter in front of you.",
+        ],
+      },
+      {
+        lesson: "The Routine",
+        title: "In the box",
+        body: [
+          "Before you step in: a breath, a look at your coach for the sign, and your one job for this pitch. Then dig in and see the ball out of her hand.",
+          "Same routine every at-bat, first inning or last. A routine is how you stay on time when the game speeds up.",
+        ],
+        tryIt: "Write your box routine in three steps in your notes below, then use it in every practice at-bat this week.",
+      },
+      {
+        lesson: "Your Count Plan",
+        title: "Hitter's counts and pitcher's counts",
+        body: [
+          "Ahead in the count (1-0, 2-0, 2-1, 3-1) the pitcher has to throw a strike. That's when you hunt your pitch and let everything else go.",
+          "Behind (0-1, 0-2, 1-2) she can throw her best pitch off the plate. Your job changes: handle what you can and stay alive.",
+        ],
+        check: {
+          question: "Which count is the best time to sit on one pitch in one zone?",
+          choices: ["0-2", "2-0", "1-2", "0-1"],
+          answer: 1,
+          why: "At 2-0 she has to come to you. Hunt your pitch; if it isn't there, 3-0 is still your count.",
+        },
+      },
+      {
+        lesson: "Your Count Plan",
+        title: "Hunt early, protect late",
+        body: [
+          "0 strikes: your pitch only. 1 strike: anything you handle. 2 strikes: protect the whole zone and battle on your weak spots.",
+          "Your count plan below comes from My Zone in your Pop Report. Mark your pitch, what you handle and your weak spots there, and the plan updates itself.",
+        ],
+      },
+      {
+        lesson: "Two Strikes",
+        title: "The two-strike approach",
+        body: [
+          "With two strikes, a close pitch can be called strike three. Widen your zone a little, shorten your swing (choke up if it helps) and let the ball travel deeper.",
+          "Your goal is contact. A foul ball is a win: it keeps you alive and makes her throw another pitch. Fight off her best pitches until she misses.",
+        ],
+        check: {
+          question: "You're 1-2 against a pitcher with a great drop ball. What's the best adjustment?",
+          choices: [
+            "Swing harder so you don't miss it",
+            "Look only for a pitch down the middle",
+            "Take until she walks you",
+            "Shorten up, look a little higher and fight off the drop",
+          ],
+          answer: 3,
+          why: "A drop ball ends in the dirt. Look slightly higher, keep a short swing and foul off the tough ones until she leaves one up.",
+        },
+      },
+      {
+        lesson: "The Short Game",
+        title: "Bunts that work",
+        body: [
+          "Sacrifice: square early, bunt a strike, get it down on the ground away from the pitcher. Push bunt: firmer, past the charging pitcher or first baseman. Drag bunt: a surprise for a hit, down the line.",
+          "Squeeze: on the suicide the runner is coming, so get the bat on the ball no matter where the pitch is. On the safety, she goes only when the bunt is down.",
+        ],
+      },
+      {
+        lesson: "The Short Game",
+        title: "Slappers read the corners",
+        body: [
+          "A slapper reads the defense. Corners playing back: soft slap or drag bunt. Corners charging: hard slap past them. Shortstop crashing early: hit it behind her.",
+          "Even if you don't slap, know what each one beats. It helps you on defense, and it helps you read what your slappers are doing.",
+        ],
+        check: {
+          question: "You're slapping and the third baseman and shortstop both charge as she starts her motion. What's the play?",
+          choices: ["Soft slap toward third", "Hard slap on the ground past them", "Drag bunt", "Take the pitch"],
+          answer: 1,
+          why: "When the left side crashes, the space is behind them. A hard slap on the ground beats charging infielders.",
+        },
+      },
+      {
+        lesson: "Reading the Pitcher",
+        title: "Patterns and tells",
+        body: [
+          "Pitchers repeat what works. Track what she starts you with, what she throws when she's behind and what she uses to put you away.",
+          "Watch for tells: a glove that flares on the change-up, a different arm speed, a catcher who always sets up early. Share what you see with your coach and teammates.",
+        ],
+      },
+      {
+        lesson: "Slump Reset",
+        title: "Get out of your own way",
+        body: [
+          "Every hitter slumps. The fix usually isn't a new swing. Shrink the goal: hit the ball hard, that's it. Hard outs count as good at-bats.",
+          "Go back to the basics: tee and front toss, one cue word, and your routine. Watch video of your good at-bats. Results come back when the process does.",
+        ],
+        tryIt: "Pick one cue word and a hard-contact goal for your next game, and write them in your notes below.",
+      },
+    ],
   },
   {
     slug: "mental-toughness",

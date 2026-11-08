@@ -46,6 +46,8 @@ export type TrophyRoom = {
 function mvpLabel(m: IqData["mvps"][number]) {
   if (m.track === "position") return `${m.position} · Golden Glove`;
   if (m.track === "extra") return "Extra Credit";
+  if (m.track === "offense") return `Offense · L${m.level}`;
+  if (m.track === "battery") return `Battery · L${m.level}`;
   return `${m.track === "defense" ? "Defense" : "Baserunning"} · L${m.level}`;
 }
 

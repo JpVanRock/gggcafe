@@ -13,6 +13,8 @@ export type DiamondSpec = {
   you?: string;
   ball?: { at: string; type?: BallType };
   arrows?: { from: string; to: string; kind?: "run" | "steal" | "throw" }[];
+  /** the at-bat's count (Offense and Battery IQ) */
+  count?: { balls: number; strikes: number };
 };
 
 // Field geometry (viewBox 0 0 400 370). Bases are 60 ft apart; the pitching
@@ -115,7 +117,8 @@ export function describeDiamond(spec: DiamondSpec) {
         : spec.you in FIELDER_NAME
           ? `. You're ${FIELDER_NAME[spec.you as Fielder]}`
           : "";
-  return `${runners}, ${outs}${ball}${you}.`;
+  const count = spec.count ? `, count ${spec.count.balls}-${spec.count.strikes}` : "";
+  return `${runners}, ${outs}${count}${ball}${you}.`;
 }
 
 export function Diamond({ spec, className = "" }: { spec: DiamondSpec; className?: string }) {
@@ -256,6 +259,18 @@ export function Diamond({ spec, className = "" }: { spec: DiamondSpec; className
             </g>
           );
         })()}
+
+        {/* the count */}
+        {spec.count && (
+          <g>
+            <text x="386" y="26" textAnchor="end" fontSize="11" fontWeight="700" fill="var(--color-muted)" fontFamily="var(--font-mono)" letterSpacing="1.5">
+              COUNT
+            </text>
+            <text x="386" y="48" textAnchor="end" fontSize="22" fontWeight="800" fill="var(--color-highlight)" fontFamily="var(--font-display)">
+              {spec.count.balls}-{spec.count.strikes}
+            </text>
+          </g>
+        )}
 
         {/* outs */}
         <g>

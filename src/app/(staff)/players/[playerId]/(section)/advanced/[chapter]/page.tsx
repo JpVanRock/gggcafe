@@ -10,6 +10,8 @@ import { loadAdvanced } from "../../../advanced-data";
 import { AdvancedNotFoundForAdmin, LEVEL_LABEL, advancedHref } from "../../../advanced";
 import { ChapterDone, ChapterNotes, FoundationHabits, MyHabits } from "../../../advanced-client";
 import { CourseRunner } from "../../../course-client";
+import { CountPlan } from "../../../my-zone";
+import type { HittingZones } from "@/lib/my-zone";
 import { firstName, loadPlayer } from "../../../section-data";
 import { SectionShell } from "../../section-shell";
 
@@ -50,6 +52,10 @@ async function Chapter({ params }: Pick<PageProps<"/players/[playerId]/advanced/
   const next = chapters[index + 1];
   const canEdit = access.canAct;
   const coming = chapter.status === "coming";
+  // her own tools on the page: the count plan from My Zone (Pop Report)
+  const zones = chapter.tools?.includes("count-plan")
+    ? (((await supabase.from("hitting_zones").select("hot, strong, weak, notes").eq("player_id", player.id).maybeSingle()).data as HittingZones | null) ?? null)
+    : null;
 
   return (
     <SectionShell title={chapter.title} subtitle={`${chapterLabel(chapter, chapters)}${chapter.kicker ? ` · ${chapter.kicker}` : ""} · ${book.title} · ${LEVEL_LABEL}`}>
@@ -90,6 +96,19 @@ async function Chapter({ params }: Pick<PageProps<"/players/[playerId]/advanced/
               done={Boolean(work?.courseDoneAt)}
               canEdit={canEdit}
             />
+          </section>
+        )}
+
+        {chapter.tools?.includes("count-plan") && (
+          <section>
+            <Heading>Your count plan</Heading>
+            <CountPlan zones={zones} />
+            <p className="mt-3 text-sm text-muted">
+              Built from My Zone.{" "}
+              <Link href={`/players/${player.id}/pop`} className="text-pink hover:underline">
+                {zones && zones.hot.length + zones.strong.length + zones.weak.length ? "Change My Zone in your Pop Report →" : "Mark My Zone in your Pop Report →"}
+              </Link>
+            </p>
           </section>
         )}
 
