@@ -10,6 +10,8 @@ import { lineupSeason } from "@/lib/gameday-data";
 import { loadOwnTeams } from "../data";
 import { TeamPicker } from "../team-picker";
 import { ApprovedClaimList, PendingClaimList, PendingParentList } from "../approvals";
+import { LeaderBadge } from "@/components/leader-badge";
+import { loadLeaderBadges } from "@/lib/leader-badges";
 
 export const metadata: Metadata = { title: "Roster · Coaches Dugout · GGG.Cafe" };
 
@@ -60,6 +62,9 @@ async function Roster({ searchParams }: Pick<PageProps<"/dugout/roster">, "searc
   const roster = ((rosterData ?? []) as unknown as RosterRow[])
     .filter((r) => r.player)
     .sort((a, b) => Number(b.active) - Number(a.active) || compareJersey(a.jersey_number, b.jersey_number) || a.player.last_name.localeCompare(b.player.last_name));
+
+  // Leader Badge: coaches/admins only (the certificates' RLS hides them from view-only staff)
+  const leaders = editor ? await loadLeaderBadges(supabase, roster.map((r) => r.player.id)) : new Set<string>();
 
   const claims = approvals?.claims ?? [];
   const pendingClaims = claims.filter((c) => c.status === "pending");
@@ -159,6 +164,15 @@ async function Roster({ searchParams }: Pick<PageProps<"/dugout/roster">, "searc
                         <Link href={`/players/${r.player.id}`} className="font-medium hover:underline">
                           {playerName(r.player)}
                         </Link>
+                        {leaders.has(r.player.id) && (
+                          <Link
+                            href={`/players/${r.player.id}/advanced/leadership/certificate`}
+                            className="ml-2 inline-block align-middle"
+                            title="Team Leader · completed the G3 Leadership Guide"
+                          >
+                            <LeaderBadge size={20} />
+                          </Link>
+                        )}
                         {!r.active && <span className="ml-2 text-xs">inactive</span>}
                       </td>
                       <td className={tdClass}>{[r.player.primary_position, ...r.player.secondary_positions].filter(Boolean).slice(0, 3).join(", ") || "–"}</td>

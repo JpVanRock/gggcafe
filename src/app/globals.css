@@ -138,3 +138,50 @@ html:has(dialog[open]) {
     font-family: var(--font-display);
   }
 }
+
+/*
+ * Printing the Certificate of Leadership (components/leadership-certificate.tsx):
+ * only the sheet prints, on its own letter-size landscape page with no margins.
+ * Everything that isn't the sheet or one of its ancestors is hidden; the
+ * ancestors lose their spacing so the sheet sits at the top-left of the page.
+ */
+@page certificate {
+  size: letter landscape;
+  margin: 0;
+}
+@media print {
+  html:has(.certificate-print) body *:not(:has(.certificate-print)):not(.certificate-print):not(.certificate-print *) {
+    display: none !important;
+  }
+  html:has(.certificate-print) body *:has(.certificate-print) {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+    max-width: none !important;
+    min-height: 0 !important;
+  }
+  html:has(.certificate-print),
+  html:has(.certificate-print) body {
+    background: #fff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .certificate-print {
+    page: certificate;
+    width: 11in !important;
+    max-width: none !important;
+    margin: 0 !important;
+    break-inside: avoid;
+  }
+  .certificate-print > div {
+    box-shadow: none !important;
+  }
+  .certificate-print,
+  .certificate-print * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

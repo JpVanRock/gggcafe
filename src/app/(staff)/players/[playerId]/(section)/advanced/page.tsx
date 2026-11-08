@@ -10,6 +10,10 @@ import { ProgressBar } from "@/components/progress-bar";
 import { BOOK_THEME, BOOK_TITLE_MAX, bookProgress, chapterLabel, visibleChapters } from "@/lib/advanced-book";
 import { possessive } from "../../data";
 import { loadAdvanced } from "../../advanced-data";
+import { loadLeadership } from "../../leadership-data";
+import { LeaderToggle } from "../../leadership-client";
+import { leadershipHref } from "../../leadership";
+import { GUIDE_TITLE, guideProgress } from "@/lib/leadership-guide";
 import { AdvancedNotFoundForAdmin, LEVEL_LABEL, advancedHref } from "../../advanced";
 import { AdvancedAccessToggle, BookTitle, ConfirmPosition } from "../../advanced-client";
 import { firstName, loadPlayer } from "../../section-data";
@@ -41,6 +45,8 @@ async function Advanced({ params }: Pick<PageProps<"/players/[playerId]/advanced
   const chapters = visibleChapters(book.confirmed);
   const progress = bookProgress(book.work, chapters);
   const next = progress.next ?? chapters[0];
+  const lead = await loadLeadership(supabase, player.id, book.unlocked);
+  const leadProgress = lead.open ? guideProgress(lead.work) : null;
   return (
     <SectionShell title={book.title} subtitle={`${LEVEL_LABEL} · ${BOOK_THEME}`}>
       {/* the cover */}
@@ -64,6 +70,21 @@ async function Advanced({ params }: Pick<PageProps<"/players/[playerId]/advanced
           {progress.done === 0 && !book.work.length ? "Start reading" : progress.next ? `Continue: ${progress.next.title}` : "Read it again"}
         </Link>
       </div>
+
+      {leadProgress && (
+        <Link
+          href={leadershipHref(player.id)}
+          className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-neon bg-neon/5 p-5 transition hover:bg-neon/10"
+        >
+          <span>
+            <span className="block font-mono text-[11px] tracking-[0.2em] text-pink-soft uppercase">Picked by your coach</span>
+            <span className="block font-display text-2xl font-bold tracking-wide text-highlight uppercase">{GUIDE_TITLE}</span>
+          </span>
+          <span className="font-mono text-xs tracking-wider text-ink uppercase">
+            {leadProgress.done} of {leadProgress.total} lessons →
+          </span>
+        </Link>
+      )}
 
       {/* table of contents */}
       <h2 className="mt-8 mb-3 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">Contents</h2>
@@ -109,6 +130,9 @@ async function Advanced({ params }: Pick<PageProps<"/players/[playerId]/advanced
             The Pitching chapter is only in the book of a player you&apos;ve confirmed as a pitcher.
           </p>
           <ConfirmPosition playerId={player.id} name={name} position="P" label="pitcher" confirmed={book.confirmed.includes("P")} />
+          <p className="mt-3 font-mono text-[11px] tracking-wider text-pink-soft uppercase">Coaches · leadership</p>
+          <p className="text-sm text-muted">The G3 Leadership Guide is for the players you pick to train as leaders.</p>
+          <LeaderToggle playerId={player.id} name={name} on={lead.picked} />
         </div>
       )}
 

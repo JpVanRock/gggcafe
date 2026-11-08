@@ -22,6 +22,9 @@ import { SmartSummary } from "./smart";
 import { TwisBoard } from "./twis";
 import { AdvancedLocked, AdvancedSummary, LEVEL_LABEL, advancedHref } from "./advanced";
 import type { AdvancedBook } from "./advanced-data";
+import type { LessonWork } from "@/lib/leadership-guide";
+import { LeaderBadge } from "@/components/leader-badge";
+import { leadershipHref } from "./leadership";
 
 /** The cafe-menu player dashboard: header, TWIS, then the menu boards. */
 export function PlayerMenu({
@@ -39,6 +42,8 @@ export function PlayerMenu({
   today,
   canEdit: editor,
   advanced,
+  leadership = null,
+  leader = false,
   isAdmin = false,
   canManage = editor,
   isSelf = false,
@@ -59,6 +64,10 @@ export function PlayerMenu({
   canEdit: boolean;
   /** G3 Advanced: shown only when unlocked for her */
   advanced: AdvancedBook;
+  /** her G3 Leadership Guide work, when she's in it */
+  leadership?: LessonWork[] | null;
+  /** she earned the Leader Badge (only coaches/admins and she herself are told) */
+  leader?: boolean;
   /** admins see an unlock control while G3 Advanced is locked */
   isAdmin?: boolean;
   /** coach/admin only: profile edits, question bank, Dugout links */
@@ -130,7 +139,7 @@ export function PlayerMenu({
             subtitle: LEVEL_LABEL,
             variant: "advanced" as const,
             wide: true,
-            summary: <AdvancedSummary book={advanced} />,
+            summary: <AdvancedSummary book={advanced} leadership={leadership} />,
             href: advancedHref(player.id),
           },
         ]
@@ -184,6 +193,15 @@ export function PlayerMenu({
           </p>
           <h1 className="mt-3 text-5xl leading-none font-bold tracking-tight text-highlight uppercase sm:text-7xl">
             {name} <span className="text-ink">{player.last_name}</span>
+            {leader && (
+              <Link
+                href={leadershipHref(player.id, "certificate")}
+                className="ml-3 inline-block align-middle transition hover:scale-105 sm:ml-4"
+                title="Team Leader · Certificate of Leadership"
+              >
+                <LeaderBadge className="h-auto w-10 sm:w-14" size={56} />
+              </Link>
+            )}
           </h1>
           {tagline && <p className="mx-auto mt-4 max-w-2xl font-mono text-sm text-muted">{tagline}</p>}
           {player.walk_up_songs.length > 0 && (

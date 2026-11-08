@@ -12,6 +12,7 @@ import {
 } from "./data";
 import { PlayerMenu } from "./player-menu";
 import { loadAdvanced } from "./advanced-data";
+import { loadLeaderCertificate, loadLeadership } from "./leadership-data";
 import { signedPhotoUrls } from "@/lib/player-photos";
 
 export const metadata: Metadata = { title: "Player · GGG.Cafe" };
@@ -50,6 +51,11 @@ async function PlayerDashboard({ params, searchParams }: Pick<PageProps<"/player
     loadMovementAndHitting(supabase, player.id),
     loadAdvanced(supabase, player.id),
   ]);
+  const [leadership, certificate] = await Promise.all([
+    loadLeadership(supabase, player.id, advanced.unlocked),
+    // the Leader Badge: RLS shows it only to coaches/admins and the player herself
+    loadLeaderCertificate(supabase, player.id),
+  ]);
   const photoUrl = player.photo_path ? ((await signedPhotoUrls(supabase, [player.photo_path])).get(player.photo_path) ?? null) : null;
 
   return (
@@ -70,6 +76,8 @@ async function PlayerDashboard({ params, searchParams }: Pick<PageProps<"/player
       canManage={access.canManage}
       isSelf={access.isSelf}
       advanced={advanced}
+      leadership={leadership.open ? leadership.work : null}
+      leader={Boolean(certificate)}
       isAdmin={access.user.staff?.role === "admin"}
     />
   );

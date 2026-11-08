@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/ui";
 import type { AdvancedBook } from "./advanced-data";
 import { AdvancedAccessToggle } from "./advanced-client";
 import { MenuItem } from "./menu";
+import { guideProgress, type LessonWork } from "@/lib/leadership-guide";
 
 export const LEVEL_LABEL = "G3 Advanced · Level 2";
 
@@ -15,7 +16,8 @@ export function advancedHref(playerId: string, slug?: string) {
 }
 
 /** Menu board summary: her book, where she is in it. */
-export function AdvancedSummary({ book }: { book: AdvancedBook }) {
+export function AdvancedSummary({ book, leadership = null }: { book: AdvancedBook; leadership?: LessonWork[] | null }) {
+  const lead = leadership ? guideProgress(leadership) : null;
   const chapters = visibleChapters(book.confirmed);
   const progress = bookProgress(book.work, chapters);
   const coming = chapters.filter((c) => c.status === "coming").length;
@@ -29,6 +31,9 @@ export function AdvancedSummary({ book }: { book: AdvancedBook }) {
           value={progress.next ? chapterLabel(progress.next, chapters).replace("Chapter ", "Ch. ") : "✓"}
           note={progress.next ? progress.next.title : "Every chapter so far is complete"}
         />
+        {lead && (
+          <MenuItem name="Leadership Guide" value={`${lead.done}/${lead.total}`} note={lead.next ? `Next: ${lead.next.title}` : "Every lesson complete"} />
+        )}
       </div>
       <div className="mt-5">
         <ProgressBar value={progress.done} max={progress.total} label={`${progress.done} of ${progress.total} chapters`} />

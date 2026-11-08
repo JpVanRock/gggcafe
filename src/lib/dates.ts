@@ -77,6 +77,11 @@ export function formatLongDate(iso: string) {
   return longDate.format(toUTC(iso));
 }
 
+/** A timestamp as a long date in the team's time zone: "November 8, 2026". */
+export function formatLongDateAt(timestamp: string) {
+  return new Intl.DateTimeFormat("en-US", { timeZone: APP_TIME_ZONE, month: "long", day: "numeric", year: "numeric" }).format(new Date(timestamp));
+}
+
 /** "Sep 14 – 20" or "Sep 28 – Oct 4" */
 export function formatWeekRange(monday: string) {
   const sunday = addDays(monday, 6);
