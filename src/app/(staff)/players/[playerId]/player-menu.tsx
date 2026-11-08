@@ -23,7 +23,7 @@ import { TwisBoard } from "./twis";
 import { AdvancedLocked, AdvancedSummary, LEVEL_LABEL, advancedHref } from "./advanced";
 import type { AdvancedBook } from "./advanced-data";
 import type { LessonWork } from "@/lib/leadership-guide";
-import { LeaderBadge } from "@/components/leader-badge";
+import { PlayerName } from "./player-name";
 import { leadershipHref } from "./leadership";
 
 /** The cafe-menu player dashboard: header, TWIS, then the menu boards. */
@@ -191,18 +191,7 @@ export function PlayerMenu({
             Player menu
             <SpeedStripes className="h-3 w-9 text-pink" />
           </p>
-          <h1 className="mt-3 text-5xl leading-none font-bold tracking-tight text-highlight uppercase sm:text-7xl">
-            {name} <span className="text-ink">{player.last_name}</span>
-            {leader && (
-              <Link
-                href={leadershipHref(player.id, "certificate")}
-                className="ml-3 inline-block align-middle transition hover:scale-105 sm:ml-4"
-                title="Team Leader · Certificate of Leadership"
-              >
-                <LeaderBadge className="h-auto w-10 sm:w-14" size={56} />
-              </Link>
-            )}
-          </h1>
+          <PlayerName first={name} last={player.last_name} leaderHref={leader ? leadershipHref(player.id, "certificate") : null} />
           {tagline && <p className="mx-auto mt-4 max-w-2xl font-mono text-sm text-muted">{tagline}</p>}
           {player.walk_up_songs.length > 0 && (
             <p className="mx-auto mt-3 flex max-w-2xl flex-wrap items-baseline justify-center gap-x-4 gap-y-1 text-sm">
