@@ -41,6 +41,7 @@ function LineupDocument({ lineup, roster }: { lineup: Lineup; roster: GamedayPla
     (id) => inDefense.has(id) || lineup.batting_order.includes(id),
   );
   const vs = lineup.opponent ? `vs ${lineup.opponent}` : "";
+  const flex = lineup.dp_player_id && lineup.flex_player_id ? lineup.flex_player_id : null;
   const colW = Math.min(46, Math.floor(330 / Math.max(1, rotations.length)));
 
   return (
@@ -86,6 +87,24 @@ function LineupDocument({ lineup, roster }: { lineup: Lineup; roster: GamedayPla
                 </View>
               );
             })}
+            {flex && (
+              <View style={s.row} wrap={false}>
+                <Cell w={18} bold color={PINK}>FX</Cell>
+                <Cell w={118} bold>{byId.get(flex)?.short ?? "Player"}</Cell>
+                <Cell w={146}>FLEX · defense for {byId.get(lineup.dp_player_id!)?.short ?? "the DP"}</Cell>
+              </View>
+            )}
+            {lineup.jobs.length > 0 && (
+              <>
+                <Text style={s.title}>Game-day jobs</Text>
+                {lineup.jobs.map((j, i) => (
+                  <View key={i} style={{ flexDirection: "row", paddingVertical: 2 }}>
+                    <Text style={{ width: 110, color: MUTED }}>{j.job}</Text>
+                    <Text style={{ fontWeight: 700 }}>{j.who}</Text>
+                  </View>
+                ))}
+              </>
+            )}
             {lineup.notes && (
               <>
                 <Text style={s.title}>Notes</Text>
@@ -148,6 +167,80 @@ function LineupDocument({ lineup, roster }: { lineup: Lineup; roster: GamedayPla
       </Page>
     </Document>
   );
+}
+
+/** The card handed to the umpire at the plate meeting: order, number, name, position, the FLEX, and the subs. */
+function UmpireCardDocument({ lineup, roster }: { lineup: Lineup; roster: GamedayPlayer[] }) {
+  const byId = new Map(roster.map((p) => [p.id, p]));
+  const flex = lineup.dp_player_id && lineup.flex_player_id ? lineup.flex_player_id : null;
+  const first = lineup.defense["1"] ?? {};
+  const pos = (id: string) => {
+    if (flex && id === lineup.dp_player_id) return "DP";
+    const spot = first[id];
+    return spot && spot !== "Sub" ? spot : "";
+  };
+  const subs = roster.filter((p) => !lineup.batting_order.includes(p.id) && p.id !== flex);
+  const line = (n: string, id: string, key: string) => {
+    const p = byId.get(id);
+    return (
+      <View key={key} style={[s.row, { paddingVertical: 6 }]} wrap={false}>
+        <Cell w={30} bold><Text style={s.num}>{n}</Text></Cell>
+        <Cell w={34} bold>{p?.number ?? ""}</Cell>
+        <Cell w={190} bold>{p?.name ?? "Player"}</Cell>
+        <Cell w={44} center bold>{pos(id)}</Cell>
+      </View>
+    );
+  };
+  return (
+    <Document title={`Umpire card · ${lineup.team.name} · ${lineup.game_date}`} author="GGG.Cafe" creator="GGG.Cafe">
+      <Page size={[396, 612]} style={[s.page, { paddingHorizontal: 22, fontSize: 10 }]}>
+        <View style={[s.header, { padding: 10 }]}>
+          <View style={{ flexGrow: 1 }}>
+            <Text style={[s.kicker, { fontSize: 15 }]}>LINEUP</Text>
+            <Text style={s.sub}>{lineup.team.name.toUpperCase()}</Text>
+          </View>
+          <View style={{ alignItems: "flex-end" }}>
+            <Text style={{ fontFamily: "Jost", fontWeight: 700, fontSize: 10, color: "#FFFFFF" }}>{formatLongDate(lineup.game_date)}</Text>
+            {lineup.opponent && <Text style={{ fontSize: 9, color: NEON, marginTop: 2 }}>vs {lineup.opponent}</Text>}
+          </View>
+        </View>
+        <View style={[s.thead, { marginTop: 12 }]}>
+          <Cell w={30}><Text style={s.label}>Bat</Text></Cell>
+          <Cell w={34}><Text style={s.label}>No.</Text></Cell>
+          <Cell w={190}><Text style={s.label}>Player</Text></Cell>
+          <Cell w={44} center><Text style={s.label}>Pos</Text></Cell>
+        </View>
+        {lineup.batting_order.map((id, i) => line(String(i + 1), id, id))}
+        {flex && line("FLEX", flex, "flex")}
+        {subs.length > 0 && (
+          <>
+            <Text style={s.title}>Substitutes</Text>
+            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+              {subs.map((p) => (
+                <Text key={p.id} style={{ width: "50%", paddingVertical: 2.5 }}>
+                  <Text style={s.num}>{p.number ? `#${p.number}  ` : ""}</Text>
+                  {p.name}
+                </Text>
+              ))}
+            </View>
+          </>
+        )}
+        <View style={{ marginTop: 26, flexDirection: "row", alignItems: "flex-end" }}>
+          <Text style={s.label}>Head coach</Text>
+          <View style={{ flexGrow: 1, marginLeft: 8, borderBottomWidth: 0.8, borderBottomColor: NAVY }} />
+        </View>
+        <View style={s.footer} fixed>
+          <Text>GGG.Cafe · GameDay</Text>
+          <Text>Umpire card</Text>
+        </View>
+      </Page>
+    </Document>
+  );
+}
+
+export async function renderUmpireCardPdf(lineup: Lineup, roster: GamedayPlayer[]) {
+  registerFonts();
+  return renderToBuffer(<UmpireCardDocument lineup={lineup} roster={roster} />);
 }
 
 export async function renderLineupPdf(lineup: Lineup, roster: GamedayPlayer[]) {

@@ -3,10 +3,10 @@ import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { isUuid } from "@/lib/softball";
 import { lineupSeason, loadGamedayRoster, loadLineup } from "@/lib/gameday-data";
-import { lineupFilename, renderLineupPdf } from "@/lib/pdf/lineup-pdf";
+import { lineupFilename, renderLineupPdf, renderUmpireCardPdf } from "@/lib/pdf/lineup-pdf";
 
-/** The lineup card as a PDF, opened in the browser to print or save. Staff only. */
-export async function GET(_request: NextRequest, ctx: RouteContext<"/dugout/gameday/[lineupId]/pdf">) {
+/** The lineup card (or, with ?card=umpire, the umpire exchange card) as a PDF to print or save. Head coaches. */
+export async function GET(request: NextRequest, ctx: RouteContext<"/dugout/gameday/[lineupId]/pdf">) {
   const { lineupId } = await ctx.params;
   const user = await getCurrentUser();
   if (!user?.staff) return new Response("Sign in to view this lineup.", { status: 401 });
@@ -19,11 +19,12 @@ export async function GET(_request: NextRequest, ctx: RouteContext<"/dugout/game
   const seasonId = await lineupSeason(supabase, lineup.team.id, lineup.season_id);
   const roster = seasonId ? await loadGamedayRoster(supabase, lineup.team.id, seasonId) : [];
 
-  const pdf = await renderLineupPdf(lineup, roster);
+  const umpire = request.nextUrl.searchParams.get("card") === "umpire";
+  const pdf = umpire ? await renderUmpireCardPdf(lineup, roster) : await renderLineupPdf(lineup, roster);
   return new Response(new Uint8Array(pdf), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `inline; filename="${lineupFilename(lineup)}"`,
+      "Content-Disposition": `inline; filename="${umpire ? lineupFilename(lineup).replace(/^lineup-/, "umpire-card-") : lineupFilename(lineup)}"`,
       "Cache-Control": "private, no-store",
     },
   });

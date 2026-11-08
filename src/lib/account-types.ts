@@ -96,15 +96,15 @@ export const SECTIONS: { title: string; rows: Row[] }[] = [
   {
     title: "Coaches Dugout",
     rows: [
-      row("Roster", "The season's roster, player accounts, approvals, the coaching staff.", ["yes", "part", "no", "no", "no"],
-        "Assistants approve player claims; parent requests and coach sign-ups go to head coaches."),
+      row("Roster", "The season's roster, player accounts, approvals, the coaching staff, and staff duties & standards (the duty matrix, the staff commitment, the before-practice checklist).", ["yes", "part", "no", "no", "no"],
+        "Assistants approve player claims and see the staff duties; parent requests, coach sign-ups and the duty matrix go to head coaches."),
       row("Culture", "Team Standards and Team Culture.", ["yes", "no", "view", "no", "no"], "Players read them in From the Dugout."),
       row("Calendar", "Practices and events that show in TWIS; offseason dates.", ["yes", "yes", "view", "no", "no"], "Players see the dates in TWIS."),
       row("Practice Plans", "Build, finalize, print and share practice plans; notes and a cue for each player; the install checklist.", ["yes", "part", "part", "no", "no"],
         "Assistants view and print every plan but change only the plans they write (the head coach's are view only); they work the install checklist. Players see a plan's notes and their own cue in TWIS."),
       row("Training", "The season roadmap, team routines, athletic testing and the offseason draft.", ["yes", "part", "view", "no", "no"],
         "Assistants plan phases, push routines and run testing; the draft is head coach only. Players see their phase, routines and results."),
-      row("GameDay", "Player cards, lineups and defensive rotations, the lineup card, and the depth chart a rotation can be filled from.", ["yes", "no", "no", "no", "no"]),
+      row("GameDay", "Player cards, lineups with DP/FLEX and game-day jobs, defensive rotations, the lineup and umpire cards, substitutions with the re-entry rule, and the depth chart.", ["yes", "no", "no", "no", "no"]),
       row("Playbook", "The team call sheet and organization playbook, team quizzes, and the scouting checklist on opponents.", ["yes", "yes", "part", "no", "no"],
         "Players see only the calls on their team's sheet (as flashcards) and published team quizzes; scouting stays with the staff."),
       row("Drill Library", "Every drill, tagged, with video links.", ["yes", "yes", "no", "no", "part"], "Mentors pick drills to suggest and can add new ones."),

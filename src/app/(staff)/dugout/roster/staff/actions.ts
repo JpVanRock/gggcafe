@@ -1,0 +1,93 @@
+"use server";
+
+import { refresh } from "next/cache";
+import { headCoachCheck } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
+import { friendlyDbError, oneOf, text, type FormState } from "@/lib/form";
+import { isUuid } from "@/lib/softball";
+import { DUTY_PHASES, STARTER_COMMITMENT, STARTER_DUTIES, STARTER_PRE_PRACTICE, cleanLines } from "@/lib/staff-duties";
+
+/** Load the starter matrix (skipping duties the team already has) and starter standards if none yet. */
+export async function loadStarterDuties(fd: FormData) {
+  const teamId = text(fd, "team_id");
+  if ((await headCoachCheck()) || !isUuid(teamId)) return;
+  const supabase = await createClient();
+  const [{ data }, { data: standards }] = await Promise.all([
+    supabase.from("staff_duties").select("phase, duty, position").eq("team_id", teamId),
+    supabase.from("staff_standards").select("team_id").eq("team_id", teamId).maybeSingle(),
+  ]);
+  const rows = (data ?? []) as { phase: string; duty: string; position: number }[];
+  const have = new Set(rows.map((r) => `${r.phase}|${r.duty}`));
+  let position = Math.max(-1, ...rows.map((r) => r.position)) + 1;
+  const add = STARTER_DUTIES.filter((d) => !have.has(`${d.phase}|${d.duty}`)).map((d) => ({ team_id: teamId, phase: d.phase, duty: d.duty, position: position++ }));
+  if (add.length) await supabase.from("staff_duties").insert(add);
+  if (!standards) await supabase.from("staff_standards").insert({ team_id: teamId, commitment: STARTER_COMMITMENT, pre_practice: STARTER_PRE_PRACTICE });
+  refresh();
+}
+
+/** Save every owner in the matrix at once (owner_<id> fields). */
+export async function saveDutyOwners(_prev: FormState, fd: FormData): Promise<FormState> {
+  const denied = await headCoachCheck();
+  if (denied) return { error: denied };
+  const updates: { id: string; owner: string | null }[] = [];
+  for (const [key, value] of fd.entries()) {
+    if (!key.startsWith("owner_") || typeof value !== "string") continue;
+    const id = key.slice(6);
+    const owner = value.trim() || null;
+    if (owner && owner.length > 60) return { error: "Keep each name to 60 characters." };
+    if (isUuid(id)) updates.push({ id, owner });
+  }
+  const supabase = await createClient();
+  for (const u of updates) {
+    const { error } = await supabase.from("staff_duties").update({ owner: u.owner }).eq("id", u.id);
+    if (error) return { error: friendlyDbError(error) };
+  }
+  refresh();
+  return { error: null, saved: true };
+}
+
+export async function addDuty(_prev: FormState, fd: FormData): Promise<FormState> {
+  const denied = await headCoachCheck();
+  if (denied) return { error: denied };
+  const teamId = text(fd, "team_id");
+  const phase = oneOf(fd, "phase", DUTY_PHASES);
+  const duty = text(fd, "duty");
+  const owner = text(fd, "owner");
+  if (!isUuid(teamId) || !phase) return { error: "Pick when the job happens." };
+  if (!duty || duty.length > 60) return { error: "Name the job, up to 60 characters." };
+  if (owner && owner.length > 60) return { error: "Keep the name to 60 characters." };
+  const supabase = await createClient();
+  const { data } = await supabase.from("staff_duties").select("position").eq("team_id", teamId).order("position", { ascending: false }).limit(1);
+  const { error } = await supabase
+    .from("staff_duties")
+    .insert({ team_id: teamId, phase, duty, owner, position: (((data ?? [])[0] as { position: number } | undefined)?.position ?? -1) + 1 });
+  if (error) return { error: friendlyDbError(error) };
+  refresh();
+  return { error: null, saved: true };
+}
+
+export async function removeDuty(fd: FormData) {
+  const id = text(fd, "remove");
+  if ((await headCoachCheck()) || !isUuid(id)) return;
+  const supabase = await createClient();
+  await supabase.from("staff_duties").delete().eq("id", id);
+  refresh();
+}
+
+export async function saveStaffStandards(_prev: FormState, fd: FormData): Promise<FormState> {
+  const denied = await headCoachCheck();
+  if (denied) return { error: denied };
+  const teamId = text(fd, "team_id");
+  if (!isUuid(teamId)) return { error: "Choose a team." };
+  const commitment = cleanLines(String(fd.get("commitment") ?? ""), 12, 200);
+  const prePractice = cleanLines(String(fd.get("pre_practice") ?? ""), 15, 120);
+  if (!Array.isArray(commitment)) return { error: `Staff commitment: ${commitment.error}` };
+  if (!Array.isArray(prePractice)) return { error: `Pre-practice checklist: ${prePractice.error}` };
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("staff_standards")
+    .upsert({ team_id: teamId, commitment, pre_practice: prePractice, updated_at: new Date().toISOString() });
+  if (error) return { error: friendlyDbError(error) };
+  refresh();
+  return { error: null, saved: true };
+}

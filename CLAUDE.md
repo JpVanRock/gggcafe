@@ -277,6 +277,20 @@ tests/unit/              node --test unit tests (npm run test:unit)
   `/iq/playbook/[quizId]` (`TeamQuizRunner`): files `playbook-data.ts`, `playbook-client.tsx`, `playbook-actions.ts`.
 - Logic in `src/lib/playbook.ts` (no imports, unit-tested). DB tests: `tests/db/playbook_scouting.test.sql`.
 
+## Game-day production (SB Blueprint Phase 9, user 2026-11-08; migration 20261109080000)
+- GameDay lineups gained DP/FLEX (`dp_player_id` bats; `flex_player_id` fields only and is the extra line after the order;
+  `dpFlexProblems`, `fieldingPlayers` in `src/lib/gameday.ts`; the depth-chart fill uses the fielding players), game-day
+  jobs (`jobs` [{job, who}], "Fill from staff duties" = the matrix's "during the game" lines with an owner) and the
+  in-game substitution log (`sub_log`, `SubTracker` in `gameday/[lineupId]/subs.tsx`, saved by `saveSubLog` on final
+  lineups): `trackSubs()` applies the re-entry rule (a starter re-enters once, in her own spot; a sub who leaves is done;
+  nobody holds two spots). The umpire exchange card is `/dugout/gameday/[id]/pdf?card=umpire` (half-letter; order,
+  number, name, position from rotation 1, DP and FLEX, substitutes, head coach signature line); the lineup card PDF
+  prints the FLEX line and the jobs.
+- Staff duties & standards (`/dugout/roster/staff`, linked from Roster; head-coach writes, every coach reads):
+  `staff_duties` (phase practice/pregame/game/postgame/season, duty, owner) and `staff_standards` (commitment,
+  pre_practice). Starters and helpers in `src/lib/staff-duties.ts` (no imports, unit-tested).
+- DB tests: `tests/db/gameday_production.test.sql`.
+
 ## Access FAQ (`/faq`, admins only, user 2026-11-08)
 - Every player feature side by side for Standard Access (approved claim) and Advanced Access (G3
   Advanced), marked with softballs (`components/softball-icon.tsx`: included / not included / "Coach's

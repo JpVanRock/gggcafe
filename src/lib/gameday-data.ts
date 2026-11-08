@@ -1,7 +1,7 @@
 import "server-only";
 import type { createClient } from "@/lib/supabase/server";
 import { compareJersey } from "@/lib/softball";
-import type { BaseRunning, HittingType, PitchPlan, Rotation } from "@/lib/gameday";
+import type { BaseRunning, GameJob, HittingType, PitchPlan, Rotation, SubEntry } from "@/lib/gameday";
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
@@ -90,12 +90,19 @@ export type Lineup = {
   notes: string | null;
   status: "draft" | "final";
   shared_at: string | null;
+  /** DP/FLEX: the DP bats, the FLEX plays defense only (the extra line on the card) */
+  dp_player_id: string | null;
+  flex_player_id: string | null;
+  jobs: GameJob[];
+  sub_log: SubEntry[];
 };
 
 export async function loadLineup(supabase: Supabase, id: string): Promise<Lineup | null> {
   const { data } = await supabase
     .from("gameday_lineups")
-    .select("id, season_id, game_date, opponent, title, rotations, batting_order, defense, pitching, notes, status, shared_at, team:teams(id, name)")
+    .select(
+      "id, season_id, game_date, opponent, title, rotations, batting_order, defense, pitching, notes, status, shared_at, dp_player_id, flex_player_id, jobs, sub_log, team:teams(id, name)",
+    )
     .eq("id", id)
     .maybeSingle();
   return (data as unknown as Lineup | null) ?? null;

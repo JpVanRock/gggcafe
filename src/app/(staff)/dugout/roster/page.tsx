@@ -219,13 +219,16 @@ async function Roster({ searchParams }: Pick<PageProps<"/dugout/roster">, "searc
           <StaffList staff={staff} isAdmin={user.staff.role === "admin"} meId={user.id} />
         </Disclosure>
       )}
-      {head && (
-        <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3">
+        <Link href={`/dugout/roster/staff?team=${team.id}`} className={pillButtonClass}>
+          Staff duties & standards →
+        </Link>
+        {head && (
           <Link href={`/dugout/roster/medical?team=${team.id}`} className={pillButtonClass}>
             Medical cards →
           </Link>
-        </div>
-      )}
+        )}
+      </div>
       {editor && <QuestionnaireTable teamId={team.id} seasonId={season?.id ?? null} />}
       {head && (
         <p className="text-xs text-muted">

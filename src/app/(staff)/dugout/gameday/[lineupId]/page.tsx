@@ -15,6 +15,8 @@ import { loadCoachingStaff } from "@/lib/practice-plans";
 import { ShareButton } from "../../plans/[planId]/share-button";
 import { deleteLineup, reopenLineup, shareLineup } from "../actions";
 import { LineupBuilder } from "./builder";
+import { SubTracker } from "./subs";
+import { gameJobsFromDuties, type DutyPhase } from "@/lib/staff-duties";
 import type { DepthChart, DepthPosition } from "@/lib/playbook";
 
 export const metadata: Metadata = { title: "Lineup · GameDay · GGG.Cafe" };
@@ -37,11 +39,13 @@ async function LineupView({ params, searchParams }: Pick<PageProps<"/dugout/game
   const lineup = await loadLineup(supabase, lineupId);
   if (!lineup) notFound();
   const seasonId = await lineupSeason(supabase, lineup.team.id, lineup.season_id);
-  const [roster, staff, depthResult] = await Promise.all([
+  const [roster, staff, depthResult, dutiesResult] = await Promise.all([
     seasonId ? loadGamedayRoster(supabase, lineup.team.id, seasonId) : Promise.resolve([]),
     editor ? loadCoachingStaff(supabase) : Promise.resolve([]),
     supabase.from("depth_chart").select("position, player_id").eq("team_id", lineup.team.id).order("rank"),
+    supabase.from("staff_duties").select("phase, duty, owner").eq("team_id", lineup.team.id).order("position"),
   ]);
+  const dutyJobs = gameJobsFromDuties((dutiesResult.data ?? []) as { phase: DutyPhase; duty: string; owner: string | null }[]);
   const depth: DepthChart = {};
   for (const r of (depthResult.data ?? []) as { position: DepthPosition; player_id: string }[]) (depth[r.position] ??= []).push(r.player_id);
   const byId = new Map(roster.map((p) => [p.id, p]));
@@ -59,7 +63,7 @@ async function LineupView({ params, searchParams }: Pick<PageProps<"/dugout/game
         </p>
       )}
       {editor && lineup.status === "draft" ? (
-        <LineupBuilder lineup={lineup} roster={roster} staff={staff} emailReady={emailConfigured()} depth={depth} />
+        <LineupBuilder lineup={lineup} roster={roster} staff={staff} emailReady={emailConfigured()} depth={depth} dutyJobs={dutyJobs} />
       ) : (
         <div className="flex flex-col gap-6">
           <header className="flex flex-col gap-4 rounded-2xl border border-navy-700 bg-navy-900/70 p-5 sm:p-6">
@@ -78,6 +82,9 @@ async function LineupView({ params, searchParams }: Pick<PageProps<"/dugout/game
             <div className="flex flex-wrap items-center gap-3">
               <a href={`/dugout/gameday/${lineup.id}/pdf`} target="_blank" rel="noopener" className={pillButtonClass}>
                 Print / PDF
+              </a>
+              <a href={`/dugout/gameday/${lineup.id}/pdf?card=umpire`} target="_blank" rel="noopener" className={pillOutlineClass}>
+                Umpire card
               </a>
               {editor && lineup.status === "final" && (
                 <ShareButton
@@ -119,6 +126,7 @@ async function LineupView({ params, searchParams }: Pick<PageProps<"/dugout/game
                       <span className="w-6 font-display text-lg font-bold text-highlight tabular-nums">{i + 1}</span>
                       <span className="min-w-0 flex-1">
                         <span className="font-semibold">{p?.short ?? "Player"}</span>
+                        {id === lineup.dp_player_id && lineup.flex_player_id && <span className="ml-1.5 font-mono text-[10px] font-bold text-pink-soft">DP</span>}
                         <span className="ml-2 text-xs text-muted">
                           {[p?.hitting_type && HITTING_TYPE_LABEL[p.hitting_type], p?.base_running && BASE_RUNNING_LABEL[p.base_running]].filter(Boolean).join(" · ")}
                         </span>
@@ -129,6 +137,13 @@ async function LineupView({ params, searchParams }: Pick<PageProps<"/dugout/game
                     </li>
                   );
                 })}
+                {lineup.flex_player_id && lineup.dp_player_id && (
+                  <li className="flex items-center gap-3 py-2 text-sm">
+                    <span className="w-6 font-display text-xs font-bold text-pink-soft">FLEX</span>
+                    <span className="font-semibold">{byId.get(lineup.flex_player_id)?.short ?? "Player"}</span>
+                    <span className="text-xs text-muted">plays defense for the DP</span>
+                  </li>
+                )}
               </ol>
             </Card>
             <Card title="Pitching plan">
@@ -178,6 +193,26 @@ async function LineupView({ params, searchParams }: Pick<PageProps<"/dugout/game
               </table>
             </div>
           </Card>
+          {lineup.jobs.length > 0 && (
+            <Card title="Game-day jobs">
+              <ul className="grid gap-1 text-sm sm:grid-cols-2">
+                {lineup.jobs.map((j, i) => (
+                  <li key={i}>
+                    <span className="text-muted">{j.job}:</span> <span className="font-semibold">{j.who}</span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
+          {editor && lineup.status === "final" && (
+            <SubTracker
+              lineupId={lineup.id}
+              starters={[...lineup.batting_order, ...(lineup.flex_player_id && lineup.dp_player_id ? [lineup.flex_player_id] : [])]}
+              flexSpot={lineup.flex_player_id && lineup.dp_player_id ? lineup.batting_order.length + 1 : null}
+              players={roster.map((p) => ({ id: p.id, short: p.short }))}
+              initial={lineup.sub_log ?? []}
+            />
+          )}
           {lineup.notes && (
             <Card title="Notes">
               <p className="text-sm whitespace-pre-line">{lineup.notes}</p>

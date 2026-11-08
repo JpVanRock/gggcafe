@@ -9,8 +9,8 @@ import { friendlyDbError, isoDate, text, wholeNumber, type FormState } from "@/l
 import { formatDay, formatLongDate } from "@/lib/dates";
 import { isUuid } from "@/lib/softball";
 import {
-  BASE_RUNNING, BASE_RUNNING_LABEL, HITTING_TYPES, HITTING_TYPE_LABEL, MAX_ROTATIONS, PITCHES, ROTATION_SPOTS,
-  type PitchPlan, type Rotation,
+  BASE_RUNNING, BASE_RUNNING_LABEL, HITTING_TYPES, HITTING_TYPE_LABEL, MAX_ROTATIONS, PITCHES, ROTATION_SPOTS, dpFlexProblems,
+  type PitchPlan, type Rotation, type SubEntry,
 } from "@/lib/gameday";
 import { lineupSeason, loadGamedayRoster, loadLineup } from "@/lib/gameday-data";
 import { DEPTH_POSITIONS, type DepthPosition } from "@/lib/playbook";
@@ -132,16 +132,44 @@ function cleanLineup(body: string) {
       };
     }
   }
+  const batting = [...new Set(order)];
+  const dp = isUuid(raw.dp_player_id) ? raw.dp_player_id : null;
+  const flex = isUuid(raw.flex_player_id) ? raw.flex_player_id : null;
+  const dpFlex = dpFlexProblems(batting, dp, flex);
+  if (dpFlex.length) return dpFlex[0];
+  const jobs = (Array.isArray(raw.jobs) ? raw.jobs : [])
+    .map((j: { job?: unknown; who?: unknown }) => ({ job: str(j?.job, 40), who: str(j?.who, 60) }))
+    .filter((j): j is { job: string; who: string } => Boolean(j.job && j.who))
+    .slice(0, 12);
   return {
     game_date: date,
     opponent: str(raw.opponent, 120),
     title: str(raw.title, 120),
     rotations,
-    batting_order: [...new Set(order)],
+    batting_order: batting,
     defense,
     pitching,
     notes: str(raw.notes, 1000),
+    dp_player_id: dp,
+    flex_player_id: flex,
+    jobs,
   };
+}
+
+/** The in-game substitution log (any time, final lineups too). */
+export async function saveSubLog(lineupId: string, log: SubEntry[]): Promise<{ error: string | null }> {
+  const denied = await headCoachCheck();
+  if (denied) return { error: denied };
+  if (!isUuid(lineupId)) return { error: "Unknown lineup." };
+  const clean = (Array.isArray(log) ? log : [])
+    .filter((e) => e && isUuid(e.in) && Number.isInteger(e.spot) && e.spot >= 1 && e.spot <= 30 && Number.isInteger(e.inning) && e.inning >= 1 && e.inning <= 20)
+    .map((e) => ({ inning: e.inning, spot: e.spot, in: e.in }))
+    .slice(0, 60);
+  const supabase = await createClient();
+  const { error } = await supabase.from("gameday_lineups").update({ sub_log: clean }).eq("id", lineupId);
+  if (error) return { error: friendlyDbError(error) };
+  refresh();
+  return { error: null };
 }
 
 export async function saveLineup(lineupId: string, body: string): Promise<{ error: string | null; savedAt?: string }> {

@@ -13,8 +13,9 @@ import { ConfirmSubmit } from "@/components/confirm-submit";
 import { Card, inputClass, pillButtonClass, pillOutlineClass, sectionLabelClass } from "@/components/ui";
 import { formatLongDate } from "@/lib/dates";
 import {
-  BASE_RUNNING_LABEL, HITTING_TYPE_LABEL, MAX_ROTATIONS, PITCHES, ROTATION_SPOTS, percent, pitcherOf, rate, rotationProblems,
-  type Pitch, type PitchPlan, type Rotation, type RotationSpot,
+  BASE_RUNNING_LABEL, GAME_JOB_STARTERS, HITTING_TYPE_LABEL, MAX_ROTATIONS, PITCHES, ROTATION_SPOTS, dpFlexProblems, fieldingPlayers, percent,
+  pitcherOf, rate, rotationProblems,
+  type GameJob, type Pitch, type PitchPlan, type Rotation, type RotationSpot,
 } from "@/lib/gameday";
 import type { GamedayPlayer, Lineup } from "@/lib/gameday-data";
 import { suggestDefense, type DepthChart } from "@/lib/playbook";
@@ -70,6 +71,7 @@ export function LineupBuilder({
   staff,
   emailReady,
   depth = {},
+  dutyJobs = [],
 }: {
   lineup: Lineup;
   roster: GamedayPlayer[];
@@ -77,6 +79,8 @@ export function LineupBuilder({
   emailReady: boolean;
   /** the team's depth chart (GameDay → Depth chart), to fill a rotation from */
   depth?: DepthChart;
+  /** "during the game" jobs from the staff duty matrix, to fill the jobs from */
+  dutyJobs?: GameJob[];
 }) {
   const router = useRouter();
   const byId = useMemo(() => new Map(roster.map((p) => [p.id, p])), [roster]);
@@ -90,10 +94,15 @@ export function LineupBuilder({
   const [order, setOrder] = useState<string[]>(lineup.batting_order);
   const [defense, setDefense] = useState<Record<string, Rotation>>(lineup.defense ?? {});
   const [pitching, setPitching] = useState<Record<string, PitchPlan>>(lineup.pitching ?? {});
+  const [dpFlex, setDpFlex] = useState<{ dp: string | null; flex: string | null }>({ dp: lineup.dp_player_id, flex: lineup.flex_player_id });
+  const [jobs, setJobs] = useState<GameJob[]>(lineup.jobs ?? []);
   const rotations = Array.from({ length: setup.rotations }, (_, i) => String(i + 1));
 
   // --- autosave -------------------------------------------------------------
-  const payload = useMemo(() => JSON.stringify({ ...setup, batting_order: order, defense, pitching }), [setup, order, defense, pitching]);
+  const payload = useMemo(
+    () => JSON.stringify({ ...setup, batting_order: order, defense, pitching, dp_player_id: dpFlex.dp, flex_player_id: dpFlex.flex, jobs }),
+    [setup, order, defense, pitching, dpFlex, jobs],
+  );
   const [savedPayload, setSavedPayload] = useState(payload);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -171,7 +180,7 @@ export function LineupBuilder({
   // The batting order plays the field; with nobody in the order yet, use everyone.
   const fromDepth = (rot: string) => {
     const inGame = order.filter((id) => byId.has(id));
-    setDefense((d) => ({ ...d, [rot]: suggestDefense(depth, inGame.length ? inGame : defenseRows) }));
+    setDefense((d) => ({ ...d, [rot]: suggestDefense(depth, inGame.length ? fieldingPlayers(inGame, dpFlex.dp, dpFlex.flex) : defenseRows) }));
   };
 
   // --- pitching ---------------------------------------------------------------
@@ -217,7 +226,8 @@ export function LineupBuilder({
       setBusy(false);
     }
   }
-  const problems = order.length === 0 ? ["Add players to the batting order."] : [];
+  const problems = [...(order.length === 0 ? ["Add players to the batting order."] : []), ...dpFlexProblems(order, dpFlex.dp, dpFlex.flex)];
+  const setJob = (i: number, patch: Partial<GameJob>) => setJobs((list) => list.map((j, k) => (k === i ? { ...j, ...patch } : j)));
 
   const status = saveError ? <span className="text-danger">{saveError}</span> : saving ? "Saving…" : dirty ? "Unsaved changes" : "All changes saved";
 
@@ -310,6 +320,35 @@ export function LineupBuilder({
           )}
         </Card>
       </section>
+
+      {/* DP / FLEX */}
+      <Card title="DP / FLEX">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="flex flex-col gap-1.5">
+            <span className={labelClass}>DP (bats, doesn&apos;t have to field)</span>
+            <select value={dpFlex.dp ?? ""} onChange={(e) => setDpFlex((d) => ({ ...d, dp: e.target.value || null }))} className={inputClass}>
+              <option value="">Not using DP/FLEX</option>
+              {order.filter((id) => byId.has(id)).map((id) => (
+                <option key={id} value={id}>
+                  {byId.get(id)!.short}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex flex-col gap-1.5">
+            <span className={labelClass}>FLEX (plays defense, doesn&apos;t bat)</span>
+            <select value={dpFlex.flex ?? ""} onChange={(e) => setDpFlex((d) => ({ ...d, flex: e.target.value || null }))} className={inputClass}>
+              <option value="">—</option>
+              {bench.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.short}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <p className="mt-3 text-xs text-muted">The FLEX goes on the card as the extra line after the batting order. In the rotations, the FLEX fields and the DP can sit.</p>
+      </Card>
 
       {/* Defensive rotations */}
       <Card title="Defensive rotations">
@@ -427,13 +466,49 @@ export function LineupBuilder({
         </ul>
       </Card>
 
+      <Card
+        title="Game-day jobs"
+        actions={
+          dutyJobs.length > 0 ? (
+            <button type="button" onClick={() => setJobs(dutyJobs.slice(0, 12))} className="text-xs font-semibold text-pink hover:underline">
+              Fill from staff duties
+            </button>
+          ) : undefined
+        }
+      >
+        {jobs.length > 0 && (
+          <ul className="mb-3 flex flex-col gap-2">
+            {jobs.map((j, i) => (
+              <li key={i} className="grid grid-cols-[1fr_1fr_auto] items-center gap-2">
+                <input value={j.job} maxLength={40} onChange={(e) => setJob(i, { job: e.target.value })} aria-label="Job" list="game-jobs" className={small} />
+                <input value={j.who} maxLength={60} onChange={(e) => setJob(i, { who: e.target.value })} aria-label="Who" placeholder="Coach or parent" className={small} />
+                <button type="button" onClick={() => setJobs((list) => list.filter((_, k) => k !== i))} aria-label="Remove job" className="rounded px-2 text-muted hover:text-danger">
+                  ✕
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        <datalist id="game-jobs">
+          {GAME_JOB_STARTERS.map((g) => (
+            <option key={g} value={g} />
+          ))}
+        </datalist>
+        {jobs.length < 12 && (
+          <button type="button" onClick={() => setJobs((list) => [...list, { job: GAME_JOB_STARTERS[list.length % GAME_JOB_STARTERS.length], who: "" }])} className="text-sm font-semibold text-pink-soft hover:underline">
+            + Add a job
+          </button>
+        )}
+        <p className="mt-2 text-xs text-muted">Printed on the lineup card. Parents can take a job too (keep the book, video).</p>
+      </Card>
+
       <Card title="Notes">
         <textarea
           value={setup.notes}
           maxLength={1000}
           rows={3}
           onChange={(e) => setSetup((s) => ({ ...s, notes: e.target.value }))}
-          placeholder="Signs, matchups, reminders"
+          placeholder="Matchups, reminders"
           className={inputClass}
         />
       </Card>
