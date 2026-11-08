@@ -151,6 +151,24 @@ tests/unit/              node --test unit tests (npm run test:unit)
 - Coaches/admins fill dashboards in; players with an approved claim can open and edit their own (see
   Player accounts below).
 
+## Offseason Training Leaderboard and + Activity (user, 2026-11-08)
+- The "From the Dugout" strip on her dashboard has two more pills: Leaderboard
+  (`/players/[id]/leaderboard?team=`) and + Activity (`/players/[id]/log`, log a session in a few taps).
+- Points (user's system): 3 per site unlock (rings, Golden Gloves, MVP badges, Champions Trophy,
+  Manager of the Year, hidden awards, training achievements; NOT the Leader Badge, which is private),
+  3 per training session, 5 per workout, 7 per private lesson. Sessions = `training_logs` (+ Activity:
+  her own, last 7 days, 4 a day; coaches remove any) plus checked-off TWIS routines with a training
+  category (workout = 5, other categories = 3). Only dates inside the team's offseason count
+  (`team_offseason`, coaches set it on the Leaderboard page).
+- Player of the Week (`team_player_of_week`): Monday-Sunday, decided from the Tuesday after by
+  `private.decide_players_of_week` (run inside `team_leaderboard()`): most points with at least 10;
+  rounds, so nobody wins twice until everyone on the roster has been named (unless nobody new
+  qualifies); never within six weeks of her last win. The user's goal: every player named at least once.
+- Teammates see each other only through `public.team_leaderboard(team)` (definer; staff or a player on
+  the team this season): names, numbers, points, weekly points, Players of the Week. Points and rules are
+  in SQL (migration 20261108124500) and mirrored in `src/lib/leaderboard.ts` (no imports, unit-tested):
+  change both together. DB tests: `tests/db/leaderboard.test.sql`.
+
 ## G3 Advanced (Level 2, `/players/[id]/advanced`)
 - The advanced tier (user, 2026-11-07): admin-approved per player now, a paid subscription later
   (`player_advanced_access`, one row per player who has it, `source` admin|subscription; only admins

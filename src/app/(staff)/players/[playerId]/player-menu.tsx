@@ -230,7 +230,7 @@ export function PlayerMenu({
       </header>
 
       <div className="flex flex-col gap-3">
-        <DugoutStrip teams={dugout} canEdit={canManage} teamHref={`${base}/team`} />
+        <DugoutStrip teams={dugout} canEdit={canManage} teamHref={`${base}/team`} leaderboardHref={`${base}/leaderboard`} activityHref={`${base}/log`} />
         <TwisBoard
           playerId={player.id}
           week={twis}

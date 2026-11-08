@@ -1,6 +1,8 @@
 // "From the Dugout": the slim bar above TWIS on a player's dashboard with Team
 // Standards and Team Culture buttons. Each opens a pop-up with what her coaches
 // wrote in the Coaches Dugout. Also used as the preview in the Dugout itself.
+// On her dashboard it also has the Leaderboard and + Activity pills
+// (Offseason Training, user 2026-11-08).
 import Link from "next/link";
 import { Modal } from "@/components/modal";
 import { EmptyState } from "@/components/ui";
@@ -24,12 +26,18 @@ export function DugoutStrip({
   canEdit,
   label = "From the Dugout",
   teamHref,
+  leaderboardHref,
+  activityHref,
 }: {
   teams: DugoutTeam[];
   canEdit: boolean;
   label?: string;
   /** the player's Team page: the buttons go there instead of opening pop-ups */
   teamHref?: string;
+  /** her Offseason Training Leaderboard */
+  leaderboardHref?: string;
+  /** + Activity: log a session */
+  activityHref?: string;
 }) {
   if (teams.length === 0) return null;
   const names = teams.map((t) => t.team.name).join(" · ");
@@ -44,9 +52,24 @@ export function DugoutStrip({
       </>
     );
 
+  const extraPills = (
+    <>
+      {leaderboardHref && (
+        <Link href={leaderboardHref} className={`${pill} bg-pink text-on-accent hover:brightness-110`}>
+          Leaderboard
+        </Link>
+      )}
+      {activityHref && (
+        <Link href={activityHref} className={`${pill} border border-neon text-highlight hover:bg-neon hover:text-on-accent`}>
+          + Activity
+        </Link>
+      )}
+    </>
+  );
+
   return (
     <section
-      aria-label="Team Standards and Team Culture"
+      aria-label="From the Dugout"
       className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 rounded-2xl border border-navy-700 bg-navy-900/60 px-4 py-3 sm:px-5"
     >
       <div className="min-w-0">
@@ -61,6 +84,7 @@ export function DugoutStrip({
           <Link href={`${teamHref}#culture`} className={`${pill} border border-pink text-ink hover:bg-pink hover:text-on-accent`}>
             Team Culture
           </Link>
+          {extraPills}
         </div>
       ) : (
       <div className="flex flex-wrap gap-2">
@@ -115,6 +139,7 @@ export function DugoutStrip({
             ))}
           </div>
         </Modal>
+        {extraPills}
       </div>
       )}
     </section>
