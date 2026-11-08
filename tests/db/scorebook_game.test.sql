@@ -11,9 +11,11 @@ begin
 end $$;
 grant execute on function pg_temp.expect(text, anycompatible, anycompatible) to anon, authenticated;
 
-create temp table game_key as select play, boxes from private.scorebook_game_key;
-grant select on game_key to authenticated;
-select pg_temp.expect('15 plays in the key', (select count(*) from game_key), 15::bigint);
+create temp table all_keys as select game, play, boxes from private.scorebook_game_key;
+create temp table all_lines as select game, line from private.scorebook_game_line;
+create temp table game_key as select play, boxes from all_keys where game = 1;
+grant select on all_keys, all_lines, game_key to authenticated;
+select pg_temp.expect('ten games of 15 plays', (select count(*) || '/' || count(distinct game) from all_keys), '150/10');
 
 insert into auth.users (id, email) values ('88888888-0000-0000-0000-000000000001', 'gamer@example.test');
 insert into public.player_claims (user_id, team_id, season_id, roster_entry_id, typed_name, typed_jersey, status)
@@ -41,8 +43,13 @@ select set_config('request.jwt.claims', '{"sub":"88888888-0000-0000-0000-0000000
 do $$
 declare run public.scorebook_game_runs; r record; k record;
 begin
+  begin
+    perform public.start_scorebook_game('00000000-0000-0000-0000-0000000000c1', 2::smallint);
+    raise exception 'FAIL: game 2 opened before a clean book in game 1';
+  exception when sqlstate 'P0004' then null;
+  end;
   select * into run from public.start_scorebook_game('00000000-0000-0000-0000-0000000000c1');
-  perform pg_temp.expect('starts at batter 1', run.next_play, 1::smallint);
+  perform pg_temp.expect('starts game 1 at batter 1', run.game || ' ' || run.next_play, '1 1');
 
   -- a wrong box: told which marks to check, no answer yet
   select * into r from public.score_game_play(run.id, 1::smallint, '{"V1-1":{"hit":2,"path":1}}');
@@ -69,7 +76,7 @@ begin
   select * into r from public.finish_scorebook_game(run.id, '{"V":[1,0],"H":[0,1]}');
   perform pg_temp.expect('wrong line score can be fixed', r.line_ok::text || ' ' || r.passed, 'false false');
   select * into r from public.finish_scorebook_game(run.id, '{"V":[1,0],"H":[0,2]}');
-  perform pg_temp.expect('clean book earns the award', r.line_ok::text || ' ' || r.passed || ' ' || r.award_earned, 'true true true');
+  perform pg_temp.expect('clean book earns the award', r.line_ok::text || ' ' || r.passed || ' ' || r.award_earned || ' ' || r.all_ten_earned, 'true true true false');
 end $$;
 select pg_temp.expect('she sees her hidden award', (select count(*) from public.player_hidden_awards where award = 'world-series'), 1::bigint);
 do $$ begin
@@ -92,6 +99,23 @@ begin
   select * into r from public.finish_scorebook_game(run.id, '{"V":[1,0],"H":[0,2]}');
   perform pg_temp.expect('11 first try is not clean', r.first_try || ' ' || r.passed, '11 false');
 end $$;
+
+-- games 2-10, each clean: the World Series Trophy isn't given twice; the tenth earns all-ten
+do $$
+declare run public.scorebook_game_runs; r record; k record; g int;
+begin
+  for g in 2..10 loop
+    select * into run from public.start_scorebook_game('00000000-0000-0000-0000-0000000000c1', g::smallint);
+    for k in select play, boxes from all_keys where game = g order by play loop
+      select * into r from public.score_game_play(run.id, k.play, k.boxes);
+      perform pg_temp.expect('game ' || g || ' play ' || k.play, r.correct, true);
+    end loop;
+    select * into r from public.finish_scorebook_game(run.id, (select line from all_lines where game = g));
+    perform pg_temp.expect('game ' || g || ' clean', r.passed::text || ' ' || r.award_earned || ' ' || r.all_ten_earned,
+      'true false ' || (g = 10)::text);
+  end loop;
+end $$;
+select pg_temp.expect('both hidden awards', (select string_agg(award, ',' order by award) from public.player_hidden_awards), 'all-ten,world-series');
 reset role;
 
 -- Clean up

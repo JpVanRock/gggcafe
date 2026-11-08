@@ -100,18 +100,23 @@ tests/unit/              node --test unit tests (npm run test:unit)
   `start_iq_level` raises P0005 until the lessons are done and P0001 until the previous chapter is
   complete. 80%+ earns that chapter's Manager of the Year (`player_manager_awards`, written only by
   `finish_iq_level`). Course quizzes earn no MVP badges.
-- Keep the Book game (extra credit, user's easter egg, 2026-11-07): after all six chapters, the course
-  card's "XC" row opens `/players/[id]/iq/scorebook/game`, a two-inning game (Bayside Blaze at Summit
-  Storm, 15 batters, walk-off; teams and play-by-play in `src/lib/scorebook-game.ts`) where she keeps
-  the book: for each batter she marks the batter's box and every runner's box (box editor with a
-  play keypad) and `score_game_play` grades it against `private.scorebook_game_key` (source
-  `supabase/iq/scorebook-game.json`, migration from `scripts/iq/build-game-key.py`; the unit test
-  replays the key against the play-by-play). Runs in `scorebook_game_runs` (her book so far,
-  first-try count; answer shown after 3 wrong tries). A clean book (12+ of 15 first try and the right
-  line score, `finish_scorebook_game`) earns the hidden GGG World Series Trophy
-  (`player_hidden_awards`, award `world-series`; art `public/awards/world-series-trophy.webp`, the
-  user's original WORLD SERIES render). The reward is a mystery: nothing names or shows it before
-  it's earned (no Trophy Room placeholder or count); once earned it gets a shelf after Manager of the Year.
+- Keep the Book games (extra credit, user's easter eggs, 2026-11-07): after all six chapters, the course
+  card's "XC" row opens `/players/[id]/iq/scorebook/game`, TEN two-inning games (15 batters each)
+  between six made-up teams (`LEAGUE`, `GAMES` in `src/lib/scorebook-game.ts`), each at
+  `/game/[n]`. She keeps the book: for each batter she marks the batter's box and every runner's box
+  (box editor with a play keypad) and `score_game_play` grades it against
+  `private.scorebook_game_key` (source `supabase/iq/scorebook-games.json`, migration from
+  `scripts/iq/build-game-key.py`; the unit test replays every game against its play-by-play:
+  batting order, runners, outs, slash, RBIs, walk-offs, line score). Runs in `scorebook_game_runs`
+  (`game`, her book so far, first-try count; answer shown after 3 wrong tries). A clean book = 12+ of
+  15 first try and the right line score (`finish_scorebook_game`); it opens the next game (P0004 until
+  then) and games can be replayed. Hidden awards (`player_hidden_awards`): the first clean book earns
+  the GGG World Series Trophy (`world-series`; art `world-series-trophy.webp`, the user's original
+  WORLD SERIES render); clean books in all ten earn the GGG Dynasty Trophy (`all-ten`; placeholder
+  name in `src/components/dynasty-trophy.tsx`, same art as the Champions Trophy, user's choice). The
+  rewards are mysteries: nothing names or shows them before they're earned (no Trophy Room
+  placeholder or count); once earned they get shelves after Manager of the Year. Runners who reached
+  on an error or fielder's choice are never put out later in a game: a box has one play field.
 - MVP badge (`player_mvp_badges`, one per test): earned when `iq_review_status` finds every missed
   question answered again, or outright for a perfect score. Drawn by `src/components/mvp-badge.tsx`.
 - Stolen Base Leader plaques: one per Baserunning IQ level, earned with that level's ring (no table).
@@ -145,6 +150,31 @@ tests/unit/              node --test unit tests (npm run test:unit)
   a scorebook box, page or field, `{"kind": ...}`): it shows the situation only, never the answer.
 - Coaches/admins fill dashboards in; players with an approved claim can open and edit their own (see
   Player accounts below).
+
+## G3 Advanced (Level 2, `/players/[id]/advanced`)
+- The advanced tier (user, 2026-11-07): admin-approved per player now, a paid subscription later
+  (`player_advanced_access`, one row per player who has it, `source` admin|subscription; only admins
+  insert/delete; `private.has_advanced()`). Until unlocked NOTHING about it shows: no menu board, no
+  section-menu entry, pages 404 for non-admins. Admins see a slim "Unlock G3 Advanced" strip under a
+  locked player's menu boards, and "Turn off" at the bottom of her book (her work is kept).
+- It's her book on how to compete: default title "How to Cook" (user's choice; she can rename it,
+  `player_advanced_books`), theme line "How to Compete". Content in `src/lib/advanced-book.ts`, which
+  is paid content: import it from server code only, never from a "use client" file (client pieces
+  get one chapter as props). Introduction "It Starts with Good Habits", then chapters from the user's
+  "How to Compete?" sheet (Pre-Game, Between Innings, On-Deck Reps, Response to Failure,
+  Communication, Regardless of Circumstances), then "coming" chapters (My Position, Hitting
+  Approach, Mental Toughness: content later). ALWAYS leave room for more chapters: add an entry to
+  `CHAPTERS` with a new permanent slug (numbers come from order; her work is keyed by slug).
+- Each chapter: the question, why it matters, a pre-filled foundation of habits she marks "I own
+  this", then she builds on it (her own habits, notes) and marks it complete
+  (`player_advanced_chapters`). Players keep their own book only while they have access (RLS).
+  Menu board variant `advanced`, placed before the Trophy Room; section menu entry after Softball IQ.
+- Position chapters (user, 2026-11-07): a chapter with `requires: { position }` is only in the book
+  of a player a coach has confirmed at that position (`player_confirmed_positions`; coaches/admins
+  confirm on her book page, "Coaches · position chapters"; the player can read, not change, it).
+  For everyone else it isn't listed, numbered, counted or readable (404), and saves are refused.
+  Always build her book with `visibleChapters(book.confirmed)`. First one: "Pitching: My Best Is
+  Better" (Focused Skill), from the user's pitching sheet, Chapter 7 for confirmed pitchers.
 
 ## Players page and intake (`/players`)
 - Age-group tabs (All, 8U, 10U, 11U, 12U, 13U, 14U, 15U, 16U, 17U, 18U; `?age=16U`, keeps `?q=`) above the

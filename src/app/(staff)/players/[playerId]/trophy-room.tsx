@@ -5,8 +5,9 @@
 //  - Golden Gloves (position tests)
 //  - MVP badges (every miss on a test reviewed, or a perfect score)
 //  - Manager of the Year (one per How to Keep the Book chapter)
-//  - GGG World Series Trophy: a hidden award (clean book in the course's game). It
-//    shows up only once earned: no placeholder, no count, nothing that names it.
+//  - Hidden awards from the How to Keep the Book games: the GGG World Series Trophy
+//    (a clean book in any game) and the GGG Dynasty Trophy (clean books in all ten).
+//    They show up only once earned: no placeholder, no count, nothing that names them.
 //  - Performance Training achievements
 //  - GGG Champions Trophy (Extra Credit Library run at 80%+)
 import { RingCase } from "@/components/rings";
@@ -16,6 +17,7 @@ import { StolenBasePlaque } from "@/components/stolen-base-plaque";
 import { ChampionsTrophy } from "@/components/champions-trophy";
 import { ManagerAward } from "@/components/manager-award";
 import { WorldSeriesTrophy } from "@/components/world-series-trophy";
+import { DYNASTY_TROPHY, DynastyTrophy } from "@/components/dynasty-trophy";
 import { CHAPTERS } from "@/lib/scorebook";
 import { formatLongDate } from "@/lib/dates";
 import type { AchievementProgress } from "@/lib/achievements";
@@ -35,8 +37,9 @@ export type TrophyRoom = {
   mvps: { key: string; label: string; earnedOn: string }[];
   /** Manager of the Year, one per How to Keep the Book chapter */
   managers: { chapter: number; label: string; earnedOn: string | null; year: string | null }[];
-  /** hidden: null until she finds it */
+  /** hidden: null until she finds them */
   worldSeriesOn: string | null;
+  dynastyOn: string | null;
   achievements: AchievementProgress[];
 };
 
@@ -74,6 +77,10 @@ export function buildTrophyRoom(iq: IqData, positions: PositionInfo[], achieveme
       const award = iq.hiddenAwards.find((a) => a.award === "world-series");
       return award ? formatLongDate(award.earned_on) : null;
     })(),
+    dynastyOn: (() => {
+      const award = iq.hiddenAwards.find((a) => a.award === "all-ten");
+      return award ? formatLongDate(award.earned_on) : null;
+    })(),
     achievements: achievements.filter((a) => a.unlockedOn),
   };
 }
@@ -84,7 +91,7 @@ export function TrophyRoomSummary({ room }: { room: TrophyRoom }) {
   const managers = room.managers.filter((m) => m.earnedOn);
   const nothing =
     !room.championsOn && !plaques.length && !room.rings.length && !gloves.length && !room.mvps.length && !managers.length &&
-    !room.worldSeriesOn && !room.achievements.length;
+    !room.worldSeriesOn && !room.dynastyOn && !room.achievements.length;
   return (
     <div>
       <div className="grid gap-x-10 gap-y-4 sm:grid-cols-3">
@@ -94,6 +101,7 @@ export function TrophyRoomSummary({ room }: { room: TrophyRoom }) {
         <MenuItem name="MVP badges" value={room.mvps.length} />
         <MenuItem name="Manager of the Year" value={`${managers.length}/${room.managers.length}`} note="One for each How to Keep the Book chapter" />
         {room.worldSeriesOn && <MenuItem name="World Series Trophy" value="✓" note={`Found ${room.worldSeriesOn}`} />}
+        {room.dynastyOn && <MenuItem name={DYNASTY_TROPHY.replace("GGG ", "")} value="✓" note={`Found ${room.dynastyOn}`} />}
         <MenuItem name="Training achievements" value={room.achievements.length} />
         <MenuItem name="Champions Trophy" value={room.championsOn ? "✓" : "–"} note={room.championsOn ? `Won ${room.championsOn}` : "Extra Credit Library"} />
       </div>
@@ -115,6 +123,7 @@ export function TrophyRoomSummary({ room }: { room: TrophyRoom }) {
             <ManagerAward key={m.chapter} name={room.plate.name} chapter={m.label} engrave={false} size={48} />
           ))}
           {room.worldSeriesOn && <WorldSeriesTrophy size={46} />}
+          {room.dynastyOn && <DynastyTrophy size={46} />}
           {room.championsOn && <ChampionsTrophy size={56} />}
         </div>
       )}
@@ -209,9 +218,17 @@ export function TrophyRoomDetail({ room }: { room: TrophyRoom }) {
       </Shelf>
 
       {room.worldSeriesOn && (
-        <Shelf title="GGG World Series Trophy" note={`Found ${room.worldSeriesOn} · a clean book for a full game in How to Keep the Book.`}>
+        <Shelf title="GGG World Series Trophy" note={`Found ${room.worldSeriesOn} · a clean book in a How to Keep the Book game.`}>
           <div className="flex justify-center">
             <WorldSeriesTrophy size={170} />
+          </div>
+        </Shelf>
+      )}
+
+      {room.dynastyOn && (
+        <Shelf title={DYNASTY_TROPHY} note={`Found ${room.dynastyOn} · clean books in all ten How to Keep the Book games.`}>
+          <div className="flex justify-center">
+            <DynastyTrophy size={170} />
           </div>
         </Shelf>
       )}

@@ -13,7 +13,7 @@ import type { TwisKind } from "./data";
 import { MENTAL_FIELDS } from "./shared";
 import { HITTING, HITTING_KEYS, MOVEMENT, MOVEMENT_KEYS, changes, cleanValues, type Values } from "@/lib/movement";
 import { CHAPTERS, type BoxMarks } from "@/lib/scorebook";
-import { GAME_PLAYS, canonicalMarks } from "@/lib/scorebook-game";
+import { GAME_COUNT, GAME_PLAYS, canonicalMarks } from "@/lib/scorebook-game";
 
 // ---------------------------------------------------------------------------
 // TWIS check-offs
@@ -690,21 +690,26 @@ export async function finishScorebookLessons(input: { playerId: string; chapter:
 // How to Keep the Book: the extra-credit game (graded in the database)
 // ---------------------------------------------------------------------------
 
-export type GameRun = { id: string; nextPlay: number; firstTry: number; tries: number; book: Record<string, BoxMarks> };
+export type GameRun = { id: string; game: number; nextPlay: number; firstTry: number; tries: number; book: Record<string, BoxMarks> };
 
-function toGameRun(row: { id: string; next_play: number; first_try: number; tries: number; book: Record<string, BoxMarks> }): GameRun {
-  return { id: row.id, nextPlay: row.next_play, firstTry: row.first_try, tries: row.tries, book: row.book ?? {} };
+function toGameRun(row: { id: string; game: number; next_play: number; first_try: number; tries: number; book: Record<string, BoxMarks> }): GameRun {
+  return { id: row.id, game: row.game, nextPlay: row.next_play, firstTry: row.first_try, tries: row.tries, book: row.book ?? {} };
 }
 
-/** Starts the game, or resumes the open one (restart deals a fresh one). Opens after all six chapters. */
-export async function startScorebookGame(input: { playerId: string; restart?: boolean }): Promise<{ error: string | null; run?: GameRun }> {
+/** Starts a game, or resumes its open run (restart deals a fresh one). Game 1 opens after all six chapters; each next game after a clean book. */
+export async function startScorebookGame(input: { playerId: string; game: number; restart?: boolean }): Promise<{ error: string | null; run?: GameRun }> {
   const denied = await actForCheck(input.playerId);
   if (denied) return { error: denied };
-  if (!isUuid(input.playerId)) return { error: "Unknown player." };
+  if (!isUuid(input.playerId) || !Number.isInteger(input.game) || input.game < 1 || input.game > GAME_COUNT) return { error: "Unknown game." };
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("start_scorebook_game", { p_player_id: input.playerId, p_restart: Boolean(input.restart) });
+  const { data, error } = await supabase.rpc("start_scorebook_game", {
+    p_player_id: input.playerId,
+    p_game: input.game,
+    p_restart: Boolean(input.restart),
+  });
   if (error) {
-    if (error.code === "P0001") return { error: "Finish all six chapters to unlock the game." };
+    if (error.code === "P0001") return { error: "Finish all six chapters to unlock the games." };
+    if (error.code === "P0004") return { error: `Game ${input.game} opens after a clean book in game ${input.game - 1}.` };
     return { error: friendlyDbError(error) };
   }
   const row = (Array.isArray(data) ? data[0] : data) as Parameters<typeof toGameRun>[0];
@@ -747,7 +752,7 @@ export async function finishScorebookGame(input: {
   playerId: string;
   runId: string;
   line: { V: number[]; H: number[] };
-}): Promise<{ error: string | null; lineOk?: boolean; passed?: boolean; firstTry?: number; awardEarned?: boolean }> {
+}): Promise<{ error: string | null; lineOk?: boolean; passed?: boolean; firstTry?: number; awardEarned?: boolean; allTenEarned?: boolean }> {
   const denied = await actForCheck(input.playerId);
   if (denied) return { error: denied };
   const clean = (runs: unknown) =>
@@ -761,9 +766,22 @@ export async function finishScorebookGame(input: {
     if (error.code === "P0003") return { error: "Score every batter first." };
     return { error: friendlyDbError(error) };
   }
-  const row = (Array.isArray(data) ? data[0] : data) as { line_ok: boolean; passed: boolean; first_try: number; award_earned: boolean };
+  const row = (Array.isArray(data) ? data[0] : data) as {
+    line_ok: boolean;
+    passed: boolean;
+    first_try: number;
+    award_earned: boolean;
+    all_ten_earned: boolean;
+  };
   if (row.line_ok) refresh();
-  return { error: null, lineOk: row.line_ok, passed: row.passed, firstTry: row.first_try, awardEarned: row.award_earned };
+  return {
+    error: null,
+    lineOk: row.line_ok,
+    passed: row.passed,
+    firstTry: row.first_try,
+    awardEarned: row.award_earned,
+    allTenEarned: row.all_ten_earned,
+  };
 }
 
 // ---------------------------------------------------------------------------

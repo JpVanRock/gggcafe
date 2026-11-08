@@ -1,0 +1,215 @@
+{
+  "_about": "Answer keys for the How to Keep the Book games (play-by-play in src/lib/scorebook-game.ts). Box ids are {team}{lineup spot}-{inning}: V = visitors, H = home. Each play lists the full state of every box she writes in on that play: the batter's box plus every runner on base before the pitch. tests/unit/scorebook-game.test.ts replays every game against its play-by-play. Regenerate the key migration with scripts/iq/build-game-key.py.",
+  "games": [
+    {
+      "n": 1,
+      "line": { "V": [1, 0], "H": [0, 2] },
+      "plays": [
+        { "n": 1, "boxes": { "V1-1": { "hit": 1, "path": 1 } } },
+        { "n": 2, "boxes": { "V2-1": { "play": "K", "out": 1 }, "V1-1": { "hit": 1, "path": 1 } } },
+        { "n": 3, "boxes": { "V3-1": { "hit": 2, "path": 2 }, "V1-1": { "hit": 1, "path": 4, "rbi": "21" } } },
+        { "n": 4, "boxes": { "V4-1": { "play": "6-3", "out": 2 }, "V3-1": { "hit": 2, "path": 3 } } },
+        { "n": 5, "boxes": { "V5-1": { "play": "F8", "out": 3, "lastOut": true }, "V3-1": { "hit": 2, "path": 3 } } },
+        { "n": 6, "boxes": { "H1-1": { "reached": "BB", "path": 1 } } },
+        { "n": 7, "boxes": { "H2-1": { "play": "6-4-3 DP", "out": 2 }, "H1-1": { "reached": "BB", "path": 1, "play": "6-4", "out": 1 } } },
+        { "n": 8, "boxes": { "H3-1": { "play": "Kc", "out": 3, "lastOut": true } } },
+        { "n": 9, "boxes": { "V6-2": { "play": "4-3", "out": 1 } } },
+        { "n": 10, "boxes": { "V7-2": { "play": "L5", "out": 2 } } },
+        { "n": 11, "boxes": { "V8-2": { "play": "K", "out": 3, "lastOut": true } } },
+        { "n": 12, "boxes": { "H4-2": { "play": "E6", "path": 1 } } },
+        { "n": 13, "boxes": { "H5-2": { "reached": "SAC", "play": "5-3", "out": 1 }, "H4-2": { "play": "E6", "path": 2 } } },
+        { "n": 14, "boxes": { "H6-2": { "hit": 1, "path": 1 }, "H4-2": { "play": "E6", "path": 4, "rbi": "44" } } },
+        { "n": 15, "boxes": { "H7-2": { "hit": 2, "path": 2 }, "H6-2": { "hit": 1, "path": 4, "rbi": "12" } } }
+      ]
+    },
+    {
+      "n": 2,
+      "line": { "V": [1, 0], "H": [1, 1] },
+      "plays": [
+        { "n": 1, "boxes": { "V1-1": { "hit": 4, "path": 4, "rbi": "4" } } },
+        { "n": 2, "boxes": { "V2-1": { "play": "4-3", "out": 1 } } },
+        { "n": 3, "boxes": { "V3-1": { "reached": "BB", "path": 1 } } },
+        { "n": 4, "boxes": { "V4-1": { "play": "FC", "path": 1 }, "V3-1": { "reached": "BB", "path": 1, "play": "6-4", "out": 2 } } },
+        { "n": 5, "boxes": { "V5-1": { "play": "F9", "out": 3, "lastOut": true }, "V4-1": { "play": "FC", "path": 1 } } },
+        { "n": 6, "boxes": { "H1-1": { "hit": 1, "path": 1 } } },
+        { "n": 7, "boxes": { "H2-1": { "reached": "SAC", "play": "1-3", "out": 1 }, "H1-1": { "hit": 1, "path": 2 } } },
+        { "n": 8, "boxes": { "H3-1": { "hit": 2, "path": 2 }, "H1-1": { "hit": 1, "path": 4, "rbi": "24" } } },
+        { "n": 9, "boxes": { "H4-1": { "play": "K", "out": 2 }, "H3-1": { "hit": 2, "path": 2 } } },
+        { "n": 10, "boxes": { "H5-1": { "play": "5-3", "out": 3, "lastOut": true }, "H3-1": { "hit": 2, "path": 2 } } },
+        { "n": 11, "boxes": { "V6-2": { "play": "Kc", "out": 1 } } },
+        { "n": 12, "boxes": { "V7-2": { "hit": 1, "path": 1 } } },
+        { "n": 13, "boxes": { "V8-2": { "play": "L6", "out": 2 }, "V7-2": { "hit": 1, "path": 1 } } },
+        { "n": 14, "boxes": { "V9-2": { "play": "F7", "out": 3, "lastOut": true }, "V7-2": { "hit": 1, "path": 1 } } },
+        { "n": 15, "boxes": { "H6-2": { "hit": 4, "path": 4, "rbi": "8" } } }
+      ]
+    },
+    {
+      "n": 3,
+      "line": { "V": [1, 1], "H": [0, 1] },
+      "plays": [
+        { "n": 1, "boxes": { "V1-1": { "hit": 2, "path": 2 } } },
+        { "n": 2, "boxes": { "V2-1": { "play": "4-3", "out": 1 }, "V1-1": { "hit": 2, "path": 3 } } },
+        { "n": 3, "boxes": { "V3-1": { "reached": "SAC", "play": "F8", "out": 2 }, "V1-1": { "hit": 2, "path": 4, "rbi": "21" } } },
+        { "n": 4, "boxes": { "V4-1": { "play": "K", "out": 3, "lastOut": true } } },
+        { "n": 5, "boxes": { "H1-1": { "play": "K", "out": 1 } } },
+        { "n": 6, "boxes": { "H2-1": { "play": "F9", "out": 2 } } },
+        { "n": 7, "boxes": { "H3-1": { "play": "5-3", "out": 3, "lastOut": true } } },
+        { "n": 8, "boxes": { "V5-2": { "hit": 1, "path": 1 } } },
+        { "n": 9, "boxes": { "V6-2": { "reached": "SAC", "play": "1-3", "out": 1 }, "V5-2": { "hit": 1, "path": 2 } } },
+        { "n": 10, "boxes": { "V7-2": { "hit": 1, "path": 1 }, "V5-2": { "hit": 1, "path": 4, "rbi": "19" } } },
+        { "n": 11, "boxes": { "V8-2": { "play": "4-6-3 DP", "out": 3, "lastOut": true }, "V7-2": { "hit": 1, "path": 1, "play": "4-6", "out": 2 } } },
+        { "n": 12, "boxes": { "H4-2": { "hit": 4, "path": 4, "rbi": "44" } } },
+        { "n": 13, "boxes": { "H5-2": { "play": "Kc", "out": 1 } } },
+        { "n": 14, "boxes": { "H6-2": { "play": "F8", "out": 2 } } },
+        { "n": 15, "boxes": { "H7-2": { "play": "4-3", "out": 3, "lastOut": true } } }
+      ]
+    },
+    {
+      "n": 4,
+      "line": { "V": [0, 2], "H": [1, 0] },
+      "plays": [
+        { "n": 1, "boxes": { "V1-1": { "reached": "HP", "path": 1 } } },
+        { "n": 2, "boxes": { "V2-1": { "play": "6-4-3 DP", "out": 2 }, "V1-1": { "reached": "HP", "path": 1, "play": "6-4", "out": 1 } } },
+        { "n": 3, "boxes": { "V3-1": { "play": "F8", "out": 3, "lastOut": true } } },
+        { "n": 4, "boxes": { "H1-1": { "hit": 3, "path": 3 } } },
+        { "n": 5, "boxes": { "H2-1": { "play": "6-3", "out": 1 }, "H1-1": { "hit": 3, "path": 4, "rbi": "13" } } },
+        { "n": 6, "boxes": { "H3-1": { "play": "L4", "out": 2 } } },
+        { "n": 7, "boxes": { "H4-1": { "play": "K", "out": 3, "lastOut": true } } },
+        { "n": 8, "boxes": { "V4-2": { "hit": 1, "path": 1 } } },
+        { "n": 9, "boxes": { "V5-2": { "hit": 3, "path": 3 }, "V4-2": { "hit": 1, "path": 4, "rbi": "16" } } },
+        { "n": 10, "boxes": { "V6-2": { "reached": "SAC", "play": "F9", "out": 1 }, "V5-2": { "hit": 3, "path": 4, "rbi": "44" } } },
+        { "n": 11, "boxes": { "V7-2": { "play": "Kc", "out": 2 } } },
+        { "n": 12, "boxes": { "V8-2": { "play": "3U", "out": 3, "lastOut": true } } },
+        { "n": 13, "boxes": { "H5-2": { "play": "F7", "out": 1 } } },
+        { "n": 14, "boxes": { "H6-2": { "play": "5-3", "out": 2 } } },
+        { "n": 15, "boxes": { "H7-2": { "play": "F8", "out": 3, "lastOut": true } } }
+      ]
+    },
+    {
+      "n": 5,
+      "line": { "V": [1, 0], "H": [0, 2] },
+      "plays": [
+        { "n": 1, "boxes": { "V1-1": { "play": "E4", "path": 1 } } },
+        { "n": 2, "boxes": { "V2-1": { "hit": 1, "path": 1 }, "V1-1": { "play": "E4", "path": 2 } } },
+        { "n": 3, "boxes": { "V3-1": { "hit": 1, "path": 1 }, "V1-1": { "play": "E4", "path": 4, "rbi": "24" }, "V2-1": { "hit": 1, "path": 2 } } },
+        { "n": 4, "boxes": { "V4-1": { "play": "6-4-3 DP", "out": 2 }, "V3-1": { "hit": 1, "path": 1, "play": "6-4", "out": 1 }, "V2-1": { "hit": 1, "path": 3 } } },
+        { "n": 5, "boxes": { "V5-1": { "play": "F9", "out": 3, "lastOut": true }, "V2-1": { "hit": 1, "path": 3 } } },
+        { "n": 6, "boxes": { "H1-1": { "play": "Kc", "out": 1 } } },
+        { "n": 7, "boxes": { "H2-1": { "play": "L5", "out": 2 } } },
+        { "n": 8, "boxes": { "H3-1": { "play": "4-3", "out": 3, "lastOut": true } } },
+        { "n": 9, "boxes": { "V6-2": { "play": "F8", "out": 1 } } },
+        { "n": 10, "boxes": { "V7-2": { "play": "K", "out": 2 } } },
+        { "n": 11, "boxes": { "V8-2": { "play": "6-3", "out": 3, "lastOut": true } } },
+        { "n": 12, "boxes": { "H4-2": { "reached": "BB", "path": 1 } } },
+        { "n": 13, "boxes": { "H5-2": { "reached": "HP", "path": 1 }, "H4-2": { "reached": "BB", "path": 2 } } },
+        { "n": 14, "boxes": { "H6-2": { "play": "K", "out": 1 }, "H4-2": { "reached": "BB", "path": 2 }, "H5-2": { "reached": "HP", "path": 1 } } },
+        { "n": 15, "boxes": { "H7-2": { "hit": 2, "path": 2 }, "H4-2": { "reached": "BB", "path": 4, "rbi": "30" }, "H5-2": { "reached": "HP", "path": 4, "rbi": "30" } } }
+      ]
+    },
+    {
+      "n": 6,
+      "line": { "V": [2, 0], "H": [1, 2] },
+      "plays": [
+        { "n": 1, "boxes": { "V1-1": { "hit": 1, "path": 1 } } },
+        { "n": 2, "boxes": { "V2-1": { "play": "F7", "out": 1 }, "V1-1": { "hit": 1, "path": 1 } } },
+        { "n": 3, "boxes": { "V3-1": { "hit": 4, "path": 4, "rbi": "23" }, "V1-1": { "hit": 1, "path": 4, "rbi": "23" } } },
+        { "n": 4, "boxes": { "V4-1": { "play": "K", "out": 2 } } },
+        { "n": 5, "boxes": { "V5-1": { "play": "5-3", "out": 3, "lastOut": true } } },
+        { "n": 6, "boxes": { "H1-1": { "hit": 2, "path": 2 } } },
+        { "n": 7, "boxes": { "H2-1": { "hit": 1, "path": 1 }, "H1-1": { "hit": 2, "path": 3 } } },
+        { "n": 8, "boxes": { "H3-1": { "play": "FC", "path": 1 }, "H2-1": { "hit": 1, "path": 1, "play": "4-6", "out": 1 }, "H1-1": { "hit": 2, "path": 4, "rbi": "21" } } },
+        { "n": 9, "boxes": { "H4-1": { "play": "L6", "out": 2 }, "H3-1": { "play": "FC", "path": 1 } } },
+        { "n": 10, "boxes": { "H5-1": { "play": "F9", "out": 3, "lastOut": true }, "H3-1": { "play": "FC", "path": 1 } } },
+        { "n": 11, "boxes": { "V6-2": { "play": "Kc", "out": 1 } } },
+        { "n": 12, "boxes": { "V7-2": { "play": "4-3", "out": 2 } } },
+        { "n": 13, "boxes": { "V8-2": { "play": "F8", "out": 3, "lastOut": true } } },
+        { "n": 14, "boxes": { "H6-2": { "hit": 1, "path": 1 } } },
+        { "n": 15, "boxes": { "H7-2": { "hit": 4, "path": 4, "rbi": "19" }, "H6-2": { "hit": 1, "path": 4, "rbi": "19" } } }
+      ]
+    },
+    {
+      "n": 7,
+      "line": { "V": [1, 1], "H": [0, 0] },
+      "plays": [
+        { "n": 1, "boxes": { "V1-1": { "reached": "BB", "path": 1 } } },
+        { "n": 2, "boxes": { "V2-1": { "reached": "SAC", "play": "5-3", "out": 1 }, "V1-1": { "reached": "BB", "path": 2 } } },
+        { "n": 3, "boxes": { "V3-1": { "hit": 1, "path": 1 }, "V1-1": { "reached": "BB", "path": 4, "rbi": "21" } } },
+        { "n": 4, "boxes": { "V4-1": { "play": "6-4-3 DP", "out": 3, "lastOut": true }, "V3-1": { "hit": 1, "path": 1, "play": "6-4", "out": 2 } } },
+        { "n": 5, "boxes": { "H1-1": { "hit": 1, "path": 1 } } },
+        { "n": 6, "boxes": { "H2-1": { "play": "K", "out": 1 }, "H1-1": { "hit": 1, "path": 1 } } },
+        { "n": 7, "boxes": { "H3-1": { "play": "F9", "out": 2 }, "H1-1": { "hit": 1, "path": 1 } } },
+        { "n": 8, "boxes": { "H4-1": { "play": "4-3", "out": 3, "lastOut": true }, "H1-1": { "hit": 1, "path": 1 } } },
+        { "n": 9, "boxes": { "V5-2": { "hit": 2, "path": 2 } } },
+        { "n": 10, "boxes": { "V6-2": { "play": "4-3", "out": 1 }, "V5-2": { "hit": 2, "path": 3 } } },
+        { "n": 11, "boxes": { "V7-2": { "reached": "SAC", "play": "F7", "out": 2 }, "V5-2": { "hit": 2, "path": 4, "rbi": "30" } } },
+        { "n": 12, "boxes": { "V8-2": { "play": "Kc", "out": 3, "lastOut": true } } },
+        { "n": 13, "boxes": { "H5-2": { "reached": "HP", "path": 1 } } },
+        { "n": 14, "boxes": { "H6-2": { "play": "F8", "out": 1 }, "H5-2": { "reached": "HP", "path": 1 } } },
+        { "n": 15, "boxes": { "H7-2": { "play": "6-4-3 DP", "out": 3, "lastOut": true }, "H5-2": { "reached": "HP", "path": 1, "play": "6-4", "out": 2 } } }
+      ]
+    },
+    {
+      "n": 8,
+      "line": { "V": [0, 1], "H": [1, 1] },
+      "plays": [
+        { "n": 1, "boxes": { "V1-1": { "play": "F8", "out": 1 } } },
+        { "n": 2, "boxes": { "V2-1": { "play": "K", "out": 2 } } },
+        { "n": 3, "boxes": { "V3-1": { "play": "6-3", "out": 3, "lastOut": true } } },
+        { "n": 4, "boxes": { "H1-1": { "hit": 3, "path": 3 } } },
+        { "n": 5, "boxes": { "H2-1": { "play": "4-3", "out": 1 }, "H1-1": { "hit": 3, "path": 4, "rbi": "12" } } },
+        { "n": 6, "boxes": { "H3-1": { "play": "K", "out": 2 } } },
+        { "n": 7, "boxes": { "H4-1": { "play": "L4", "out": 3, "lastOut": true } } },
+        { "n": 8, "boxes": { "V4-2": { "hit": 2, "path": 2 } } },
+        { "n": 9, "boxes": { "V5-2": { "play": "6-3", "out": 1 }, "V4-2": { "hit": 2, "path": 3 } } },
+        { "n": 10, "boxes": { "V6-2": { "reached": "SAC", "play": "F8", "out": 2 }, "V4-2": { "hit": 2, "path": 4, "rbi": "15" } } },
+        { "n": 11, "boxes": { "V7-2": { "play": "K", "out": 3, "lastOut": true } } },
+        { "n": 12, "boxes": { "H5-2": { "reached": "BB", "path": 1 } } },
+        { "n": 13, "boxes": { "H6-2": { "reached": "SAC", "play": "1-3", "out": 1 }, "H5-2": { "reached": "BB", "path": 2 } } },
+        { "n": 14, "boxes": { "H7-2": { "play": "Kc", "out": 2 }, "H5-2": { "reached": "BB", "path": 2 } } },
+        { "n": 15, "boxes": { "H8-2": { "hit": 1, "path": 1 }, "H5-2": { "reached": "BB", "path": 4, "rbi": "31" } } }
+      ]
+    },
+    {
+      "n": 9,
+      "line": { "V": [2, 0], "H": [0, 0] },
+      "plays": [
+        { "n": 1, "boxes": { "V1-1": { "hit": 1, "path": 1 } } },
+        { "n": 2, "boxes": { "V2-1": { "play": "FC", "path": 1 }, "V1-1": { "hit": 1, "path": 1, "play": "5-4", "out": 1 } } },
+        { "n": 3, "boxes": { "V3-1": { "hit": 4, "path": 4, "rbi": "24" }, "V2-1": { "play": "FC", "path": 4, "rbi": "24" } } },
+        { "n": 4, "boxes": { "V4-1": { "play": "K", "out": 2 } } },
+        { "n": 5, "boxes": { "V5-1": { "play": "F7", "out": 3, "lastOut": true } } },
+        { "n": 6, "boxes": { "H1-1": { "play": "L6", "out": 1 } } },
+        { "n": 7, "boxes": { "H2-1": { "play": "3U", "out": 2 } } },
+        { "n": 8, "boxes": { "H3-1": { "play": "F9", "out": 3, "lastOut": true } } },
+        { "n": 9, "boxes": { "V6-2": { "hit": 1, "path": 1 } } },
+        { "n": 10, "boxes": { "V7-2": { "play": "6-4-3 DP", "out": 2 }, "V6-2": { "hit": 1, "path": 1, "play": "6-4", "out": 1 } } },
+        { "n": 11, "boxes": { "V8-2": { "hit": 2, "path": 2 } } },
+        { "n": 12, "boxes": { "V9-2": { "play": "4-3", "out": 3, "lastOut": true }, "V8-2": { "hit": 2, "path": 2 } } },
+        { "n": 13, "boxes": { "H4-2": { "play": "Kc", "out": 1 } } },
+        { "n": 14, "boxes": { "H5-2": { "play": "F8", "out": 2 } } },
+        { "n": 15, "boxes": { "H6-2": { "play": "5-3", "out": 3, "lastOut": true } } }
+      ]
+    },
+    {
+      "n": 10,
+      "line": { "V": [2, 0], "H": [0, 3] },
+      "plays": [
+        { "n": 1, "boxes": { "V1-1": { "reached": "HP", "path": 1 } } },
+        { "n": 2, "boxes": { "V2-1": { "reached": "BB", "path": 1 }, "V1-1": { "reached": "HP", "path": 2 } } },
+        { "n": 3, "boxes": { "V3-1": { "hit": 2, "path": 2 }, "V1-1": { "reached": "HP", "path": 4, "rbi": "23" }, "V2-1": { "reached": "BB", "path": 3 } } },
+        { "n": 4, "boxes": { "V4-1": { "reached": "SAC", "play": "F9", "out": 1 }, "V2-1": { "reached": "BB", "path": 4, "rbi": "44" }, "V3-1": { "hit": 2, "path": 3 } } },
+        { "n": 5, "boxes": { "V5-1": { "play": "K", "out": 2 }, "V3-1": { "hit": 2, "path": 3 } } },
+        { "n": 6, "boxes": { "V6-1": { "play": "6-3", "out": 3, "lastOut": true }, "V3-1": { "hit": 2, "path": 3 } } },
+        { "n": 7, "boxes": { "H1-1": { "play": "F8", "out": 1 } } },
+        { "n": 8, "boxes": { "H2-1": { "play": "K", "out": 2 } } },
+        { "n": 9, "boxes": { "H3-1": { "play": "4-3", "out": 3, "lastOut": true } } },
+        { "n": 10, "boxes": { "V7-2": { "play": "L5", "out": 1 } } },
+        { "n": 11, "boxes": { "V8-2": { "play": "Kc", "out": 2 } } },
+        { "n": 12, "boxes": { "V9-2": { "play": "F7", "out": 3, "lastOut": true } } },
+        { "n": 13, "boxes": { "H4-2": { "play": "E5", "path": 1 } } },
+        { "n": 14, "boxes": { "H5-2": { "hit": 1, "path": 1 }, "H4-2": { "play": "E5", "path": 2 } } },
+        { "n": 15, "boxes": { "H6-2": { "hit": 4, "path": 4, "rbi": "5" }, "H4-2": { "play": "E5", "path": 4, "rbi": "5" }, "H5-2": { "hit": 1, "path": 4, "rbi": "5" } } }
+      ]
+    }
+  ]
+}

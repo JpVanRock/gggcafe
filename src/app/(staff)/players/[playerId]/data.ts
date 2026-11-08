@@ -412,11 +412,9 @@ export async function loadIq(supabase: Supabase, playerId: string) {
     supabase.from("player_hidden_awards").select("award, earned_on").eq("player_id", playerId),
     supabase
       .from("scorebook_game_runs")
-      .select("id, next_play, first_try, finished_at, passed")
+      .select("id, game, next_play, first_try, finished_at, passed")
       .eq("player_id", playerId)
-      .order("started_at", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
+      .order("started_at", { ascending: false }),
   ]);
   return {
     questions: ((questionsResult.data ?? []) as Omit<IqQuestion, "correct_index" | "explanation">[]).map((q) => ({
@@ -436,8 +434,9 @@ export async function loadIq(supabase: Supabase, playerId: string) {
       step: p.step,
       completedAt: p.completed_at,
     })),
-    hiddenAwards: (hiddenResult.data ?? []) as { award: "world-series"; earned_on: string }[],
-    lastGame: (gameResult.data ?? null) as { id: string; next_play: number; first_try: number; finished_at: string | null; passed: boolean | null } | null,
+    hiddenAwards: (hiddenResult.data ?? []) as { award: "world-series" | "all-ten"; earned_on: string }[],
+    /** her How to Keep the Book game runs, newest first */
+    gameRuns: (gameResult.data ?? []) as GameRunRow[],
   };
 }
 
@@ -456,6 +455,7 @@ export type IqAttempt = {
 };
 
 export type IqData = Awaited<ReturnType<typeof loadIq>>;
+export type GameRunRow = { id: string; game: number; next_play: number; first_try: number; finished_at: string | null; passed: boolean | null };
 
 // ---------------------------------------------------------------------------
 // Mental GP

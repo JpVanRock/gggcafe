@@ -7,7 +7,7 @@ import { ProgressBar } from "@/components/progress-bar";
 import { ManagerAward } from "@/components/manager-award";
 import { OutlineText } from "@/components/athletic";
 import { buttonClass } from "@/components/ui";
-import { GAME_PLAYS } from "@/lib/scorebook-game";
+import { GAME_COUNT, GAME_PLAYS, gameStatuses } from "@/lib/scorebook-game";
 import type { IqData } from "./data";
 import type { Nameplate } from "./iq-client";
 
@@ -31,8 +31,8 @@ export type Course = {
   done: number;
   total: number;
   next: number | null;
-  /** the extra-credit game: opens after every chapter; won = she found the hidden award */
-  game: { unlocked: boolean; won: boolean; batter: number | null };
+  /** the extra-credit games: open after every chapter; clean = games with a clean book */
+  game: { unlocked: boolean; clean: number; playing: { n: number; batter: number } | null };
 };
 
 export function buildCourse(iq: IqData): Course {
@@ -61,14 +61,15 @@ export function buildCourse(iq: IqData): Course {
     };
   });
   const progress = courseProgress(iq.scorebookProgress, awards);
-  const open = iq.lastGame && !iq.lastGame.finished_at ? iq.lastGame : null;
+  const games = gameStatuses(iq.gameRuns);
+  const playing = games.find((g) => g.status === "playing");
   return {
     chapters,
     ...progress,
     game: {
       unlocked: progress.done === progress.total,
-      won: iq.hiddenAwards.some((a) => a.award === "world-series"),
-      batter: open ? Math.min(open.next_play, GAME_PLAYS) : null,
+      clean: games.filter((g) => g.status === "clean").length,
+      playing: playing ? { n: playing.n, batter: playing.batter ?? 1 } : null,
     },
   };
 }
@@ -94,9 +95,9 @@ export function chapterHref(playerId: string, n: number) {
 
 function gameLine(game: Course["game"]) {
   if (!game.unlocked) return "Finish all six chapters to unlock";
-  if (game.won) return "Clean book kept · check your Trophy Room";
-  if (game.batter) return `In progress · batter ${game.batter} of ${GAME_PLAYS}`;
-  return `2 innings · ${GAME_PLAYS} batters · mystery reward`;
+  if (game.playing) return `Game ${game.playing.n} in progress · batter ${game.playing.batter} of ${GAME_PLAYS} · ${game.clean} of ${GAME_COUNT} clean`;
+  if (game.clean) return `${game.clean} of ${GAME_COUNT} games kept clean`;
+  return `${GAME_COUNT} games · 2 innings, ${GAME_PLAYS} batters each · mystery reward`;
 }
 
 /** The course on the Softball IQ page. */
@@ -163,8 +164,8 @@ export function CourseCard({ playerId, course, plate }: { playerId: string; cour
                   XC
                 </OutlineText>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-semibold text-ink">Extra credit: keep the book for a real game</span>
-                  <span className={`block font-mono text-[11px] tracking-wider uppercase ${course.game.won ? "text-highlight" : "text-pink-soft"}`}>
+                  <span className="block text-sm font-semibold text-ink">Extra credit: keep the book for real games</span>
+                  <span className={`block font-mono text-[11px] tracking-wider uppercase ${course.game.clean ? "text-highlight" : "text-pink-soft"}`}>
                     {gameLine(course.game)}
                   </span>
                 </span>

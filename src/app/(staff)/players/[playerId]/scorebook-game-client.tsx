@@ -10,10 +10,11 @@ import { buttonClass, inputClass, secondaryButtonClass } from "@/components/ui";
 import { ProgressBar } from "@/components/progress-bar";
 import { ScoreBox, ScoreSheet } from "@/components/scorebook";
 import { WorldSeriesTrophy } from "@/components/world-series-trophy";
+import { DYNASTY_TROPHY, DynastyTrophy } from "@/components/dynasty-trophy";
 import type { BoxMarks } from "@/lib/scorebook";
 import {
-  CALLS, CLEAN_BOOK, GAME_PLAYS, PLAY_TOKENS, TEAMS, boxId, canonicalMarks, formatPlay, parseBoxId, parsePlay, runnersOn,
-  type Team,
+  CLEAN_BOOK, GAMES, GAME_COUNT, GAME_PLAYS, PLAY_TOKENS, boxId, canonicalMarks, formatPlay, parseBoxId, parsePlay, runnersOn, teamsOf,
+  type Club, type Team,
 } from "@/lib/scorebook-game";
 import { finishScorebookGame, scoreGamePlay, startScorebookGame, type GameRun } from "./actions";
 
@@ -38,10 +39,10 @@ function chip(on: boolean, flagged = false) {
   }`;
 }
 
-function playerOf(id: string) {
+function playerOf(id: string, teams: Record<Team, Club>) {
   const p = parseBoxId(id);
   if (!p) return null;
-  const player = TEAMS[p.team].lineup[p.row - 1];
+  const player = teams[p.team].lineup[p.row - 1];
   return { ...p, ...player, last: player.name.split(",")[0] };
 }
 
@@ -56,6 +57,7 @@ function draftFrom(marks: BoxMarks | undefined): Draft {
 /** One box she's writing in: circle, play, out, how far she got, RBI, slash. */
 function BoxEditor({
   id,
+  teams,
   role,
   draft,
   onChange,
@@ -64,6 +66,7 @@ function BoxEditor({
   disabled,
 }: {
   id: string;
+  teams: Record<Team, Club>;
   role: string;
   draft: Draft;
   onChange: (d: Draft) => void;
@@ -71,7 +74,7 @@ function BoxEditor({
   flagged: Set<string>;
   disabled: boolean;
 }) {
-  const who = playerOf(id)!;
+  const who = playerOf(id, teams)!;
   const m = draft.marks;
   const set = (patch: Partial<BoxMarks>) => onChange({ ...draft, marks: { ...m, ...patch } });
   const setTokens = (tokens: string[]) => onChange({ tokens, marks: { ...m, play: formatPlay(tokens) || undefined } });
@@ -202,20 +205,29 @@ function BoxEditor({
 
 export function GameRunner({
   playerId,
+  game: n,
   initialRun,
   canEdit,
-  won,
-  iqHref,
+  found,
+  gamesHref,
+  nextHref,
   trophiesHref,
 }: {
   playerId: string;
+  game: number;
   initialRun: GameRun | null;
   canEdit: boolean;
-  /** she's already found the surprise */
-  won: boolean;
-  iqHref: string;
+  /** the surprises she's already found */
+  found: { worldSeries: boolean; allTen: boolean };
+  /** the list of games */
+  gamesHref: string;
+  /** the next game, when there is one */
+  nextHref: string | null;
   trophiesHref: string;
 }) {
+  const game = GAMES[n - 1];
+  const TEAMS = teamsOf(game);
+  const CALLS = game.calls;
   const [run, setRun] = useState<GameRun | null>(initialRun);
   const [view, setView] = useState<View>("intro");
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
@@ -223,7 +235,7 @@ export function GameRunner({
   const [sheetTeam, setSheetTeam] = useState<Team>("V");
   const [line, setLine] = useState<Record<Team, string[]>>({ V: ["", ""], H: ["", ""] });
   const [lineWrong, setLineWrong] = useState(false);
-  const [result, setResult] = useState<{ passed: boolean; firstTry: number; awardEarned: boolean } | null>(null);
+  const [result, setResult] = useState<{ passed: boolean; firstTry: number; awardEarned: boolean; allTenEarned: boolean } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -253,7 +265,7 @@ export function GameRunner({
   function start(restart = false) {
     setError(null);
     startTransition(async () => {
-      const res = await startScorebookGame({ playerId, restart });
+      const res = await startScorebookGame({ playerId, game: n, restart });
       if (res.error || !res.run) return setError(res.error ?? "Couldn't start the game.");
       setLine({ V: ["", ""], H: ["", ""] });
       setResult(null);
@@ -292,7 +304,12 @@ export function GameRunner({
       if (res.error) return setError(res.error);
       if (!res.lineOk) return setLineWrong(true);
       setLineWrong(false);
-      setResult({ passed: Boolean(res.passed), firstTry: res.firstTry ?? run.firstTry, awardEarned: Boolean(res.awardEarned) });
+      setResult({
+        passed: Boolean(res.passed),
+        firstTry: res.firstTry ?? run.firstTry,
+        awardEarned: Boolean(res.awardEarned),
+        allTenEarned: Boolean(res.allTenEarned),
+      });
       setView("result");
     });
   }
@@ -300,13 +317,15 @@ export function GameRunner({
   const header = (
     <div className="flex flex-wrap items-end justify-between gap-3">
       <div>
-        <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">How to Keep the Book · Extra credit</p>
+        <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">
+          How to Keep the Book · Game {n} of {GAME_COUNT}
+        </p>
         <h2 className="mt-1 font-display text-3xl font-bold tracking-wide text-highlight uppercase">
           {TEAMS.V.short} at {TEAMS.H.short}
         </h2>
       </div>
-      <Link href={iqHref} className="text-sm text-pink hover:underline">
-        ← Softball IQ
+      <Link href={gamesHref} className="text-sm text-pink hover:underline">
+        ← All games
       </Link>
     </div>
   );
@@ -333,7 +352,11 @@ export function GameRunner({
             </li>
           </ul>
           <p className="mt-4 font-mono text-xs tracking-widest text-pink-soft uppercase">
-            {won ? "You've already found what this game was hiding. Play it again any time." : "A clean book unlocks something. That's all we're saying."}
+            {!found.worldSeries
+              ? "A clean book unlocks something. That's all we're saying."
+              : !found.allTen
+                ? `Clean books in all ${GAME_COUNT} games? Something else is waiting.`
+                : "You've found everything these games were hiding. Play any of them again."}
           </p>
           <div className="mt-5 flex flex-wrap items-center gap-3">
             <button type="button" onClick={() => start()} disabled={!canEdit || pending} className={buttonClass}>
@@ -362,22 +385,48 @@ export function GameRunner({
     return (
       <div className="flex flex-col gap-5">
         {header}
-        {result.passed ? (
+        {result.passed && (result.allTenEarned || result.awardEarned) ? (
           <div className="flex flex-col items-center gap-3 rounded-xl border border-neon bg-neon/10 p-6 text-center">
-            <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">Clean book · {result.firstTry} of {GAME_PLAYS} first try</p>
-            <WorldSeriesTrophy size={240} />
-            <p className="font-display text-3xl font-bold tracking-wide text-highlight uppercase">GGG World Series Trophy</p>
+            <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">
+              Clean book · {result.firstTry} of {GAME_PLAYS} first try
+            </p>
+            {result.allTenEarned ? <DynastyTrophy size={240} /> : <WorldSeriesTrophy size={240} />}
+            <p className="font-display text-3xl font-bold tracking-wide text-highlight uppercase">
+              {result.allTenEarned ? DYNASTY_TROPHY : "GGG World Series Trophy"}
+            </p>
             <p className="max-w-md text-sm">
-              {result.awardEarned
-                ? "You kept the book for a full game without losing the thread. That's a scorekeeper. The trophy is in your Trophy Room."
-                : "Clean book again. The trophy's already in your case."}
+              {result.allTenEarned
+                ? `Ten games, ten clean books. Nobody keeps a better book than you. The ${DYNASTY_TROPHY} is in your Trophy Room.`
+                : "You kept the book for a full game without losing the thread. That's a scorekeeper. The trophy is in your Trophy Room."}
             </p>
             <div className="mt-2 flex flex-wrap justify-center gap-2">
               <Link href={trophiesHref} className={buttonClass}>
                 See the Trophy Room
               </Link>
-              <Link href={iqHref} className={secondaryButtonClass}>
-                Back to Softball IQ
+              {nextHref && (
+                <Link href={nextHref} className={secondaryButtonClass}>
+                  Game {n + 1} →
+                </Link>
+              )}
+            </div>
+          </div>
+        ) : result.passed ? (
+          <div className="flex flex-col items-center gap-3 rounded-xl border border-neon bg-neon/10 p-6 text-center">
+            <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">Game {n} · clean book</p>
+            <p className="text-4xl font-bold text-highlight tabular-nums">
+              {result.firstTry}/{GAME_PLAYS}
+            </p>
+            <p className="max-w-md text-sm">
+              {nextHref ? `Right on the first try, and the line score checks out. Game ${n + 1} is open.` : "Right on the first try, and the line score checks out."}
+            </p>
+            <div className="mt-2 flex flex-wrap justify-center gap-2">
+              {nextHref && (
+                <Link href={nextHref} className={buttonClass}>
+                  Game {n + 1} →
+                </Link>
+              )}
+              <Link href={gamesHref} className={secondaryButtonClass}>
+                All games
               </Link>
             </div>
           </div>
@@ -394,8 +443,8 @@ export function GameRunner({
               <button type="button" onClick={() => start()} disabled={pending} className={buttonClass}>
                 Play it again
               </button>
-              <Link href={iqHref} className={secondaryButtonClass}>
-                Back to Softball IQ
+              <Link href={gamesHref} className={secondaryButtonClass}>
+                All games
               </Link>
             </div>
           </div>
@@ -542,6 +591,7 @@ export function GameRunner({
                 <BoxEditor
                   key={id}
                   id={id}
+                  teams={TEAMS}
                   role={id === batter ? "Batting" : `Runner · was on ${BASES[run.book[id]?.path ?? 0]}`}
                   draft={drafts[id] ?? draftFrom(undefined)}
                   onChange={(d) => setDrafts({ ...drafts, [id]: d })}
@@ -556,7 +606,7 @@ export function GameRunner({
                   <ul className="mt-1 list-disc pl-5">
                     {[...wrongBy].map(([id, fields]) => (
                       <li key={id}>
-                        Check {playerOf(id) ? `${playerOf(id)!.last}'s box` : "the book"}: {[...fields].map((f) => FIELD_NAME[f] ?? f).join(", ")}.
+                        Check {playerOf(id, TEAMS) ? `${playerOf(id, TEAMS)!.last}'s box` : "the book"}: {[...fields].map((f) => FIELD_NAME[f] ?? f).join(", ")}.
                       </li>
                     ))}
                   </ul>
