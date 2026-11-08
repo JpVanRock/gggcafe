@@ -82,6 +82,9 @@ export function DugoutStrip({
     >
       <div className="min-w-0">
         <p className="font-mono text-[0.75rem] leading-4 tracking-[0.25em] text-pink-soft uppercase">{label}</p>
+        {teams.map((t) => t.culture?.motto).filter(Boolean).slice(0, 1).map((m) => (
+          <p key={m} className="font-display text-sm font-bold tracking-wide text-highlight uppercase italic">“{m}”</p>
+        ))}
         <p className="mt-0.5 truncate text-sm font-semibold text-ink">{names}</p>
       </div>
       {teamHref ? (

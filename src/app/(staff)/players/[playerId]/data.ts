@@ -606,7 +606,7 @@ export async function loadTeamDugout(supabase: Supabase, playerId: string): Prom
 
   const ids = [...teams.keys()];
   const [cultureResult, standardsResult] = await Promise.all([
-    supabase.from("team_culture").select("team_id, headline, statement").in("team_id", ids),
+    supabase.from("team_culture").select("team_id, headline, statement, motto").in("team_id", ids),
     supabase.from("team_standards").select("team_id, title, detail").in("team_id", ids).order("position"),
   ]);
   const cultures = (cultureResult.data ?? []) as (TeamCulture & { team_id: string })[];
@@ -618,7 +618,7 @@ export async function loadTeamDugout(supabase: Supabase, playerId: string): Prom
       const c = cultures.find((x) => x.team_id === team.id);
       return {
         team,
-        culture: c ? { headline: c.headline, statement: c.statement } : null,
+        culture: c ? { headline: c.headline, statement: c.statement, motto: c.motto ?? null } : null,
         standards: standards.filter((s) => s.team_id === team.id).map(({ title, detail }) => ({ title, detail })),
       };
     });

@@ -3,8 +3,9 @@
 import { refresh } from "next/cache";
 import { headCoachCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { friendlyDbError, text, type FormState } from "@/lib/form";
+import { friendlyDbError, oneOf, text, type FormState } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
+import { GOAL_PHASES, MOTTO_MAX, SPOTLIGHT } from "@/lib/culture";
 
 export async function saveTeamDugout(_prev: FormState, fd: FormData): Promise<FormState> {
   const denied = await headCoachCheck();
@@ -38,4 +39,112 @@ export async function saveTeamDugout(_prev: FormState, fd: FormData): Promise<Fo
 
   refresh();
   return { error: null, saved: true };
+}
+
+// ---------------------------------------------------------------------------
+// Culture & team (Phase 5): motto, Team Season Goals, Player Spotlights (head coach)
+// ---------------------------------------------------------------------------
+
+export async function saveMotto(_prev: FormState, fd: FormData): Promise<FormState> {
+  const denied = await headCoachCheck();
+  if (denied) return { error: denied };
+  const teamId = text(fd, "team_id");
+  const motto = text(fd, "motto");
+  if (!isUuid(teamId)) return { error: "Unknown team." };
+  if (motto && motto.length > MOTTO_MAX) return { error: `Keep the motto under ${MOTTO_MAX} characters.` };
+  const supabase = await createClient();
+  const { error } = await supabase.from("team_culture").upsert({ team_id: teamId, motto, updated_at: new Date().toISOString() }, { onConflict: "team_id" });
+  if (error) return { error: friendlyDbError(error) };
+  refresh();
+  return { error: null, saved: true };
+}
+
+function amount(fd: FormData, name: string): number | null | "invalid" {
+  const raw = text(fd, name);
+  if (raw === null) return null;
+  const n = Number(raw.replace(",", "."));
+  return Number.isFinite(n) && Math.abs(n) < 1_000_000 ? n : "invalid";
+}
+
+export async function saveGoal(_prev: FormState, fd: FormData): Promise<FormState> {
+  const denied = await headCoachCheck();
+  if (denied) return { error: denied };
+  const id = text(fd, "id");
+  const teamId = text(fd, "team_id");
+  const phase = oneOf(fd, "phase", GOAL_PHASES) ?? "season";
+  const title = text(fd, "title");
+  const unit = text(fd, "unit");
+  const target = amount(fd, "target");
+  const current = amount(fd, "current");
+  if (!isUuid(teamId) || (id && !isUuid(id))) return { error: "Unknown team." };
+  if (!title || title.length > 140) return { error: "Write the goal (140 characters at most)." };
+  if (target === "invalid" || current === "invalid") return { error: "Target and progress are numbers." };
+  if (unit && unit.length > 20) return { error: "Keep the unit short (20 characters)." };
+  const supabase = await createClient();
+  const row = { team_id: teamId, phase, title, target, current, unit, updated_at: new Date().toISOString() };
+  const { error } = id ? await supabase.from("team_goals").update(row).eq("id", id) : await supabase.from("team_goals").insert({ ...row, position: Date.now() % 30000 });
+  if (error) return { error: friendlyDbError(error) };
+  refresh();
+  return { error: null, saved: true };
+}
+
+export async function setGoalAchieved(fd: FormData) {
+  if (await headCoachCheck()) return;
+  const id = text(fd, "id");
+  if (!isUuid(id)) return;
+  const supabase = await createClient();
+  await supabase.from("team_goals").update({ achieved_at: fd.get("achieved") === "on" ? new Date().toISOString() : null }).eq("id", id);
+  refresh();
+}
+
+export async function deleteGoal(fd: FormData) {
+  if (await headCoachCheck()) return;
+  const id = text(fd, "id");
+  if (!isUuid(id)) return;
+  const supabase = await createClient();
+  await supabase.from("team_goals").delete().eq("id", id);
+  refresh();
+}
+
+export async function saveSpotlight(_prev: FormState, fd: FormData): Promise<FormState> {
+  const denied = await headCoachCheck();
+  if (denied) return { error: denied };
+  const teamId = text(fd, "team_id");
+  const playerId = text(fd, "player_id");
+  const headline = text(fd, "headline");
+  const body = text(fd, "body");
+  if (!isUuid(teamId) || !isUuid(playerId)) return { error: "Pick a player." };
+  if (!headline || headline.length > SPOTLIGHT.headline) return { error: `Write a headline (${SPOTLIGHT.headline} characters at most).` };
+  if (!body || body.length > SPOTLIGHT.body) return { error: `Write the story (${SPOTLIGHT.body} characters at most).` };
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("roster_entries")
+    .select("jersey_number, player:players(first_name, preferred_name, last_name)")
+    .eq("team_id", teamId)
+    .eq("player_id", playerId)
+    .eq("active", true)
+    .limit(1)
+    .maybeSingle();
+  const entry = data as unknown as { jersey_number: string | null; player: { first_name: string; preferred_name: string | null; last_name: string } | null } | null;
+  if (!entry?.player) return { error: "She isn't on this team's roster." };
+  const { error } = await supabase.from("player_spotlights").insert({
+    team_id: teamId,
+    player_id: playerId,
+    player_name: `${entry.player.preferred_name || entry.player.first_name} ${entry.player.last_name}`,
+    jersey: entry.jersey_number,
+    headline,
+    body,
+  });
+  if (error) return { error: friendlyDbError(error) };
+  refresh();
+  return { error: null, saved: true };
+}
+
+export async function deleteSpotlight(fd: FormData) {
+  if (await headCoachCheck()) return;
+  const id = text(fd, "id");
+  if (!isUuid(id)) return;
+  const supabase = await createClient();
+  await supabase.from("player_spotlights").delete().eq("id", id);
+  refresh();
 }

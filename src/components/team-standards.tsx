@@ -3,7 +3,7 @@
 import { OutlineText, SpeedStripes } from "@/components/athletic";
 
 export type TeamStandard = { title: string; detail: string | null };
-export type TeamCulture = { headline: string | null; statement: string | null };
+export type TeamCulture = { headline: string | null; statement: string | null; /** the season motto (Phase 5) */ motto?: string | null };
 
 /** Numbered standards with outlined numerals, like a locker-room wall. */
 export function StandardsList({ standards }: { standards: TeamStandard[] }) {

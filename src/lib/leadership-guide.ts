@@ -33,7 +33,7 @@ export const LADDER = [
 ] as const;
 
 export const CORE_PARTS = ["Why it matters", "Lead yourself", "Lead others", "Lead the team", "Learn from the greats", "Keep climbing"] as const;
-export const BONUS_SHELVES = ["Lead", "Team and culture", "Character", "Mental toughness"] as const;
+export const BONUS_SHELVES = ["Lead", "Team and culture", "Character", "Mental toughness", "Know your why"] as const;
 export type CorePart = (typeof CORE_PARTS)[number];
 export type BonusShelf = (typeof BONUS_SHELVES)[number];
 
@@ -1241,6 +1241,64 @@ export const BONUS: Lesson[] = bonus([
       { key: "s1", text: "Rate your commitment honestly, 1 to 10." },
       { key: "s2", text: "Set one goal and three daily habits that get you there." },
       { key: "s3", text: "Track those habits for two weeks." },
+    ],
+  },
+  // Know your why (SB Blueprint #75, user 2026-11-08): short reflection reps
+  {
+    slug: "why-i-play",
+    part: "Know your why",
+    title: "Why I Play",
+    bigIdea: "Your why is what you hold on to when the game gets hard.",
+    body: [
+      "Everybody loves softball on the days you go 3-for-3. Your why is for the other days: the 0-for-4, the error that cost a run, the 6 a.m. bus to a tournament in the rain.",
+      "It doesn't have to sound impressive. Maybe it's your teammates, the feeling of a perfect throw, the player you want to become or the people who drive you to every game. It has to be true, and it has to be yours.",
+    ],
+    questions: [
+      { key: "q1", text: "Why do you play? Write it in one sentence." },
+      { key: "q2", text: "When was the last time your why kept you going?" },
+      { key: "q3", text: "Who do you play for besides yourself?" },
+    ],
+    steps: [
+      { key: "s1", text: "Write your why on a card and keep it in your bat bag." },
+      { key: "s2", text: "Read it before your next tournament." },
+    ],
+  },
+  {
+    slug: "how-i-want-to-be-remembered",
+    part: "Know your why",
+    title: "How I Want to Be Remembered",
+    bigIdea: "Your teammates won't remember your batting average. They'll remember how you made them feel.",
+    body: [
+      "Picture the last game of your career. What would you want your teammates to say about you in the dugout afterward? Not your stats: who you were.",
+      "That answer is a plan. If you want to be the teammate who picked everyone up, start picking people up today. Every practice is a chance to be remembered the right way.",
+    ],
+    questions: [
+      { key: "q1", text: "What three words do you want teammates to use about you?" },
+      { key: "q2", text: "What did you do this week that matches those words?" },
+      { key: "q3", text: "What's one thing you'd change so they fit even better?" },
+    ],
+    steps: [
+      { key: "s1", text: "Ask one teammate which word she'd use for you right now." },
+      { key: "s2", text: "Do one thing at the next practice that earns one of your three words." },
+    ],
+  },
+  {
+    slug: "my-why-on-hard-days",
+    part: "Know your why",
+    title: "My Why on Hard Days",
+    bigIdea: "Plan for the hard day before it comes.",
+    body: [
+      "Hard days are coming: a slump, a benching, an injury, a coach's tough feedback. Players who know their why bounce back faster because they already know what they're fighting for.",
+      "Decide now what you'll tell yourself on that day, and who you'll talk to. A leader has a plan for her own bad day, so she can still be there for her team.",
+    ],
+    questions: [
+      { key: "q1", text: "What's the hardest day you've had in softball? What got you through it?" },
+      { key: "q2", text: "What will you tell yourself the next time it happens?" },
+      { key: "q3", text: "Who will you talk to?" },
+    ],
+    steps: [
+      { key: "s1", text: "Write a two-sentence note to yourself for your next hard day." },
+      { key: "s2", text: "Tell one person on your team or at home that they're your call on a hard day." },
     ],
   },
 ]);

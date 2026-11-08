@@ -9,7 +9,7 @@ import {
 
 test("twenty-five core lessons on a seven-rung ladder, and twenty-two Extra Reps", () => {
   assert.equal(LESSONS.length, 25);
-  assert.equal(BONUS.length, 22);
+  assert.equal(BONUS.length, 25);
   assert.equal(LADDER.length, 7);
   assert.equal(lessonNumber("why-leadership"), 1);
   assert.equal(lessonNumber("keep-growing"), 25);

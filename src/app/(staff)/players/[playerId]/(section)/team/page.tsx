@@ -9,6 +9,11 @@ import { CultureStatement, StandardsList, hasCulture } from "@/components/team-s
 import { loadTeamDugout } from "../../data";
 import { loadPlayer } from "../../section-data";
 import { SectionShell } from "../section-shell";
+import { formatDay } from "@/lib/dates";
+import { pledgeStatus } from "@/lib/culture";
+import { GoalsBoard } from "@/app/(staff)/dugout/culture-team";
+import { loadTeamExtras } from "../../team-culture-data";
+import { PledgeForm } from "../../team-culture-client";
 
 export const metadata: Metadata = { title: "Team Standards & Culture · GGG.Cafe" };
 
@@ -44,6 +49,9 @@ async function Team({ params }: Pick<PageProps<"/players/[playerId]/team">, "par
       </>
     );
 
+  // Phase 5: season goals, her pledge (current season) and spotlights, per team
+  const extras = await loadTeamExtras(supabase, player.id, teams.map((t) => t.team.id));
+
   return (
     <SectionShell title="Team Standards & Culture" subtitle={teams.map((t) => t.team.name).join(" · ") || undefined}>
       {teams.length === 0 ? (
@@ -61,6 +69,69 @@ async function Team({ params }: Pick<PageProps<"/players/[playerId]/team">, "par
                 <Heading id={i === 0 ? "culture" : `culture-${team.id}`}>Team Culture</Heading>
                 {hasCulture(culture) ? <CultureStatement culture={culture} /> : <EmptyState>No team culture posted yet.{write(team.id)}</EmptyState>}
               </section>
+              {(extras.goals.get(team.id)?.length ?? 0) > 0 && (
+                <section>
+                  <Heading id={i === 0 ? "goals" : `goals-${team.id}`}>Season goals</Heading>
+                  <GoalsBoard goals={extras.goals.get(team.id)!} />
+                </section>
+              )}
+              {standards.length > 0 && (
+                <section>
+                  <Heading id={i === 0 ? "pledge" : `pledge-${team.id}`}>My commitment</Heading>
+                  {(() => {
+                    const pledge = extras.pledges.get(team.id) ?? null;
+                    const titles = standards.map((st) => st.title);
+                    const status = pledgeStatus(pledge, titles);
+                    return (
+                      <div className="flex flex-col gap-4">
+                        <p className="text-sm text-muted">
+                          One &ldquo;I will…&rdquo; line for each Team Standard, then sign the team pledge.
+                          {status.signed && pledge?.signed_at ? ` Signed by ${pledge.signed_name} on ${formatDay(pledge.signed_at.slice(0, 10))}.` : ""}
+                        </p>
+                        {access.canAct ? (
+                          <PledgeForm
+                            playerId={player.id}
+                            teamId={team.id}
+                            standards={titles}
+                            lines={pledge?.lines ?? {}}
+                            signedName={pledge?.signed_name ?? null}
+                            signedAt={pledge?.signed_at ?? null}
+                            defaultName={`${player.preferred_name || player.first_name} ${player.last_name}`}
+                          />
+                        ) : (
+                          <ul className="flex flex-col gap-1 text-sm">
+                            {titles.map((t) => (
+                              <li key={t}>
+                                <span className="font-semibold">{t}:</span> {pledge?.lines[t] ?? "–"}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </section>
+              )}
+              {(extras.spotlights.get(team.id)?.length ?? 0) > 0 && (
+                <section>
+                  <Heading id={i === 0 ? "spotlight" : `spotlight-${team.id}`}>Player Spotlight</Heading>
+                  <ul className="grid gap-3 md:grid-cols-2">
+                    {extras.spotlights.get(team.id)!.map((sp) => (
+                      <li key={sp.id} className="rounded-2xl border border-pink/50 bg-pink/5 p-4">
+                        <p className="font-mono text-[11px] tracking-widest text-pink-soft uppercase">
+                          {sp.jersey ? `#${sp.jersey} · ` : ""}
+                          {sp.player_name}
+                        </p>
+                        <p className="mt-1 font-display text-xl font-bold tracking-wide uppercase">{sp.headline}</p>
+                        <p className="mt-1 line-clamp-3 text-sm text-ink/90">{sp.body}</p>
+                        <Link href={`/players/${player.id}/spotlight/${sp.id}`} className="mt-2 inline-block text-sm font-semibold text-pink hover:underline">
+                          The media-day graphic →
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
             </div>
           ))}
         </div>
