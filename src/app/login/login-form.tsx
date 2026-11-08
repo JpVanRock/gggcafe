@@ -11,11 +11,13 @@ export function LoginForm() {
   return (
     <form action={formAction} className="flex flex-col gap-4">
       <label className="flex flex-col gap-1.5">
-        <span className="text-sm font-medium">Email</span>
+        <span className="text-sm font-medium">Email or username</span>
         <input
-          type="email"
+          type="text"
           name="email"
-          autoComplete="email"
+          autoComplete="username"
+          autoCapitalize="none"
+          spellCheck={false}
           required
           defaultValue={state.email}
           className="rounded-md border border-navy-600 bg-navy-950 px-3 py-2 outline-none focus:border-pink focus:ring-2 focus:ring-pink/30"

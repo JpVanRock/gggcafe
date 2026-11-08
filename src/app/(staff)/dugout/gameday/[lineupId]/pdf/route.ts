@@ -10,6 +10,7 @@ export async function GET(_request: NextRequest, ctx: RouteContext<"/dugout/game
   const { lineupId } = await ctx.params;
   const user = await getCurrentUser();
   if (!user?.staff) return new Response("Sign in to view this lineup.", { status: 401 });
+  if (user.staff.role === "assistant") return new Response("Not found", { status: 404 });
   if (!isUuid(lineupId)) return new Response("Not found", { status: 404 });
 
   const supabase = await createClient();

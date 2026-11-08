@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { canEdit, requireStaffPage } from "@/lib/auth";
+import { canEdit, requireHeadCoachPage } from "@/lib/auth";
 import { formatDay } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
 import { playerName } from "@/lib/softball";
@@ -26,7 +26,7 @@ type Spot = { jersey_number: string | null; player: { id: string; first_name: st
 const heading = "mb-3 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
 
 async function Mentors() {
-  const user = await requireStaffPage();
+  const user = await requireHeadCoachPage();
   const editor = canEdit(user.staff.role);
   const admin = user.staff.role === "admin";
   const supabase = await createClient();

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { Suspense } from "react";
-import { canEdit, requireStaffPage } from "@/lib/auth";
+import { canEdit, requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { Card, EmptyState, Loading, buttonClass, pillQuietClass } from "@/components/ui";
@@ -24,7 +24,7 @@ export default function ParentsPage({ searchParams }: PageProps<"/dugout/parents
 
 
 async function Parents({ searchParams }: Pick<PageProps<"/dugout/parents">, "searchParams">) {
-  const user = await requireStaffPage();
+  const user = await requireHeadCoachPage();
   const editor = canEdit(user.staff.role);
   const { team: teamParam } = await searchParams;
   const supabase = await createClient();

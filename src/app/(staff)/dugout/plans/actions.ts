@@ -4,6 +4,7 @@ import { refresh } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { editorCheck, getCurrentUser } from "@/lib/auth";
+import { canEditPlanRole } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
 import { friendlyDbError, isoDate, oneOf, text, wholeNumber, type FormState } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
@@ -121,10 +122,27 @@ function cleanPlan(body: string) {
 
 export type SaveResult = { error: string | null; savedAt?: string };
 
-export async function savePracticePlan(planId: string, body: string): Promise<SaveResult> {
+/**
+ * For changes to one plan: an error unless she can edit (coach/assistant/admin)
+ * and, for an assistant coach, the plan is one she wrote. The database checks too.
+ */
+async function planEditCheck(planId: string): Promise<string | null> {
   const denied = await editorCheck();
+  if (denied) return denied;
+  if (!isUuid(planId)) return "Unknown practice plan.";
+  const user = await getCurrentUser();
+  if (user?.staff?.role !== "assistant") return null;
+  const supabase = await createClient();
+  const { data } = await supabase.from("practice_plans").select("created_by").eq("id", planId).maybeSingle();
+  if (!data) return "This plan was deleted.";
+  return canEditPlanRole(user.staff.role, user.id, (data.created_by as string | null) ?? null)
+    ? null
+    : "This is another coach's plan. Assistant coaches change only the plans they write.";
+}
+
+export async function savePracticePlan(planId: string, body: string): Promise<SaveResult> {
+  const denied = await planEditCheck(planId);
   if (denied) return { error: denied };
-  if (!isUuid(planId)) return { error: "Unknown practice plan." };
   const plan = cleanPlan(body);
   if (typeof plan === "string") return { error: plan };
 
@@ -155,9 +173,8 @@ async function finalize(supabase: Supabase, plan: PracticePlan): Promise<string 
 }
 
 export async function finalizePracticePlan(planId: string): Promise<{ error: string | null }> {
-  const denied = await editorCheck();
+  const denied = await planEditCheck(planId);
   if (denied) return { error: denied };
-  if (!isUuid(planId)) return { error: "Unknown practice plan." };
   const supabase = await createClient();
   const plan = await loadPracticePlan(supabase, planId);
   if (!plan) return { error: "This plan was deleted." };
@@ -168,19 +185,17 @@ export async function finalizePracticePlan(planId: string): Promise<{ error: str
 }
 
 export async function reopenPracticePlan(fd: FormData) {
-  if (await editorCheck()) return;
   const id = text(fd, "id");
-  if (!isUuid(id)) return;
+  if (!isUuid(id) || (await planEditCheck(id))) return;
   const supabase = await createClient();
   await supabase.from("practice_plans").update({ status: "draft", finalized_at: null }).eq("id", id);
   refresh();
 }
 
 export async function deletePracticePlan(fd: FormData) {
-  if (await editorCheck()) return;
   const id = text(fd, "id");
   const teamId = text(fd, "team_id");
-  if (!isUuid(id)) return;
+  if (!isUuid(id) || (await planEditCheck(id))) return;
   const supabase = await createClient();
   await supabase.from("practice_plans").delete().eq("id", id);
   redirect(isUuid(teamId) ? `/dugout/plans?team=${teamId}` : "/dugout/plans");
@@ -264,9 +279,8 @@ function emailBodies(plan: PracticePlan, url: string, from: string, note: string
 }
 
 export async function sharePracticePlan(planId: string, recipientIds: string[], note: string): Promise<ShareResult> {
-  const denied = await editorCheck();
+  const denied = await planEditCheck(planId);
   if (denied) return { error: denied };
-  if (!isUuid(planId)) return { error: "Unknown practice plan." };
 
   const supabase = await createClient();
   const plan = await loadPracticePlan(supabase, planId);

@@ -4,7 +4,7 @@
 // off, and remove mentors; coaches and admins assign players and can remove any
 // message (oversight). The database enforces the same rules.
 import { refresh } from "next/cache";
-import { adminCheck, editorCheck } from "@/lib/auth";
+import { adminCheck, headCoachCheck } from "@/lib/auth";
 import { friendlyDbError } from "@/lib/form";
 import { MESSAGE_PHOTO_BUCKET } from "@/lib/mentors";
 import { isUuid } from "@/lib/softball";
@@ -52,7 +52,7 @@ export async function removeMentor(input: { userId: string }): Promise<Result> {
 }
 
 export async function assignMentorPlayer(input: { mentorId: string; playerId: string }): Promise<Result> {
-  const denied = await editorCheck();
+  const denied = await headCoachCheck();
   if (denied) return { error: denied };
   if (!isUuid(input.mentorId) || !isUuid(input.playerId)) return { error: "Pick a player." };
   const supabase = await createClient();
@@ -63,7 +63,7 @@ export async function assignMentorPlayer(input: { mentorId: string; playerId: st
 }
 
 export async function unassignMentorPlayer(input: { mentorId: string; playerId: string }): Promise<Result> {
-  const denied = await editorCheck();
+  const denied = await headCoachCheck();
   if (denied) return { error: denied };
   const supabase = await createClient();
   const { error } = await supabase.from("mentor_players").delete().eq("mentor_id", input.mentorId).eq("player_id", input.playerId);
@@ -74,7 +74,7 @@ export async function unassignMentorPlayer(input: { mentorId: string; playerId: 
 
 /** Oversight: remove a message (and its photo). */
 export async function removeMentorMessage(input: { id: string }): Promise<Result> {
-  const denied = await editorCheck();
+  const denied = await headCoachCheck();
   if (denied) return { error: denied };
   if (!isUuid(input.id)) return { error: "Unknown message." };
   const supabase = await createClient();

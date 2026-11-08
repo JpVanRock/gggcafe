@@ -39,6 +39,37 @@ type SpotRow = {
   player: { id: string; first_name: string; last_name: string; preferred_name: string | null } | null;
 };
 
+/** A coach sign-up the signed-in user may decide (admins: all; head coaches: assistants). */
+export type StaffRequestRow = {
+  user_id: string;
+  display_name: string;
+  email: string;
+  role: "coach" | "assistant";
+  team_id: string | null;
+  team_name: string | null;
+  note: string | null;
+  requested_at: string;
+};
+
+/**
+ * How many approvals wait on the signed-in coach: player claims, parent requests
+ * (head coaches) and coach sign-ups she may decide. The database decides what
+ * each role sees; viewers get 0.
+ */
+export async function countWaiting(supabase: Supabase): Promise<number> {
+  const [{ data }, { data: staff }] = await Promise.all([supabase.rpc("pending_approvals"), supabase.rpc("staff_requests_to_decide")]);
+  const teams = ((data ?? []) as { player_claims: number; parent_requests: number }[]).reduce(
+    (sum, t) => sum + Number(t.player_claims) + Number(t.parent_requests),
+    0,
+  );
+  return teams + ((staff ?? []) as unknown[]).length;
+}
+
+export async function loadStaffRequests(supabase: Supabase): Promise<StaffRequestRow[]> {
+  const { data } = await supabase.rpc("staff_requests_to_decide");
+  return (data ?? []) as StaffRequestRow[];
+}
+
 export const nameKey = (s: string) => s.toLowerCase().replace(/[^a-z]/g, "");
 
 /** Everything to review for a team: player claims (with spots) and parent requests (with players). Coaches only. */

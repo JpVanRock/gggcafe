@@ -18,7 +18,10 @@ export default function RegisterPage() {
         </Link>
         <h1 className="mt-6 text-2xl font-semibold tracking-[0.08em] text-highlight uppercase">Sign up</h1>
         <span aria-hidden className="mt-2 block h-0.5 w-12 rounded-full bg-pink" />
-        <p className="mt-3 text-sm text-muted">Players claim their profile. Parents join the team. Your coach approves both.</p>
+        <p className="mt-3 text-sm text-muted">
+          Pick your account type. You confirm your email first, then a coach or admin approves you. No email? A parent can make a
+          player&apos;s login from the family page.
+        </p>
       </header>
 
       <Suspense fallback={<p className="text-center text-sm text-muted">Loading…</p>}>

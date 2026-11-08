@@ -1,9 +1,10 @@
 import "server-only";
 import { cache } from "react";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { canEditRole, isHeadCoachRole, type StaffRole } from "@/lib/roles";
 
-export type StaffRole = "viewer" | "coach" | "admin";
+export type { StaffRole };
 
 export type CurrentUser = {
   id: string;
@@ -38,8 +39,14 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   };
 });
 
+/** Coaches, assistants and admins change data; viewers only read. */
 export function canEdit(role: StaffRole) {
-  return role === "coach" || role === "admin";
+  return canEditRole(role);
+}
+
+/** Head coaches and admins: culture, GameDay, parents, mentors, every practice plan. */
+export function isHeadCoach(role: StaffRole) {
+  return isHeadCoachRole(role);
 }
 
 export type StaffUser = CurrentUser & { staff: NonNullable<CurrentUser["staff"]> };
@@ -53,6 +60,24 @@ export async function requireStaffPage(): Promise<StaffUser> {
   if (!user) redirect("/login");
   if (!user.staff) redirect("/dashboard");
   return user as StaffUser;
+}
+
+/**
+ * For the Dugout pages assistants don't get (Culture, GameDay, Parents, Mentors):
+ * a 404 for an Assistant Coach. Viewers still read them.
+ */
+export async function requireHeadCoachPage(): Promise<StaffUser> {
+  const user = await requireStaffPage();
+  if (user.staff.role === "assistant") notFound();
+  return user;
+}
+
+/** For head-coach-only server actions: an error message unless the user is a head coach or admin. */
+export async function headCoachCheck(): Promise<string | null> {
+  const user = await getCurrentUser();
+  if (!user) return "Your session has ended. Sign in again.";
+  if (!user.staff || !isHeadCoach(user.staff.role)) return "Only a head coach can change this.";
+  return null;
 }
 
 /** For admin-only server actions (e.g. granting G3 Advanced): an error message unless the user is an admin. */

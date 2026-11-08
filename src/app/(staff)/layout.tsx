@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense, type ReactNode } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { ROLE_LABEL } from "@/lib/roles";
 import { signOut } from "@/app/auth/actions";
 import { secondaryButtonClass } from "@/components/ui";
 import { Logo } from "@/components/brand";
@@ -38,7 +39,7 @@ async function UserMenu() {
     <div className="flex items-center gap-3">
       {user.staff && (
         <span className="hidden text-sm text-muted sm:inline">
-          {user.staff.displayName} · {user.staff.role}
+          {user.staff.displayName} · {ROLE_LABEL[user.staff.role]}
         </span>
       )}
       <form action={signOut}>

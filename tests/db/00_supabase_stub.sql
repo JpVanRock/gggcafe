@@ -10,7 +10,29 @@ create table auth.users (
   id                 uuid primary key default gen_random_uuid(),
   email              text unique,
   raw_user_meta_data jsonb not null default '{}'::jsonb,  -- sign-up data (display_name, role...)
-  created_at         timestamptz not null default now()
+  created_at         timestamptz not null default now(),
+  -- columns create_player_login() fills (parent-made username logins)
+  instance_id            uuid,
+  aud                    text,
+  role                   text,
+  encrypted_password     text,
+  email_confirmed_at     timestamptz,
+  confirmation_token     text,
+  recovery_token         text,
+  email_change_token_new text,
+  email_change           text,
+  raw_app_meta_data      jsonb,
+  updated_at             timestamptz
+);
+create table auth.identities (
+  id              uuid primary key default gen_random_uuid(),
+  provider_id     text not null,
+  user_id         uuid not null references auth.users (id) on delete cascade,
+  identity_data   jsonb not null,
+  provider        text not null,
+  last_sign_in_at timestamptz,
+  created_at      timestamptz,
+  updated_at      timestamptz
 );
 create function auth.uid() returns uuid language sql stable as $$
   select nullif(nullif(current_setting('request.jwt.claims', true), '')::json ->> 'sub', '')::uuid

@@ -3,6 +3,7 @@
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { buttonClass, inputClass, secondaryButtonClass } from "@/components/ui";
 import { formatDay } from "@/lib/dates";
+import { usernameFromEmail } from "@/lib/player-logins";
 import { nameKey, type ClaimRow, type ParentLinkRow, type ParentMatch, type SpotOption } from "@/lib/approvals";
 import { decidePlayerClaim, removePlayerClaim } from "../teams/actions";
 import { decideParentLink } from "./parents/actions";
@@ -66,7 +67,7 @@ export function ApprovedClaimList({ claims, spots }: { claims: ClaimRow[]; spots
           <span>
             <span className="font-semibold">{c.roster_entry_id ? (label.get(c.roster_entry_id) ?? c.typed_name) : c.typed_name}</span>{" "}
             <span className="text-muted">
-              · {c.email} · {c.season_name}
+              · {usernameFromEmail(c.email) ? `username ${usernameFromEmail(c.email)} (made by her parent)` : c.email} · {c.season_name}
             </span>
           </span>
           <form action={removePlayerClaim}>

@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { canEdit, requireStaffPage } from "@/lib/auth";
+import { canEdit, isHeadCoach, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Card, Disclosure, EmptyState, Loading, pillButtonClass, tableClass, tdClass, thClass } from "@/components/ui";
 import { batsThrows, compareJersey, playerName, type Player, type Season } from "@/lib/softball";
-import { loadTeamApprovals } from "@/lib/approvals";
+import { loadStaffRequests, loadTeamApprovals } from "@/lib/approvals";
 import { lineupSeason } from "@/lib/gameday-data";
 import { loadOwnTeams } from "../data";
 import { TeamPicker } from "../team-picker";
 import { ApprovedClaimList, PendingClaimList, PendingParentList } from "../approvals";
 import { LeaderBadge } from "@/components/leader-badge";
 import { loadLeaderBadges } from "@/lib/leader-badges";
+import { PendingStaffList, StaffList, type StaffMember } from "./staff";
 
 export const metadata: Metadata = { title: "Roster · Coaches Dugout · GGG.Cafe" };
 
@@ -33,6 +34,8 @@ function Pill({ tone, children }: { tone: "on" | "wait" | "off"; children: React
 async function Roster({ searchParams }: Pick<PageProps<"/dugout/roster">, "searchParams">) {
   const user = await requireStaffPage();
   const editor = canEdit(user.staff.role);
+  // Head coaches and admins also handle parents and coach sign-ups; assistants don't.
+  const head = isHeadCoach(user.staff.role);
   const { team: teamParam, season: seasonParam } = await searchParams;
   const supabase = await createClient();
   const teams = await loadOwnTeams(supabase);
@@ -48,11 +51,16 @@ async function Roster({ searchParams }: Pick<PageProps<"/dugout/roster">, "searc
     );
   }
   const team = teams.find((t) => t.id === teamParam) ?? teams[0];
-  const [seasonsResult, currentSeason, approvals] = await Promise.all([
+  const [seasonsResult, currentSeason, approvals, staffRequests, staffResult] = await Promise.all([
     supabase.from("seasons").select("*").order("start_date", { ascending: false, nullsFirst: false }).order("created_at", { ascending: false }),
     lineupSeason(supabase, team.id, null),
     editor ? loadTeamApprovals(supabase, team.id) : Promise.resolve(null),
+    head ? loadStaffRequests(supabase) : Promise.resolve([]),
+    supabase.from("staff").select("user_id, display_name, role"),
   ]);
+  // Coach sign-ups for this team, plus head-coach sign-ups (no team; admins only)
+  const pendingStaff = staffRequests.filter((r) => r.team_id === team.id || r.team_id === null);
+  const staff = (staffResult.data ?? []) as StaffMember[];
   const seasons = (seasonsResult.data ?? []) as Season[];
   const season = seasons.find((s) => s.id === seasonParam) ?? seasons.find((s) => s.id === currentSeason) ?? seasons[0] ?? null;
 
@@ -70,7 +78,7 @@ async function Roster({ searchParams }: Pick<PageProps<"/dugout/roster">, "searc
   const pendingClaims = claims.filter((c) => c.status === "pending");
   const approvedClaims = claims.filter((c) => c.status === "approved");
   const pendingParents = (approvals?.parentLinks ?? []).filter((l) => l.status === "pending");
-  const waiting = pendingClaims.length + pendingParents.length;
+  const waiting = pendingClaims.length + pendingParents.length + pendingStaff.length;
   const claimOf = new Map(claims.filter((c) => c.roster_entry_id && c.status !== "declined").map((c) => [c.roster_entry_id!, c.status]));
   const parentsOf = new Map<string, number>();
   for (const l of approvals?.parentLinks ?? []) if (l.status === "approved" && l.player_id) parentsOf.set(l.player_id, (parentsOf.get(l.player_id) ?? 0) + 1);
@@ -113,9 +121,17 @@ async function Roster({ searchParams }: Pick<PageProps<"/dugout/roster">, "searc
         <section id="waiting" aria-label="Waiting for approval" className={`rounded-2xl border p-4 sm:p-5 ${waiting ? "border-pink/60 bg-pink/5" : "border-navy-700 bg-navy-900/60"}`}>
           <h2 className="font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">Waiting for approval ({waiting})</h2>
           {waiting === 0 ? (
-            <p className="mt-3 text-sm text-muted">Nothing waiting. Players claiming their profile and parents asking to join show up here.</p>
+            <p className="mt-3 text-sm text-muted">
+              Nothing waiting. Players claiming their profile{head ? ", parents asking to join and coaches signing up" : ""} show up here.
+            </p>
           ) : (
             <div className="mt-4 flex flex-col gap-6">
+              {pendingStaff.length > 0 && (
+                <div>
+                  <h3 className="mb-2 text-sm font-semibold">Coaches signing up ({pendingStaff.length})</h3>
+                  <PendingStaffList requests={pendingStaff} />
+                </div>
+              )}
               {pendingClaims.length > 0 && (
                 <div>
                   <h3 className="mb-2 text-sm font-semibold">Players claiming their profile ({pendingClaims.length})</h3>
@@ -150,7 +166,7 @@ async function Roster({ searchParams }: Pick<PageProps<"/dugout/roster">, "searc
                   <th className={thClass}>B/T</th>
                   <th className={thClass}>Class</th>
                   {editor && <th className={thClass}>Player account</th>}
-                  {editor && <th className={thClass}>Parents</th>}
+                  {head && <th className={thClass}>Parents</th>}
                 </tr>
               </thead>
               <tbody>
@@ -183,7 +199,7 @@ async function Roster({ searchParams }: Pick<PageProps<"/dugout/roster">, "searc
                           {claim === "approved" ? <Pill tone="on">Claimed</Pill> : claim === "pending" ? <Pill tone="wait">Waiting</Pill> : <Pill tone="off">—</Pill>}
                         </td>
                       )}
-                      {editor && <td className={`${tdClass} tabular-nums`}>{parents || "–"}</td>}
+                      {head && <td className={`${tdClass} tabular-nums`}>{parents || "–"}</td>}
                     </tr>
                   );
                 })}
@@ -198,7 +214,12 @@ async function Roster({ searchParams }: Pick<PageProps<"/dugout/roster">, "searc
           <ApprovedClaimList claims={approvedClaims} spots={approvals!.spots} />
         </Disclosure>
       )}
-      {editor && (
+      {staff.length > 0 && (
+        <Disclosure summary={`Coaching staff (${staff.length})`}>
+          <StaffList staff={staff} isAdmin={user.staff.role === "admin"} meId={user.id} />
+        </Disclosure>
+      )}
+      {head && (
         <p className="text-xs text-muted">
           Parent sign-up codes and approved parents are on the{" "}
           <Link href={`/dugout/parents?team=${team.id}`} className="text-pink hover:underline">

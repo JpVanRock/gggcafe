@@ -1,13 +1,13 @@
 "use server";
 
 import { refresh } from "next/cache";
-import { editorCheck } from "@/lib/auth";
+import { headCoachCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { friendlyDbError, text, type FormState } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 
 export async function saveTeamDugout(_prev: FormState, fd: FormData): Promise<FormState> {
-  const denied = await editorCheck();
+  const denied = await headCoachCheck();
   if (denied) return { error: denied };
 
   const teamId = text(fd, "team_id");

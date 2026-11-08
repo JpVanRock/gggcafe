@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { canEdit, requireStaffPage } from "@/lib/auth";
+import { canEdit, requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { isUuid } from "@/lib/softball";
 import { ConfirmSubmit } from "@/components/confirm-submit";
@@ -27,7 +27,7 @@ export default function LineupPage({ params, searchParams }: PageProps<"/dugout/
 }
 
 async function LineupView({ params, searchParams }: Pick<PageProps<"/dugout/gameday/[lineupId]">, "params" | "searchParams">) {
-  const user = await requireStaffPage();
+  const user = await requireHeadCoachPage();
   const editor = canEdit(user.staff.role);
   const { lineupId } = await params;
   const { shared } = await searchParams;

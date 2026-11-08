@@ -5,6 +5,7 @@ import { requireStaffPage } from "@/lib/auth";
 import { FAQ, FEATURE_SECTIONS, TIERS, type Access } from "@/lib/access-faq";
 import { Softball } from "@/components/softball-icon";
 import { Disclosure, Loading, PageHeader } from "@/components/ui";
+import { FaqNav } from "./faq-nav";
 
 export const metadata: Metadata = { title: "Access FAQ · GGG.Cafe" };
 
@@ -36,6 +37,7 @@ async function Faq() {
   return (
     <div className="flex flex-col gap-8">
       <PageHeader title="Access FAQ" description="Admins only · what a player gets with Standard and Advanced Access, side by side" />
+      <FaqNav current="/faq" />
 
       <div className="grid gap-3 sm:grid-cols-2">
         {TIERS.map((t) => (

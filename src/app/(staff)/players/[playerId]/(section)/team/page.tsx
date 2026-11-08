@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { requirePlayerPage } from "@/lib/auth";
+import { requirePlayerPage, isHeadCoach } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { EmptyState, Loading } from "@/components/ui";
 import { ScrollToHash } from "@/components/scroll-to-hash";
@@ -35,7 +35,7 @@ async function Team({ params }: Pick<PageProps<"/players/[playerId]/team">, "par
   const player = await loadPlayer(supabase, playerId);
   const teams = await loadTeamDugout(supabase, player.id);
   const write = (teamId: string) =>
-    access.canManage && (
+    access.user.staff && isHeadCoach(access.user.staff.role) && (
       <>
         {" "}
         <Link href={`/dugout?team=${teamId}`} className="text-pink hover:underline">

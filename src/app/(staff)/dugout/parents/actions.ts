@@ -2,7 +2,7 @@
 
 import { randomInt } from "node:crypto";
 import { refresh } from "next/cache";
-import { editorCheck, getCurrentUser } from "@/lib/auth";
+import { headCoachCheck, getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { text } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
@@ -13,7 +13,7 @@ const newCode = () => Array.from({ length: 6 }, () => ALPHABET[randomInt(ALPHABE
 
 /** Turns parent sign-up on with a fresh code, or off (code = null). */
 export async function setParentCode(fd: FormData) {
-  if (await editorCheck()) return;
+  if (await headCoachCheck()) return;
   const teamId = text(fd, "team_id");
   if (!isUuid(teamId)) return;
   const supabase = await createClient();
@@ -30,7 +30,7 @@ export async function setParentCode(fd: FormData) {
 
 /** Approves a request (matched to one of the team's players) or declines it. */
 export async function decideParentLink(fd: FormData) {
-  if (await editorCheck()) return;
+  if (await headCoachCheck()) return;
   const id = text(fd, "link_id");
   const playerId = text(fd, "player_id");
   if (!isUuid(id)) return;
@@ -51,7 +51,7 @@ export async function decideParentLink(fd: FormData) {
 }
 
 export async function removeParentLink(fd: FormData) {
-  if (await editorCheck()) return;
+  if (await headCoachCheck()) return;
   const id = text(fd, "link_id");
   if (!isUuid(id)) return;
   const supabase = await createClient();

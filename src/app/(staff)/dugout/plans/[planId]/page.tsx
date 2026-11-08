@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { isUuid } from "@/lib/softball";
+import { canEditPlanRole } from "@/lib/roles";
 import { Loading } from "@/components/ui";
 import { emailConfigured } from "@/lib/email";
 import type { LibraryDrill } from "@/lib/dugout";
@@ -45,7 +46,9 @@ async function Plan({ params, searchParams }: Pick<PageProps<"/dugout/plans/[pla
   const supabase = await createClient();
   const plan = await loadPracticePlan(supabase, planId);
   if (!plan) notFound();
-  const building = editor && plan.status === "draft";
+  // Head coaches change any plan; an assistant coach only the plans she wrote (she views the rest).
+  const mine = editor && canEditPlanRole(user.staff.role, user.id, plan.created_by);
+  const building = mine && plan.status === "draft";
 
   const [roster, libraryResult, coachNames, staff] = await Promise.all([
     loadPlanRoster(supabase, plan.team.id, plan.spots.map((s) => s.player_id)),
@@ -53,7 +56,7 @@ async function Plan({ params, searchParams }: Pick<PageProps<"/dugout/plans/[pla
       ? supabase.from("practice_drills").select("id, name, description, tags, equipment, video_url").order("name")
       : Promise.resolve({ data: [] }),
     building ? loadCoachNames(supabase) : Promise.resolve([]),
-    editor ? loadCoachingStaff(supabase) : Promise.resolve([]),
+    mine ? loadCoachingStaff(supabase) : Promise.resolve([]),
   ]);
 
   return (
@@ -62,6 +65,11 @@ async function Plan({ params, searchParams }: Pick<PageProps<"/dugout/plans/[pla
         ← Practice plans · {plan.team.name}
       </Link>
       {typeof shared === "string" && plan.status === "final" && <SharedBanner shared={shared} />}
+      {editor && !mine && (
+        <p className="rounded-xl border border-navy-600 bg-navy-900/70 px-4 py-3 text-sm text-muted">
+          Another coach&apos;s plan · view only. Assistant coaches change only the plans they write.
+        </p>
+      )}
       {building ? (
         <PlanBuilder
           plan={plan}
@@ -72,7 +80,7 @@ async function Plan({ params, searchParams }: Pick<PageProps<"/dugout/plans/[pla
           emailReady={emailConfigured()}
         />
       ) : (
-        <PlanSheet plan={plan} roster={roster} canEdit={editor} staff={staff} emailReady={emailConfigured()} />
+        <PlanSheet plan={plan} roster={roster} canEdit={mine} staff={staff} emailReady={emailConfigured()} />
       )}
     </div>
   );

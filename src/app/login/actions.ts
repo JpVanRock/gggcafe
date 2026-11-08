@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { signInEmail } from "@/lib/player-logins";
 
 export type SignInState = { error: string | null; email: string };
 
@@ -13,16 +14,20 @@ export async function signIn(
   const password = String(formData.get("password") ?? "");
 
   if (!email || !password) {
-    return { error: "Enter your email and password.", email };
+    return { error: "Enter your email (or username) and password.", email };
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  // A player whose parent made her login signs in with a username instead of an email.
+  const username = !email.includes("@");
+  const { error } = await supabase.auth.signInWithPassword({ email: signInEmail(email), password });
 
   if (error) {
     const message =
       error.code === "invalid_credentials"
-        ? "That email and password don't match."
+        ? username
+          ? "That username and password don't match."
+          : "That email and password don't match."
         : error.code === "email_not_confirmed"
           ? "Your email isn't confirmed yet. Open the confirmation link we emailed you (check spam too)."
           : error.status === 429

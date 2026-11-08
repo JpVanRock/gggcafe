@@ -9,6 +9,8 @@ import { Card, Disclosure, Loading, PageHeader, secondaryButtonClass } from "@/c
 import { JoinForm } from "./join-form";
 import { FamilyHeader } from "./header";
 import { yearbookTeams } from "@/lib/yearbook-data";
+import { suggestUsername } from "@/lib/player-logins";
+import { CreatePlayerLoginForm, ResetPlayerPasswordForm } from "./player-login";
 
 export const metadata: Metadata = { title: "Family · GGG.Cafe" };
 
@@ -25,6 +27,8 @@ export default function FamilyPage({ searchParams }: PageProps<"/family">) {
   );
 }
 
+type Daughter = { player_id: string; player_name: string; team_name: string; on_roster: boolean; username: string | null; has_account: boolean };
+
 type Link_ = {
   link_id: string;
   team_id: string;
@@ -40,11 +44,13 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
   const { code } = await searchParams;
 
   const supabase = await createClient();
-  const [{ data: account }, { data: claims }, linksResult] = await Promise.all([
+  const [{ data: account }, { data: claims }, linksResult, daughtersResult] = await Promise.all([
     supabase.from("parent_accounts").select("display_name").eq("user_id", user.id).maybeSingle(),
     supabase.auth.getClaims(),
     supabase.rpc("parent_home"),
+    supabase.rpc("parent_player_logins"),
   ]);
+  const daughters = (daughtersResult.data ?? []) as Daughter[];
   const links = (linksResult.data ?? []) as Link_[];
   const metaName = ((claims?.claims?.user_metadata as { display_name?: string } | undefined)?.display_name ?? "").trim();
   const approvedTeams = [...new Map(links.filter((l) => l.status === "approved").map((l) => [l.team_id, l])).values()];
@@ -98,6 +104,48 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
           {links.some((l) => l.status === "declined") && (
             <p className="mt-3 text-sm text-muted">If a request wasn&apos;t approved, check the team code and name with your coach.</p>
           )}
+        </Card>
+      )}
+
+      {daughters.length > 0 && (
+        <Card title={daughters.length === 1 ? "Her login" : "Their logins"}>
+          <ul className="flex flex-col gap-5">
+            {daughters.map((d) => {
+              const first = d.player_name.split(" ")[0];
+              return (
+                <li key={d.player_id} className="flex flex-col gap-3">
+                  <p className="font-semibold">
+                    {d.player_name} <span className="font-normal text-muted">· {d.team_name}</span>
+                  </p>
+                  {d.username ? (
+                    <>
+                      <p className="text-sm text-muted">
+                        {first} signs in with the username <span className="font-mono font-bold text-ink">{d.username}</span> and the password
+                        you set.
+                      </p>
+                      <Disclosure summary={`Set a new password for ${first}`}>
+                        <ResetPlayerPasswordForm playerId={d.player_id} firstName={first} />
+                      </Disclosure>
+                    </>
+                  ) : d.has_account ? (
+                    <p className="text-sm text-muted">{first} has her own account and signs in with her email.</p>
+                  ) : !d.on_roster ? (
+                    <p className="text-sm text-muted">
+                      {first} isn&apos;t on the team&apos;s current roster yet. Once the head coach adds her, you can make her login here.
+                    </p>
+                  ) : (
+                    <>
+                      <p className="text-sm text-muted">
+                        No email for {first}? Make her a username and password; she signs in with them instead of an email. If she has
+                        an email, she can sign up herself and claim her profile.
+                      </p>
+                      <CreatePlayerLoginForm playerId={d.player_id} firstName={first} suggestion={suggestUsername(d.player_name)} />
+                    </>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
         </Card>
       )}
 

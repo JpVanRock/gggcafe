@@ -4,7 +4,7 @@
 // with the site when features change. No imports, so it runs in unit tests.
 
 export const TIERS = [
-  { key: "standard", label: "Standard Access", note: "Every player whose profile claim a coach approves." },
+  { key: "standard", label: "Standard Access", note: "Every player whose profile claim a coach approves, or whose parent made her login." },
   { key: "advanced", label: "Advanced Access", note: "G3 Advanced: an admin unlocks it per player today; a paid subscription later." },
 ] as const;
 
@@ -72,7 +72,7 @@ export const FAQ: { q: string; a: string[] }[] = [
   {
     q: "What's the difference between Standard and Advanced Access?",
     a: [
-      "Standard Access is everything on the site for a player whose profile claim a coach has approved: her menu, TWIS, goals, Softball IQ, the Trophy Room, training and the offseason Leaderboard.",
+      "Standard Access is everything on the site for a player whose profile claim a coach has approved (or whose parent made her login): her menu, TWIS, goals, Softball IQ, the Trophy Room, training and the offseason Leaderboard.",
       "Advanced Access adds G3 Advanced: Movement Preferences in her Pop Report, her How to Cook book, position chapters, and the G3 Leadership Guide for players her coach picks.",
     ],
   },
@@ -132,7 +132,7 @@ export const FAQ: { q: string; a: string[] }[] = [
   {
     q: "What can a mentor see and do?",
     a: [
-      "Mentors (a mentor, a pitching or hitting coach…) sign up and pick \"Mentor\"; an admin approves them in Coaches Dugout → Mentors, and a coach assigns their players.",
+      "Mentors (a mentor, a pitching or hitting coach…) sign up and pick \"Mentor\"; an admin approves them in Coaches Dugout → Mentors, and a head coach assigns their players.",
       "A mentor sees only her players' Goals, Pop Report (Movement Preferences only with G3 Advanced) and Mental GP, read-only. She can message them with a photo or a drill (from the Drill Library, or one she adds to it). If an admin turns on calendar dates, she can add dates to their This Week in Softball.",
       "Mentors aren't staff and see nothing else. Coaches and admins can read and remove every message.",
     ],

@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { isPlayerLoginEmail } from "@/lib/player-logins";
 
 export type ResetRequestState = { sent: boolean; error: string | null; email: string };
 
@@ -16,6 +17,10 @@ export async function requestPasswordReset(
   formData: FormData,
 ): Promise<ResetRequestState> {
   const email = String(formData.get("email") ?? "").trim();
+  // Username logins (made by a parent) have no inbox: the parent resets them on the family page.
+  if (email && (!email.includes("@") || isPlayerLoginEmail(email))) {
+    return { sent: false, error: "Signing in with a username? Ask your parent to set a new password on their family page, or ask your head coach.", email };
+  }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return { sent: false, error: "Enter the email you sign in with.", email };
   }

@@ -12,6 +12,7 @@ import { MainNav } from "@/components/main-nav";
 import { Card, Loading, PageHeader, inputClass, secondaryButtonClass } from "@/components/ui";
 import { isUuid } from "@/lib/softball";
 import { ClaimForm } from "./claim-form";
+import { usernameFromEmail } from "@/lib/player-logins";
 
 export const metadata: Metadata = { title: "My profile · GGG.Cafe" };
 
@@ -113,7 +114,7 @@ async function Me({ searchParams }: Pick<PageProps<"/me">, "searchParams">) {
 
   return (
     <div className="flex flex-col gap-8">
-      <PageHeader title={firstName ? `Hey, ${firstName}` : "My profile"} description={user.email ?? undefined}>
+      <PageHeader title={firstName ? `Hey, ${firstName}` : "My profile"} description={usernameFromEmail(user.email) ? `Username: ${usernameFromEmail(user.email)}` : (user.email ?? undefined)}>
         {user.staff && (
           <Link href="/dashboard" className={secondaryButtonClass}>
             Coach dashboard →

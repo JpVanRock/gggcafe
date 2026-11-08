@@ -3,16 +3,21 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { SIGNUP_TYPES, type SignupType } from "@/lib/account-types";
+
 
 export type RegisterState = {
   error: string | null;
   /** set when Supabase sent a confirmation email instead of signing her in */
   checkEmail?: boolean;
-  values: { role: "player" | "parent" | "mentor"; name: string; email: string; code: string; child: string; team: string; specialty: string };
+  values: { role: SignupType; name: string; email: string; code: string; child: string; team: string; specialty: string; org: string };
 };
 
 /**
- * Sign-up for players, parents and mentors.
+ * Sign-up for every account type. Each one confirms its email first (Supabase
+ * Auth "Confirm email" is on), then finishes on its own home page:
+ * Head Coach / Assistant Coach: /dashboard sends the request; an admin approves
+ * head coaches, a head coach approves assistants (staff_requests).
  * Player: creates the account, then /me shows her team's welcome message and
  * asks her to claim her profile (a coach approves it).
  * Parent: creates the account, her parent profile and the request to join the
@@ -22,27 +27,32 @@ export type RegisterState = {
  */
 export async function registerAccount(_prev: RegisterState, fd: FormData): Promise<RegisterState> {
   const values = {
-    role: (fd.get("role") === "parent" ? "parent" : fd.get("role") === "mentor" ? "mentor" : "player") as "player" | "parent" | "mentor",
+    role: SIGNUP_TYPES.find((t) => t === fd.get("role")) ?? "player",
     name: String(fd.get("name") ?? "").trim(),
     email: String(fd.get("email") ?? "").trim(),
     code: String(fd.get("code") ?? "").trim(),
     child: String(fd.get("child") ?? "").trim(),
     team: String(fd.get("team") ?? "").trim(),
     specialty: String(fd.get("specialty") ?? "").trim().slice(0, 60),
+    org: String(fd.get("org") ?? "").trim().slice(0, 120),
   };
   const player = values.role === "player";
   const mentor = values.role === "mentor";
+  const headCoach = values.role === "head-coach";
+  const assistant = values.role === "assistant-coach";
+  const coach = headCoach || assistant;
+  const parent = values.role === "parent";
   const password = String(fd.get("password") ?? "");
   const fail = (error: string): RegisterState => ({ error, values });
 
   if (!values.name || values.name.length > 80) return fail("Enter your name.");
-  if ((player || mentor) && !/\s/.test(values.name)) return fail("Enter your first and last name.");
+  if ((player || mentor || coach) && !/\s/.test(values.name)) return fail("Enter your first and last name.");
   if (!/^\S+@\S+\.\S+$/.test(values.email)) return fail("Enter a valid email address.");
   if (password.length < 8) return fail("Use a password of at least 8 characters.");
   if (password !== String(fd.get("confirm") ?? "")) return fail("The two passwords don't match.");
-  if (player && !/^[0-9a-f-]{36}$/.test(values.team)) return fail("Choose your team.");
-  if (!player && !mentor && !values.code) return fail("Enter the team code from your coach.");
-  if (!player && !mentor && (!values.child || values.child.length > 80)) return fail("Enter your daughter's first and last name.");
+  if ((player || assistant) && !/^[0-9a-f-]{36}$/.test(values.team)) return fail("Choose your team.");
+  if (parent && !values.code) return fail("Enter the team code from your coach.");
+  if (parent && (!values.child || values.child.length > 80)) return fail("Enter your daughter's first and last name.");
 
   const h = await headers();
   const host = h.get("x-forwarded-host") ?? h.get("host") ?? "gggcafe.vercel.app";
@@ -53,8 +63,14 @@ export async function registerAccount(_prev: RegisterState, fd: FormData): Promi
     email: values.email,
     password,
     options: {
-      data: { display_name: values.name, role: values.role, ...(mentor && values.specialty ? { specialty: values.specialty } : {}) },
-      emailRedirectTo: `${origin}/auth/confirm?next=${player ? "/me" : mentor ? "/mentor" : "/family"}`,
+      data: {
+        display_name: values.name,
+        role: values.role,
+        ...(mentor && values.specialty ? { specialty: values.specialty } : {}),
+        ...(assistant ? { team: values.team } : {}),
+        ...(headCoach && values.org ? { note: values.org } : {}),
+      },
+      emailRedirectTo: `${origin}/auth/confirm?next=${player ? "/me" : mentor ? "/mentor" : coach ? "/dashboard" : "/family"}`,
     },
   });
   if (error) {
@@ -81,6 +97,8 @@ export async function registerAccount(_prev: RegisterState, fd: FormData): Promi
   if (player) redirect(`/me?team=${values.team}`);
   // Mentors: an admin approves them; /mentor says so.
   if (mentor) redirect("/mentor");
+  // Coaches: /dashboard sends the request and says who approves it.
+  if (coach) redirect("/dashboard");
 
   await supabase.from("parent_accounts").insert({ display_name: values.name });
   const { error: linkError } = await supabase.rpc("request_parent_link", { p_code: values.code, p_child_name: values.child });

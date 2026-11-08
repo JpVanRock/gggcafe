@@ -30,6 +30,8 @@ export type PracticePlan = {
   status: "draft" | "final";
   finalized_at: string | null;
   shared_at: string | null;
+  /** who wrote it: an assistant coach may change only her own plans */
+  created_by: string | null;
   blocks: PlanBlock[];
   spots: PlanSpot[];
 };
@@ -47,7 +49,7 @@ export async function loadPracticePlan(supabase: Supabase, planId: string): Prom
   const { data } = await supabase
     .from("practice_plans")
     .select(
-      "id, practice_date, start_time, setting, total_minutes, location, focus, status, finalized_at, shared_at, team:teams(id, name), " +
+      "id, practice_date, start_time, setting, total_minutes, location, focus, status, finalized_at, shared_at, created_by, team:teams(id, name), " +
         "blocks:practice_plan_drills(drill_id, name, description, tags, minutes, coaches, equipment, video_url, position), " +
         "spots:practice_plan_positions(position, player_id, sort)",
     )

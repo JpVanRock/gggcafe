@@ -30,10 +30,14 @@ export function ForgotForm() {
       )}
       <label className="flex flex-col gap-1.5">
         <span className="text-sm font-medium">Email</span>
+        {/* text, not email: a username gets a clear answer (her parent resets it) */}
         <input
-          type="email"
+          type="text"
+          inputMode="email"
           name="email"
           autoComplete="email"
+          autoCapitalize="none"
+          spellCheck={false}
           required
           defaultValue={state.email}
           className="rounded-md border border-navy-600 bg-navy-950 px-3 py-2 outline-none focus:border-pink focus:ring-2 focus:ring-pink/30"

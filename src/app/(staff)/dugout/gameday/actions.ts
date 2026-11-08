@@ -3,7 +3,7 @@
 import { refresh } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { editorCheck, getCurrentUser } from "@/lib/auth";
+import { headCoachCheck, getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { friendlyDbError, isoDate, text, wholeNumber, type FormState } from "@/lib/form";
 import { formatDay, formatLongDate } from "@/lib/dates";
@@ -31,7 +31,7 @@ function rateInput(v: FormDataEntryValue | undefined, max: number) {
 }
 
 export async function saveGamedayCards(_prev: FormState, fd: FormData): Promise<FormState> {
-  const denied = await editorCheck();
+  const denied = await headCoachCheck();
   if (denied) return { error: denied };
   const teamId = text(fd, "team_id");
   const seasonId = text(fd, "season_id");
@@ -71,7 +71,7 @@ export async function saveGamedayCards(_prev: FormState, fd: FormData): Promise<
 // ---------------------------------------------------------------------------
 
 export async function createLineup(_prev: FormState, fd: FormData): Promise<FormState> {
-  const denied = await editorCheck();
+  const denied = await headCoachCheck();
   if (denied) return { error: denied };
   const teamId = text(fd, "team_id");
   const seasonId = text(fd, "season_id");
@@ -144,7 +144,7 @@ function cleanLineup(body: string) {
 }
 
 export async function saveLineup(lineupId: string, body: string): Promise<{ error: string | null; savedAt?: string }> {
-  const denied = await editorCheck();
+  const denied = await headCoachCheck();
   if (denied) return { error: denied };
   if (!isUuid(lineupId)) return { error: "Unknown lineup." };
   const lineup = cleanLineup(body);
@@ -162,7 +162,7 @@ export async function saveLineup(lineupId: string, body: string): Promise<{ erro
 }
 
 export async function finalizeLineup(lineupId: string): Promise<{ error: string | null }> {
-  const denied = await editorCheck();
+  const denied = await headCoachCheck();
   if (denied) return { error: denied };
   if (!isUuid(lineupId)) return { error: "Unknown lineup." };
   const supabase = await createClient();
@@ -177,7 +177,7 @@ export async function finalizeLineup(lineupId: string): Promise<{ error: string 
 }
 
 export async function reopenLineup(fd: FormData) {
-  if (await editorCheck()) return;
+  if (await headCoachCheck()) return;
   const id = text(fd, "id");
   if (!isUuid(id)) return;
   const supabase = await createClient();
@@ -186,7 +186,7 @@ export async function reopenLineup(fd: FormData) {
 }
 
 export async function deleteLineup(fd: FormData) {
-  if (await editorCheck()) return;
+  if (await headCoachCheck()) return;
   const id = text(fd, "id");
   const teamId = text(fd, "team_id");
   if (!isUuid(id)) return;
@@ -200,7 +200,7 @@ export async function deleteLineup(fd: FormData) {
 // ---------------------------------------------------------------------------
 
 export async function shareLineup(lineupId: string, recipientIds: string[], note: string): Promise<ShareResult> {
-  const denied = await editorCheck();
+  const denied = await headCoachCheck();
   if (denied) return { error: denied };
   if (!isUuid(lineupId)) return { error: "Unknown lineup." };
   const supabase = await createClient();

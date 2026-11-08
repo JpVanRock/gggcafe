@@ -49,6 +49,7 @@ export function PlayerMenu({
   mentorMessages = null,
   isAdmin = false,
   canManage = editor,
+  canWriteCulture = false,
   isSelf = false,
 }: {
   player: Player;
@@ -77,6 +78,8 @@ export function PlayerMenu({
   isAdmin?: boolean;
   /** coach/admin only: profile edits, question bank, Dugout links */
   canManage?: boolean;
+  /** head coaches/admins: links to write the team's standards and culture */
+  canWriteCulture?: boolean;
   /** the signed-in player viewing her own dashboard */
   isSelf?: boolean;
 }) {
@@ -245,7 +248,7 @@ export function PlayerMenu({
             canDismiss={isSelf}
           />
         )}
-        <DugoutStrip teams={dugout} canEdit={canManage} teamHref={`${base}/team`} yearbookHref={advanced.unlocked ? `${base}/yearbook` : undefined} leaderboardHref={`${base}/leaderboard`} activityHref={`${base}/log`} />
+        <DugoutStrip teams={dugout} canEdit={canWriteCulture} teamHref={`${base}/team`} yearbookHref={advanced.unlocked ? `${base}/yearbook` : undefined} leaderboardHref={`${base}/leaderboard`} activityHref={`${base}/log`} />
         <TwisBoard
           playerId={player.id}
           week={twis}

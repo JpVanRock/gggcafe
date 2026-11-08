@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { requirePlayerPage } from "@/lib/auth";
+import { requirePlayerPage, isHeadCoach } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { isISODate, todayISO, weekStart } from "@/lib/dates";
 import { isUuid, type Player } from "@/lib/softball";
@@ -82,6 +82,7 @@ async function PlayerDashboard({ params, searchParams }: Pick<PageProps<"/player
       today={today}
       canEdit={access.canAct}
       canManage={access.canManage}
+      canWriteCulture={Boolean(access.user.staff && isHeadCoach(access.user.staff.role))}
       isSelf={access.isSelf}
       advanced={advanced}
       leadership={leadership.open ? leadership.work : null}

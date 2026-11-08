@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { canEdit, requireStaffPage } from "@/lib/auth";
+import { canEdit, requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Card, EmptyState, Loading } from "@/components/ui";
 import { DugoutStrip } from "@/components/dugout-strip";
@@ -21,7 +21,7 @@ export default function DugoutPage({ searchParams }: PageProps<"/dugout">) {
 }
 
 async function StandardsAndCulture({ searchParams }: Pick<PageProps<"/dugout">, "searchParams">) {
-  const user = await requireStaffPage();
+  const user = await requireHeadCoachPage();
   const editor = canEdit(user.staff.role);
   const { team: teamParam } = await searchParams;
 

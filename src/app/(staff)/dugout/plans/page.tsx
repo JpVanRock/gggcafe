@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { canEdit, requireStaffPage } from "@/lib/auth";
+import { canEditPlanRole } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
 import { Disclosure, EmptyState, Loading } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
@@ -30,6 +31,7 @@ type PlanRow = {
   location: string | null;
   status: "draft" | "final";
   shared_at: string | null;
+  created_by: string | null;
   drills: { count: number }[];
 };
 
@@ -46,7 +48,7 @@ function StatusChip({ plan }: { plan: PlanRow }) {
   );
 }
 
-function PlanCard({ plan }: { plan: PlanRow }) {
+function PlanCard({ plan, viewOnly = false }: { plan: PlanRow; viewOnly?: boolean }) {
   const [weekday, ...rest] = formatDay(plan.practice_date).split(", ");
   const drills = plan.drills[0]?.count ?? 0;
   return (
@@ -73,7 +75,10 @@ function PlanCard({ plan }: { plan: PlanRow }) {
               .join(" · ")}
           </p>
         </div>
-        <StatusChip plan={plan} />
+        <span className="flex shrink-0 flex-col items-end gap-1">
+          <StatusChip plan={plan} />
+          {viewOnly && <span className="font-mono text-[10px] tracking-wider text-muted uppercase">View only</span>}
+        </span>
       </Link>
     </li>
   );
@@ -101,13 +106,15 @@ async function Plans({ searchParams }: Pick<PageProps<"/dugout/plans">, "searchP
 
   const { data } = await supabase
     .from("practice_plans")
-    .select("id, practice_date, start_time, setting, total_minutes, focus, location, status, shared_at, drills:practice_plan_drills(count)")
+    .select("id, practice_date, start_time, setting, total_minutes, focus, location, status, shared_at, created_by, drills:practice_plan_drills(count)")
     .eq("team_id", team.id)
     .order("practice_date", { ascending: false })
     .order("start_time", { ascending: false, nullsFirst: false });
   const plans = (data ?? []) as unknown as PlanRow[];
   const upcoming = plans.filter((p) => p.practice_date >= today).reverse();
   const past = plans.filter((p) => p.practice_date < today);
+  // Assistant coaches see every plan but change only their own.
+  const viewOnly = (p: PlanRow) => editor && !canEditPlanRole(user.staff.role, user.id, p.created_by);
 
   return (
     <div className="flex flex-col gap-8">
@@ -124,7 +131,7 @@ async function Plans({ searchParams }: Pick<PageProps<"/dugout/plans">, "searchP
         {upcoming.length ? (
           <ul className="flex flex-col gap-3">
             {upcoming.map((p) => (
-              <PlanCard key={p.id} plan={p} />
+              <PlanCard key={p.id} plan={p} viewOnly={viewOnly(p)} />
             ))}
           </ul>
         ) : (
@@ -137,7 +144,7 @@ async function Plans({ searchParams }: Pick<PageProps<"/dugout/plans">, "searchP
           <h2 className="mb-3 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">Past</h2>
           <ul className="flex flex-col gap-3">
             {past.map((p) => (
-              <PlanCard key={p.id} plan={p} />
+              <PlanCard key={p.id} plan={p} viewOnly={viewOnly(p)} />
             ))}
           </ul>
         </section>

@@ -1,11 +1,12 @@
 // The top menu. Staff get the full menu (with a count of approvals waiting on the
 // Coaches Dugout) on every page, including the player (/me) and family (/family)
-// homes; everyone else gets `fallback`. Coaches and admins also get the
-// notifications bell (new Player of the Week...); admins get the Access FAQ.
+// homes; everyone else gets `fallback`. Head coaches and admins also get the
+// notifications bell (new Player of the Week...); admins get the FAQ.
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { canEdit, getCurrentUser } from "@/lib/auth";
+import { canEdit, getCurrentUser, isHeadCoach } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { countWaiting } from "@/lib/approvals";
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard" },
@@ -25,11 +26,8 @@ export async function MainNav({ fallback = null }: { fallback?: ReactNode }) {
   const editor = canEdit(user.staff.role);
   if (editor) {
     const supabase = await createClient();
-    const [{ data }, { data: notes }] = await Promise.all([supabase.rpc("pending_approvals"), supabase.rpc("unread_notifications")]);
-    waiting = ((data ?? []) as { player_claims: number; parent_requests: number }[]).reduce(
-      (sum, t) => sum + Number(t.player_claims) + Number(t.parent_requests),
-      0,
-    );
+    const [count, { data: notes }] = await Promise.all([countWaiting(supabase), supabase.rpc("unread_notifications")]);
+    waiting = count;
     unread = Number(notes ?? 0);
   }
   return (
@@ -52,7 +50,8 @@ export async function MainNav({ fallback = null }: { fallback?: ReactNode }) {
           FAQ
         </Link>
       )}
-      {editor && (
+      {/* Player of the Week notices go to head coaches and admins */}
+      {isHeadCoach(user.staff.role) && (
         <Link
           href="/notifications"
           className={`${linkClass} inline-flex items-center gap-1`}
