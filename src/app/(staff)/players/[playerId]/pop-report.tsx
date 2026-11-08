@@ -57,10 +57,13 @@ export function PopDetail({
   move,
   styles,
   canAct = canEdit,
+  movementAccess = "open",
 }: {
   player: Player;
   pop: PopReport;
   canEdit: boolean;
+  /** Movement Preferences is G3 Advanced: "open" with it, "locked" (admins: a note) or "hidden" without */
+  movementAccess?: "open" | "locked" | "hidden";
   /** Movement Preferences and Preferred Hitting Style, newest version first */
   styles?: { movement: StyleVersion[]; hitting: StyleVersion[] };
   /** the player herself or a coach: can change her hitting style */
@@ -94,7 +97,16 @@ export function PopDetail({
         {canEdit && player.notes && <p className="mt-4 whitespace-pre-wrap text-sm text-ink/90">{player.notes}</p>}
       </section>
 
-      {styles && <MovementSection playerId={player.id} versions={styles.movement} canManage={canEdit} />}
+      {styles && movementAccess === "open" && <MovementSection playerId={player.id} versions={styles.movement} canManage={canEdit} />}
+      {movementAccess === "locked" && (
+        <p className="rounded-xl border border-dashed border-navy-600 px-4 py-3 text-sm text-muted">
+          Movement Preferences is a G3 Advanced feature.{" "}
+          <Link href={`/players/${player.id}`} className="text-pink hover:underline">
+            Unlock G3 Advanced on her menu
+          </Link>{" "}
+          to use it. Anything already saved is kept.
+        </p>
+      )}
       {styles && <HittingSection playerId={player.id} versions={styles.hitting} canAct={canAct} />}
 
       <section>

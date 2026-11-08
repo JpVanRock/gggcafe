@@ -258,6 +258,10 @@ tests/unit/              node --test unit tests (npm run test:unit)
   before upload; replaced photos are deleted. Photo and walk-up songs show in the dashboard header.
 
 ## Movement Preferences and Preferred Hitting Style (Pop Report)
+- Movement Preferences is a G3 Advanced feature (user, 2026-11-08): shown (Pop Report section, dashboard
+  summary line, move dial, at-bat focus tip) and saved only for players with G3 Advanced; the player's
+  read policy needs `private.has_advanced`. Without it nothing shows (admins see a slim locked note in her
+  Pop Report); saved versions are kept. Preferred Hitting Style stays Standard.
 - Background is the user's movement-preference booklet (2026-11-07): use its ideas, never name it or its
   company, never show testing steps, and write for a 10-year-old. Categories/choices come from the
   user's sheet (POP tab, column A); labels and plain-language text live in `src/lib/movement.ts`

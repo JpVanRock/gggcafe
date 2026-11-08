@@ -41,7 +41,14 @@ insert into public.gameday_profiles (team_id, season_id, player_id, hitting_type
 values ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000c1', 'gap', 'pure', 0.412);
 reset role;
 
--- Player: reads her movement history, can't add to it; owns her hitting style history
+-- Movement Preferences is G3 Advanced: without it she sees none (her history is kept)
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"77777777-0000-0000-0000-000000000002"}', false);
+select pg_temp.expect('no G3 Advanced: no movement preferences', (select count(*) from public.movement_preferences), 0::bigint);
+reset role;
+insert into public.player_advanced_access (player_id) values ('00000000-0000-0000-0000-0000000000c1');
+
+-- Player with G3 Advanced: reads her movement history, can't add to it; owns her hitting style history
 set role authenticated;
 select set_config('request.jwt.claims', '{"sub":"77777777-0000-0000-0000-000000000002"}', false);
 select pg_temp.expect('player sees both movement versions', (select count(*) from public.movement_preferences), 2::bigint),
@@ -99,6 +106,7 @@ end $$;
 -- Clean up
 delete from public.gameday_lineups; delete from public.gameday_profiles;
 delete from public.hitting_styles; delete from public.movement_preferences;
+delete from public.player_advanced_access where player_id = '00000000-0000-0000-0000-0000000000c1';
 delete from public.player_claims where user_id::text like '77777777-%';
 delete from public.staff where user_id::text like '77777777-%';
 delete from auth.users where id::text like '77777777-%';

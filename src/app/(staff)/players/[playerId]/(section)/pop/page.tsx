@@ -25,7 +25,7 @@ async function Pop({ params }: Pick<PageProps<"/players/[playerId]/pop">, "param
   const supabase = await createClient();
   const access = await requirePlayerPage(playerId);
   const player = await loadPlayer(supabase, playerId);
-  const [pop, styles, photos, move] = await Promise.all([
+  const [pop, styles, photos, move, { data: g3 }] = await Promise.all([
     loadPopReport(supabase, player.id),
     loadMovementAndHitting(supabase, player.id),
     signedPhotoUrls(supabase, [player.photo_path]),
@@ -35,9 +35,12 @@ async function Pop({ params }: Pick<PageProps<"/players/[playerId]/pop">, "param
           supabase.from("seasons").select("id, name").order("start_date", { ascending: false, nullsFirst: false }).order("created_at", { ascending: false }),
         ]).then(([t, s]) => ({ teams: (t.data ?? []) as MoveTeam[], seasons: (s.data ?? []) as MoveSeason[] }))
       : Promise.resolve(null),
+    // Movement Preferences is G3 Advanced
+    supabase.from("player_advanced_access").select("player_id").eq("player_id", player.id).maybeSingle(),
   ]);
+  const movementAccess = g3 ? "open" : access.user.staff?.role === "admin" ? "locked" : "hidden";
   return (
-    <SectionShell title={`${possessive(firstName(player))} Pop Report`} subtitle="Profile · movement · hitting style · teams · measurements">
+    <SectionShell title={`${possessive(firstName(player))} Pop Report`} subtitle={`Profile · ${movementAccess === "open" ? "movement · " : ""}hitting style · teams · measurements`}>
       <PopDetail
         player={player}
         pop={pop}
@@ -46,6 +49,7 @@ async function Pop({ params }: Pick<PageProps<"/players/[playerId]/pop">, "param
         photoUrl={player.photo_path ? (photos.get(player.photo_path) ?? null) : null}
         move={move}
         styles={styles}
+        movementAccess={movementAccess}
       />
     </SectionShell>
   );

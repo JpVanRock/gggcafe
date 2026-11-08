@@ -102,7 +102,8 @@ export function PlayerMenu({
       key: "pop",
       title: `${possessive(name)} Pop Report`,
       variant: "pink",
-      summary: <PopSummary player={player} pop={pop} styles={styles} />,
+      // Movement Preferences is G3 Advanced
+      summary: <PopSummary player={player} pop={pop} styles={advanced.unlocked ? styles : { ...styles, movement: [] }} />,
       href: `${base}/pop`,
     },
     {

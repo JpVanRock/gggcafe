@@ -20,7 +20,8 @@ export const FEATURE_SECTIONS: { title: string; features: Feature[] }[] = [
       { name: "Player menu dashboard", detail: "Her cafe-menu home: photo, walk-up songs, every menu board.", standard: "yes", advanced: "yes" },
       { name: "From the Dugout", detail: "Team Standards and Team Culture from her coaches.", standard: "yes", advanced: "yes" },
       { name: "This Week in Softball (TWIS)", detail: "Practices, games and her activities for the week, with check-offs.", standard: "yes", advanced: "yes" },
-      { name: "Pop Report", detail: "Profile, Movement Preferences, Preferred Hitting Style.", standard: "yes", advanced: "yes" },
+      { name: "Pop Report", detail: "Profile, teams, measurements and her Preferred Hitting Style.", standard: "yes", advanced: "yes" },
+      { name: "Movement Preferences", detail: "Her move dial and at-bat focus tip in the Pop Report, set by her coaches.", standard: "no", advanced: "yes" },
       { name: "Goals", detail: "Harada Method chart or SMART goals.", standard: "yes", advanced: "yes" },
       { name: "Mental GP", detail: "Her Mental Game Plan.", standard: "yes", advanced: "yes" },
     ],
@@ -70,7 +71,7 @@ export const FAQ: { q: string; a: string[] }[] = [
     q: "What's the difference between Standard and Advanced Access?",
     a: [
       "Standard Access is everything on the site for a player whose profile claim a coach has approved: her menu, TWIS, goals, Softball IQ, the Trophy Room, training and the offseason Leaderboard.",
-      "Advanced Access adds G3 Advanced: her How to Cook book, position chapters, and the G3 Leadership Guide for players her coach picks.",
+      "Advanced Access adds G3 Advanced: Movement Preferences in her Pop Report, her How to Cook book, position chapters, and the G3 Leadership Guide for players her coach picks.",
     ],
   },
   {
@@ -82,7 +83,9 @@ export const FAQ: { q: string; a: string[] }[] = [
   },
   {
     q: "What happens if I turn G3 Advanced off?",
-    a: ["It disappears for her right away, menu board, section and pages. Everything she wrote is kept and comes back if you unlock it again."],
+    a: [
+      "It disappears for her right away: the G3 Advanced board, section and pages, and Movement Preferences in her Pop Report. Everything she wrote, and every movement version her coaches saved, is kept and comes back if you unlock it again.",
+    ],
   },
   {
     q: "Does a player know G3 Advanced exists before she has it?",
