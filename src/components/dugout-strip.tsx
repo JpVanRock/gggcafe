@@ -26,6 +26,7 @@ export function DugoutStrip({
   canEdit,
   label = "From the Dugout",
   teamHref,
+  yearbookHref,
   leaderboardHref,
   activityHref,
 }: {
@@ -34,6 +35,8 @@ export function DugoutStrip({
   label?: string;
   /** the player's Team page: the buttons go there instead of opening pop-ups */
   teamHref?: string;
+  /** the Team Yearbook (G3 Advanced): between Team Culture and Leaderboard */
+  yearbookHref?: string;
   /** her Offseason Training Leaderboard */
   leaderboardHref?: string;
   /** + Activity: log a session */
@@ -54,6 +57,11 @@ export function DugoutStrip({
 
   const extraPills = (
     <>
+      {yearbookHref && (
+        <Link href={yearbookHref} className={`${pill} border border-ink/70 text-ink hover:bg-ink hover:text-navy-950`}>
+          Yearbook
+        </Link>
+      )}
       {leaderboardHref && (
         <Link href={leaderboardHref} className={`${pill} bg-pink text-on-accent hover:brightness-110`}>
           Leaderboard

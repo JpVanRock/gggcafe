@@ -245,7 +245,7 @@ export function PlayerMenu({
             canDismiss={isSelf}
           />
         )}
-        <DugoutStrip teams={dugout} canEdit={canManage} teamHref={`${base}/team`} leaderboardHref={`${base}/leaderboard`} activityHref={`${base}/log`} />
+        <DugoutStrip teams={dugout} canEdit={canManage} teamHref={`${base}/team`} yearbookHref={advanced.unlocked ? `${base}/yearbook` : undefined} leaderboardHref={`${base}/leaderboard`} activityHref={`${base}/log`} />
         <TwisBoard
           playerId={player.id}
           week={twis}

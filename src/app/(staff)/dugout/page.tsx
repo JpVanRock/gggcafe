@@ -68,7 +68,10 @@ async function StandardsAndCulture({ searchParams }: Pick<PageProps<"/dugout">, 
         <h2 className="font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">
           What players see above TWIS
         </h2>
-        <DugoutStrip teams={[{ team, culture, standards }]} canEdit={false} />
+        <DugoutStrip teams={[{ team, culture, standards }]} canEdit={false} yearbookHref={`/dugout/yearbook?team=${team.id}`} />
+        <p className="mt-2 text-xs text-muted">
+          The Yearbook pill shows for players with G3 Advanced. Coaches and parents of those players add photos.
+        </p>
       </section>
     </div>
   );

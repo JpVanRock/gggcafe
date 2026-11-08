@@ -4,37 +4,18 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { signOut } from "@/app/auth/actions";
-import { Logo } from "@/components/brand";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { MainNav } from "@/components/main-nav";
 import { BudgetSummary, type BudgetSummaryData } from "@/components/budget-summary";
 import { Card, Disclosure, Loading, PageHeader, secondaryButtonClass } from "@/components/ui";
 import { JoinForm } from "./join-form";
+import { FamilyHeader } from "./header";
+import { yearbookTeams } from "@/lib/yearbook-data";
 
 export const metadata: Metadata = { title: "Family · GGG.Cafe" };
 
 export default function FamilyPage({ searchParams }: PageProps<"/family">) {
   return (
     <div className="flex flex-1 flex-col">
-      <header className="sticky top-0 z-10 border-b border-pink/40 bg-navy-950/90 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-2.5">
-          <Link href="/family" aria-label="GGG.Cafe family home" className="shrink-0">
-            <Logo size={44} className="h-11 w-11" />
-          </Link>
-          <Suspense fallback={<span className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">Family</span>}>
-            <MainNav fallback={<span className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">Family</span>} />
-          </Suspense>
-          <div className="ml-auto flex items-center gap-4">
-            <ThemeToggle />
-            <form action={signOut}>
-              <button type="submit" className={secondaryButtonClass}>
-                Sign out
-              </button>
-            </form>
-          </div>
-        </div>
-      </header>
+      <FamilyHeader />
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
         <Suspense fallback={<Loading />}>
           <Family searchParams={searchParams} />
@@ -74,6 +55,7 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
     })),
   );
   const firstName = (account?.display_name ?? metaName).split(" ")[0];
+  const yearbooks = await yearbookTeams(supabase, approvedTeams.map((l) => l.team_id));
 
   return (
     <div className="flex flex-col gap-8">
@@ -117,6 +99,22 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
             <p className="mt-3 text-sm text-muted">If a request wasn&apos;t approved, check the team code and name with your coach.</p>
           )}
         </Card>
+      )}
+
+      {yearbooks.length > 0 && (
+        <Link
+          href="/family/yearbook"
+          className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border-2 border-neon bg-linear-to-r from-neon/10 to-pink/10 p-5 transition hover:from-neon/15"
+        >
+          <span>
+            <span className="block font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">
+              {approvedTeams.filter((l) => yearbooks.includes(l.team_id)).map((l) => l.team_name).join(" · ")}
+            </span>
+            <span className="block font-display text-4xl font-black tracking-tight text-highlight uppercase italic">Yearbook</span>
+            <span className="block text-sm text-muted">The season in photos. Add yours and tag the players in them.</span>
+          </span>
+          <span className="font-mono text-xs tracking-wider text-ink uppercase">Open →</span>
+        </Link>
       )}
 
       {budgets.map(({ link, summary }) => (

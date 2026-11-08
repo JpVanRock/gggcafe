@@ -58,6 +58,7 @@ export const FEATURE_SECTIONS: { title: string; features: Feature[] }[] = [
   {
     title: "G3 Advanced",
     features: [
+      { name: "Team Yearbook", detail: "The season in photos from coaches and parents, tagged by player: yearbook spreads or thumbnails.", standard: "no", advanced: "yes" },
       { name: "Her book: How to Cook", detail: "How to Compete: It Starts with Good Habits, then six chapters she builds on and completes.", standard: "no", advanced: "yes" },
       { name: "Position chapters", detail: "First one: Pitching: My Best Is Better.", standard: "no", advanced: "coach", condition: "A coach confirms her position on her book page." },
       { name: "Coming chapters", detail: "My Position, Hitting Approach, Mental Toughness (content later).", standard: "no", advanced: "yes" },
@@ -119,6 +120,13 @@ export const FAQ: { q: string; a: string[] }[] = [
     a: [
       "Most points Monday to Sunday, with at least 10, named the Tuesday after. Nobody wins twice until every teammate has won once, and never twice within six weeks.",
       "Coaches and admins get a notification (the bell in the top menu) for each new Player of the Week.",
+    ],
+  },
+  {
+    q: "Who can see and add to the Team Yearbook?",
+    a: [
+      "Players with G3 Advanced see their team's yearbook (the Yearbook pill on their menu). Parents see it as a main menu item, and can add photos, once their daughter on that team has G3 Advanced.",
+      "Coaches and admins always see it (Coaches Dugout → Culture, the Yearbook pill in \"What players see\"), add photos, and can edit or remove any of them. Whoever adds a photo can tag players, so everyone can search by name.",
     ],
   },
   {
