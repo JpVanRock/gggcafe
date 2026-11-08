@@ -4,11 +4,12 @@ import { Suspense } from "react";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { EmptyState, Loading, pillQuietClass } from "@/components/ui";
-import { todayISO } from "@/lib/dates";
+import { formatLongDate, todayISO } from "@/lib/dates";
 import { monthGrid, monthLabel, monthOf, shiftMonth, type EventKind } from "@/lib/dugout";
 import { loadOwnTeams } from "../data";
 import { TeamPicker } from "../team-picker";
 import { CalendarView, type CalEvent, type CalGame } from "./calendar";
+import { OffseasonForm } from "./offseason";
 
 export const metadata: Metadata = { title: "Calendar · Coaches Dugout · GGG.Cafe" };
 
@@ -67,7 +68,7 @@ async function Calendar({ searchParams }: Pick<PageProps<"/dugout/calendar">, "s
   const days = monthGrid(month);
   const [from, to] = [days[0], days[days.length - 1]];
 
-  const [eventsResult, gamesResult, plansResult, staffResult] = await Promise.all([
+  const [eventsResult, gamesResult, plansResult, staffResult, offseasonResult] = await Promise.all([
     supabase
       .from("team_events")
       .select("id, kind, title, event_date, start_time, end_time, location, notes, series_id, created_by, updated_by")
@@ -84,7 +85,9 @@ async function Calendar({ searchParams }: Pick<PageProps<"/dugout/calendar">, "s
       .lte("game_date", to),
     supabase.from("practice_plans").select("id, practice_date").eq("team_id", team.id).gte("practice_date", from).lte("practice_date", to),
     supabase.from("staff").select("user_id, display_name"),
+    supabase.from("team_offseason").select("starts_on, ends_on").eq("team_id", team.id).maybeSingle(),
   ]);
+  const offseason = (offseasonResult.data as { starts_on: string; ends_on: string | null } | null) ?? null;
 
   const names = new Map(((staffResult.data ?? []) as { user_id: string; display_name: string }[]).map((s) => [s.user_id, s.display_name]));
   const planByDate = new Map(((plansResult.data ?? []) as { id: string; practice_date: string }[]).map((p) => [p.practice_date, p.id]));
@@ -146,7 +149,33 @@ async function Calendar({ searchParams }: Pick<PageProps<"/dugout/calendar">, "s
           </Link>
         </nav>
       </div>
-      <CalendarView key={`${team.id}-${month}`} teamId={team.id} month={month} days={days} today={today} events={events} games={games} canEdit={editor} />
+      <section aria-label="Offseason Training" className="flex flex-col gap-3 rounded-2xl border border-neon/50 bg-neon/5 p-4 sm:p-5">
+        <div>
+          <h3 className="font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">Offseason Training</h3>
+          <p className="mt-1 text-sm">
+            {offseason
+              ? offseason.ends_on
+                ? `${formatLongDate(offseason.starts_on)} – ${formatLongDate(offseason.ends_on)}`
+                : `Started ${formatLongDate(offseason.starts_on)} · no end date yet`
+              : "Not set. The players' Leaderboard opens once you set a start date."}
+          </p>
+          <p className="mt-1 text-xs text-muted">
+            Only sessions and unlocks between these dates count on the players&apos; Leaderboard and for Player of the Week.
+          </p>
+        </div>
+        {editor && <OffseasonForm key={`${team.id}-${offseason?.starts_on}-${offseason?.ends_on}`} teamId={team.id} startsOn={offseason?.starts_on ?? null} endsOn={offseason?.ends_on ?? null} />}
+      </section>
+      <CalendarView
+        key={`${team.id}-${month}`}
+        teamId={team.id}
+        month={month}
+        days={days}
+        today={today}
+        events={events}
+        games={games}
+        canEdit={editor}
+        offseason={offseason ? { startsOn: offseason.starts_on, endsOn: offseason.ends_on } : null}
+      />
       {editor && <p className="text-xs text-muted">Tap + on a day to add a practice, workout, lesson or meeting. Tap an event to change or remove it.</p>}
     </div>
   );

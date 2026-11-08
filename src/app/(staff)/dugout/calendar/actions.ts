@@ -64,3 +64,28 @@ export async function deleteCalendarEvent(_prev: FormState, fd: FormData): Promi
   refresh();
   return { error: null, saved: true };
 }
+
+/** Coaches set the offseason window (no end date = still going; no start = turn it off). */
+export async function setOffseason(input: { teamId: string; startsOn: string; endsOn: string }): Promise<{ error: string | null }> {
+  const denied = await editorCheck();
+  if (denied) return { error: denied };
+  if (!isUuid(input.teamId)) return { error: "Unknown team." };
+  const iso = (v: string) => (/^\d{4}-\d{2}-\d{2}$/.test(v) ? v : "");
+  const startsOn = iso(input.startsOn);
+  const endsOn = iso(input.endsOn);
+  const supabase = await createClient();
+  if (!startsOn) {
+    if (input.startsOn) return { error: "Pick a start date." };
+    const { error } = await supabase.from("team_offseason").delete().eq("team_id", input.teamId);
+    if (error) return { error: friendlyDbError(error) };
+    refresh();
+    return { error: null };
+  }
+  if (endsOn && endsOn < startsOn) return { error: "The offseason has to end after it starts." };
+  const { error } = await supabase
+    .from("team_offseason")
+    .upsert({ team_id: input.teamId, starts_on: startsOn, ends_on: endsOn || null, updated_at: new Date().toISOString() }, { onConflict: "team_id" });
+  if (error) return { error: friendlyDbError(error) };
+  refresh();
+  return { error: null };
+}

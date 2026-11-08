@@ -159,7 +159,7 @@ tests/unit/              node --test unit tests (npm run test:unit)
   3 per training session, 5 per workout, 7 per private lesson. Sessions = `training_logs` (+ Activity:
   her own, last 7 days, 4 a day; coaches remove any) plus checked-off TWIS routines with a training
   category (workout = 5, other categories = 3). Only dates inside the team's offseason count
-  (`team_offseason`, coaches set it on the Leaderboard page).
+  (`team_offseason`, coaches set it in Coaches Dugout → Calendar, user 2026-11-08; the grid marks the window).
 - Player of the Week (`team_player_of_week`): Monday-Sunday, decided from the Tuesday after by
   `private.decide_players_of_week` (run inside `team_leaderboard()`): most points with at least 10;
   rounds, so nobody wins twice until everyone on the roster has been named (unless nobody new

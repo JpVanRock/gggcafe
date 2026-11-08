@@ -11,7 +11,7 @@ import { SpeedStripes } from "@/components/athletic";
 import { EmptyState, Loading, buttonClass, tableClass, tdClass, thClass } from "@/components/ui";
 import { loadTeamDugout } from "../../data";
 import { loadLeaderboard, loadTeamSessions } from "../../leaderboard-data";
-import { OffseasonForm, RemoveTeamSession } from "../../leaderboard-client";
+import { RemoveTeamSession } from "../../leaderboard-client";
 import { firstName, loadPlayer } from "../../section-data";
 import { SectionShell } from "../section-shell";
 
@@ -72,10 +72,9 @@ async function Leaderboard({ params, searchParams }: Pick<PageProps<"/players/[p
             {board ? "Offseason Training hasn't started yet. Your coach sets the dates, and the leaderboard opens then." : "You can only see your own team's leaderboard."}
           </EmptyState>
           {access.canManage && board && (
-            <div className="rounded-xl border border-navy-700 p-4">
-              <p className={heading}>Coaches · offseason dates</p>
-              <OffseasonForm teamId={team.id} startsOn={null} endsOn={null} />
-            </div>
+            <Link href={`/dugout/calendar?team=${team.id}`} className="self-start text-sm text-pink hover:underline">
+              Coaches: set the offseason dates in the Coaches Dugout calendar →
+            </Link>
           )}
         </div>
       </SectionShell>
@@ -263,10 +262,12 @@ async function Leaderboard({ params, searchParams }: Pick<PageProps<"/players/[p
 
         {access.canManage && (
           <section className="flex flex-col gap-5 rounded-xl border border-navy-700 p-4">
-            <div>
-              <p className={heading}>Coaches · offseason dates</p>
-              <OffseasonForm teamId={team.id} startsOn={off.starts_on} endsOn={off.ends_on} />
-            </div>
+            <p className="text-sm text-muted">
+              Offseason dates: {span}.{" "}
+              <Link href={`/dugout/calendar?team=${team.id}`} className="text-pink hover:underline">
+                Change them in the Coaches Dugout calendar →
+              </Link>
+            </p>
             <div>
               <p className={heading}>Sessions logged in the last two weeks</p>
               {recent.length === 0 ? (

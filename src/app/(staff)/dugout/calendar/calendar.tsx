@@ -186,6 +186,7 @@ export function CalendarView({
   events,
   games,
   canEdit,
+  offseason = null,
 }: {
   teamId: string;
   month: string;
@@ -194,6 +195,8 @@ export function CalendarView({
   events: CalEvent[];
   games: CalGame[];
   canEdit: boolean;
+  /** the team's Offseason Training window: its days get a neon edge, the first and last a label */
+  offseason?: { startsOn: string; endsOn: string | null } | null;
 }) {
   const [mode, setMode] = useState<Mode>(null);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -279,12 +282,14 @@ export function CalendarView({
           {days.map((date, i) => {
             const { games: g, events: e } = byDay(date);
             const isToday = date === today;
+            const off = offseason && date >= offseason.startsOn && (!offseason.endsOn || date <= offseason.endsOn);
+            const offLabel = offseason && date === offseason.startsOn ? "Offseason starts" : offseason && date === offseason.endsOn ? "Offseason ends" : null;
             return (
               <div
                 key={date}
                 className={`group relative min-h-28 border-navy-700 p-1.5 ${i % 7 ? "border-l" : ""} ${i >= 7 ? "border-t" : ""} ${
                   inMonth(date) ? "bg-navy-950" : "bg-navy-900/40"
-                }`}
+                } ${off ? "shadow-[inset_0_-3px_0_rgb(231_251_6/0.55)]" : ""}`}
               >
                 <div className="mb-1 flex items-center justify-between">
                   <span
@@ -306,6 +311,9 @@ export function CalendarView({
                   )}
                 </div>
                 <div className="flex flex-col gap-1">
+                  {offLabel && (
+                    <span className="rounded bg-neon px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wider text-on-accent uppercase">{offLabel}</span>
+                  )}
                   {g.map((game) => (
                     <GameChip key={game.id} game={game} onOpen={() => setMode({ type: "game", game })} />
                   ))}
