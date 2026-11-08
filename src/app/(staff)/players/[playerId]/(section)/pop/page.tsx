@@ -5,10 +5,15 @@ import { createClient } from "@/lib/supabase/server";
 import { Loading } from "@/components/ui";
 import { signedPhotoUrls } from "@/lib/player-photos";
 import type { MoveSeason, MoveTeam } from "../../../move-form";
-import { loadMovementAndHitting, loadPopReport, possessive } from "../../data";
+import { loadMovementAndHitting, loadPopReport, loadTeamDugout, possessive } from "../../data";
 import { PopDetail } from "../../pop-report";
 import { firstName, loadPlayer } from "../../section-data";
 import { SectionShell } from "../section-shell";
+import type { Questionnaire } from "@/lib/family";
+import { lineupSeason } from "@/lib/gameday-data";
+import { saveQuestionnaire } from "../../family-actions";
+import { QuestionnaireForm } from "@/components/family-forms";
+import { Disclosure } from "@/components/ui";
 
 export const metadata: Metadata = { title: "Pop Report · GGG.Cafe" };
 
@@ -39,6 +44,14 @@ async function Pop({ params }: Pick<PageProps<"/players/[playerId]/pop">, "param
     supabase.from("player_advanced_access").select("player_id").eq("player_id", player.id).maybeSingle(),
   ]);
   const movementAccess = g3 ? "open" : access.user.staff?.role === "admin" ? "locked" : "hidden";
+  // Phase 6: her preseason questionnaire (her current own team and season; she and coaches)
+  const ownTeam = (await loadTeamDugout(supabase, player.id))[0]?.team ?? null;
+  const season = ownTeam ? await lineupSeason(supabase, ownTeam.id, null) : null;
+  const questionnaire =
+    ownTeam && season && access.canAct
+      ? (((await supabase.from("player_questionnaires").select("*").eq("player_id", player.id).eq("team_id", ownTeam.id).eq("season_id", season).maybeSingle()).data ??
+          null) as Partial<Questionnaire> | null)
+      : null;
   return (
     <SectionShell title={`${possessive(firstName(player))} Pop Report`} subtitle={`Profile · ${movementAccess === "open" ? "movement · " : ""}hitting style · teams · measurements`}>
       <PopDetail
@@ -51,6 +64,15 @@ async function Pop({ params }: Pick<PageProps<"/players/[playerId]/pop">, "param
         styles={styles}
         movementAccess={movementAccess}
       />
+      {ownTeam && season && access.canAct && (
+        <section className="mt-10 flex flex-col gap-3">
+          <h2 className="font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">Preseason questionnaire · {ownTeam.name}</h2>
+          <p className="text-sm text-muted">Sizes, jersey numbers and the positions she wants. Coaches see it; teammates don&apos;t.</p>
+          <Disclosure summary={questionnaire ? "Edit the questionnaire ✓" : "Fill in the questionnaire"} open={!questionnaire}>
+            <QuestionnaireForm action={saveQuestionnaire} hidden={{ player_id: player.id, team_id: ownTeam.id }} values={questionnaire} />
+          </Disclosure>
+        </section>
+      )}
     </SectionShell>
   );
 }

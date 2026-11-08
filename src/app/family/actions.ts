@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { text, type FormState } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import { isValidUsername, normalizeUsername } from "@/lib/player-logins";
+import { cleanMedical, cleanQuestionnaire } from "@/lib/family";
 
 /** Creates her parent profile if needed, then asks to join a team with its code. */
 export async function joinTeam(_prev: FormState, fd: FormData): Promise<FormState> {
@@ -82,4 +83,50 @@ export async function resetPlayerPassword(_prev: FormState, fd: FormData): Promi
   const { error } = await supabase.rpc("reset_player_password", { p_player_id: playerId, p_password: String(fd.get("password")) });
   if (error) return { error: error.code === "42501" ? "Only her approved parent can do that." : "Couldn't change the password. Try again." };
   return { error: null, saved: true };
+}
+
+// ---------------------------------------------------------------------------
+// Phase 6: her preseason questionnaire and medical card (approved parents, through
+// the database functions), and marking the welcome packet read.
+// ---------------------------------------------------------------------------
+
+function formValues(fd: FormData) {
+  return { ...Object.fromEntries(fd.entries()), numbers: fd.getAll("numbers"), positions: fd.getAll("positions") } as Record<string, unknown>;
+}
+
+export async function saveQuestionnaireAsParent(_prev: FormState, fd: FormData): Promise<FormState> {
+  const user = await getCurrentUser();
+  if (!user) return { error: "Your session has ended. Sign in again." };
+  const playerId = text(fd, "player_id");
+  if (!playerId || !isUuid(playerId)) return { error: "Unknown player." };
+  const q = cleanQuestionnaire(formValues(fd));
+  if (typeof q === "string") return { error: q };
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("save_parent_questionnaire", { p_player_id: playerId, p_data: q });
+  if (error) return { error: error.code === "42501" ? "Your coach needs to approve you as her parent first." : error.code === "P0006" ? "The team has no roster this season yet." : "Couldn't save. Try again." };
+  refresh();
+  return { error: null, saved: true };
+}
+
+export async function saveMedicalAsParent(_prev: FormState, fd: FormData): Promise<FormState> {
+  const user = await getCurrentUser();
+  if (!user) return { error: "Your session has ended. Sign in again." };
+  const playerId = text(fd, "player_id");
+  if (!playerId || !isUuid(playerId)) return { error: "Unknown player." };
+  const card = cleanMedical(Object.fromEntries(fd.entries()));
+  if (typeof card === "string") return { error: card };
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("save_parent_medical_card", { p_player_id: playerId, p_data: card });
+  if (error) return { error: error.code === "42501" ? "Your coach needs to approve you as her parent first." : "Couldn't save. Try again." };
+  refresh();
+  return { error: null, saved: true };
+}
+
+export async function markPacketRead(fd: FormData) {
+  const user = await getCurrentUser();
+  const itemId = text(fd, "item_id");
+  if (!user || !itemId || !isUuid(itemId)) return;
+  const supabase = await createClient();
+  await supabase.from("parent_packet_reads").upsert({ parent_id: user.id, item_id: itemId }, { onConflict: "parent_id,item_id" });
+  refresh();
 }

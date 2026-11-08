@@ -11,6 +11,9 @@ import { FamilyHeader } from "./header";
 import { yearbookTeams } from "@/lib/yearbook-data";
 import { suggestUsername } from "@/lib/player-logins";
 import { CreatePlayerLoginForm, ResetPlayerPasswordForm } from "./player-login";
+import { MedicalForm, QuestionnaireForm } from "@/components/family-forms";
+import { markPacketRead, saveMedicalAsParent, saveQuestionnaireAsParent } from "./actions";
+import { PACKET_KIND_LABEL, medicalOnFile, type PacketKind, type Questionnaire } from "@/lib/family";
 
 export const metadata: Metadata = { title: "Family · GGG.Cafe" };
 
@@ -51,6 +54,20 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
     supabase.rpc("parent_player_logins"),
   ]);
   const daughters = (daughtersResult.data ?? []) as Daughter[];
+  // Phase 6: her questionnaire and medical card (through the database functions), and the welcome packet
+  const [forms, packetResult, readsResult] = await Promise.all([
+    Promise.all(
+      daughters.map(async (d) => ({
+        id: d.player_id,
+        questionnaire: ((await supabase.rpc("parent_questionnaire", { p_player_id: d.player_id })).data ?? null) as Partial<Questionnaire> | null,
+        medical: ((await supabase.rpc("parent_medical_card", { p_player_id: d.player_id })).data ?? null) as Record<string, string | null> | null,
+      })),
+    ),
+    supabase.from("parent_packet_items").select("id, team_id, kind, title, body, position").order("position"),
+    supabase.from("parent_packet_reads").select("item_id").eq("parent_id", user.id),
+  ]);
+  const packet = (packetResult.data ?? []) as { id: string; team_id: string; kind: PacketKind; title: string; body: string }[];
+  const readIds = new Set(((readsResult.data ?? []) as { item_id: string }[]).map((r) => r.item_id));
   const links = (linksResult.data ?? []) as Link_[];
   const metaName = ((claims?.claims?.user_metadata as { display_name?: string } | undefined)?.display_name ?? "").trim();
   const approvedTeams = [...new Map(links.filter((l) => l.status === "approved").map((l) => [l.team_id, l])).values()];
@@ -148,6 +165,47 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
           </ul>
         </Card>
       )}
+
+      {packet.length > 0 && (
+        <Card title={`Welcome packet · ${packet.filter((i) => readIds.has(i.id)).length} of ${packet.length} read`}>
+          <ul className="flex flex-col gap-3">
+            {packet.map((it) => (
+              <li key={it.id} className={`rounded-xl border p-4 ${readIds.has(it.id) ? "border-navy-700" : "border-pink/60 bg-pink/5"}`}>
+                <p className="font-mono text-[11px] tracking-widest text-pink-soft uppercase">{PACKET_KIND_LABEL[it.kind]}</p>
+                <p className="mt-1 font-semibold">{it.title}</p>
+                <p className="mt-1 text-sm whitespace-pre-wrap text-ink/90">{it.body}</p>
+                {readIds.has(it.id) ? (
+                  <p className="mt-2 text-xs text-muted">Read ✓</p>
+                ) : (
+                  <form action={markPacketRead} className="mt-2">
+                    <input type="hidden" name="item_id" value={it.id} />
+                    <button type="submit" className="text-sm font-semibold text-pink hover:underline">
+                      Mark as read
+                    </button>
+                  </form>
+                )}
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
+
+      {daughters.map((d) => {
+        const f = forms.find((x) => x.id === d.player_id);
+        const first = d.player_name.split(" ")[0];
+        return (
+          <Card key={`forms-${d.player_id}`} title={`${first}'s season forms`}>
+            <div className="flex flex-col gap-3">
+              <Disclosure summary={`Preseason questionnaire: sizes, numbers, positions${f?.questionnaire ? " ✓" : ""}`}>
+                <QuestionnaireForm action={saveQuestionnaireAsParent} hidden={{ player_id: d.player_id }} values={f?.questionnaire ?? null} />
+              </Disclosure>
+              <Disclosure summary={`Medical & emergency card${medicalOnFile(f?.medical ?? null) ? " ✓ on file" : " · not on file yet"}`}>
+                <MedicalForm action={saveMedicalAsParent} hidden={{ player_id: d.player_id }} values={f?.medical ?? null} />
+              </Disclosure>
+            </div>
+          </Card>
+        );
+      })}
 
       {yearbooks.length > 0 && (
         <Link

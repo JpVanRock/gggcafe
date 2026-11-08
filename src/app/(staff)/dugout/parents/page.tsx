@@ -5,12 +5,15 @@ import { Suspense } from "react";
 import { canEdit, requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Card, EmptyState, Loading, buttonClass, pillQuietClass } from "@/components/ui";
+import { Card, EmptyState, Loading, buttonClass, pillQuietClass, Disclosure } from "@/components/ui";
 import { loadOwnTeams } from "../data";
 import { TeamPicker } from "../team-picker";
 import { removeParentLink, setParentCode } from "./actions";
 import { PendingParentList } from "../approvals";
 import { loadTeamApprovals } from "@/lib/approvals";
+import { PACKET_KIND_LABEL, type PacketKind } from "@/lib/family";
+import { addStarterTips, deletePacketItem } from "./actions";
+import { PacketItemForm } from "./packet-forms";
 
 export const metadata: Metadata = { title: "Parents · Coaches Dugout · GGG.Cafe" };
 
@@ -167,6 +170,61 @@ async function Parents({ searchParams }: Pick<PageProps<"/dugout/parents">, "sea
           </ul>
         </Card>
       )}
+      <PacketSection teamId={team.id} />
     </div>
+  );
+}
+
+
+// The parent welcome packet (Phase 6): the coach's letter, team policies and "how to
+// help her" tips that approved parents read (and mark read) on /family.
+async function PacketSection({ teamId }: { teamId: string }) {
+  const supabase = await createClient();
+  const [{ data: items }, { data: reads }] = await Promise.all([
+    supabase.from("parent_packet_items").select("id, kind, title, body, position").eq("team_id", teamId).order("position"),
+    supabase.from("parent_packet_reads").select("item_id"),
+  ]);
+  const list = (items ?? []) as { id: string; kind: PacketKind; title: string; body: string; position: number }[];
+  const readCount = (id: string) => ((reads ?? []) as { item_id: string }[]).filter((r) => r.item_id === id).length;
+  return (
+    <section className="flex flex-col gap-3">
+      <h2 className="font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">Welcome packet</h2>
+      <p className="text-sm text-muted">Approved parents read it on their family page and mark each item read.</p>
+      {list.length > 0 && (
+        <ul className="grid gap-3 md:grid-cols-2">
+          {list.map((it) => (
+            <li key={it.id} className="rounded-xl border border-navy-700 p-4">
+              <p className="font-mono text-[11px] tracking-widest text-pink-soft uppercase">
+                {PACKET_KIND_LABEL[it.kind]} · read by {readCount(it.id)}
+              </p>
+              <p className="mt-1 font-semibold">{it.title}</p>
+              <p className="mt-1 line-clamp-3 text-sm whitespace-pre-wrap text-ink/90">{it.body}</p>
+              <div className="mt-2 flex flex-wrap items-center gap-3">
+                <form action={deletePacketItem}>
+                  <input type="hidden" name="id" value={it.id} />
+                  <ConfirmSubmit message={`Remove "${it.title}" from the packet?`} className="text-xs text-muted hover:text-danger">
+                    Remove
+                  </ConfirmSubmit>
+                </form>
+                <div className="w-full">
+                  <Disclosure summary="Edit">
+                    <PacketItemForm teamId={teamId} item={it} />
+                  </Disclosure>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+      <Disclosure summary="Add to the packet" open={list.length === 0}>
+        <PacketItemForm teamId={teamId} />
+      </Disclosure>
+      <form action={addStarterTips}>
+        <input type="hidden" name="team_id" value={teamId} />
+        <button type="submit" className="text-sm font-semibold text-pink hover:underline">
+          + Add the starter &ldquo;how to help her&rdquo; tips
+        </button>
+      </form>
+    </section>
   );
 }

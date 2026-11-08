@@ -220,6 +220,14 @@ async function Roster({ searchParams }: Pick<PageProps<"/dugout/roster">, "searc
         </Disclosure>
       )}
       {head && (
+        <div className="flex flex-wrap gap-3">
+          <Link href={`/dugout/roster/medical?team=${team.id}`} className={pillButtonClass}>
+            Medical cards →
+          </Link>
+        </div>
+      )}
+      {editor && <QuestionnaireTable teamId={team.id} seasonId={season?.id ?? null} />}
+      {head && (
         <p className="text-xs text-muted">
           Parent sign-up codes and approved parents are on the{" "}
           <Link href={`/dugout/parents?team=${team.id}`} className="text-pink hover:underline">
@@ -229,5 +237,54 @@ async function Roster({ searchParams }: Pick<PageProps<"/dugout/roster">, "searc
         </p>
       )}
     </div>
+  );
+}
+
+
+// Preseason questionnaires (Phase 6): sizes, number choices and the positions she wants, for coaches.
+async function QuestionnaireTable({ teamId, seasonId }: { teamId: string; seasonId: string | null }) {
+  if (!seasonId) return null;
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("player_questionnaires")
+    .select("top_size, bottom_size, jacket_size, hat_size, numbers, positions, goals, player:players(first_name, preferred_name, last_name)")
+    .eq("team_id", teamId)
+    .eq("season_id", seasonId);
+  const rows = (data ?? []) as unknown as { top_size: string | null; bottom_size: string | null; jacket_size: string | null; hat_size: string | null; numbers: string[]; positions: string[]; goals: string | null; player: { first_name: string; preferred_name: string | null; last_name: string } | null }[];
+  if (rows.length === 0) return null;
+  return (
+    <Disclosure summary={`Preseason questionnaires (${rows.length})`}>
+      <div className="overflow-x-auto">
+        <table className={tableClass}>
+          <thead>
+            <tr>
+              <th className={thClass}>Player</th>
+              <th className={thClass}>Top</th>
+              <th className={thClass}>Pants</th>
+              <th className={thClass}>Jacket</th>
+              <th className={thClass}>Hat</th>
+              <th className={thClass}>Numbers</th>
+              <th className={thClass}>Wants to play</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows
+              .filter((r) => r.player)
+              .sort((a, b) => a.player!.last_name.localeCompare(b.player!.last_name))
+              .map((r, i) => (
+                <tr key={i}>
+                  <td className={tdClass}>{`${r.player!.preferred_name || r.player!.first_name} ${r.player!.last_name}`}</td>
+                  <td className={tdClass}>{r.top_size ?? "–"}</td>
+                  <td className={tdClass}>{r.bottom_size ?? "–"}</td>
+                  <td className={tdClass}>{r.jacket_size ?? "–"}</td>
+                  <td className={tdClass}>{r.hat_size ?? "–"}</td>
+                  <td className={`${tdClass} font-display tabular-nums`}>{r.numbers.join(", ") || "–"}</td>
+                  <td className={tdClass}>{r.positions.join(", ") || "–"}</td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </div>
+    </Disclosure>
   );
 }
