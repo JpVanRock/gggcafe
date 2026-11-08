@@ -296,7 +296,7 @@ tests/unit/              node --test unit tests (npm run test:unit)
 - DB tests: `tests/db/players.test.sql`.
 
 ## Coaches Dugout (`/dugout`, nav "Coaches Dugout")
-- Header tabs (`dugout/tabs.tsx`): Culture (`/dugout`; Team Standards + Team Culture), Roster (`/dugout/roster`), Calendar (`/dugout/calendar`),
+- Header tabs (`dugout/tabs.tsx`): Roster (`/dugout/roster`, first: user 2026-11-08), Culture (`/dugout`; Team Standards + Team Culture), Calendar (`/dugout/calendar`),
   Practice Plans (`/dugout/plans`), GameDay (`/dugout/gameday`), Drill Library (`/dugout/drills`),
   Team Budget (`/dugout/budget`), Parents (`/dugout/parents`).
 - GameDay (tab renamed from "GameDay Prep"; from the user's Lineup + Defensive Rotations tabs): season player cards
