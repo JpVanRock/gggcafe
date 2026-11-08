@@ -91,6 +91,8 @@ export type ActivityRow = {
   source?: string | null;
   /** a guided mental session (the routine's library drill) */
   drill?: { guide: string | null } | null;
+  /** a bullpen script (pitching routines pushed by coaches) */
+  bullpen_script_id?: string | null;
 };
 
 export async function loadTwisWeek(supabase: Supabase, playerId: string, monday: string): Promise<TwisWeek> {
@@ -185,7 +187,11 @@ export async function loadTwisWeek(supabase: Supabase, playerId: string, monday:
   }
 
   for (const a of activitiesResult) {
-    const link = a.drill?.guide ? { href: `/players/${playerId}/mental/session/${a.drill.guide}`, label: "Start" } : undefined;
+    const link = a.drill?.guide
+      ? { href: `/players/${playerId}/mental/session/${a.drill.guide}`, label: "Start" }
+      : a.bullpen_script_id
+        ? { href: `/players/${playerId}/training/bullpen/${a.bullpen_script_id}`, label: "Start" }
+        : undefined;
     const tag =
       a.source === "leadership-checkin"
         ? "Leadership"
@@ -232,7 +238,7 @@ export async function loadTwisWeek(supabase: Supabase, playerId: string, monday:
 export async function loadActivities(supabase: Supabase, playerId: string, from: string, to: string): Promise<ActivityRow[]> {
   const { data } = await supabase
     .from("player_activities")
-    .select("id, title, details, days, starts_on, ends_on, pillar_id, category, source, pillar:harada_pillars(title), drill:drills(guide)")
+    .select("id, title, details, days, starts_on, ends_on, pillar_id, category, source, bullpen_script_id, pillar:harada_pillars(title), drill:drills(guide)")
     .eq("player_id", playerId)
     .lte("starts_on", to)
     .or(`ends_on.is.null,ends_on.gte.${from}`)

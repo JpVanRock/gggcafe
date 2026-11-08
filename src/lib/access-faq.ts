@@ -41,6 +41,8 @@ export const FEATURE_SECTIONS: { title: string; features: Feature[] }[] = [
       { name: "Player of the Week", detail: "Most points that week; a teammate who has not won yet goes first.", standard: "yes", advanced: "yes" },
       { name: "Training phase in TWIS", detail: "Her team's roadmap phase and week (Build · Week 3 of 9) with its focus.", standard: "yes", advanced: "yes" },
       { name: "Team routines", detail: "Routines her coaches push to the team; she checks them off in TWIS but can't change them.", standard: "yes", advanced: "yes" },
+      { name: "Scripted bullpens", detail: "Pitchers throw their coaches' scripts and tap hit or miss; command % by pitch type.", standard: "yes", advanced: "yes" },
+      { name: "Pitcher's game plans", detail: "Before each game her plan (first pitch, out pitch, reset), after it a look-back.", standard: "yes", advanced: "yes" },
       { name: "Athletic testing results", detail: "Her latest result in each test, rated Building to Elite for her age group, with a score. Only she and her coaches see them.", standard: "yes", advanced: "yes" },
       { name: "Offseason squads", detail: "Her squad and every squad's points on the Leaderboard, after the head coach runs the draft.", standard: "yes", advanced: "yes" },
     ],
@@ -50,6 +52,7 @@ export const FEATURE_SECTIONS: { title: string; features: Feature[] }[] = [
     features: [
       { name: "Defense and Baserunning IQ", detail: "Playbook tests, Levels 1-3, with hints and review.", standard: "yes", advanced: "yes" },
       { name: "Offense IQ", detail: "Counts, situational hitting, the short game and slapping: Levels 1-3, each passed level unlocks the next, MVP badges.", standard: "yes", advanced: "yes" },
+      { name: "Battery IQ", detail: "Pitch calling for pitchers and catchers (anyone can take it): Levels 1-3, MVP badges.", standard: "yes", advanced: "yes" },
       { name: "Position IQ", detail: "21 questions per position; 80% earns that Golden Glove.", standard: "yes", advanced: "yes" },
       { name: "Extra Credit Library", detail: "Every shelf in one run; 80% earns the GGG Champions Trophy.", standard: "yes", advanced: "yes" },
       { name: "How to Keep the Book", detail: "Six-chapter scorekeeping course; each chapter earns Manager of the Year.", standard: "yes", advanced: "yes" },

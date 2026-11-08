@@ -99,6 +99,15 @@ async function Chapter({ params }: Pick<PageProps<"/players/[playerId]/advanced/
           </section>
         )}
 
+        {chapter.tools?.includes("game-plans") && (
+          <section className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-pink/50 bg-pink/5 p-4">
+            <p className="text-sm">Put this chapter to work: a plan before every game you pitch, and a look-back after it.</p>
+            <Link href={`/players/${player.id}/training/game-plan`} className="font-semibold text-pink hover:underline">
+              Your game plans →
+            </Link>
+          </section>
+        )}
+
         {chapter.tools?.includes("count-plan") && (
           <section>
             <Heading>Your count plan</Heading>

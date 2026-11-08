@@ -6,6 +6,8 @@ import { Loading } from "@/components/ui";
 import { todayISO } from "@/lib/dates";
 import { loadPerformance } from "../../data";
 import { loadMyTesting } from "../../testing-data";
+import { loadBullpens } from "../../pitching-data";
+import { PitchingSection } from "../../pitching";
 import { PerformanceDetail, summarizePerformance } from "../../performance";
 import { loadPlayer, positionsOf } from "../../section-data";
 import { SectionShell } from "../section-shell";
@@ -26,11 +28,20 @@ async function Training({ params }: Pick<PageProps<"/players/[playerId]/training
   const access = await requirePlayerPage(playerId);
   const player = await loadPlayer(supabase, playerId);
   const today = todayISO();
-  const [performance, testing] = await Promise.all([loadPerformance(supabase, player.id), loadMyTesting(supabase, player.id)]);
-  const summary = summarizePerformance(performance, positionsOf(player), today);
+  const positions = positionsOf(player);
+  const pitcher = positions.includes("P");
+  const [performance, testing, bullpens] = await Promise.all([
+    loadPerformance(supabase, player.id),
+    loadMyTesting(supabase, player.id),
+    pitcher ? loadBullpens(supabase, player.id) : Promise.resolve(null),
+  ]);
+  const summary = summarizePerformance(performance, positions, today);
   return (
     <SectionShell title="Performance Training" subtitle="Workouts · stretching · drills · testing">
-      <PerformanceDetail playerId={player.id} perf={performance} summary={summary} today={today} canEdit={access.canAct} testing={testing} />
+      <div className="flex flex-col gap-10">
+        {bullpens && <PitchingSection playerId={player.id} scripts={bullpens.scripts} sessions={bullpens.sessions} canEdit={access.canAct} />}
+        <PerformanceDetail playerId={player.id} perf={performance} summary={summary} today={today} canEdit={access.canAct} testing={testing} />
+      </div>
     </SectionShell>
   );
 }

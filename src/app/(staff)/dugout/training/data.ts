@@ -45,7 +45,7 @@ export async function loadTeamAge(supabase: Supabase, teamId: string): Promise<s
 }
 
 export async function loadRoadmap(supabase: Supabase, teamId: string) {
-  const [phases, routines, library] = await Promise.all([
+  const [phases, routines, library, scripts] = await Promise.all([
     supabase.from("training_phases").select("id, kind, name, starts_on, ends_on, focus").eq("team_id", teamId).order("starts_on"),
     supabase
       .from("team_routines")
@@ -53,11 +53,13 @@ export async function loadRoadmap(supabase: Supabase, teamId: string) {
       .eq("team_id", teamId)
       .order("starts_on", { ascending: false }),
     supabase.from("drills").select("id, name, category, focus").not("category", "is", null).order("name"),
+    supabase.from("bullpen_scripts").select("id, name").eq("team_id", teamId).order("name"),
   ]);
   return {
     phases: (phases.data ?? []) as PhaseRow[],
     routines: (routines.data ?? []) as unknown as TeamRoutineRow[],
     library: (library.data ?? []) as LibraryDrill[],
+    scripts: (scripts.data ?? []) as { id: string; name: string }[],
   };
 }
 

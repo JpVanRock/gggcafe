@@ -56,7 +56,7 @@ async function Training({ searchParams }: Pick<PageProps<"/dugout/training">, "s
   }
   const team = teams.find((t) => t.id === teamParam) ?? teams[0];
   const today = todayISO();
-  const [{ phases, routines, library }, offseason, nextGame] = await Promise.all([
+  const [{ phases, routines, library, scripts }, offseason, nextGame] = await Promise.all([
     loadRoadmap(supabase, team.id),
     supabase.from("team_offseason").select("starts_on").eq("team_id", team.id).maybeSingle(),
     supabase
@@ -208,7 +208,7 @@ async function Training({ searchParams }: Pick<PageProps<"/dugout/training">, "s
         </div>
         {editor && (
           <Disclosure summary="Push a routine to the team" open={routines.length === 0}>
-            <TeamRoutineForm teamId={team.id} phases={phases} library={library} today={today} />
+            <TeamRoutineForm teamId={team.id} phases={phases} library={library} scripts={scripts} today={today} />
           </Disclosure>
         )}
         {current.length > 0 && <ul className="grid gap-3 md:grid-cols-2">{current.map((r) => routineCard(r, true))}</ul>}

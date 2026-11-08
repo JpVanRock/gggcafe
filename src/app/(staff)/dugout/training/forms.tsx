@@ -95,12 +95,26 @@ export function SuggestForm({ teamId, start, firstGame, hasPhases }: { teamId: s
   );
 }
 
-export function TeamRoutineForm({ teamId, phases, library, today }: { teamId: string; phases: PhaseRow[]; library: LibraryDrill[]; today: string }) {
+export function TeamRoutineForm({
+  teamId,
+  phases,
+  library,
+  scripts = [],
+  today,
+}: {
+  teamId: string;
+  phases: PhaseRow[];
+  library: LibraryDrill[];
+  /** bullpen scripts (pitching routines can carry one) */
+  scripts?: { id: string; name: string }[];
+  today: string;
+}) {
   const [state, action, pending] = useActionState(saveTeamRoutine, initialFormState);
   const current = phases.find((p) => p.starts_on <= today && today <= p.ends_on) ?? phases.find((p) => p.starts_on > today) ?? null;
   const [phaseId, setPhaseId] = useState(current?.id ?? "");
   const [category, setCategory] = useState<TrainingCategory>("workout");
   const [drill, setDrill] = useState("");
+  const [script, setScript] = useState("");
   const phase = phases.find((p) => p.id === phaseId) ?? null;
   const drills = useMemo(() => library.filter((d) => d.category === category), [library, category]);
   return (
@@ -144,9 +158,21 @@ export function TeamRoutineForm({ teamId, phases, library, today }: { teamId: st
           ))}
         </select>
       </Field>
+      {category === "pitching" && scripts.length > 0 && (
+        <Field label="Bullpen script" hint="Optional: TWIS shows Start on it">
+          <select name="bullpen_script_id" value={script} onChange={(e) => setScript(e.target.value)} className={inputClass}>
+            <option value="">None</option>
+            {scripts.map((sc) => (
+              <option key={sc.id} value={sc.id}>
+                {sc.name}
+              </option>
+            ))}
+          </select>
+        </Field>
+      )}
       {!drill && (
-        <Field label="Routine name">
-          <input name="title" required maxLength={120} placeholder="Tee work: 50 swings" className={inputClass} />
+        <Field label="Routine name" hint={script ? "Leave blank to use the script's name" : undefined}>
+          <input name="title" required={!script} maxLength={120} placeholder="Tee work: 50 swings" className={inputClass} />
         </Field>
       )}
       <Field label="How much" hint="Sets, reps, time">

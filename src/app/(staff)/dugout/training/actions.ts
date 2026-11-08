@@ -9,8 +9,11 @@ import { createClient } from "@/lib/supabase/server";
 import { friendlyDbError, isoDate, oneOf, text, type FormState } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import { TRAINING_CATEGORIES } from "@/lib/achievements";
+import { cleanScript } from "@/lib/bullpen";
 import { todayISO } from "@/lib/dates";
 import { PHASE_KINDS, SQUAD_MAX, SQUAD_MIN, TESTS, onTheClock, suggestRoadmap, testByKey, tierFor, validCutoffs } from "@/lib/training-plan";
+
+const category_is_pitching = (fd: FormData) => fd.get("category") === "pitching";
 
 /** A form result that can also say what happened ("Pushed to 12 players."). */
 export type TrainingState = FormState & { message?: string };
@@ -87,6 +90,7 @@ export async function saveTeamRoutine(_prev: TrainingState, fd: FormData): Promi
   const phaseId = text(fd, "phase_id");
   const category = oneOf(fd, "category", TRAINING_CATEGORIES);
   const drillId = text(fd, "drill_id");
+  const scriptId = category_is_pitching(fd) ? text(fd, "bullpen_script_id") : null;
   const details = text(fd, "details");
   const startsOn = isoDate(fd, "starts_on");
   const endsOn = isoDate(fd, "ends_on");
@@ -104,10 +108,16 @@ export async function saveTeamRoutine(_prev: TrainingState, fd: FormData): Promi
     if (!data) return { error: "Unknown drill." };
     title = data.name as string;
   }
+  if (scriptId) {
+    if (!isUuid(scriptId)) return { error: "Unknown bullpen script." };
+    const { data } = await supabase.from("bullpen_scripts").select("name").eq("id", scriptId).maybeSingle();
+    if (!data) return { error: "Unknown bullpen script." };
+    if (!title) title = `Bullpen: ${data.name as string}`;
+  }
   if (!title || title.length > 120) return { error: "Pick a drill from the library or name the routine." };
   const { data, error } = await supabase
     .from("team_routines")
-    .insert({ team_id: teamId, phase_id: phaseId, title, details, category, drill_id: drillId || null, days, starts_on: startsOn, ends_on: endsOn })
+    .insert({ team_id: teamId, phase_id: phaseId, title, details, category, drill_id: drillId || null, bullpen_script_id: scriptId, days, starts_on: startsOn, ends_on: endsOn })
     .select("id")
     .single();
   if (error) return { error: friendlyDbError(error) };
@@ -276,5 +286,36 @@ export async function resetDraft(fd: FormData) {
   if (!isUuid(teamId)) return;
   const supabase = await createClient();
   await supabase.from("offseason_squads").delete().eq("team_id", teamId);
+  refresh();
+}
+
+// ---------------------------------------------------------------------------
+// Bullpen scripts (Phase 4)
+// ---------------------------------------------------------------------------
+
+export async function saveBullpenScript(input: { id?: string | null; teamId: string; name: string; notes: string; pitches: unknown }): Promise<{ error: string | null }> {
+  const denied = await editorCheck();
+  if (denied) return { error: denied };
+  if (!isUuid(input.teamId) || (input.id && !isUuid(input.id))) return { error: "Unknown team." };
+  const name = (input.name ?? "").trim();
+  const notes = (input.notes ?? "").trim();
+  if (!name || name.length > 60) return { error: "Name the script (60 characters at most)." };
+  if (notes.length > 300) return { error: "Keep the notes under 300 characters." };
+  const pitches = cleanScript(input.pitches);
+  if (typeof pitches === "string") return { error: pitches };
+  const supabase = await createClient();
+  const row = { team_id: input.teamId, name, notes: notes || null, pitches, updated_at: new Date().toISOString() };
+  const { error } = input.id ? await supabase.from("bullpen_scripts").update(row).eq("id", input.id) : await supabase.from("bullpen_scripts").insert(row);
+  if (error) return { error: friendlyDbError(error) };
+  refresh();
+  return { error: null };
+}
+
+export async function deleteBullpenScript(fd: FormData) {
+  if (await editorCheck()) return;
+  const id = text(fd, "id");
+  if (!isUuid(id)) return;
+  const supabase = await createClient();
+  await supabase.from("bullpen_scripts").delete().eq("id", id);
   refresh();
 }

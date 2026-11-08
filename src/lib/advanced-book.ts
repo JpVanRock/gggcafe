@@ -61,8 +61,8 @@ export type BookChapter = {
   habits?: Habit[];
   /** step-through lessons before the foundation; she finishes them to complete the chapter */
   course?: CourseStep[];
-  /** her own tools shown on the chapter page: "count-plan" = her count plan from My Zone (Pop Report) */
-  tools?: "count-plan"[];
+  /** her own tools on the chapter page: "count-plan" = her count plan from My Zone (Pop Report); "game-plans" = her pitcher game plans */
+  tools?: ("count-plan" | "game-plans")[];
 };
 
 export const CHAPTERS: BookChapter[] = [
@@ -193,6 +193,7 @@ export const CHAPTERS: BookChapter[] = [
     status: "ready",
     requires: { position: "P" },
     kicker: "Focused Skill",
+    tools: ["game-plans"],
     title: "Pitching: My Best Is Better",
     question: "Am I mastering a few simple things, or trying to throw everything?",
     summary: "Focus on mastering a few simple things: one delivery, pitches that tunnel, and a batter who's always guessing.",
