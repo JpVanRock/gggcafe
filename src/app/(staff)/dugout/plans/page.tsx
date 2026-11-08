@@ -10,6 +10,7 @@ import { PRACTICE_SETTING_LABEL, durationLabel, practiceRange, type PracticeSett
 import { loadOwnTeams } from "../data";
 import { TeamPicker } from "../team-picker";
 import { NewPlanForm } from "./new-plan-form";
+import { PlansNav } from "./plans-nav";
 
 export const metadata: Metadata = { title: "Practice Plans · Coaches Dugout · GGG.Cafe" };
 
@@ -119,6 +120,7 @@ async function Plans({ searchParams }: Pick<PageProps<"/dugout/plans">, "searchP
   return (
     <div className="flex flex-col gap-8">
       <TeamPicker teams={teams} current={team.id} basePath="/dugout/plans" />
+      <PlansNav current="plans" teamId={team.id} />
 
       {editor && (
         <Disclosure summary={`New practice plan for ${team.name}`} open={plans.length === 0}>

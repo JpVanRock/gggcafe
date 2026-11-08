@@ -6,7 +6,7 @@ import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
 import { WEEKDAYS } from "@/lib/dates";
 import { initialFormState } from "@/lib/form";
 import { addActivity, setTwisCheck } from "./actions";
-import type { TwisItem } from "./data";
+import type { PracticeNote, TwisItem } from "./data";
 
 export type TwisCellView = {
   key: string;
@@ -15,7 +15,33 @@ export type TwisCellView = {
   isToday: boolean;
   isRestDay: boolean;
   items: TwisItem[];
+  /** the coach's practice notes that day, with her own cue */
+  notes?: PracticeNote[];
 };
+
+function PracticeNotes({ notes, many }: { notes: PracticeNote[]; many: boolean }) {
+  return (
+    <div className="mt-3 space-y-2">
+      {notes.map((n, i) => (
+        <div key={i} className="rounded-lg border-l-2 border-pink bg-navy-900/60 px-2.5 py-2 text-xs leading-snug">
+          <p className="font-mono text-[10px] font-bold tracking-wider text-pink-soft uppercase">Practice plan{many ? ` · ${n.team}` : ""}</p>
+          {n.objective && <p className="mt-1 text-ink">{n.objective}</p>}
+          {n.rule && (
+            <p className="mt-1 text-muted">
+              <span className="font-semibold text-ink/90">Rule of the day:</span> {n.rule}
+            </p>
+          )}
+          {n.cue && (
+            <p className="mt-1">
+              <span className="font-semibold text-highlight">Your cue:</span> {n.cue}
+            </p>
+          )}
+          {n.announcements && <p className="mt-1 whitespace-pre-line text-muted">{n.announcements}</p>}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 const TAG_CLASS: Record<TwisItem["kind"], string> = {
   game: "bg-neon text-on-accent",
@@ -67,9 +93,9 @@ export function TwisChecklist({ playerId, cells, canEdit }: { playerId: string; 
               <span className="font-mono text-xs font-bold tracking-widest text-highlight uppercase">{cell.label}</span>
               <span className="font-mono text-xs text-muted">{cell.isToday ? "Today" : cell.sublabel}</span>
             </header>
-            {cell.items.length === 0 ? (
+            {cell.items.length === 0 && !cell.notes?.length ? (
               <p className="mt-3 text-sm text-muted/70">{cell.isRestDay ? "Rest day" : "Nothing extra this week"}</p>
-            ) : (
+            ) : cell.items.length === 0 ? null : (
               <ul className="mt-3 space-y-2.5">
                 {cell.items.map((item) => {
                   const on = checked.has(item.key);
@@ -105,6 +131,7 @@ export function TwisChecklist({ playerId, cells, canEdit }: { playerId: string; 
                 })}
               </ul>
             )}
+            {cell.notes && cell.notes.length > 0 && <PracticeNotes notes={cell.notes} many={new Set(cell.notes.map((n) => n.team)).size > 1} />}
           </section>
         ))}
       </div>

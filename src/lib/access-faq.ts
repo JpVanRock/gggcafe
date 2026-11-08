@@ -23,6 +23,7 @@ export const FEATURE_SECTIONS: { title: string; features: Feature[] }[] = [
       { name: "My commitment and the team pledge", detail: "An \"I will...\" line for each Team Standard, and her signature on the team pledge each season.", standard: "yes", advanced: "yes" },
       { name: "Messages from her mentors", detail: "Alerts at the top of her menu: notes, photos and drills to try, from mentors her coach assigned.", standard: "yes", advanced: "yes" },
       { name: "This Week in Softball (TWIS)", detail: "Practices, games and her activities for the week, with check-offs.", standard: "yes", advanced: "yes" },
+      { name: "Practice notes in TWIS", detail: "On practice days: the plan's objective, rule of the day, announcements and a cue her coach wrote just for her (never the coach-only notes).", standard: "yes", advanced: "yes" },
       { name: "Pop Report", detail: "Profile, teams, measurements and her Preferred Hitting Style.", standard: "yes", advanced: "yes" },
       { name: "My Zone", detail: "Her pitch, what she handles and her weak spots on the strike zone, and the count plan they give (0, 1, 2 strikes).", standard: "yes", advanced: "yes" },
       { name: "Movement Preferences", detail: "Her move dial and at-bat focus tip in the Pop Report, set by her coaches.", standard: "no", advanced: "yes" },

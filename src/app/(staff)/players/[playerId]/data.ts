@@ -43,7 +43,16 @@ export type TwisItem = {
   link?: { href: string; label: string };
 };
 
-export type TwisCell = { key: string; date: string | null; items: TwisItem[] };
+/** A practice plan's notes for her that day: what the coach wrote for everyone, plus her own cue. */
+export type PracticeNote = {
+  team: string;
+  objective: string | null;
+  rule: string | null;
+  announcements: string | null;
+  cue: string | null;
+};
+
+export type TwisCell = { key: string; date: string | null; items: TwisItem[]; notes?: PracticeNote[] };
 
 export type TwisWeek = {
   monday: string;
@@ -109,6 +118,7 @@ export async function loadTwisWeek(supabase: Supabase, playerId: string, monday:
   const phasesPromise = teamIds.length
     ? supabase.from("training_phases").select("name, focus, starts_on, ends_on").in("team_id", teamIds).lte("starts_on", sunday).gte("ends_on", monday)
     : Promise.resolve({ data: [] });
+  const notesPromise = supabase.rpc("my_practice_notes", { p_player_id: playerId, p_from: monday, p_to: sunday });
   const [eventsResult, gamesResult, activitiesResult, checksResult] = await Promise.all([
     teamIds.length
       ? supabase
@@ -215,10 +225,21 @@ export async function loadTwisWeek(supabase: Supabase, playerId: string, monday:
     }
   }
 
+  const notes = ((await notesPromise).data ?? []) as {
+    practice_date: string;
+    team_name: string;
+    objective: string | null;
+    rule_of_day: string | null;
+    announcements: string | null;
+    cue: string | null;
+  }[];
   const cells: TwisCell[] = dates.map((d) => ({
     key: d,
     date: d,
     items: (byDate.get(d) ?? []).sort((x, y) => x.sort.localeCompare(y.sort)).map((x) => x.item),
+    notes: notes
+      .filter((n) => n.practice_date === d)
+      .map((n) => ({ team: n.team_name, objective: n.objective, rule: n.rule_of_day, announcements: n.announcements, cue: n.cue })),
   }));
   cells.push({ key: "any", date: null, items: anyDay });
 

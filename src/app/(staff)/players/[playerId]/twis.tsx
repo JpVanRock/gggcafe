@@ -32,6 +32,7 @@ export function TwisBoard({
           isToday: cell.date === today,
           isRestDay: true,
           items: cell.items,
+          notes: cell.notes,
         }
       : { key: cell.key, label: "Any day", sublabel: "This week", isToday: false, isRestDay: false, items: cell.items },
   );

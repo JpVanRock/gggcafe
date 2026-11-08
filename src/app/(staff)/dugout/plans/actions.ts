@@ -15,6 +15,7 @@ import {
 } from "@/lib/dugout";
 import { loadCoachingStaff, loadPlanRoster, loadPracticePlan, type PracticePlan } from "@/lib/practice-plans";
 import { emailConfigured, escapeHtml, sendEmail } from "@/lib/email";
+import { NOTE_LIMITS, cleanNote } from "@/lib/install";
 import { practicePlanFilename, renderPracticePlanPdf } from "@/lib/pdf/practice-plan-pdf";
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
@@ -324,4 +325,51 @@ export async function sharePracticePlan(planId: string, recipientIds: string[], 
   await supabase.from("practice_plans").update({ shared_at: new Date().toISOString() }).eq("id", plan.id);
   refresh();
   return { error: null, sent: to.length };
+}
+
+// ---------------------------------------------------------------------------
+// Notes for players, cues and installs (editable on final plans too)
+// ---------------------------------------------------------------------------
+
+export async function savePlanExtras(planId: string, _prev: FormState, fd: FormData): Promise<FormState> {
+  const denied = await planEditCheck(planId);
+  if (denied) return { error: denied };
+
+  const fields = {
+    objective: cleanNote(fd.get("objective") as string | null, NOTE_LIMITS.objective, "The objective"),
+    rule_of_day: cleanNote(fd.get("rule_of_day") as string | null, NOTE_LIMITS.rule_of_day, "The rule of the day"),
+    announcements: cleanNote(fd.get("announcements") as string | null, NOTE_LIMITS.announcements, "Announcements"),
+    coach_notes: cleanNote(fd.get("coach_notes") as string | null, NOTE_LIMITS.coach_notes, "Coach notes"),
+  };
+  for (const v of Object.values(fields)) if (v && typeof v === "object") return { error: v.error };
+
+  const cues: { plan_id: string; player_id: string; cue: string }[] = [];
+  for (const [key, value] of fd.entries()) {
+    if (!key.startsWith("cue_") || typeof value !== "string") continue;
+    const playerId = key.slice(4);
+    const cue = cleanNote(value, NOTE_LIMITS.cue, "A cue");
+    if (cue && typeof cue === "object") return { error: cue.error };
+    if (isUuid(playerId) && cue) cues.push({ plan_id: planId, player_id: playerId, cue });
+  }
+  const installs = fd.getAll("install").filter((v): v is string => typeof v === "string" && isUuid(v));
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("practice_plans").update(fields).eq("id", planId);
+  if (error) return { error: friendlyDbError(error) };
+
+  const { error: clearCues } = await supabase.from("practice_plan_cues").delete().eq("plan_id", planId);
+  if (clearCues) return { error: friendlyDbError(clearCues) };
+  if (cues.length) {
+    const { error: cueError } = await supabase.from("practice_plan_cues").insert(cues);
+    if (cueError) return { error: friendlyDbError(cueError) };
+  }
+
+  const { error: clearInstalls } = await supabase.from("install_item_plans").delete().eq("plan_id", planId);
+  if (clearInstalls) return { error: friendlyDbError(clearInstalls) };
+  if (installs.length) {
+    const { error: installError } = await supabase.from("install_item_plans").insert(installs.map((item_id) => ({ item_id, plan_id: planId })));
+    if (installError) return { error: friendlyDbError(installError) };
+  }
+  refresh();
+  return { error: null, saved: true };
 }
