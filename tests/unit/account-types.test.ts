@@ -35,6 +35,8 @@ test("the Dugout rows match each role's tabs", () => {
   for (const name of ["Culture", "GameDay", "Parents", "Mentors"]) assert.ok(!assistantTabs.has(name), name);
   const plans = dugout.rows.find((r) => r.name === "Practice Plans")!;
   assert.equal(plans.access["assistant-coach"], "part");
+  // the user (2026-11-08): assistants see the Team Budget but can't change it
+  assert.equal(dugout.rows.find((r) => r.name === "Team Budget")!.access["assistant-coach"], "view");
 });
 
 test("only approved parents create player logins", () => {

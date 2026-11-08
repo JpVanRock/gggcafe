@@ -18,7 +18,7 @@ export const ROLE_LABEL: Record<StaffRole, string> = {
 export const ROLE_NOTE: Record<StaffRole, string> = {
   admin: "Admin · everything a head coach has, plus staff, mentors and G3 Advanced",
   coach: "Head Coach · your teams, your staff and your players",
-  assistant: "Assistant Coach · roster, calendar, practice plans, training, the playbook, drills and the team budget",
+  assistant: "Assistant Coach · roster, calendar, practice plans, training, the playbook and drills; views the team budget",
   viewer: "Viewer · read only",
 };
 

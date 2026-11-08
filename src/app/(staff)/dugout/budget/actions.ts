@@ -1,7 +1,7 @@
 "use server";
 
 import { refresh } from "next/cache";
-import { editorCheck } from "@/lib/auth";
+import { headCoachCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { friendlyDbError, isoDate, oneOf, text, type FormState } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
@@ -15,7 +15,7 @@ function scope(fd: FormData) {
 
 /** Replaces the season's registration costs (name + amount per player). */
 export async function saveFees(_prev: FormState, fd: FormData): Promise<FormState> {
-  const denied = await editorCheck();
+  const denied = await headCoachCheck();
   if (denied) return { error: denied };
   const where = scope(fd);
   if (!where) return { error: "Choose a team and season." };
@@ -42,7 +42,7 @@ export async function saveFees(_prev: FormState, fd: FormData): Promise<FormStat
 
 /** Records a player's payment. */
 export async function recordPayment(_prev: FormState, fd: FormData): Promise<FormState> {
-  const denied = await editorCheck();
+  const denied = await headCoachCheck();
   if (denied) return { error: denied };
   const where = scope(fd);
   if (!where) return { error: "Choose a team and season." };
@@ -70,7 +70,7 @@ export async function recordPayment(_prev: FormState, fd: FormData): Promise<For
 
 /** Sets a player's discount (negative) or extra charge, or clears it. */
 export async function saveAdjustment(_prev: FormState, fd: FormData): Promise<FormState> {
-  const denied = await editorCheck();
+  const denied = await headCoachCheck();
   if (denied) return { error: denied };
   const where = scope(fd);
   if (!where) return { error: "Choose a team and season." };
@@ -96,7 +96,7 @@ export async function saveAdjustment(_prev: FormState, fd: FormData): Promise<Fo
 
 /** Adds an expense or other income (sponsor, fundraiser...). */
 export async function addEntry(_prev: FormState, fd: FormData): Promise<FormState> {
-  const denied = await editorCheck();
+  const denied = await headCoachCheck();
   if (denied) return { error: denied };
   const where = scope(fd);
   if (!where) return { error: "Choose a team and season." };
@@ -119,7 +119,7 @@ export async function addEntry(_prev: FormState, fd: FormData): Promise<FormStat
 }
 
 export async function deleteEntry(fd: FormData) {
-  if (await editorCheck()) return;
+  if (await headCoachCheck()) return;
   const id = text(fd, "id");
   if (!isUuid(id)) return;
   const supabase = await createClient();

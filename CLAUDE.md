@@ -319,7 +319,7 @@ tests/unit/              node --test unit tests (npm run test:unit)
   `decide_staff_request()` (admins any, head coaches assistants) add the `staff` row. Roster tab: "Coaches signing up"
   plus "Coaching staff" (admins change roles/remove, `roster/actions.ts`). Counts in `countWaiting()` (approvals.ts).
 - Assistants: `private.can_edit()` includes them, `private.is_head_coach()` doesn't. Head-coach-only writes
-  (`private.apply_head_coach_writes`): team_culture/standards, gameday_*, mentor_players; parent links, parent emails
+  (`private.apply_head_coach_writes`): team_culture/standards, gameday_*, mentor_players, the Team Budget (budget_*); parent links, parent emails
   (`team_parent_links`), the team code (trigger), mentor message removal. Practice plans: everyone reads; assistants
   change only plans they created (`private.can_edit_plan`, `canEditPlanRole`); others show "View only".
   App: `src/lib/roles.ts` (labels, `dugoutTabsFor` hides Culture/GameDay/Parents/Mentors from assistants),
@@ -529,7 +529,8 @@ tests/unit/              node --test unit tests (npm run test:unit)
 - Team Budget, per team and season (`?season=`): registration costs every player owes (`budget_fees`,
   saved by `save_budget_fees`), per-player discount/extra charge (`budget_adjustments`), and the ledger
   `budget_entries` (kind payment/income/expense). Money math in `src/lib/budget.ts` (cents; no
-  imports; unit-tested). Coaches/admins edit, other staff view.
+  imports; unit-tested). Head coaches/admins edit (user 2026-11-08: assistants view only; migration 20261109100000),
+  other staff view.
 - Parents (user's choice: sign-in accounts, team totals only): parents sign up at `/register` (name,
   email, password, team code, daughter's name) and land on `/family`. A coach turns on a 6-character
   team code (`teams.parent_code`, Dugout → Parents) and approves each request by matching it to a

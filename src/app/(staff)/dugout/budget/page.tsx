@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { canEdit, requireStaffPage } from "@/lib/auth";
+import { isHeadCoach, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { Modal } from "@/components/modal";
@@ -51,7 +51,8 @@ const STATUS: Record<PlayerStatus, { label: string; className: string }> = {
 
 async function Budget({ searchParams }: Pick<PageProps<"/dugout/budget">, "searchParams">) {
   const user = await requireStaffPage();
-  const editor = canEdit(user.staff.role);
+  // Head coaches and admins change the budget; assistant coaches and viewers read it (user, 2026-11-08).
+  const editor = isHeadCoach(user.staff.role);
   const { team: teamParam, season: seasonParam } = await searchParams;
   const supabase = await createClient();
   const teams = await loadOwnTeams(supabase);
