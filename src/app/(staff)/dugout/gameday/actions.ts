@@ -13,6 +13,7 @@ import {
   type PitchPlan, type Rotation,
 } from "@/lib/gameday";
 import { lineupSeason, loadGamedayRoster, loadLineup } from "@/lib/gameday-data";
+import { DEPTH_POSITIONS, type DepthPosition } from "@/lib/playbook";
 import { loadCoachingStaff } from "@/lib/practice-plans";
 import { emailConfigured, escapeHtml, sendEmail } from "@/lib/email";
 import { lineupFilename, renderLineupPdf } from "@/lib/pdf/lineup-pdf";
@@ -272,4 +273,84 @@ export async function shareLineup(lineupId: string, recipientIds: string[], note
   await supabase.from("gameday_lineups").update({ shared_at: new Date().toISOString() }).eq("id", lineup.id);
   refresh();
   return { error: null, sent: to.length };
+}
+
+// ---------------------------------------------------------------------------
+// Depth chart (head coaches): a ranked list per field position
+// ---------------------------------------------------------------------------
+
+type DepthRow = { position: string; player_id: string; rank: number };
+
+async function depthRows(supabase: Awaited<ReturnType<typeof createClient>>, teamId: string, position?: string) {
+  let q = supabase.from("depth_chart").select("position, player_id, rank").eq("team_id", teamId);
+  if (position) q = q.eq("position", position);
+  const { data } = await q.order("rank");
+  return (data ?? []) as DepthRow[];
+}
+
+export async function addToDepth(fd: FormData) {
+  const teamId = text(fd, "team_id");
+  const position = text(fd, "position");
+  const playerId = text(fd, "player_id");
+  if ((await headCoachCheck()) || !isUuid(teamId) || !isUuid(playerId) || !DEPTH_POSITIONS.includes(position as DepthPosition)) return;
+  const supabase = await createClient();
+  const rows = await depthRows(supabase, teamId, position!);
+  if (rows.some((r) => r.player_id === playerId) || rows.length >= 30) return;
+  await supabase.from("depth_chart").insert({ team_id: teamId, position, player_id: playerId, rank: (rows.at(-1)?.rank ?? 0) + 1 });
+  refresh();
+}
+
+export async function moveInDepth(fd: FormData) {
+  const teamId = text(fd, "team_id");
+  const position = text(fd, "position");
+  const playerId = text(fd, "player_id");
+  const dir = text(fd, "dir") === "up" ? -1 : 1;
+  if ((await headCoachCheck()) || !isUuid(teamId) || !isUuid(playerId) || !position) return;
+  const supabase = await createClient();
+  const rows = await depthRows(supabase, teamId, position);
+  const i = rows.findIndex((r) => r.player_id === playerId);
+  const j = i + dir;
+  if (i < 0 || j < 0 || j >= rows.length) return;
+  await supabase.from("depth_chart").update({ rank: rows[j].rank }).match({ team_id: teamId, position, player_id: rows[i].player_id });
+  await supabase.from("depth_chart").update({ rank: rows[i].rank }).match({ team_id: teamId, position, player_id: rows[j].player_id });
+  refresh();
+}
+
+export async function removeFromDepth(fd: FormData) {
+  const teamId = text(fd, "team_id");
+  const position = text(fd, "position");
+  const playerId = text(fd, "player_id");
+  if ((await headCoachCheck()) || !isUuid(teamId) || !isUuid(playerId) || !position) return;
+  const supabase = await createClient();
+  await supabase.from("depth_chart").delete().match({ team_id: teamId, position, player_id: playerId });
+  refresh();
+}
+
+/** Start the depth chart from each player's listed positions (primary first), skipping anyone already there. */
+export async function fillDepthFromPositions(fd: FormData) {
+  const teamId = text(fd, "team_id");
+  if ((await headCoachCheck()) || !isUuid(teamId)) return;
+  const supabase = await createClient();
+  const seasonId = await lineupSeason(supabase, teamId, null);
+  if (!seasonId) return;
+  const [roster, existing] = await Promise.all([loadGamedayRoster(supabase, teamId, seasonId), depthRows(supabase, teamId)]);
+  const have = new Set(existing.map((r) => `${r.position}|${r.player_id}`));
+  const next = new Map<string, number>();
+  for (const r of existing) next.set(r.position, Math.max(next.get(r.position) ?? 0, r.rank));
+  const rows: { team_id: string; position: string; player_id: string; rank: number }[] = [];
+  // primary positions first for everyone, then secondary ones
+  for (const pass of [0, 1]) {
+    for (const p of roster) {
+      const list = (pass === 0 ? p.positions.slice(0, 1) : p.positions.slice(1)).filter((x): x is DepthPosition => DEPTH_POSITIONS.includes(x as DepthPosition));
+      for (const pos of list) {
+        if (have.has(`${pos}|${p.id}`)) continue;
+        have.add(`${pos}|${p.id}`);
+        const rank = (next.get(pos) ?? 0) + 1;
+        next.set(pos, rank);
+        rows.push({ team_id: teamId, position: pos, player_id: p.id, rank });
+      }
+    }
+  }
+  if (rows.length) await supabase.from("depth_chart").insert(rows);
+  refresh();
 }

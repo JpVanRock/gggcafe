@@ -18,7 +18,7 @@ export const ROLE_LABEL: Record<StaffRole, string> = {
 export const ROLE_NOTE: Record<StaffRole, string> = {
   admin: "Admin · everything a head coach has, plus staff, mentors and G3 Advanced",
   coach: "Head Coach · your teams, your staff and your players",
-  assistant: "Assistant Coach · roster, calendar, practice plans, drills and the team budget",
+  assistant: "Assistant Coach · roster, calendar, practice plans, training, the playbook, drills and the team budget",
   viewer: "Viewer · read only",
 };
 
@@ -40,6 +40,7 @@ export const DUGOUT_TABS = [
   { href: "/dugout/plans", label: "Practice Plans", headOnly: false },
   { href: "/dugout/training", label: "Training", headOnly: false },
   { href: "/dugout/gameday", label: "GameDay", headOnly: true },
+  { href: "/dugout/playbook", label: "Playbook", headOnly: false },
   { href: "/dugout/drills", label: "Drill Library", headOnly: false },
   { href: "/dugout/budget", label: "Team Budget", headOnly: false },
   { href: "/dugout/parents", label: "Parents", headOnly: true },

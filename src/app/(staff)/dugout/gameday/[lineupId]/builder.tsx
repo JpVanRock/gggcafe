@@ -17,6 +17,7 @@ import {
   type Pitch, type PitchPlan, type Rotation, type RotationSpot,
 } from "@/lib/gameday";
 import type { GamedayPlayer, Lineup } from "@/lib/gameday-data";
+import { suggestDefense, type DepthChart } from "@/lib/playbook";
 import type { StaffContact } from "@/lib/practice-plans";
 import { ShareButton } from "../../plans/[planId]/share-button";
 import { deleteLineup, finalizeLineup, saveLineup, shareLineup } from "../actions";
@@ -68,11 +69,14 @@ export function LineupBuilder({
   roster,
   staff,
   emailReady,
+  depth = {},
 }: {
   lineup: Lineup;
   roster: GamedayPlayer[];
   staff: StaffContact[];
   emailReady: boolean;
+  /** the team's depth chart (GameDay → Depth chart), to fill a rotation from */
+  depth?: DepthChart;
 }) {
   const router = useRouter();
   const byId = useMemo(() => new Map(roster.map((p) => [p.id, p])), [roster]);
@@ -163,6 +167,12 @@ export function LineupBuilder({
     });
   const copyRotation = (from: string, to: string) => setDefense((d) => ({ ...d, [to]: { ...(d[from] ?? {}) } }));
   const defenseRows = [...order.filter((id) => byId.has(id)), ...bench.map((p) => p.id)];
+  const hasDepth = Object.values(depth).some((list) => list && list.length > 0);
+  // The batting order plays the field; with nobody in the order yet, use everyone.
+  const fromDepth = (rot: string) => {
+    const inGame = order.filter((id) => byId.has(id));
+    setDefense((d) => ({ ...d, [rot]: suggestDefense(depth, inGame.length ? inGame : defenseRows) }));
+  };
 
   // --- pitching ---------------------------------------------------------------
   const setPitch = (rot: string, patch: Partial<PitchPlan>) =>
@@ -324,6 +334,11 @@ export function LineupBuilder({
                         {i > 0 && (
                           <button type="button" onClick={() => copyRotation(rotations[i - 1], r)} className="text-[10px] text-muted hover:text-pink" title={`Copy R${rotations[i - 1]} into R${r}`}>
                             Copy R{rotations[i - 1]}
+                          </button>
+                        )}
+                        {hasDepth && (
+                          <button type="button" onClick={() => fromDepth(r)} className="text-[10px] text-muted hover:text-pink" title={`Fill R${r} from the depth chart`}>
+                            Depth chart
                           </button>
                         )}
                       </div>

@@ -15,6 +15,7 @@ import { loadCoachingStaff } from "@/lib/practice-plans";
 import { ShareButton } from "../../plans/[planId]/share-button";
 import { deleteLineup, reopenLineup, shareLineup } from "../actions";
 import { LineupBuilder } from "./builder";
+import type { DepthChart, DepthPosition } from "@/lib/playbook";
 
 export const metadata: Metadata = { title: "Lineup · GameDay · GGG.Cafe" };
 
@@ -36,10 +37,13 @@ async function LineupView({ params, searchParams }: Pick<PageProps<"/dugout/game
   const lineup = await loadLineup(supabase, lineupId);
   if (!lineup) notFound();
   const seasonId = await lineupSeason(supabase, lineup.team.id, lineup.season_id);
-  const [roster, staff] = await Promise.all([
+  const [roster, staff, depthResult] = await Promise.all([
     seasonId ? loadGamedayRoster(supabase, lineup.team.id, seasonId) : Promise.resolve([]),
     editor ? loadCoachingStaff(supabase) : Promise.resolve([]),
+    supabase.from("depth_chart").select("position, player_id").eq("team_id", lineup.team.id).order("rank"),
   ]);
+  const depth: DepthChart = {};
+  for (const r of (depthResult.data ?? []) as { position: DepthPosition; player_id: string }[]) (depth[r.position] ??= []).push(r.player_id);
   const byId = new Map(roster.map((p) => [p.id, p]));
   const rotations = Array.from({ length: lineup.rotations }, (_, i) => String(i + 1));
   const n = Number(shared);
@@ -55,7 +59,7 @@ async function LineupView({ params, searchParams }: Pick<PageProps<"/dugout/game
         </p>
       )}
       {editor && lineup.status === "draft" ? (
-        <LineupBuilder lineup={lineup} roster={roster} staff={staff} emailReady={emailConfigured()} />
+        <LineupBuilder lineup={lineup} roster={roster} staff={staff} emailReady={emailConfigured()} depth={depth} />
       ) : (
         <div className="flex flex-col gap-6">
           <header className="flex flex-col gap-4 rounded-2xl border border-navy-700 bg-navy-900/70 p-5 sm:p-6">

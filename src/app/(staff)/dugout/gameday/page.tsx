@@ -10,6 +10,7 @@ import { lineupSeason, loadGamedayRoster } from "@/lib/gameday-data";
 import { loadOwnTeams } from "../data";
 import { TeamPicker } from "../team-picker";
 import { CardsForm, NewLineupForm } from "./forms";
+import { GamedayNav } from "./nav";
 
 export const metadata: Metadata = { title: "GameDay · Coaches Dugout · GGG.Cafe" };
 
@@ -67,6 +68,7 @@ async function Gameday({ searchParams }: Pick<PageProps<"/dugout/gameday">, "sea
   return (
     <div className="flex flex-col gap-8">
       <TeamPicker teams={teams} current={team.id} basePath="/dugout/gameday" />
+      <GamedayNav current="lineups" teamId={team.id} />
 
       <section className="flex flex-col gap-4">
         <div className="flex flex-wrap items-end justify-between gap-3">

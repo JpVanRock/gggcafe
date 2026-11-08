@@ -56,6 +56,7 @@ export const FEATURE_SECTIONS: { title: string; features: Feature[] }[] = [
       { name: "Defense and Baserunning IQ", detail: "Playbook tests, Levels 1-3, with hints and review.", standard: "yes", advanced: "yes" },
       { name: "Offense IQ", detail: "Counts, situational hitting, the short game and slapping: Levels 1-3, each passed level unlocks the next, MVP badges.", standard: "yes", advanced: "yes" },
       { name: "Battery IQ", detail: "Pitch calling for pitchers and catchers (anyone can take it): Levels 1-3, MVP badges.", standard: "yes", advanced: "yes" },
+      { name: "Team Playbook", detail: "Her team's call sheet as flashcards and the short quizzes her coaches write (graded right away; her first try is her score). Only her team's calls; never how signs are given.", standard: "yes", advanced: "yes" },
       { name: "Position IQ", detail: "21 questions per position; 80% earns that Golden Glove.", standard: "yes", advanced: "yes" },
       { name: "Extra Credit Library", detail: "Every shelf in one run; 80% earns the GGG Champions Trophy.", standard: "yes", advanced: "yes" },
       { name: "How to Keep the Book", detail: "Six-chapter scorekeeping course; each chapter earns Manager of the Year.", standard: "yes", advanced: "yes" },
