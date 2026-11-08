@@ -12,7 +12,9 @@ import {
 } from "@/lib/box-score";
 import { saveBoxScore } from "../../actions";
 
-const cell = `${inputClass} w-11 px-1 py-1 text-center text-sm tabular-nums`;
+// inputClass is full width; these small inputs set their own width instead
+const base = inputClass.replace("w-full ", "");
+const cell = `${base} w-11 px-1 py-1 text-center text-sm tabular-nums`;
 const th = "px-0.5 pb-1 text-center font-mono text-[10px] font-bold tracking-wider text-muted uppercase";
 
 function Num({ value, onChange, label, max = 99 }: { value: number; onChange: (n: number) => void; label: string; max?: number }) {
@@ -167,7 +169,7 @@ export function BoxScoreForm({
                         value={grades[key] ?? ""}
                         onChange={(e) => setGrades((g) => ({ ...g, [key]: e.target.value === "" ? null : Number(e.target.value) }))}
                         aria-label={`${p.short}, plate appearance ${n}`}
-                        className={`${inputClass} w-14 px-1 py-1 text-center text-sm`}
+                        className={`${base} w-14 px-1 py-1 text-center text-sm`}
                       >
                         <option value="">PA{n}</option>
                         {[5, 4, 3, 2, 1, 0].map((g) => (
@@ -223,7 +225,7 @@ export function BoxScoreForm({
                       <Num value={p.strikes ?? 0} onChange={(n) => setPitch(i, { strikes: n || null })} label="Strikes" max={400} />
                     </td>
                     <td className="px-0.5">
-                      <select value={p.decision ?? ""} onChange={(e) => setPitch(i, { decision: (e.target.value || null) as PitchingLine["decision"] })} aria-label="Decision" className={`${inputClass} px-1 py-1 text-sm`}>
+                      <select value={p.decision ?? ""} onChange={(e) => setPitch(i, { decision: (e.target.value || null) as PitchingLine["decision"] })} aria-label="Decision" className={`${base} px-1 py-1 text-sm`}>
                         <option value="">–</option>
                         <option value="W">W</option>
                         <option value="L">L</option>
@@ -255,7 +257,7 @@ export function BoxScoreForm({
               ])
             }
             aria-label="Add a pitcher"
-            className={`${inputClass} max-w-60 px-2 py-1 text-sm`}
+            className={`${base} w-60 px-2 py-1 text-sm`}
           >
             <option value="">+ Add a pitcher…</option>
             {unpitched.map((p) => (
