@@ -6,11 +6,12 @@ import { RingCase, TRACK_LABEL, type RingTrack } from "@/components/rings";
 import { GoldenGlove } from "@/components/golden-glove";
 import { formatLongDate } from "@/lib/dates";
 import {
-  BADGE_TRACK_LABEL, IqQuestionForm, IqTests, QuizRunner, type BadgeTrack, type BadgeTrackInfo, type LevelInfo, type LibraryInfo, type Nameplate,
+  IqQuestionForm, IqTests, QuizRunner, type BadgeTrackInfo, type LevelInfo, type LibraryInfo, type Nameplate,
   type PositionInfo, type QuizInfo, type TrackInfo,
 } from "./iq-client";
 import { DetailHeading, MenuItem } from "./menu";
 import { CourseCard, buildCourse } from "./scorebook";
+import { BADGE_TRACK_LABEL, type BadgeTrack } from "@/lib/iq-tracks";
 
 const QUIZ_POSITIONS: readonly Position[] = FIELD_POSITIONS;
 

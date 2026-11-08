@@ -8,6 +8,7 @@ import { Diamond, type DiamondSpec } from "@/components/diamond";
 import { Ring, TRACK_LABEL, type RingTrack } from "@/components/rings";
 import { GoldenGlove } from "@/components/golden-glove";
 import { MvpBadge } from "@/components/mvp-badge";
+import { BADGE_TRACK_LABEL, isBadgeTrack, type BadgeTrack } from "@/lib/iq-tracks";
 import { ChampionsTrophy } from "@/components/champions-trophy";
 import { StolenBasePlaque } from "@/components/stolen-base-plaque";
 import { DetailHeading } from "./menu";
@@ -291,10 +292,7 @@ export type LevelInfo = TestState & {
 };
 export type TrackInfo = { track: RingTrack; label: string; blurb: string; levels: LevelInfo[] };
 /** Offense IQ and Battery IQ: Levels 1-3, passing unlocks the next; the award is the MVP badge (no ring). */
-export type BadgeTrack = "offense" | "battery";
-export const BADGE_TRACK_LABEL: Record<BadgeTrack, string> = { offense: "Offense IQ", battery: "Battery IQ" };
 export type BadgeTrackInfo = { track: BadgeTrack; label: string; blurb: string; levels: (LevelInfo & { mvp: boolean })[] };
-const isBadgeTrack = (t: string): t is BadgeTrack => t === "offense" || t === "battery";
 export type PositionInfo = TestState & {
   position: FieldPosition;
   label: string;
