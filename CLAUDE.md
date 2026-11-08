@@ -25,7 +25,7 @@ src/lib/form.ts          FormData readers + friendlyDbError for server actions
 src/lib/softball.ts      positions, bats/throws, formats, row types (must match DB enums)
 src/lib/supabase/        server.ts (Server Components/Actions), client.ts (browser),
                          env.ts, database.types.ts (generated: npm run db:types)
-src/components/main-nav.tsx  top menu: staff get Dashboard/Coaches Dugout/Teams/Players on every page,
+src/components/main-nav.tsx  top menu: staff get Dashboard/Coaches Dugout (opens Roster)/Teams/Players on every page,
                          including /me and /family; players get "My profile"
 src/proxy.ts             refreshes the Supabase auth session each request (Next 16 "proxy", formerly middleware)
 supabase/migrations/     schema, applied in filename order

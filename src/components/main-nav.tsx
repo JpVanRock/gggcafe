@@ -9,7 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard" },
-  { href: "/dugout", label: "Coaches Dugout" },
+  { href: "/dugout/roster", label: "Coaches Dugout" }, // opens the first tab, Roster
   { href: "/teams", label: "Teams" },
   { href: "/players", label: "Players" },
 ] as const;
@@ -37,7 +37,7 @@ export async function MainNav({ fallback = null }: { fallback?: ReactNode }) {
       {NAV.map((item) => (
         <Link key={item.href} href={item.href} className={`${linkClass} inline-flex items-center gap-1.5`}>
           {item.label}
-          {item.href === "/dugout" && waiting > 0 && (
+          {item.href === "/dugout/roster" && waiting > 0 && (
             <span
               className="grid h-5 min-w-5 place-items-center rounded-full bg-pink px-1 font-mono text-[10px] font-bold text-on-accent"
               title={`${waiting} approval${waiting === 1 ? "" : "s"} waiting`}
