@@ -345,7 +345,7 @@ export const LESSONS: Lesson[] = core([
     bigIdea: "Culture is what you allow, what you emphasize, and what you do every single day.",
     body: [
       "Culture isn't a poster on the wall. It's built one decision at a time: what you let slide, what you make a big deal of, and what you do every day when nobody's grading it.",
-      "Leaders are the gatekeepers. The coach can't be in the locker room or the group chat, so what you allow there is your culture. That's why player-led teams win. Check in with your coach often so you're building the same thing.",
+      "Leaders are the gatekeepers. The coach can't be in the hotel lobby at a tournament, the back of the bus or the group chat, so what you allow there is your culture. That's why player-led teams win. Check in with your coach often so you're building the same thing.",
     ],
     lists: [{ title: "Culture is", points: ["What you allow.", "What you emphasize.", "What you do every day."] }],
     questions: [
@@ -573,7 +573,7 @@ export const LESSONS: Lesson[] = core([
     body: [
       "A researcher once planted an actor in small groups that had a job to do. Sometimes he played the jerk, sometimes the slacker, sometimes the downer. Every time, the group did a lot worse, and the others started acting like him. When he played the downer, the whole room went flat.",
       "Except one group. One member there kept defusing him: leaning in, staying upbeat, asking questions and steering everyone back to the work. That group did the best of all.",
-      "There's a story about a pro football team that drafted a less talented player over a star. The star could stay out all night and still play great the next day, but the teammates he took with him couldn't. The player they drafted was the one who'd keep his teammates home. Influence spreads both ways. Which way will yours go?",
+      "Picture a college coach choosing between two recruits. One is the better player, but she stays out late the night before games and takes teammates with her, and they're the ones who play flat in the morning. The other is a little less talented, and she's the one who keeps everyone in the hotel the night before the championship game. The coach takes the second one every time. Influence spreads both ways. Which way will yours go?",
     ],
     lists: [
       {
@@ -590,7 +590,7 @@ export const LESSONS: Lesson[] = core([
     questions: [
       { key: "q1", text: "Why does one person's negativity spread so fast?" },
       { key: "q2", text: "What can you do the moment you feel negative energy creeping in?" },
-      { key: "q3", text: "Who would your team want to keep everyone home the night before a big game? Is it you?" },
+      { key: "q3", text: "Who keeps your team in the hotel the night before a big tournament? Is it you?" },
     ],
     steps: [
       { key: "s1", text: "The next time negativity starts, be the first positive voice." },
@@ -601,24 +601,24 @@ export const LESSONS: Lesson[] = core([
     slug: "make-everyone-better",
     part: "Learn from the greats",
     title: "Make Everyone Better",
-    bigIdea: "The best players make the people around them better. That's leadership you can see from the stands.",
+    bigIdea: "The best players make the people around them better. That's leadership you can see from the bleachers.",
     body: [
-      "Watch Caitlin Clark run an offense and you'll see more than the deep threes. She believes she'll make the play, and her teammates start believing too. The pass that sets up someone else counts as much as her own shot.",
-      "You don't need her range to lead like that. Here are ten things her game shows, and every one of them works on a softball field.",
+      "Caitlin Clark plays basketball, not softball, but watch her and you'll see leadership that works on any diamond. She believes she'll make the play, and her teammates start believing too. To her, setting up a teammate matters as much as scoring herself.",
+      "You don't need her range to lead like that. Here are ten things her game shows, and what each one looks like on a softball field.",
     ],
     lists: [
       {
         title: "Ten things to take from her game",
         points: [
-          "Confidence that spreads: when you believe, your teammates believe.",
-          "Make everyone around you better: the assist matters as much as the shot.",
-          "Calm in the clutch: the bigger the moment, the steadier the leader.",
-          "Relentless work: elite skill gets built in practices nobody films.",
-          "Bounce back: a bad game, a bad call, a bad week, then right back to it.",
-          "Be consistent: teammates know exactly what they'll get from you.",
+          "Confidence that spreads: walk to the plate like you expect to win the at-bat, and the dugout believes it too.",
+          "Make everyone around you better: the sac bunt that moves a runner matters as much as the home run.",
+          "Calm in the clutch: bases loaded, two outs, last inning. The bigger the moment, the steadier the leader.",
+          "Relentless work: elite skill gets built in tee work and bullpens nobody films.",
+          "Bounce back: an error, a strikeout, a bad call, then right back to the next pitch.",
+          "Be consistent: teammates know exactly what they'll get from you, every inning.",
           "Demand excellence: from yourself first, then from your team.",
-          "Want the challenge: the toughest pitcher, the biggest stage.",
-          "Talk constantly: vocal, clear, always communicating on the field.",
+          "Want the challenge: the toughest pitcher, the biggest game, the ball hit to you.",
+          "Talk constantly: call the outs, the cuts and the coverages, every pitch.",
           "Stay humble: credit your teammates and your coaches.",
         ],
       },
@@ -792,7 +792,7 @@ export const BONUS: Lesson[] = bonus([
     bigIdea: "Captain is a title someone gives you. Leader is a choice you make.",
     body: [
       "The captain's patch doesn't always go to the real leader, and the best player isn't always the one people follow. Titles get handed out. Influence gets earned.",
-      "Picture a team that plays an awful first half. At the break, one player asks the coach for a minute alone with the team. She says what needs saying, and the team owns it. When the coach walks in, they're ready to play. That's leadership, patch or no patch.",
+      "Picture a team that's down 5-0 after three innings: flat, quiet, kicking the ball around. Between innings, one player calls everyone to the dugout rail. She says what needs saying, and the team owns it. By the time they take the field again, they're ready to play. That's leadership, patch or no patch.",
     ],
     lists: [{ title: "Leaders choose to", points: ["Lead by example.", "Cheer.", "Connect.", "Confront.", "Challenge."] }],
     questions: [
@@ -915,7 +915,7 @@ export const BONUS: Lesson[] = bonus([
     title: "Positive Energy Is Contagious",
     bigIdea: "Energy spreads. Make sure yours is worth catching.",
     body: [
-      "Think of a coach or teammate who walked into a team full of doubt and won everyone over with care and optimism. That's what positive energy does to a room.",
+      "Think of a coach or teammate who walked into a team full of doubt and won everyone over with care and optimism. That's what positive energy does to a dugout.",
       "You don't have to be cheerful every second. But a leader's energy sets the tone, and positive energy builds trust. That trust is what lets you have the hard conversation later without losing her.",
     ],
     questions: [
@@ -974,7 +974,7 @@ export const BONUS: Lesson[] = bonus([
     bigIdea: "High fives, fist bumps and huddles aren't extras. They're how teams build trust.",
     body: [
       "Researchers once counted how often NBA players touched each other early in a season: high fives, fist bumps, chest bumps, huddles. The teams that touched the most tended to win the most. They trusted each other, cooperated more and played less selfishly. The teams that touched less, with negative body language, played more for themselves.",
-      "Every high five says I'm with you. That's an energy-giving play, and you can bring it every inning.",
+      "Softball has more of those moments than any sport: the high five at home plate, the fist bump when a teammate comes off the field, the huddle in the circle. Every one says I'm with you. That's an energy-giving play, and you can bring it every inning.",
     ],
     questions: [
       { key: "q1", text: "How does a high five or a tap on the helmet build trust?" },
@@ -1079,7 +1079,7 @@ export const BONUS: Lesson[] = bonus([
     title: "Sweat the Small Stuff",
     bigIdea: "If you skip the little things, you won't handle the big ones.",
     body: [
-      "Picture a team talking big about its season, then every single player walking past an empty bottle on the locker room floor. Nobody picks it up. That team was never as good as it talked.",
+      "Picture a team talking big about its season, then every single player walking past an empty water bottle on the dugout floor. Nobody picks it up. That team was never as good as it talked.",
       "Big goals are built out of small details: how you warm up, how you take care of your gear, how you show up. Get those right and the big things follow.",
     ],
     questions: [
@@ -1098,7 +1098,7 @@ export const BONUS: Lesson[] = bonus([
     title: "Leave It Better",
     bigIdea: "Lead yourself first. Then leave every place better than you found it.",
     body: [
-      "Some of the best athletes ever are known for cleaning the locker room. Nobody asked them to. They know that how you do the small things is how you do everything.",
+      "Some of the best athletes in any sport are known for cleaning up after their team: the dugout, the bus, the locker room. Nobody asked them to. They know that how you do the small things is how you do everything.",
       "Leave the dugout, the bus and the field cleaner than you found them. It's a small thing. That's the point.",
     ],
     questions: [
@@ -1117,7 +1117,7 @@ export const BONUS: Lesson[] = bonus([
     title: "Feel It, Then Choose",
     bigIdea: "Feelings come and go. Feel them, then choose what you do next.",
     body: [
-      "Every athlete gets nervous, angry, scared and frustrated. Pretending you don't is how those feelings take over. Accept them instead, then decide what to do with them.",
+      "Every player gets nervous in the box, angry after a bad call, frustrated after an error. Pretending you don't is how those feelings take over. Accept them instead, then decide what to do with them.",
       "Pause before you react. The breath between the feeling and the action is where your poise lives. And just because a negative thought shows up doesn't mean you have to believe it.",
     ],
     questions: [
@@ -1137,7 +1137,7 @@ export const BONUS: Lesson[] = bonus([
     title: "Back Yourself",
     bigIdea: "Believe in yourself before anyone else does, then work like you mean it.",
     body: [
-      "Some of the greatest athletes ever started as backups nobody believed in. What they had was belief in themselves and a stubborn refusal to stop working.",
+      "Plenty of great players started on the bench, got cut once, or batted ninth for a season. What they had was belief in themselves and a stubborn refusal to stop working.",
       "Confidence isn't bragging. It's knowing what you've put in. Great leaders pair that belief with high standards.",
     ],
     questions: [
@@ -1210,7 +1210,7 @@ export const BONUS: Lesson[] = bonus([
     title: "Work Beats Fear",
     bigIdea: "Fear shrinks when you know you've done the work.",
     body: [
-      "The greatest players aren't scared of failing in big moments, because they've already put in the work. Confidence is earned in practice, one day at a time.",
+      "The best players aren't scared to be up with the game on the line, because they've already taken thousands of swings in practice. Confidence is earned in the cage and the bullpen, one day at a time.",
       "Fake confidence talks big and cracks under pressure, and it hurts the team when it does. Real confidence comes from the process.",
     ],
     questions: [
@@ -1229,7 +1229,7 @@ export const BONUS: Lesson[] = bonus([
     title: "You Get What You Put In",
     bigIdea: "There's no shortcut. You get out what you put in.",
     body: [
-      "Nothing in, nothing out. The best put in the time, consistently, when it's boring and when nobody's watching. People who chase shortcuts find that out the hard way.",
+      "Nothing in, nothing out. The best put in the time: the extra cage rounds, the bullpens in January, the long toss when it's boring and nobody's watching. People who chase shortcuts find that out the hard way.",
       "Leaders have to be among the hardest workers on the team. Otherwise nobody listens.",
     ],
     questions: [
@@ -1455,6 +1455,27 @@ export function cleanPlan(raw: LeadershipPlan): LeadershipPlan {
     return typeof d === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : "";
   });
   return { why: text(raw.why), habits, goals, checkIns, reflection: text(raw.reflection) };
+}
+
+/** Her plan's check-in dates become one-day reminders in her TWIS (player_activities.source). */
+export const CHECKIN_SOURCE = "leadership-checkin";
+export const CHECKIN_TITLE = "Leadership check-in with your coach";
+export const CHECKIN_DETAILS = "Bring your Leadership Plan: what's working, what's in the way, what you'll change.";
+
+/** The TWIS activity for one check-in date: that day only. */
+export function checkInActivity(date: string) {
+  const weekday = new Date(`${date}T00:00:00Z`).getUTCDay() || 7; // ISO: 1 = Monday ... 7 = Sunday
+  return { title: CHECKIN_TITLE, details: CHECKIN_DETAILS, days: [weekday], starts_on: date, ends_on: date, source: CHECKIN_SOURCE };
+}
+
+/** What to change so the reminders match the plan: dates to add, reminders to remove (kept ones keep their check-offs). */
+export function checkInChanges(planDates: (string | undefined)[], existing: { id: string; starts_on: string }[]) {
+  const wanted = [...new Set(planDates.filter((d): d is string => Boolean(d && /^\d{4}-\d{2}-\d{2}$/.test(d))))].sort();
+  const have = new Set(existing.map((e) => e.starts_on));
+  return {
+    add: wanted.filter((d) => !have.has(d)),
+    remove: existing.filter((e) => !wanted.includes(e.starts_on)).map((e) => e.id),
+  };
 }
 
 /** A plan is ready to commit to once she's written why she leads, a habit and a goal. */

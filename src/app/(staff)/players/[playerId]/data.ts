@@ -81,6 +81,8 @@ export type ActivityRow = {
   pillar_id: string | null;
   pillar: { title: string } | null;
   category: TrainingCategory | null;
+  /** made by the app (leadership-checkin: a Leadership Plan check-in date) */
+  source?: string | null;
 };
 
 export async function loadTwisWeek(supabase: Supabase, playerId: string, monday: string): Promise<TwisWeek> {
@@ -171,7 +173,12 @@ export async function loadTwisWeek(supabase: Supabase, playerId: string, monday:
   }
 
   for (const a of activitiesResult) {
-    const tag = a.category ? TRAINING_CATEGORY_LABEL[a.category].title.split(" ")[0] : (a.pillar?.title ?? "My activity");
+    const tag =
+      a.source === "leadership-checkin"
+        ? "Leadership"
+        : a.category
+          ? TRAINING_CATEGORY_LABEL[a.category].title.split(" ")[0]
+          : (a.pillar?.title ?? "My activity");
     if (a.days.length === 0) {
       const key = `a:${a.id}:${monday}`;
       anyDay.push({ key, kind: "activity", refId: a.id, onDate: monday, title: a.title, detail: a.details, tag, checked: checked.has(key) });
@@ -202,7 +209,7 @@ export async function loadTwisWeek(supabase: Supabase, playerId: string, monday:
 export async function loadActivities(supabase: Supabase, playerId: string, from: string, to: string): Promise<ActivityRow[]> {
   const { data } = await supabase
     .from("player_activities")
-    .select("id, title, details, days, starts_on, ends_on, pillar_id, category, pillar:harada_pillars(title)")
+    .select("id, title, details, days, starts_on, ends_on, pillar_id, category, source, pillar:harada_pillars(title)")
     .eq("player_id", playerId)
     .lte("starts_on", to)
     .or(`ends_on.is.null,ends_on.gte.${from}`)

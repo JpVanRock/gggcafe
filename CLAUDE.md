@@ -201,7 +201,13 @@ tests/unit/              node --test unit tests (npm run test:unit)
 - User's rules (2026-11-08): no quotes, simple, voice of a strong female athlete (never name or
   quote the athletes the user mentioned for the voice). No reference to any outside course, program
   or author anywhere on the site, in the code, comments or docs. Real people named in lesson
-  examples are fine (user's choice). No trust falls in team-building (injury risk).
+  examples are fine (user's choice). No trust falls in team-building (injury risk). Tailored to
+  fastpitch (user, 2026-11-08): innings, at-bats, the dugout, the circle, bullpens and tee work, never
+  halves, courts, shots or locker-room-only settings; examples from other sports get a softball version.
+- Plan check-in dates become one-day TWIS activities (`player_activities.source = 'leadership-checkin'`,
+  tag "Leadership"), kept in step whenever she saves or commits her plan (`syncCheckIns`: adds new dates,
+  removes dropped ones, keeps the rest so check-offs stay). Left out of Manage activities; no points.
+  Coaches/admins see the next two weeks of check-ins on their dashboard.
 - Content in `src/lib/leadership-guide.ts` (paid content: server only, no imports, unit-tested):
   25 core lessons in parts (`CORE_PARTS`), 22 Extra Reps on shelves (`BONUS_SHELVES`, optional, any
   order, own progress, "X01"...), tools (`roles` 7 kinds of leaders, `engagement` five levels, `starters`,

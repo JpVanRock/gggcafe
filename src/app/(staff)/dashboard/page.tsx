@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { canEdit, getCurrentUser, type StaffRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Card, Loading, PageHeader } from "@/components/ui";
+import { addDays, formatDay, todayISO } from "@/lib/dates";
 
 export const metadata: Metadata = { title: "Dashboard · GGG.Cafe" };
 
@@ -63,6 +64,19 @@ async function Dashboard() {
   const waiting = editorRole
     ? (((await supabase.rpc("pending_approvals")).data ?? []) as { team_id: string; team_name: string; player_claims: number; parent_requests: number }[])
     : [];
+  // Leadership Plan check-ins coming up (coaches/admins): the dates her plan set, as TWIS reminders
+  const today = todayISO();
+  const checkIns = editorRole
+    ? (((
+        await supabase
+          .from("player_activities")
+          .select("id, starts_on, player:players(id, first_name, preferred_name, last_name)")
+          .eq("source", "leadership-checkin")
+          .gte("starts_on", today)
+          .lte("starts_on", addDays(today, 14))
+          .order("starts_on")
+      ).data ?? []) as unknown as { id: string; starts_on: string; player: { id: string; first_name: string; preferred_name: string | null; last_name: string } | null }[])
+    : [];
   const [teams, players, games, metrics] = await Promise.all(
     ["teams", "players", "games", "metrics"].map((table) =>
       supabase.from(table).select("*", { count: "exact", head: true }),
@@ -80,6 +94,29 @@ async function Dashboard() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader title={`Welcome, ${user.staff.displayName}`} description={ROLE_LABEL[user.staff.role]} />
+
+      {checkIns.length > 0 && (
+        <section className="rounded-2xl border border-neon/60 bg-neon/5 p-4 sm:p-5" aria-label="Leadership check-ins">
+          <h2 className="font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">Leadership check-ins · next two weeks</h2>
+          <ul className="mt-3 flex flex-col gap-2">
+            {checkIns.map((c) => (
+              <li key={c.id} className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+                <span className={`w-24 font-display font-bold tabular-nums ${c.starts_on === today ? "text-highlight" : "text-muted"}`}>
+                  {c.starts_on === today ? "Today" : c.starts_on === addDays(today, 1) ? "Tomorrow" : formatDay(c.starts_on)}
+                </span>
+                <span className="font-semibold">
+                  {c.player ? `${c.player.preferred_name || c.player.first_name} ${c.player.last_name}` : "A player"}
+                </span>
+                {c.player && (
+                  <Link href={`/players/${c.player.id}/advanced/leadership/plan`} className="text-pink hover:underline">
+                    Her Leadership Plan →
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {waiting.length > 0 && (
         <section className="rounded-2xl border border-pink/60 bg-pink/10 p-4 sm:p-5" aria-label="Waiting for your approval">

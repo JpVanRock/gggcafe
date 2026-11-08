@@ -33,7 +33,7 @@ async function Activities({ params, searchParams }: Pick<PageProps<"/players/[pl
       {access.canAct ? (
         <ActivitiesManager
           playerId={player.id}
-          activities={activities.filter((a) => !a.category)}
+          activities={activities.filter((a) => !a.category && !a.source)}
           today={today}
           defaultStart={monday}
           pillars={(chart?.pillars ?? []).map((p) => ({ id: p.id, title: p.title }))}

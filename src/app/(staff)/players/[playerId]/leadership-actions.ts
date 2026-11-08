@@ -8,7 +8,10 @@ import { actForCheck, editorCheck, getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { friendlyDbError } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
-import { cleanAnswer, cleanPlan, courseReady, findLesson, planReady, validCoachRating, type LeadershipPlan } from "@/lib/leadership-guide";
+import {
+  CHECKIN_SOURCE, checkInActivity, checkInChanges, cleanAnswer, cleanPlan, courseReady, findLesson, planReady, validCoachRating,
+  type LeadershipPlan,
+} from "@/lib/leadership-guide";
 
 type Result = { error: string | null };
 type Supabase = Awaited<ReturnType<typeof createClient>>;
@@ -87,16 +90,36 @@ export async function setLeadershipLessonDone(input: { playerId: string; lesson:
   return saveLesson(input.playerId, input.lesson, () => ({ completed_at: input.done ? new Date().toISOString() : null }), true);
 }
 
+/**
+ * Her check-in dates as one-day reminders in her TWIS: adds new dates, removes
+ * dropped ones, and leaves the rest alone (so a ticked-off check-in stays ticked).
+ */
+async function syncCheckIns(supabase: Supabase, playerId: string, plan: LeadershipPlan): Promise<string | null> {
+  const { data } = await supabase.from("player_activities").select("id, starts_on").eq("player_id", playerId).eq("source", CHECKIN_SOURCE);
+  const { add, remove } = checkInChanges(plan.checkIns ?? [], (data ?? []) as { id: string; starts_on: string }[]);
+  if (remove.length) {
+    const { error } = await supabase.from("player_activities").delete().in("id", remove);
+    if (error) return friendlyDbError(error);
+  }
+  if (add.length) {
+    const { error } = await supabase.from("player_activities").insert(add.map((d) => ({ player_id: playerId, ...checkInActivity(d) })));
+    if (error) return friendlyDbError(error);
+  }
+  return null;
+}
+
 /** Her Leadership Plan (saving again after committing keeps the commitment). */
 export async function saveLeadershipPlan(input: { playerId: string; plan: LeadershipPlan }): Promise<Result> {
   const denied = await actForCheck(input.playerId);
   if (denied) return { error: denied };
   if (!isUuid(input.playerId)) return { error: "Unknown player." };
   const supabase = await createClient();
+  const plan = cleanPlan(input.plan ?? {});
   const { error } = await supabase
     .from("player_leadership_plans")
-    .upsert({ player_id: input.playerId, plan: cleanPlan(input.plan ?? {}), updated_at: new Date().toISOString() }, { onConflict: "player_id" });
-  return { error: error ? friendlyDbError(error) : null };
+    .upsert({ player_id: input.playerId, plan, updated_at: new Date().toISOString() }, { onConflict: "player_id" });
+  if (error) return { error: friendlyDbError(error) };
+  return { error: await syncCheckIns(supabase, input.playerId, plan) };
 }
 
 /** She commits to her plan (it needs her why, a habit and a goal first). */
@@ -112,6 +135,8 @@ export async function commitLeadershipPlan(input: { playerId: string; plan: Lead
     .from("player_leadership_plans")
     .upsert({ player_id: input.playerId, plan, committed_at: now, updated_at: now }, { onConflict: "player_id" });
   if (error) return { error: friendlyDbError(error) };
+  const reminders = await syncCheckIns(supabase, input.playerId, plan);
+  if (reminders) return { error: reminders };
   refresh();
   return { error: null };
 }

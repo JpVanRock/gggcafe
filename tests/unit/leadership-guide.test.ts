@@ -2,7 +2,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  ALL_LESSONS, BONUS, BONUS_SHELVES, CORE_PARTS, ENGAGEMENT_ASK, HABITS, LADDER, LEADER_ROLES, LESSONS, RUBRIC, RUBRIC_MAX, SCENARIOS,
+  ALL_LESSONS, BONUS, CHECKIN_SOURCE, checkInActivity, checkInChanges, BONUS_SHELVES, CORE_PARTS, ENGAGEMENT_ASK, HABITS, LADDER, LEADER_ROLES, LESSONS, RUBRIC, RUBRIC_MAX, SCENARIOS,
   SCENARIO_GROUPS, STARTER_GROUPS, answerKeys, bonusProgress, cleanAnswer, cleanPlan, courseReady, findLesson, guideProgress, lessonLabel,
   lessonNumber, planReady, rubricTotal, validCoachRating,
 } from "../../src/lib/leadership-guide.ts";
@@ -98,4 +98,19 @@ test("progress: core lessons drive the course, Extra Reps count on their own", (
   assert.ok(!courseReady(all, null), "needs the committed plan");
   assert.ok(!courseReady(all.slice(1), "2026-11-08T12:00:00Z"), "needs every core lesson");
   assert.ok(courseReady(all, "2026-11-08T12:00:00Z"), "Extra Reps are optional");
+});
+
+test("check-in dates become one-day TWIS reminders, kept in step with the plan", () => {
+  const sunday = checkInActivity("2026-11-08");
+  assert.deepEqual([sunday.days, sunday.starts_on, sunday.ends_on, sunday.source], [[7], "2026-11-08", "2026-11-08", CHECKIN_SOURCE]);
+  assert.deepEqual(checkInActivity("2026-11-09").days, [1]);
+  const existing = [
+    { id: "keep", starts_on: "2026-12-01" },
+    { id: "drop", starts_on: "2026-11-20" },
+  ];
+  assert.deepEqual(checkInChanges(["2026-12-01", "2027-01-05", "", undefined, "2027-01-05", "soon"], existing), {
+    add: ["2027-01-05"],
+    remove: ["drop"],
+  });
+  assert.deepEqual(checkInChanges([], existing).remove, ["keep", "drop"]);
 });

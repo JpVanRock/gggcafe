@@ -473,6 +473,9 @@ export function PlanForm({
         </section>
         <section>
           <h2 className={heading}>4 · Check-ins with my coach</h2>
+          <p className="mb-3 text-sm text-muted">
+            Save your plan and each date shows up in your This Week in Softball. Your coach gets a reminder too.
+          </p>
           <div className="flex flex-wrap gap-3">
             {plan.checkIns.map((d, i) => (
               <label key={i} className="flex flex-col gap-1 text-sm">

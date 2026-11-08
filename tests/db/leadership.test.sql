@@ -68,6 +68,21 @@ exception when insufficient_privilege then null;
 end $$;
 reset role;
 
+-- Her plan's check-in dates become TWIS reminders she owns (source = leadership-checkin); other sources are refused
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000001"}', false);
+insert into public.player_activities (player_id, title, days, starts_on, ends_on, source)
+values ('00000000-0000-0000-0000-0000000000c1', 'Leadership check-in with your coach', '{1}', '2027-01-04', '2027-01-04', 'leadership-checkin');
+do $$ begin
+  insert into public.player_activities (player_id, title, source) values ('00000000-0000-0000-0000-0000000000c1', 'x', 'made-up');
+  raise exception 'FAIL: an unknown activity source was accepted';
+exception when check_violation then null;
+end $$;
+reset role;
+select pg_temp.expect('check-in reminder saved',
+  (select count(*) from public.player_activities where source = 'leadership-checkin' and player_id = '00000000-0000-0000-0000-0000000000c1'), 1::bigint);
+delete from public.player_activities where source = 'leadership-checkin';
+
 -- The coach rates her and signs off; she can read it
 set role authenticated;
 select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000002"}', false);
