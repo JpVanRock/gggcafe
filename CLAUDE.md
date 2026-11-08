@@ -100,6 +100,18 @@ tests/unit/              node --test unit tests (npm run test:unit)
   `start_iq_level` raises P0005 until the lessons are done and P0001 until the previous chapter is
   complete. 80%+ earns that chapter's Manager of the Year (`player_manager_awards`, written only by
   `finish_iq_level`). Course quizzes earn no MVP badges.
+- Keep the Book game (extra credit, user's easter egg, 2026-11-07): after all six chapters, the course
+  card's "XC" row opens `/players/[id]/iq/scorebook/game`, a two-inning game (Bayside Blaze at Summit
+  Storm, 15 batters, walk-off; teams and play-by-play in `src/lib/scorebook-game.ts`) where she keeps
+  the book: for each batter she marks the batter's box and every runner's box (box editor with a
+  play keypad) and `score_game_play` grades it against `private.scorebook_game_key` (source
+  `supabase/iq/scorebook-game.json`, migration from `scripts/iq/build-game-key.py`; the unit test
+  replays the key against the play-by-play). Runs in `scorebook_game_runs` (her book so far,
+  first-try count; answer shown after 3 wrong tries). A clean book (12+ of 15 first try and the right
+  line score, `finish_scorebook_game`) earns the hidden GGG World Series Trophy
+  (`player_hidden_awards`, award `world-series`; art `public/awards/world-series-trophy.webp`, the
+  user's original WORLD SERIES render). The reward is a mystery: nothing names or shows it before
+  it's earned (no Trophy Room placeholder or count); once earned it gets a shelf after Manager of the Year.
 - MVP badge (`player_mvp_badges`, one per test): earned when `iq_review_status` finds every missed
   question answered again, or outright for a perfect score. Drawn by `src/components/mvp-badge.tsx`.
 - Stolen Base Leader plaques: one per Baserunning IQ level, earned with that level's ring (no table).
@@ -107,8 +119,9 @@ tests/unit/              node --test unit tests (npm run test:unit)
   "BASERUNNING IQ · LEVEL n · {Rookie|Varsity|All-American}" beneath.
 - Trophy Room (`trophy-room.tsx`, last menu board, `trophy` board variant), shelves top to bottom:
   championship rings, Stolen Base Leader plaques, Golden Gloves, MVP badges, Manager of the Year (one
-  per course chapter, all six shown), Performance Training achievements, then the GGG Champions
-  Trophy at the bottom (user's order). Unearned ones dim.
+  per course chapter, all six shown), the hidden GGG World Series Trophy (only once earned),
+  Performance Training achievements, then the GGG Champions Trophy at the bottom (user's order).
+  Unearned ones dim.
 - Question source of truth: `supabase/iq/{defense,baserunning,positions,extra,scorebook}.json`. After
   editing, generate a NEW migration with `scripts/iq/build-playbook-migration.py` (validates everything,
   slugs each question `{track}-{level}-{nn}` / `position-{pos}-{nn}` / `scorebook-{chapter}-{nn}` and upserts on the slug, so

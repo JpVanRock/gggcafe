@@ -12,7 +12,8 @@ import {
 import type { TwisKind } from "./data";
 import { MENTAL_FIELDS } from "./shared";
 import { HITTING, HITTING_KEYS, MOVEMENT, MOVEMENT_KEYS, changes, cleanValues, type Values } from "@/lib/movement";
-import { CHAPTERS } from "@/lib/scorebook";
+import { CHAPTERS, type BoxMarks } from "@/lib/scorebook";
+import { GAME_PLAYS, canonicalMarks } from "@/lib/scorebook-game";
 
 // ---------------------------------------------------------------------------
 // TWIS check-offs
@@ -683,6 +684,86 @@ export async function finishScorebookLessons(input: { playerId: string; chapter:
   if (error) return { error: friendlyDbError(error) };
   refresh();
   return { error: null };
+}
+
+// ---------------------------------------------------------------------------
+// How to Keep the Book: the extra-credit game (graded in the database)
+// ---------------------------------------------------------------------------
+
+export type GameRun = { id: string; nextPlay: number; firstTry: number; tries: number; book: Record<string, BoxMarks> };
+
+function toGameRun(row: { id: string; next_play: number; first_try: number; tries: number; book: Record<string, BoxMarks> }): GameRun {
+  return { id: row.id, nextPlay: row.next_play, firstTry: row.first_try, tries: row.tries, book: row.book ?? {} };
+}
+
+/** Starts the game, or resumes the open one (restart deals a fresh one). Opens after all six chapters. */
+export async function startScorebookGame(input: { playerId: string; restart?: boolean }): Promise<{ error: string | null; run?: GameRun }> {
+  const denied = await actForCheck(input.playerId);
+  if (denied) return { error: denied };
+  if (!isUuid(input.playerId)) return { error: "Unknown player." };
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("start_scorebook_game", { p_player_id: input.playerId, p_restart: Boolean(input.restart) });
+  if (error) {
+    if (error.code === "P0001") return { error: "Finish all six chapters to unlock the game." };
+    return { error: friendlyDbError(error) };
+  }
+  const row = (Array.isArray(data) ? data[0] : data) as Parameters<typeof toGameRun>[0];
+  return { error: null, run: toGameRun(row) };
+}
+
+/** Grades one batter: the full state of every box she wrote in. */
+export async function scoreGamePlay(input: {
+  playerId: string;
+  runId: string;
+  play: number;
+  boxes: Record<string, BoxMarks>;
+}): Promise<{ error: string | null; correct?: boolean; wrong?: string[]; answer?: Record<string, BoxMarks> | null; nextPlay?: number; firstTry?: number }> {
+  const denied = await actForCheck(input.playerId);
+  if (denied) return { error: denied };
+  if (!isUuid(input.runId) || !Number.isInteger(input.play) || input.play < 1 || input.play > GAME_PLAYS) return { error: "That play couldn't be scored." };
+  const boxes = Object.fromEntries(
+    Object.entries(input.boxes ?? {})
+      .filter(([id]) => /^[VH][1-9]-[12]$/.test(id))
+      .map(([id, m]) => [id, canonicalMarks(m)]),
+  );
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("score_game_play", { p_run_id: input.runId, p_play: input.play, p_boxes: boxes });
+  if (error) {
+    if (error.code === "P0008") return { error: "That batter isn't up. Reload the page to pick up where the book stands." };
+    return { error: friendlyDbError(error) };
+  }
+  const row = (Array.isArray(data) ? data[0] : data) as {
+    correct: boolean;
+    wrong: string[];
+    answer: Record<string, BoxMarks> | null;
+    next_play: number;
+    first_try: number;
+  };
+  return { error: null, correct: row.correct, wrong: row.wrong ?? [], answer: row.answer, nextPlay: row.next_play, firstTry: row.first_try };
+}
+
+/** The final line score. Right: the run ends, and a clean book earns the surprise. */
+export async function finishScorebookGame(input: {
+  playerId: string;
+  runId: string;
+  line: { V: number[]; H: number[] };
+}): Promise<{ error: string | null; lineOk?: boolean; passed?: boolean; firstTry?: number; awardEarned?: boolean }> {
+  const denied = await actForCheck(input.playerId);
+  if (denied) return { error: denied };
+  const clean = (runs: unknown) =>
+    Array.isArray(runs) && runs.length === 2 && runs.every((n) => Number.isInteger(n) && n >= 0 && n <= 30) ? (runs as number[]) : null;
+  const V = clean(input.line?.V);
+  const H = clean(input.line?.H);
+  if (!isUuid(input.runId) || !V || !H) return { error: "Fill in the runs for each inning." };
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("finish_scorebook_game", { p_run_id: input.runId, p_line: { V, H } });
+  if (error) {
+    if (error.code === "P0003") return { error: "Score every batter first." };
+    return { error: friendlyDbError(error) };
+  }
+  const row = (Array.isArray(data) ? data[0] : data) as { line_ok: boolean; passed: boolean; first_try: number; award_earned: boolean };
+  if (row.line_ok) refresh();
+  return { error: null, lineOk: row.line_ok, passed: row.passed, firstTry: row.first_try, awardEarned: row.award_earned };
 }
 
 // ---------------------------------------------------------------------------

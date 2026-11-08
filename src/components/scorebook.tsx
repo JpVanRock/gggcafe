@@ -266,7 +266,7 @@ export function ScoreSheet({ spec, className = "" }: { spec: SheetSpec; classNam
         {Array.from({ length: rows }, (_, r) => {
           const row = r + 1;
           const y = rowY(row);
-          const player = LINEUP[r];
+          const player = (spec.lineup ?? LINEUP)[r];
           return (
             <g key={row}>
               <rect x="0" y={y} width={LINEUP_W} height={CELL} fill="var(--color-navy-900)" stroke={LINE} strokeWidth="1" />

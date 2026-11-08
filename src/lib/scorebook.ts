@@ -46,6 +46,8 @@ export type SheetSpec = {
   rows?: number;
   /** false: a blank lineup (no names or numbers yet) */
   names?: boolean;
+  /** the lineup to print (default: the lessons' sample lineup) */
+  lineup?: { no: string; name: string }[];
   /** show the after-game stat columns on the right */
   stats?: boolean;
   /** key "row-inning", e.g. "3-1" */

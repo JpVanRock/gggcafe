@@ -5,6 +5,8 @@
 //  - Golden Gloves (position tests)
 //  - MVP badges (every miss on a test reviewed, or a perfect score)
 //  - Manager of the Year (one per How to Keep the Book chapter)
+//  - GGG World Series Trophy: a hidden award (clean book in the course's game). It
+//    shows up only once earned: no placeholder, no count, nothing that names it.
 //  - Performance Training achievements
 //  - GGG Champions Trophy (Extra Credit Library run at 80%+)
 import { RingCase } from "@/components/rings";
@@ -13,6 +15,7 @@ import { MvpBadge } from "@/components/mvp-badge";
 import { StolenBasePlaque } from "@/components/stolen-base-plaque";
 import { ChampionsTrophy } from "@/components/champions-trophy";
 import { ManagerAward } from "@/components/manager-award";
+import { WorldSeriesTrophy } from "@/components/world-series-trophy";
 import { CHAPTERS } from "@/lib/scorebook";
 import { formatLongDate } from "@/lib/dates";
 import type { AchievementProgress } from "@/lib/achievements";
@@ -32,6 +35,8 @@ export type TrophyRoom = {
   mvps: { key: string; label: string; earnedOn: string }[];
   /** Manager of the Year, one per How to Keep the Book chapter */
   managers: { chapter: number; label: string; earnedOn: string | null; year: string | null }[];
+  /** hidden: null until she finds it */
+  worldSeriesOn: string | null;
   achievements: AchievementProgress[];
 };
 
@@ -65,6 +70,10 @@ export function buildTrophyRoom(iq: IqData, positions: PositionInfo[], achieveme
         year: award ? award.earned_on.slice(0, 4) : null,
       };
     }),
+    worldSeriesOn: (() => {
+      const award = iq.hiddenAwards.find((a) => a.award === "world-series");
+      return award ? formatLongDate(award.earned_on) : null;
+    })(),
     achievements: achievements.filter((a) => a.unlockedOn),
   };
 }
@@ -74,7 +83,8 @@ export function TrophyRoomSummary({ room }: { room: TrophyRoom }) {
   const plaques = room.plaques.filter((p) => p.earnedOn);
   const managers = room.managers.filter((m) => m.earnedOn);
   const nothing =
-    !room.championsOn && !plaques.length && !room.rings.length && !gloves.length && !room.mvps.length && !managers.length && !room.achievements.length;
+    !room.championsOn && !plaques.length && !room.rings.length && !gloves.length && !room.mvps.length && !managers.length &&
+    !room.worldSeriesOn && !room.achievements.length;
   return (
     <div>
       <div className="grid gap-x-10 gap-y-4 sm:grid-cols-3">
@@ -83,6 +93,7 @@ export function TrophyRoomSummary({ room }: { room: TrophyRoom }) {
         <MenuItem name="Golden Gloves" value={`${gloves.length}/9`} note={gloves.length ? gloves.map((g) => g.position).join(", ") : undefined} />
         <MenuItem name="MVP badges" value={room.mvps.length} />
         <MenuItem name="Manager of the Year" value={`${managers.length}/${room.managers.length}`} note="One for each How to Keep the Book chapter" />
+        {room.worldSeriesOn && <MenuItem name="World Series Trophy" value="✓" note={`Found ${room.worldSeriesOn}`} />}
         <MenuItem name="Training achievements" value={room.achievements.length} />
         <MenuItem name="Champions Trophy" value={room.championsOn ? "✓" : "–"} note={room.championsOn ? `Won ${room.championsOn}` : "Extra Credit Library"} />
       </div>
@@ -103,6 +114,7 @@ export function TrophyRoomSummary({ room }: { room: TrophyRoom }) {
           {managers.map((m) => (
             <ManagerAward key={m.chapter} name={room.plate.name} chapter={m.label} engrave={false} size={48} />
           ))}
+          {room.worldSeriesOn && <WorldSeriesTrophy size={46} />}
           {room.championsOn && <ChampionsTrophy size={56} />}
         </div>
       )}
@@ -195,6 +207,14 @@ export function TrophyRoomDetail({ room }: { room: TrophyRoom }) {
           ))}
         </ul>
       </Shelf>
+
+      {room.worldSeriesOn && (
+        <Shelf title="GGG World Series Trophy" note={`Found ${room.worldSeriesOn} · a clean book for a full game in How to Keep the Book.`}>
+          <div className="flex justify-center">
+            <WorldSeriesTrophy size={170} />
+          </div>
+        </Shelf>
+      )}
 
       <Shelf title="Training achievements" note="From Performance Training: consistency earns these.">
         {room.achievements.length ? (

@@ -7,6 +7,7 @@ import { ProgressBar } from "@/components/progress-bar";
 import { ManagerAward } from "@/components/manager-award";
 import { OutlineText } from "@/components/athletic";
 import { buttonClass } from "@/components/ui";
+import { GAME_PLAYS } from "@/lib/scorebook-game";
 import type { IqData } from "./data";
 import type { Nameplate } from "./iq-client";
 
@@ -25,7 +26,14 @@ export type CourseChapter = {
   earnedOn: string | null;
   earnedYear: string | null;
 };
-export type Course = { chapters: CourseChapter[]; done: number; total: number; next: number | null };
+export type Course = {
+  chapters: CourseChapter[];
+  done: number;
+  total: number;
+  next: number | null;
+  /** the extra-credit game: opens after every chapter; won = she found the hidden award */
+  game: { unlocked: boolean; won: boolean; batter: number | null };
+};
 
 export function buildCourse(iq: IqData): Course {
   const awards = iq.managerAwards.map((a) => a.chapter);
@@ -52,7 +60,17 @@ export function buildCourse(iq: IqData): Course {
       earnedYear: award ? award.earned_on.slice(0, 4) : null,
     };
   });
-  return { chapters, ...courseProgress(iq.scorebookProgress, awards) };
+  const progress = courseProgress(iq.scorebookProgress, awards);
+  const open = iq.lastGame && !iq.lastGame.finished_at ? iq.lastGame : null;
+  return {
+    chapters,
+    ...progress,
+    game: {
+      unlocked: progress.done === progress.total,
+      won: iq.hiddenAwards.some((a) => a.award === "world-series"),
+      batter: open ? Math.min(open.next_play, GAME_PLAYS) : null,
+    },
+  };
 }
 
 function statusLine(c: CourseChapter) {
@@ -72,6 +90,13 @@ function statusLine(c: CourseChapter) {
 
 export function chapterHref(playerId: string, n: number) {
   return `/players/${playerId}/iq/scorebook/${n}`;
+}
+
+function gameLine(game: Course["game"]) {
+  if (!game.unlocked) return "Finish all six chapters to unlock";
+  if (game.won) return "Clean book kept · check your Trophy Room";
+  if (game.batter) return `In progress · batter ${game.batter} of ${GAME_PLAYS}`;
+  return `2 innings · ${GAME_PLAYS} batters · mystery reward`;
 }
 
 /** The course on the Softball IQ page. */
@@ -130,6 +155,34 @@ export function CourseCard({ playerId, course, plate }: { playerId: string; cour
             </li>
           );
         })}
+        <li className="md:col-span-2">
+          {(() => {
+            const inner = (
+              <>
+                <OutlineText className="w-9 shrink-0 text-center text-3xl" stroke="var(--color-pink)">
+                  XC
+                </OutlineText>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-semibold text-ink">Extra credit: keep the book for a real game</span>
+                  <span className={`block font-mono text-[11px] tracking-wider uppercase ${course.game.won ? "text-highlight" : "text-pink-soft"}`}>
+                    {gameLine(course.game)}
+                  </span>
+                </span>
+                {course.game.unlocked && <span className="text-sm text-pink">→</span>}
+              </>
+            );
+            return course.game.unlocked ? (
+              <Link
+                href={`/players/${playerId}/iq/scorebook/game`}
+                className="flex items-center gap-3 rounded-lg border border-pink/50 px-3 py-2.5 transition hover:border-pink hover:bg-navy-800"
+              >
+                {inner}
+              </Link>
+            ) : (
+              <div className="flex items-center gap-3 rounded-lg border border-dashed border-navy-600 px-3 py-2.5 opacity-60">{inner}</div>
+            );
+          })()}
+        </li>
       </ol>
     </div>
   );

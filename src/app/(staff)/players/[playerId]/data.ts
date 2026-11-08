@@ -394,7 +394,7 @@ export async function loadIq(supabase: Supabase, playerId: string) {
   const key = new Map(
     ((keyResult.data ?? []) as { question_id: string; correct_index: number; explanation: string | null }[]).map((k) => [k.question_id, k]),
   );
-  const [ringsResult, glovesResult, mvpResult, trophyResult, attemptsResult, managerResult, courseResult] = await Promise.all([
+  const [ringsResult, glovesResult, mvpResult, trophyResult, attemptsResult, managerResult, courseResult, hiddenResult, gameResult] = await Promise.all([
     supabase.from("player_rings").select("track, level, earned_on").eq("player_id", playerId),
     supabase.from("player_golden_gloves").select("position, earned_on").eq("player_id", playerId),
     supabase.from("player_mvp_badges").select("track, level, position, earned_on").eq("player_id", playerId).order("earned_on"),
@@ -408,6 +408,15 @@ export async function loadIq(supabase: Supabase, playerId: string) {
     // How to Keep the Book: Manager of the Year awards and lesson progress
     supabase.from("player_manager_awards").select("chapter, earned_on").eq("player_id", playerId).order("chapter"),
     supabase.from("player_scorebook_progress").select("chapter, step, completed_at").eq("player_id", playerId),
+    // easter eggs: hidden awards, and her latest How to Keep the Book game
+    supabase.from("player_hidden_awards").select("award, earned_on").eq("player_id", playerId),
+    supabase
+      .from("scorebook_game_runs")
+      .select("id, next_play, first_try, finished_at, passed")
+      .eq("player_id", playerId)
+      .order("started_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
   ]);
   return {
     questions: ((questionsResult.data ?? []) as Omit<IqQuestion, "correct_index" | "explanation">[]).map((q) => ({
@@ -427,6 +436,8 @@ export async function loadIq(supabase: Supabase, playerId: string) {
       step: p.step,
       completedAt: p.completed_at,
     })),
+    hiddenAwards: (hiddenResult.data ?? []) as { award: "world-series"; earned_on: string }[],
+    lastGame: (gameResult.data ?? null) as { id: string; next_play: number; first_try: number; finished_at: string | null; passed: boolean | null } | null,
   };
 }
 

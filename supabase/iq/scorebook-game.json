@@ -1,0 +1,21 @@
+{
+  "_about": "Answer key for the How to Keep the Book extra-credit game (Bayside Blaze at Summit Storm). Box ids are {team}{lineup spot}-{inning}: V = Blaze (visitors), H = Storm (home). Each play lists the full state of every box she writes in on that play: the batter's box plus every runner on base before the pitch. The play-by-play lives in src/lib/scorebook-game.ts. Regenerate the key migration with scripts/iq/build-game-key.py.",
+  "line": { "V": [1, 0], "H": [0, 2] },
+  "plays": [
+    { "n": 1, "boxes": { "V1-1": { "hit": 1, "path": 1 } } },
+    { "n": 2, "boxes": { "V2-1": { "play": "K", "out": 1 }, "V1-1": { "hit": 1, "path": 1 } } },
+    { "n": 3, "boxes": { "V3-1": { "hit": 2, "path": 2 }, "V1-1": { "hit": 1, "path": 4, "rbi": "21" } } },
+    { "n": 4, "boxes": { "V4-1": { "play": "6-3", "out": 2 }, "V3-1": { "hit": 2, "path": 3 } } },
+    { "n": 5, "boxes": { "V5-1": { "play": "F8", "out": 3, "lastOut": true }, "V3-1": { "hit": 2, "path": 3 } } },
+    { "n": 6, "boxes": { "H1-1": { "reached": "BB", "path": 1 } } },
+    { "n": 7, "boxes": { "H2-1": { "play": "6-4-3 DP", "out": 2 }, "H1-1": { "reached": "BB", "path": 1, "play": "6-4", "out": 1 } } },
+    { "n": 8, "boxes": { "H3-1": { "play": "Kc", "out": 3, "lastOut": true } } },
+    { "n": 9, "boxes": { "V6-2": { "play": "4-3", "out": 1 } } },
+    { "n": 10, "boxes": { "V7-2": { "play": "L5", "out": 2 } } },
+    { "n": 11, "boxes": { "V8-2": { "play": "K", "out": 3, "lastOut": true } } },
+    { "n": 12, "boxes": { "H4-2": { "play": "E6", "path": 1 } } },
+    { "n": 13, "boxes": { "H5-2": { "reached": "SAC", "play": "5-3", "out": 1 }, "H4-2": { "play": "E6", "path": 2 } } },
+    { "n": 14, "boxes": { "H6-2": { "hit": 1, "path": 1 }, "H4-2": { "play": "E6", "path": 4, "rbi": "44" } } },
+    { "n": 15, "boxes": { "H7-2": { "hit": 2, "path": 2 }, "H6-2": { "hit": 1, "path": 4, "rbi": "12" } } }
+  ]
+}
