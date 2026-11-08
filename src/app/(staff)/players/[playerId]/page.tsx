@@ -11,6 +11,7 @@ import {
   loadMovementAndHitting, loadTeamDugout, loadTwisWeek,
 } from "./data";
 import { PlayerMenu } from "./player-menu";
+import { loadAdvanced } from "./advanced-data";
 import { signedPhotoUrls } from "@/lib/player-photos";
 
 export const metadata: Metadata = { title: "Player · GGG.Cafe" };
@@ -37,7 +38,7 @@ async function PlayerDashboard({ params, searchParams }: Pick<PageProps<"/player
 
   const today = todayISO();
   const monday = weekStart(isISODate(week) ? week : today);
-  const [twis, chart, mental, pop, smartGoals, performance, iq, dugout, styles] = await Promise.all([
+  const [twis, chart, mental, pop, smartGoals, performance, iq, dugout, styles, advanced] = await Promise.all([
     loadTwisWeek(supabase, player.id, monday),
     loadHarada(supabase, player.id),
     loadMentalPlan(supabase, player.id),
@@ -47,6 +48,7 @@ async function PlayerDashboard({ params, searchParams }: Pick<PageProps<"/player
     loadIq(supabase, player.id),
     loadTeamDugout(supabase, player.id),
     loadMovementAndHitting(supabase, player.id),
+    loadAdvanced(supabase, player.id),
   ]);
   const photoUrl = player.photo_path ? ((await signedPhotoUrls(supabase, [player.photo_path])).get(player.photo_path) ?? null) : null;
 
@@ -67,6 +69,8 @@ async function PlayerDashboard({ params, searchParams }: Pick<PageProps<"/player
       canEdit={access.canAct}
       canManage={access.canManage}
       isSelf={access.isSelf}
+      advanced={advanced}
+      isAdmin={access.user.staff?.role === "admin"}
     />
   );
 }

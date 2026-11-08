@@ -14,13 +14,20 @@ export const SECTIONS = [
   { slug: "activities", label: "Activities" },
 ] as const;
 
+/** G3 Advanced sits after Softball IQ, and only when it's unlocked for her. */
+function sectionsFor(advanced: boolean) {
+  if (!advanced) return SECTIONS;
+  const at = SECTIONS.findIndex((s) => s.slug === "iq") + 1;
+  return [...SECTIONS.slice(0, at), { slug: "advanced", label: "G3 Advanced" }, ...SECTIONS.slice(at)];
+}
+
 /** The menu across the top of every player section page. */
-export function SectionNav({ playerId, path = "" }: { playerId: string; path?: string }) {
+export function SectionNav({ playerId, path = "", advanced = false }: { playerId: string; path?: string; advanced?: boolean }) {
   const base = `/players/${playerId}`;
   return (
     <nav aria-label="Player sections" className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none]">
       <ul className="flex min-w-max gap-5 border-b border-navy-700">
-        {SECTIONS.map((s) => {
+        {sectionsFor(advanced).map((s) => {
           const href = `${base}/${s.slug}`;
           const active = path === href || path.startsWith(`${href}/`);
           return (
@@ -42,6 +49,6 @@ export function SectionNav({ playerId, path = "" }: { playerId: string; path?: s
   );
 }
 
-export function LiveSectionNav({ playerId }: { playerId: string }) {
-  return <SectionNav playerId={playerId} path={usePathname()} />;
+export function LiveSectionNav({ playerId, advanced = false }: { playerId: string; advanced?: boolean }) {
+  return <SectionNav playerId={playerId} path={usePathname()} advanced={advanced} />;
 }

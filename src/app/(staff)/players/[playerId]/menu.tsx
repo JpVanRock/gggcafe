@@ -39,6 +39,14 @@ const BOARD = {
     cta: "text-highlight",
     numeral: "rgb(254 31 124 / 0.45)",
   },
+  // G3 Advanced (Level 2): a premium cover, pink edge with a neon glow
+  advanced: {
+    board:
+      "border-2 border-pink bg-linear-to-br from-navy-950 via-navy-900 to-navy-800 text-ink shadow-[0_0_40px_rgba(231,251,6,0.14)] [--menu-value:var(--color-highlight)] [--menu-note:var(--color-muted)]",
+    subtitle: "text-highlight",
+    cta: "text-pink-soft",
+    numeral: "rgb(231 251 6 / 0.35)",
+  },
   outlinePink: {
     board: "border-2 border-pink bg-navy-900 text-ink [--menu-value:var(--color-pink-soft)] [--menu-note:var(--color-muted)]",
     subtitle: "text-highlight",

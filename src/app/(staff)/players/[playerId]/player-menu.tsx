@@ -20,6 +20,8 @@ import { PerformanceSummary, summarizePerformance } from "./performance";
 import { PopSummary } from "./pop-report";
 import { SmartSummary } from "./smart";
 import { TwisBoard } from "./twis";
+import { AdvancedLocked, AdvancedSummary, LEVEL_LABEL, advancedHref } from "./advanced";
+import type { AdvancedBook } from "./advanced-data";
 
 /** The cafe-menu player dashboard: header, TWIS, then the menu boards. */
 export function PlayerMenu({
@@ -36,6 +38,8 @@ export function PlayerMenu({
   styles,
   today,
   canEdit: editor,
+  advanced,
+  isAdmin = false,
   canManage = editor,
   isSelf = false,
 }: {
@@ -53,6 +57,10 @@ export function PlayerMenu({
   today: string;
   /** coach/admin or the player herself */
   canEdit: boolean;
+  /** G3 Advanced: shown only when unlocked for her */
+  advanced: AdvancedBook;
+  /** admins see an unlock control while G3 Advanced is locked */
+  isAdmin?: boolean;
   /** coach/admin only: profile edits, question bank, Dugout links */
   canManage?: boolean;
   /** the signed-in player viewing her own dashboard */
@@ -114,6 +122,19 @@ export function PlayerMenu({
       summary: <IqSummary quizzes={quizzes} tracks={iqTracks} positions={iqPositions} plate={plate} rings={iq.rings} bookDone={iq.managerAwards.length} />,
       href: `${base}/iq`,
     },
+    ...(advanced.unlocked
+      ? [
+          {
+            key: "advanced",
+            title: advanced.title,
+            subtitle: LEVEL_LABEL,
+            variant: "advanced" as const,
+            wide: true,
+            summary: <AdvancedSummary book={advanced} />,
+            href: advancedHref(player.id),
+          },
+        ]
+      : []),
     {
       key: "trophies",
       title: `${possessive(name)} Trophy Room`,
@@ -216,6 +237,7 @@ export function PlayerMenu({
           <MenuBoard key={section.key} section={section} number={i + 1} />
         ))}
       </section>
+      {isAdmin && !advanced.unlocked && <AdvancedLocked playerId={player.id} name={name} />}
     </div>
   );
 }

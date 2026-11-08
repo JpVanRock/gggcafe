@@ -22,18 +22,24 @@ export default function SectionLayout({ children, params }: LayoutProps<"/player
 async function SectionHeader({ params }: { params: LayoutProps<"/players/[playerId]">["params"] }) {
   const { playerId } = await params;
   let name = "Player";
+  let advanced = false;
   if (isUuid(playerId)) {
     const supabase = await createClient();
-    const { data } = await supabase.from("players").select("first_name, preferred_name").eq("id", playerId).maybeSingle();
+    const [{ data }, { data: access }] = await Promise.all([
+      supabase.from("players").select("first_name, preferred_name").eq("id", playerId).maybeSingle(),
+      // G3 Advanced shows in the menu only when it's unlocked for her
+      supabase.from("player_advanced_access").select("player_id").eq("player_id", playerId).maybeSingle(),
+    ]);
     if (data) name = (data.preferred_name as string | null) || (data.first_name as string);
+    advanced = Boolean(access);
   }
   return (
     <div className="flex flex-col gap-3">
       <Link href={`/players/${playerId}`} className="self-start text-sm text-muted hover:text-ink">
         ← Back to {name}&apos;s menu
       </Link>
-      <Suspense fallback={<SectionNav playerId={playerId} />}>
-        <LiveSectionNav playerId={playerId} />
+      <Suspense fallback={<SectionNav playerId={playerId} advanced={advanced} />}>
+        <LiveSectionNav playerId={playerId} advanced={advanced} />
       </Suspense>
     </div>
   );

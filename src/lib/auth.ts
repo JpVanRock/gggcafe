@@ -55,6 +55,14 @@ export async function requireStaffPage(): Promise<StaffUser> {
   return user as StaffUser;
 }
 
+/** For admin-only server actions (e.g. granting G3 Advanced): an error message unless the user is an admin. */
+export async function adminCheck(): Promise<string | null> {
+  const user = await getCurrentUser();
+  if (!user) return "Your session has ended. Sign in again.";
+  if (user.staff?.role !== "admin") return "Only an admin can do that.";
+  return null;
+}
+
 /** For server actions that change data: an error message unless the user is a coach or admin. */
 export async function editorCheck(): Promise<string | null> {
   const user = await getCurrentUser();
