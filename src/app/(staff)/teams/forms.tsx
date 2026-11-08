@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
-import { Field, FormMessage, buttonClass, inputClass, secondaryButtonClass } from "@/components/ui";
+import { Field, FormMessage, buttonClass, fieldClass, inputClass, secondaryButtonClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import {
   AGE_GROUPS, BATS, BATS_LABEL, FORMATS, FORMAT_LABEL, POSITIONS, POSITION_LABEL, THROWS, THROWS_LABEL,
@@ -229,7 +229,7 @@ export function RosterEntryEditor({
         defaultValue={jersey ?? ""}
         inputMode="numeric"
         maxLength={2}
-        className={`${inputClass} w-16 py-1`}
+        className={`${fieldClass} w-16 py-1`}
       />
       <label className="flex items-center gap-1.5 text-xs">
         <input type="checkbox" name="active" defaultChecked={active} /> Active

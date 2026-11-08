@@ -16,6 +16,7 @@ import { loadLeaderboard, loadTeamSessions } from "../../leaderboard-data";
 import { RemoveTeamSession } from "../../leaderboard-client";
 import { firstName, loadPlayer } from "../../section-data";
 import { SectionShell } from "../section-shell";
+import { pickTeam } from "../../../../dugout/team-picker";
 
 export const metadata: Metadata = { title: "Leaderboard · GGG.Cafe" };
 
@@ -54,7 +55,7 @@ async function Leaderboard({ params, searchParams }: Pick<PageProps<"/players/[p
   const player = await loadPlayer(supabase, playerId);
   const name = firstName(player);
   const teams = (await loadTeamDugout(supabase, player.id)).map((t) => t.team);
-  const team = teams.find((t) => t.id === teamParam) ?? teams[0];
+  const team = pickTeam(teams, teamParam);
   if (!team) {
     return (
       <SectionShell title="Leaderboard" subtitle="Offseason Training">
@@ -103,12 +104,17 @@ async function Leaderboard({ params, searchParams }: Pick<PageProps<"/players/[p
   const { round, named } = currentRound(board.players, board.weeks);
   const off = board.offseason;
   const span = off.ends_on ? `${formatDay(off.starts_on)} – ${formatLongDate(off.ends_on)}` : `Since ${formatLongDate(off.starts_on)}`;
-  const recent = access.canManage ? await loadTeamSessions(supabase, board.players.map((p) => p.player_id), addDays(board.today, -14)) : [];
+  // Coaches' session list, the draft squads and the BP board don't depend on each other: load them together.
+  const [recent, squadRows, bpRows] = await Promise.all([
+    access.canManage ? loadTeamSessions(supabase, board.players.map((p) => p.player_id), addDays(board.today, -14)) : Promise.resolve([]),
+    supabase.rpc("team_squads", { p_team_id: team.id }),
+    supabase.rpc("team_bp_leaders", { p_team_id: team.id }),
+  ]);
   // the offseason draft: squads score their players' points
-  const squads = squadStandings(((await supabase.rpc("team_squads", { p_team_id: team.id })).data ?? []) as SquadRow[], board.players);
+  const squads = squadStandings((squadRows.data ?? []) as SquadRow[], board.players);
   const mySquad = squads.find((sq) => sq.members.includes(player.id));
   // BP production (Phase 9): the top five hitters with 20+ graded swings
-  const bpLeaders = ((await supabase.rpc("team_bp_leaders", { p_team_id: team.id })).data ?? []) as {
+  const bpLeaders = (bpRows.data ?? []) as {
     player_id: string;
     first_name: string;
     last_name: string;

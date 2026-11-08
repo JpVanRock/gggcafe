@@ -6,7 +6,7 @@ import { EmptyState, Loading, buttonClass, inputClass } from "@/components/ui";
 import { lineupSeason, loadGamedayRoster } from "@/lib/gameday-data";
 import { DEPTH_POSITIONS } from "@/lib/playbook";
 import { loadOwnTeams } from "../../data";
-import { TeamPicker } from "../../team-picker";
+import { TeamPicker, pickTeam } from "../../team-picker";
 import { GamedayNav } from "../nav";
 import { addToDepth, fillDepthFromPositions, moveInDepth, removeFromDepth } from "../actions";
 
@@ -29,7 +29,7 @@ async function DepthChart({ searchParams }: Pick<PageProps<"/dugout/gameday/dept
   const supabase = await createClient();
   const teams = await loadOwnTeams(supabase);
   if (teams.length === 0) return <EmptyState>Add your team on the Teams page first.</EmptyState>;
-  const team = teams.find((t) => t.id === teamParam) ?? teams[0];
+  const team = pickTeam(teams, teamParam);
   const seasonId = await lineupSeason(supabase, team.id, null);
   const [roster, depthResult] = await Promise.all([
     seasonId ? loadGamedayRoster(supabase, team.id, seasonId) : Promise.resolve([]),

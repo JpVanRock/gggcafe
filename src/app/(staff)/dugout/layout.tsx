@@ -2,13 +2,12 @@ import { Suspense, type ReactNode } from "react";
 import { PageHeader } from "@/components/ui";
 import { DugoutTabs, TabList } from "./tabs";
 import { canEdit, getCurrentUser } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
-import { countWaiting } from "@/lib/approvals";
+import { getWaitingCount } from "@/lib/approvals";
 
 /** The tabs for her role, with how many approvals are waiting on the Roster tab (coaches). */
 async function TabsWithCounts() {
   const user = await getCurrentUser();
-  const waiting = user?.staff && canEdit(user.staff.role) ? await countWaiting(await createClient()) : 0;
+  const waiting = user?.staff && canEdit(user.staff.role) ? await getWaitingCount() : 0;
   return <DugoutTabs badges={{ "/dugout/roster": waiting }} role={user?.staff?.role} />;
 }
 

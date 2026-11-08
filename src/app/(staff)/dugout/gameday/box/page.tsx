@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { EmptyState, Loading } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import { loadOwnTeams } from "../../data";
-import { TeamPicker } from "../../team-picker";
+import { TeamPicker, pickTeam } from "../../team-picker";
 import { GamedayNav } from "../nav";
 
 export const metadata: Metadata = { title: "Box Scores · GameDay · GGG.Cafe" };
@@ -38,7 +38,7 @@ async function BoxScores({ searchParams }: Pick<PageProps<"/dugout/gameday/box">
   const supabase = await createClient();
   const teams = await loadOwnTeams(supabase);
   if (teams.length === 0) return <EmptyState>Add your team on the Teams page first.</EmptyState>;
-  const team = teams.find((t) => t.id === teamParam) ?? teams[0];
+  const team = pickTeam(teams, teamParam);
   const today = todayISO();
   const { data } = await supabase
     .from("games")

@@ -36,6 +36,18 @@ scripts/                 db-test.sh, db-push.sh, db-check.sh, db-types.sh (+ lib
 tests/unit/              node --test unit tests (npm run test:unit)
 ```
 
+## Shared building blocks (use these, don't copy them)
+- Form fields: `inputClass` is full width. An input that sets its own width uses `fieldClass` + `w-*` (never
+  `${inputClass} w-20`: both widths apply and full width wins).
+- Dugout pages: `pickTeam(teams, ?team)` and `<TeamPicker>` (`dugout/team-picker.tsx`); a tab's sub-menu is
+  `<PillNav items={teamPages(PAGES, teamId)}>` (`components/pill-nav.tsx`).
+- Server actions that append to an ordered list: `nextPosition(supabase, table, column, value)` (`src/lib/db.ts`).
+- Names: `playerName()` in `src/lib/softball.ts`.
+- The approvals count (top menu + Dugout tabs): `getWaitingCount()` in `src/lib/approvals.ts` (React `cache()`, one
+  fetch per request).
+- Load independent queries together (`Promise.all`); only what needs an earlier result waits for it (see the player
+  dashboard, `players/[playerId]/page.tsx`: two rounds).
+
 ## Database rules
 - Every new table: `select private.apply_staff_rls('public.<table>');` (staff read, coach/admin write).
   Exceptions need their own explicit policies and a reason.

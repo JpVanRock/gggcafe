@@ -6,7 +6,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { canEdit, getCurrentUser, isHeadCoach } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { countWaiting } from "@/lib/approvals";
+import { getWaitingCount } from "@/lib/approvals";
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard" },
@@ -26,7 +26,7 @@ export async function MainNav({ fallback = null }: { fallback?: ReactNode }) {
   const editor = canEdit(user.staff.role);
   if (editor) {
     const supabase = await createClient();
-    const [count, { data: notes }] = await Promise.all([countWaiting(supabase), supabase.rpc("unread_notifications")]);
+    const [count, { data: notes }] = await Promise.all([getWaitingCount(), supabase.rpc("unread_notifications")]);
     waiting = count;
     unread = Number(notes ?? 0);
   }

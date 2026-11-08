@@ -8,7 +8,7 @@ import { DugoutStrip } from "@/components/dugout-strip";
 import { CultureStatement, StandardsList, hasCulture, type TeamCulture, type TeamStandard } from "@/components/team-standards";
 import { loadOwnTeams } from "./data";
 import { StandardsForm } from "./standards-form";
-import { TeamPicker } from "./team-picker";
+import { TeamPicker, pickTeam } from "./team-picker";
 import { CultureTeamSections, type Spotlight } from "./culture-team";
 import { MottoForm } from "./culture-forms";
 import { loadTeamRoster } from "./training/data";
@@ -43,7 +43,7 @@ async function StandardsAndCulture({ searchParams }: Pick<PageProps<"/dugout">, 
       </EmptyState>
     );
   }
-  const team = teams.find((t) => t.id === teamParam) ?? teams[0];
+  const team = pickTeam(teams, teamParam);
 
   const season = await lineupSeason(supabase, team.id, null);
   const [cultureResult, standardsResult, goalsResult, roster, pledgesResult, spotlightsResult] = await Promise.all([

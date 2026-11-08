@@ -8,7 +8,7 @@ import { formatDay, todayISO } from "@/lib/dates";
 import { BASE_RUNNING_LABEL, HITTING_TYPE_LABEL, percent, rate } from "@/lib/gameday";
 import { lineupSeason, loadGamedayRoster } from "@/lib/gameday-data";
 import { loadOwnTeams } from "../data";
-import { TeamPicker } from "../team-picker";
+import { TeamPicker, pickTeam } from "../team-picker";
 import { CardsForm, NewLineupForm } from "./forms";
 import { GamedayNav } from "./nav";
 import { StatTerm } from "@/components/stat-term";
@@ -42,7 +42,7 @@ async function Gameday({ searchParams }: Pick<PageProps<"/dugout/gameday">, "sea
       </EmptyState>
     );
   }
-  const team = teams.find((t) => t.id === teamParam) ?? teams[0];
+  const team = pickTeam(teams, teamParam);
   const today = todayISO();
   const seasonId = await lineupSeason(supabase, team.id, null);
   const [roster, lineupsResult, gamesResult, seasonResult] = await Promise.all([

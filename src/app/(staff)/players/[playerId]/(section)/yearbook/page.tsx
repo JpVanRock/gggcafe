@@ -10,6 +10,7 @@ import { EmptyState, Loading } from "@/components/ui";
 import { loadTeamDugout } from "../../data";
 import { loadPlayer } from "../../section-data";
 import { SectionShell } from "../section-shell";
+import { pickTeam } from "../../../../dugout/team-picker";
 
 export const metadata: Metadata = { title: "Yearbook · GGG.Cafe" };
 
@@ -28,7 +29,7 @@ async function Yearbook({ params, searchParams }: Pick<PageProps<"/players/[play
   const access = await requirePlayerPage(playerId);
   const player = await loadPlayer(supabase, playerId);
   const teams = (await loadTeamDugout(supabase, player.id)).map((t) => t.team);
-  const team = teams.find((t) => t.id === teamParam) ?? teams[0];
+  const team = pickTeam(teams, teamParam);
   const loaded = team ? await loadYearbook(supabase, team.id, typeof season === "string" ? season : null) : null;
   // the Yearbook is G3 Advanced: nobody else learns it exists
   if (!loaded && !access.user.staff) notFound();

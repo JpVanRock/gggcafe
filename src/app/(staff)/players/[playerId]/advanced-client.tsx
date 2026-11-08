@@ -229,7 +229,7 @@ export function ChapterNotes({ playerId, chapter, notes, canEdit, maxLength }: {
         rows={5}
         aria-label="My notes"
         placeholder="What works for you, what you noticed, what you're working on."
-        className={`${inputClass} w-full`}
+        className={inputClass}
       />
       {canEdit && (
         <div className="mt-2 flex items-center gap-3">

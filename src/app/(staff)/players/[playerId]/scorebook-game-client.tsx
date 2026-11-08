@@ -6,7 +6,7 @@
 // src/lib/scorebook-game.ts); nothing here names it until it's earned.
 import Link from "next/link";
 import { useState, useTransition } from "react";
-import { buttonClass, inputClass, secondaryButtonClass } from "@/components/ui";
+import { buttonClass, fieldClass, inputClass, secondaryButtonClass } from "@/components/ui";
 import { ProgressBar } from "@/components/progress-bar";
 import { ScoreBox, ScoreSheet } from "@/components/scorebook";
 import { WorldSeriesTrophy } from "@/components/world-series-trophy";
@@ -184,7 +184,7 @@ function BoxEditor({
                 inputMode="numeric"
                 aria-label="Jersey number of the batter who drove her in"
                 placeholder="#"
-                className={`${inputClass} w-20`}
+                className={`${fieldClass} w-20`}
               />
               <button type="button" onClick={() => set({ rbi: batterNo })} className={chip(m.rbi === batterNo)}>
                 #{batterNo} (batter)

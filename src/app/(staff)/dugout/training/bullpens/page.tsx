@@ -7,7 +7,7 @@ import { ConfirmSubmit } from "@/components/confirm-submit";
 import { Disclosure, EmptyState, Loading } from "@/components/ui";
 import { INTENT_LABEL, type ScriptPitch } from "@/lib/bullpen";
 import { loadOwnTeams } from "../../data";
-import { TeamPicker } from "../../team-picker";
+import { TeamPicker, pickTeam } from "../../team-picker";
 import { TrainingNav } from "../nav";
 import { deleteBullpenScript } from "../actions";
 import { BullpenBuilder } from "../bullpen-builder";
@@ -43,7 +43,7 @@ async function Bullpens({ searchParams }: Pick<PageProps<"/dugout/training/bullp
       </EmptyState>
     );
   }
-  const team = teams.find((t) => t.id === teamParam) ?? teams[0];
+  const team = pickTeam(teams, teamParam);
   const { data } = await supabase.from("bullpen_scripts").select("id, name, notes, pitches").eq("team_id", team.id).order("name");
   const scripts = (data ?? []) as Script[];
 

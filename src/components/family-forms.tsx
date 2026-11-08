@@ -4,7 +4,7 @@
 // forms serve parents (/family), the player and coaches (Pop Report) and head coaches
 // (Dugout); the page passes the server action that saves for that person.
 import { useActionState } from "react";
-import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, buttonClass, fieldClass, inputClass } from "@/components/ui";
 import { initialFormState, type FormState } from "@/lib/form";
 import { MEDICAL_FIELDS, QUESTIONNAIRE_POSITIONS, SIZES, SIZE_LABEL, type Questionnaire } from "@/lib/family";
 
@@ -50,7 +50,7 @@ export function QuestionnaireForm({ action, hidden, values }: { action: Action; 
         <legend className="mb-1.5 text-sm font-medium">Jersey numbers, in order of choice</legend>
         <div className="flex gap-2">
           {[0, 1, 2].map((i) => (
-            <input key={i} name="numbers" maxLength={2} inputMode="numeric" defaultValue={values?.numbers?.[i] ?? ""} aria-label={`Choice ${i + 1}`} className={`${inputClass} w-20 text-center font-display text-lg`} />
+            <input key={i} name="numbers" maxLength={2} inputMode="numeric" defaultValue={values?.numbers?.[i] ?? ""} aria-label={`Choice ${i + 1}`} className={`${fieldClass} w-20 text-center font-display text-lg`} />
           ))}
         </div>
       </fieldset>

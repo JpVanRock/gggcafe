@@ -7,7 +7,7 @@ import { loadYearbook } from "@/lib/yearbook-data";
 import { YearbookView } from "@/components/yearbook-view";
 import { EmptyState, Loading } from "@/components/ui";
 import { loadOwnTeams } from "../data";
-import { TeamPicker } from "../team-picker";
+import { TeamPicker, pickTeam } from "../team-picker";
 
 export const metadata: Metadata = { title: "Yearbook · Coaches Dugout · GGG.Cafe" };
 
@@ -25,7 +25,7 @@ async function DugoutYearbook({ searchParams }: Pick<PageProps<"/dugout/yearbook
   const supabase = await createClient();
   const teams = await loadOwnTeams(supabase);
   if (teams.length === 0) return <EmptyState>Add your team on the Teams page first.</EmptyState>;
-  const team = teams.find((t) => t.id === teamParam) ?? teams[0];
+  const team = pickTeam(teams, teamParam);
   const loaded = await loadYearbook(supabase, team.id, typeof season === "string" ? season : null);
   return (
     <div className="flex flex-col gap-6">

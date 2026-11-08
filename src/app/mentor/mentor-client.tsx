@@ -117,7 +117,7 @@ export function MessageForm({
           maxLength={MESSAGE_MAX}
           rows={3}
           placeholder="Great pen today. Keep your front side closed on the drop ball."
-          className={`${inputClass} w-full`}
+          className={inputClass}
         />
       </label>
 

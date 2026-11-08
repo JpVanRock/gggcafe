@@ -9,9 +9,9 @@ import { BudgetSummary, type BudgetSummaryData } from "@/components/budget-summa
 import { Card, Disclosure, EmptyState, Loading, pillQuietClass, tableClass, tdClass, thClass } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import { money, playerBalances, runningLedger, toCents, type EntryKind, type PlayerStatus } from "@/lib/budget";
-import { compareJersey, type Season } from "@/lib/softball";
+import { compareJersey, type Season, playerName } from "@/lib/softball";
 import { loadOwnTeams } from "../data";
-import { TeamPicker } from "../team-picker";
+import { TeamPicker, pickTeam } from "../team-picker";
 import { deleteEntry } from "./actions";
 import { AdjustmentForm, EntryForm, FeesForm, PaymentForm, type BudgetPlayer } from "./forms";
 
@@ -67,7 +67,7 @@ async function Budget({ searchParams }: Pick<PageProps<"/dugout/budget">, "searc
       </EmptyState>
     );
   }
-  const team = teams.find((t) => t.id === teamParam) ?? teams[0];
+  const team = pickTeam(teams, teamParam);
 
   const [seasonsResult, rosterResult] = await Promise.all([
     supabase.from("seasons").select("*").order("start_date", { ascending: false, nullsFirst: false }).order("created_at", { ascending: false }),
@@ -113,7 +113,7 @@ async function Budget({ searchParams }: Pick<PageProps<"/dugout/budget">, "searc
     .filter((r) => r.season_id === season.id)
     .sort((a, b) => compareJersey(a.jersey_number, b.jersey_number) || a.player!.last_name.localeCompare(b.player!.last_name));
   const nameOf = new Map(
-    roster.map((r) => [r.player!.id, `${r.player!.preferred_name || r.player!.first_name} ${r.player!.last_name}`]),
+    roster.map((r) => [r.player!.id, playerName(r.player!)]),
   );
   const options: BudgetPlayer[] = players.map((r) => ({
     id: r.player!.id,

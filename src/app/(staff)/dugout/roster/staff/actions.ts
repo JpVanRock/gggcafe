@@ -3,6 +3,7 @@
 import { refresh } from "next/cache";
 import { headCoachCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { nextPosition } from "@/lib/db";
 import { friendlyDbError, oneOf, text, type FormState } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import { DUTY_PHASES, STARTER_COMMITMENT, STARTER_DUTIES, STARTER_PRE_PRACTICE, cleanLines } from "@/lib/staff-duties";
@@ -25,7 +26,7 @@ export async function loadStarterDuties(fd: FormData) {
   refresh();
 }
 
-/** Save every owner in the matrix at once (owner_<id> fields). */
+/** Save the matrix's owners (owner_<id> fields): only the ones that changed (was_<id>), all at once. */
 export async function saveDutyOwners(_prev: FormState, fd: FormData): Promise<FormState> {
   const denied = await headCoachCheck();
   if (denied) return { error: denied };
@@ -35,13 +36,13 @@ export async function saveDutyOwners(_prev: FormState, fd: FormData): Promise<Fo
     const id = key.slice(6);
     const owner = value.trim() || null;
     if (owner && owner.length > 60) return { error: "Keep each name to 60 characters." };
-    if (isUuid(id)) updates.push({ id, owner });
+    const was = fd.get(`was_${id}`);
+    if (isUuid(id) && (typeof was !== "string" || (was.trim() || null) !== owner)) updates.push({ id, owner });
   }
   const supabase = await createClient();
-  for (const u of updates) {
-    const { error } = await supabase.from("staff_duties").update({ owner: u.owner }).eq("id", u.id);
-    if (error) return { error: friendlyDbError(error) };
-  }
+  const results = await Promise.all(updates.map((u) => supabase.from("staff_duties").update({ owner: u.owner }).eq("id", u.id)));
+  const failed = results.find((r) => r.error);
+  if (failed?.error) return { error: friendlyDbError(failed.error) };
   refresh();
   return { error: null, saved: true };
 }
@@ -57,10 +58,8 @@ export async function addDuty(_prev: FormState, fd: FormData): Promise<FormState
   if (!duty || duty.length > 60) return { error: "Name the job, up to 60 characters." };
   if (owner && owner.length > 60) return { error: "Keep the name to 60 characters." };
   const supabase = await createClient();
-  const { data } = await supabase.from("staff_duties").select("position").eq("team_id", teamId).order("position", { ascending: false }).limit(1);
-  const { error } = await supabase
-    .from("staff_duties")
-    .insert({ team_id: teamId, phase, duty, owner, position: (((data ?? [])[0] as { position: number } | undefined)?.position ?? -1) + 1 });
+  const position = await nextPosition(supabase, "staff_duties", "team_id", teamId);
+  const { error } = await supabase.from("staff_duties").insert({ team_id: teamId, phase, duty, owner, position });
   if (error) return { error: friendlyDbError(error) };
   refresh();
   return { error: null, saved: true };

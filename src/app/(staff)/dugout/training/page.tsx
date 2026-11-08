@@ -9,7 +9,7 @@ import { WEEKDAYS, formatDay, todayISO } from "@/lib/dates";
 import { TRAINING_CATEGORY_LABEL } from "@/lib/achievements";
 import { PHASE_INFO, overlaps, phaseOn, phaseWeek } from "@/lib/training-plan";
 import { loadOwnTeams } from "../data";
-import { TeamPicker } from "../team-picker";
+import { TeamPicker, pickTeam } from "../team-picker";
 import { TrainingNav } from "./nav";
 import { loadRoadmap } from "./data";
 import { deletePhase, deleteTeamRoutine, endTeamRoutine } from "./actions";
@@ -54,7 +54,7 @@ async function Training({ searchParams }: Pick<PageProps<"/dugout/training">, "s
       </EmptyState>
     );
   }
-  const team = teams.find((t) => t.id === teamParam) ?? teams[0];
+  const team = pickTeam(teams, teamParam);
   const today = todayISO();
   const [{ phases, routines, library, scripts }, offseason, nextGame] = await Promise.all([
     loadRoadmap(supabase, team.id),

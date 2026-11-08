@@ -4,6 +4,7 @@ import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { editorCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { nextPosition } from "@/lib/db";
 import { checkbox, friendlyDbError, isoDate, oneOf, text, wholeNumber, type FormState } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import { PLAY_CATEGORIES, PLAY_CATEGORY_LABEL, SCOUT_PROMPTS, parseChoices } from "@/lib/playbook";
@@ -62,14 +63,13 @@ export async function addPlayToInstall(fd: FormData) {
   const { data } = await supabase.from("playbook_plays").select("name, category").eq("id", id).maybeSingle();
   if (!data) return;
   const play = data as { name: string; category: (typeof PLAY_CATEGORIES)[number] };
-  const { data: last } = await supabase.from("install_items").select("position").eq("team_id", teamId).order("position", { ascending: false }).limit(1);
   await supabase.from("install_items").insert({
     team_id: teamId,
     category: "situation",
     group_name: PLAY_CATEGORY_LABEL[play.category].slice(0, 40),
     title: play.name,
     play_id: id,
-    position: (((last ?? [])[0] as { position: number } | undefined)?.position ?? -1) + 1,
+    position: await nextPosition(supabase, "install_items", "team_id", teamId),
   });
   refresh();
 }
@@ -106,7 +106,6 @@ export async function addQuizQuestion(quizId: string, _prev: FormState, fd: Form
   if (explanation && explanation.length > 500) return { error: "Keep the explanation to 500 characters." };
 
   const supabase = await createClient();
-  const { data: last } = await supabase.from("team_quiz_questions").select("position").eq("quiz_id", quizId).order("position", { ascending: false }).limit(1);
   const { error } = await supabase.from("team_quiz_questions").insert({
     quiz_id: quizId,
     question,
@@ -114,7 +113,7 @@ export async function addQuizQuestion(quizId: string, _prev: FormState, fd: Form
     correct_index: correct - 1,
     explanation,
     play_id: playId && isUuid(playId) ? playId : null,
-    position: (((last ?? [])[0] as { position: number } | undefined)?.position ?? -1) + 1,
+    position: await nextPosition(supabase, "team_quiz_questions", "quiz_id", quizId),
   });
   if (error) return { error: friendlyDbError(error) };
   refresh();

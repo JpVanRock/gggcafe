@@ -8,7 +8,7 @@ import { formatDay, todayISO } from "@/lib/dates";
 import { TESTS, composite, cutoffsFor, rate, tierFor } from "@/lib/training-plan";
 import { RatingChip } from "@/components/rating-chip";
 import { loadOwnTeams } from "../../data";
-import { TeamPicker } from "../../team-picker";
+import { TeamPicker, pickTeam } from "../../team-picker";
 import { TrainingNav } from "../nav";
 import { loadTeamAge, loadTeamRoster, loadTesting } from "../data";
 import { BandsForm, ResultsForm } from "../forms";
@@ -46,7 +46,7 @@ async function Testing({ searchParams }: Pick<PageProps<"/dugout/training/testin
       </EmptyState>
     );
   }
-  const team = teams.find((t) => t.id === teamParam) ?? teams[0];
+  const team = pickTeam(teams, teamParam);
   const [roster, ageGroup] = await Promise.all([loadTeamRoster(supabase, team.id), loadTeamAge(supabase, team.id)]);
   const { results, bands } = await loadTesting(supabase, roster.map((p) => p.id), TESTS.map((t) => t.key));
   const latest = (playerId: string, key: string) => results.find((r) => r.player_id === playerId && r.metric_key === key) ?? null;

@@ -461,7 +461,7 @@ export function YearbookView({
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Find a player"
                 aria-label="Find a player"
-                className={`${inputClass} w-full max-w-xs`}
+                className={`${inputClass} max-w-xs`}
               />
               {picked && (
                 <button type="button" onClick={() => setPlayer(null)} className="rounded-full border border-neon bg-neon px-3 py-1 text-xs font-bold text-on-accent">

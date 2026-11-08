@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Card, Disclosure, EmptyState, Loading, buttonClass, sectionLabelClass } from "@/components/ui";
 import { DUTY_PHASES, DUTY_PHASE_LABEL, STARTER_DUTIES } from "@/lib/staff-duties";
 import { loadOwnTeams } from "../../data";
-import { TeamPicker } from "../../team-picker";
+import { TeamPicker, pickTeam } from "../../team-picker";
 import { loadStarterDuties } from "./actions";
 import { AddDutyForm, DutyMatrixForm, StaffStandardsForm, type DutyRow } from "./forms";
 
@@ -27,7 +27,7 @@ async function StaffDuties({ searchParams }: Pick<PageProps<"/dugout/roster/staf
   const supabase = await createClient();
   const teams = await loadOwnTeams(supabase);
   if (teams.length === 0) return <EmptyState>Add your team on the Teams page first.</EmptyState>;
-  const team = teams.find((t) => t.id === teamParam) ?? teams[0];
+  const team = pickTeam(teams, teamParam);
 
   const [dutiesResult, standardsResult, staffResult] = await Promise.all([
     supabase.from("staff_duties").select("id, phase, duty, owner").eq("team_id", team.id).order("position"),

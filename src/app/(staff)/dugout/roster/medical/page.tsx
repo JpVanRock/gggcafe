@@ -7,7 +7,7 @@ import { Disclosure, EmptyState, Loading } from "@/components/ui";
 import { MedicalForm } from "@/components/family-forms";
 import { medicalOnFile } from "@/lib/family";
 import { loadOwnTeams } from "../../data";
-import { TeamPicker } from "../../team-picker";
+import { TeamPicker, pickTeam } from "../../team-picker";
 import { loadTeamRoster } from "../../training/data";
 import { saveMedicalCard } from "../actions";
 
@@ -31,7 +31,7 @@ async function Medical({ searchParams }: Pick<PageProps<"/dugout/roster/medical"
   const supabase = await createClient();
   const teams = await loadOwnTeams(supabase);
   if (teams.length === 0) return <EmptyState>Add your team first.</EmptyState>;
-  const team = teams.find((t) => t.id === teamParam) ?? teams[0];
+  const team = pickTeam(teams, teamParam);
   const roster = await loadTeamRoster(supabase, team.id);
   const { data } = roster.length ? await supabase.from("medical_cards").select("*").in("player_id", roster.map((p) => p.id)) : { data: [] };
   const cards = new Map(((data ?? []) as Card[]).map((c) => [c.player_id, c]));

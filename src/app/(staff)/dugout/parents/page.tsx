@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { Card, EmptyState, Loading, buttonClass, pillQuietClass, Disclosure } from "@/components/ui";
 import { loadOwnTeams } from "../data";
-import { TeamPicker } from "../team-picker";
+import { TeamPicker, pickTeam } from "../team-picker";
 import { removeParentLink, setParentCode } from "./actions";
 import { PendingParentList } from "../approvals";
 import { loadTeamApprovals } from "@/lib/approvals";
@@ -43,7 +43,7 @@ async function Parents({ searchParams }: Pick<PageProps<"/dugout/parents">, "sea
       </EmptyState>
     );
   }
-  const team = teams.find((t) => t.id === teamParam) ?? teams[0];
+  const team = pickTeam(teams, teamParam);
   if (!editor) {
     return (
       <div className="flex flex-col gap-6">

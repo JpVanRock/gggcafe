@@ -2,7 +2,7 @@
 
 import { StatTerm } from "@/components/stat-term";
 import { useActionState } from "react";
-import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, buttonClass, fieldClass, inputClass } from "@/components/ui";
 import { BASE_RUNNING, BASE_RUNNING_LABEL, HITTING_TYPES, HITTING_TYPE_LABEL, MAX_ROTATIONS, percent, rate } from "@/lib/gameday";
 import { initialFormState } from "@/lib/form";
 import { createLineup, saveGamedayCards } from "./actions";
@@ -94,13 +94,13 @@ export function CardsForm({ teamId, seasonId, players }: { teamId: string; seaso
                 ) : (
                   <>
                     <td className="py-2 pr-2">
-                      <input name="avg" defaultValue={stat(p.typed.avg)} inputMode="decimal" placeholder=".000" aria-label={`AVG for ${p.short}`} className={`${small} w-20 font-display tabular-nums`} />
+                      <input name="avg" defaultValue={stat(p.typed.avg)} inputMode="decimal" placeholder=".000" aria-label={`AVG for ${p.short}`} className={`${fieldClass} w-20 px-2 py-1.5 text-sm font-display tabular-nums`} />
                     </td>
                     <td className="py-2 pr-2">
-                      <input name="obp" defaultValue={stat(p.typed.obp)} inputMode="decimal" placeholder=".000" aria-label={`OBP for ${p.short}`} className={`${small} w-20 font-display tabular-nums`} />
+                      <input name="obp" defaultValue={stat(p.typed.obp)} inputMode="decimal" placeholder=".000" aria-label={`OBP for ${p.short}`} className={`${fieldClass} w-20 px-2 py-1.5 text-sm font-display tabular-nums`} />
                     </td>
                     <td className="py-2 pr-2">
-                      <input name="k_pct" defaultValue={stat(p.typed.k_pct, true)} inputMode="decimal" placeholder="0" aria-label={`K% for ${p.short}`} className={`${small} w-20 font-display tabular-nums`} />
+                      <input name="k_pct" defaultValue={stat(p.typed.k_pct, true)} inputMode="decimal" placeholder="0" aria-label={`K% for ${p.short}`} className={`${fieldClass} w-20 px-2 py-1.5 text-sm font-display tabular-nums`} />
                     </td>
                   </>
                 )}

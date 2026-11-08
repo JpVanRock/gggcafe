@@ -4,6 +4,7 @@ import type { createClient } from "@/lib/supabase/server";
 import { lineupSeason } from "@/lib/gameday-data";
 import type { TrainingCategory } from "@/lib/achievements";
 import type { PhaseKind, SquadRow } from "@/lib/training-plan";
+import { playerName } from "@/lib/softball";
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
@@ -35,7 +36,7 @@ export async function loadTeamRoster(supabase: Supabase, teamId: string): Promis
     .eq("active", true);
   return ((data ?? []) as unknown as { jersey_number: string | null; player: { id: string; first_name: string; preferred_name: string | null; last_name: string } | null }[])
     .filter((r) => r.player)
-    .map((r) => ({ id: r.player!.id, name: `${r.player!.preferred_name || r.player!.first_name} ${r.player!.last_name}`, jersey: r.jersey_number }))
+    .map((r) => ({ id: r.player!.id, name: playerName(r.player!), jersey: r.jersey_number }))
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 

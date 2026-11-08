@@ -29,6 +29,7 @@ export function DutyMatrixForm({ duties, names }: { duties: DutyRow[]; names: st
                 {list.map((d) => (
                   <li key={d.id} className="grid grid-cols-[1fr_1fr_auto] items-center gap-2 text-sm">
                     <span className="truncate">{d.duty}</span>
+                    <input type="hidden" name={`was_${d.id}`} value={d.owner ?? ""} />
                     <input name={`owner_${d.id}`} defaultValue={d.owner ?? ""} maxLength={60} list="staff-names" placeholder="Who" aria-label={`Who: ${d.duty}`} className={`${inputClass} px-2 py-1 text-sm`} />
                     <button type="submit" formAction={removeDuty} name="remove" value={d.id} aria-label={`Remove ${d.duty}`} className="rounded px-1.5 text-muted hover:text-danger">
                       ✕

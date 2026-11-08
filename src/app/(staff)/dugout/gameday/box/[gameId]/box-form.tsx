@@ -4,7 +4,7 @@
 // final score, and an optional 0-5 grade on each plate appearance (quality at-bats).
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Card, buttonClass, inputClass } from "@/components/ui";
+import { Card, buttonClass, fieldClass } from "@/components/ui";
 import {
   BATTING_COLUMNS, BATTING_LABEL, FIELDING_COLUMNS, FIELDING_LABEL, PITCHING_COLUMNS, PITCHING_LABEL, QAB_SCALE,
   boxProblems, emptyBatting, emptyFielding, ipLabel, parseIp,
@@ -12,8 +12,8 @@ import {
 } from "@/lib/box-score";
 import { saveBoxScore } from "../../actions";
 
-// inputClass is full width; these small inputs set their own width instead
-const base = inputClass.replace("w-full ", "");
+// these small inputs set their own width (fieldClass has none)
+const base = fieldClass;
 const cell = `${base} w-11 px-1 py-1 text-center text-sm tabular-nums`;
 const th = "px-0.5 pb-1 text-center font-mono text-[10px] font-bold tracking-wider text-muted uppercase";
 

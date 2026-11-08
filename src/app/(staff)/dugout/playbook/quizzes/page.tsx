@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Card, EmptyState, Loading } from "@/components/ui";
 import { formatDay } from "@/lib/dates";
 import { loadOwnTeams } from "../../data";
-import { TeamPicker } from "../../team-picker";
+import { TeamPicker, pickTeam } from "../../team-picker";
 import { PlaybookNav } from "../nav";
 import { NewQuizForm } from "../forms";
 
@@ -35,7 +35,7 @@ async function Quizzes({ searchParams }: Pick<PageProps<"/dugout/playbook/quizze
   const supabase = await createClient();
   const teams = await loadOwnTeams(supabase);
   if (teams.length === 0) return <EmptyState>Add your team on the Teams page first (mark it as one of our teams).</EmptyState>;
-  const team = teams.find((t) => t.id === teamParam) ?? teams[0];
+  const team = pickTeam(teams, teamParam);
 
   const { data } = await supabase
     .from("team_quizzes")

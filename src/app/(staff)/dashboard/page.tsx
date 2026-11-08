@@ -8,6 +8,7 @@ import { Card, Loading, PageHeader } from "@/components/ui";
 import { addDays, formatDay, formatTime, todayISO } from "@/lib/dates";
 import { COACH_SIGNUP_ROLE, ROLE_NOTE, canEditPlanRole, dugoutTabsFor, isCoachSignup, type StaffRole } from "@/lib/roles";
 import { loadStaffRequests, type StaffRequestRow } from "@/lib/approvals";
+import { playerName } from "@/lib/softball";
 
 export const metadata: Metadata = { title: "Dashboard · GGG.Cafe" };
 
@@ -225,7 +226,7 @@ async function CheckIns() {
             <span className={`w-24 font-display font-bold tabular-nums ${c.starts_on === today ? "text-highlight" : "text-muted"}`}>
               {c.starts_on === today ? "Today" : c.starts_on === addDays(today, 1) ? "Tomorrow" : formatDay(c.starts_on)}
             </span>
-            <span className="font-semibold">{c.player ? `${c.player.preferred_name || c.player.first_name} ${c.player.last_name}` : "A player"}</span>
+            <span className="font-semibold">{c.player ? playerName(c.player) : "A player"}</span>
             {c.player && (
               <Link href={`/players/${c.player.id}/advanced/leadership/plan`} className="text-pink hover:underline">
                 Her Leadership Plan →

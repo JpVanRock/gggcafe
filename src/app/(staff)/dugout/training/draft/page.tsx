@@ -7,7 +7,7 @@ import { ConfirmSubmit } from "@/components/confirm-submit";
 import { EmptyState, Loading, secondaryButtonClass } from "@/components/ui";
 import { onTheClock, squadStandings } from "@/lib/training-plan";
 import { loadOwnTeams } from "../../data";
-import { TeamPicker } from "../../team-picker";
+import { TeamPicker, pickTeam } from "../../team-picker";
 import { TrainingNav } from "../nav";
 import { loadSquads, loadTeamRoster } from "../data";
 import { draftPick, resetDraft, undoPick } from "../actions";
@@ -45,7 +45,7 @@ async function Draft({ searchParams }: Pick<PageProps<"/dugout/training/draft">,
       </EmptyState>
     );
   }
-  const team = teams.find((t) => t.id === teamParam) ?? teams[0];
+  const team = pickTeam(teams, teamParam);
   const [roster, squads, board] = await Promise.all([
     loadTeamRoster(supabase, team.id),
     loadSquads(supabase, team.id),

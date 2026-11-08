@@ -3,6 +3,7 @@
 import { refresh } from "next/cache";
 import { editorCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { nextPosition } from "@/lib/db";
 import { friendlyDbError, oneOf, text, type FormState } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import { INSTALL_CATEGORIES, INSTALL_STATUSES, STARTER_ITEMS } from "@/lib/install";
@@ -39,8 +40,7 @@ export async function addInstallItem(_prev: FormState, fd: FormData): Promise<Fo
   if (!title || title.length > 140) return { error: "Write what to install, up to 140 characters." };
 
   const supabase = await createClient();
-  const { data } = await supabase.from("install_items").select("position").eq("team_id", teamId).order("position", { ascending: false }).limit(1);
-  const position = (((data ?? [])[0] as { position: number } | undefined)?.position ?? -1) + 1;
+  const position = await nextPosition(supabase, "install_items", "team_id", teamId);
   const { error } = await supabase.from("install_items").insert({ team_id: teamId, category, group_name: group, title, position });
   if (error) return { error: friendlyDbError(error) };
   refresh();

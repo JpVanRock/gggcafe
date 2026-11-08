@@ -2,7 +2,7 @@
 
 // Forms for the mental-game tools on her Mental GP page.
 import { useActionState, useState, useTransition } from "react";
-import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, buttonClass, fieldClass, inputClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import {
   ADJUSTMENT_MAX, CONTEXT_LABEL, DEFAULT_ZONE, INTENSITY_CONTEXTS, INTENSITY_LEVELS, JOURNAL_LIMITS, JOURNAL_PROMPTS, SCAN_LABELS,
@@ -42,7 +42,7 @@ export function SignalsForm({ playerId, plan }: { playerId: string; plan: Signal
         <legend className="mb-1.5 text-sm font-medium">My zone: the intensity I play my best at</legend>
         <label className="flex items-center gap-2 text-sm">
           From
-          <select name="zone_low" defaultValue={plan?.zone_low ?? ""} className={`${inputClass} w-20`}>
+          <select name="zone_low" defaultValue={plan?.zone_low ?? ""} className={`${fieldClass} w-20`}>
             <option value="">–</option>
             {INTENSITY_LEVELS.map((n) => (
               <option key={n} value={n}>
@@ -53,7 +53,7 @@ export function SignalsForm({ playerId, plan }: { playerId: string; plan: Signal
         </label>
         <label className="flex items-center gap-2 text-sm">
           to
-          <select name="zone_high" defaultValue={plan?.zone_high ?? ""} className={`${inputClass} w-20`}>
+          <select name="zone_high" defaultValue={plan?.zone_high ?? ""} className={`${fieldClass} w-20`}>
             <option value="">–</option>
             {INTENSITY_LEVELS.map((n) => (
               <option key={n} value={n}>

@@ -4,7 +4,7 @@ import { refresh } from "next/cache";
 import { headCoachCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { friendlyDbError, oneOf, text, type FormState } from "@/lib/form";
-import { isUuid } from "@/lib/softball";
+import { isUuid, playerName } from "@/lib/softball";
 import { GOAL_PHASES, MOTTO_MAX, SPOTLIGHT } from "@/lib/culture";
 
 export async function saveTeamDugout(_prev: FormState, fd: FormData): Promise<FormState> {
@@ -130,7 +130,7 @@ export async function saveSpotlight(_prev: FormState, fd: FormData): Promise<For
   const { error } = await supabase.from("player_spotlights").insert({
     team_id: teamId,
     player_id: playerId,
-    player_name: `${entry.player.preferred_name || entry.player.first_name} ${entry.player.last_name}`,
+    player_name: playerName(entry.player),
     jersey: entry.jersey_number,
     headline,
     body,

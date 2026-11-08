@@ -48,7 +48,6 @@ export function PlayerMenu({
   leader = false,
   mentorMessages = null,
   isAdmin = false,
-  canManage = editor,
   canWriteCulture = false,
   isSelf = false,
 }: {
@@ -76,8 +75,6 @@ export function PlayerMenu({
   mentorMessages?: { unread: MentorMessage[]; total: number; photoUrls: Map<string, string> } | null;
   /** admins see an unlock control while G3 Advanced is locked */
   isAdmin?: boolean;
-  /** coach/admin only: profile edits, question bank, Dugout links */
-  canManage?: boolean;
   /** head coaches/admins: links to write the team's standards and culture */
   canWriteCulture?: boolean;
   /** the signed-in player viewing her own dashboard */

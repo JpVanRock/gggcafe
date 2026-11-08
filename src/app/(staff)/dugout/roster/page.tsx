@@ -8,7 +8,7 @@ import { batsThrows, compareJersey, playerName, type Player, type Season } from 
 import { loadStaffRequests, loadTeamApprovals } from "@/lib/approvals";
 import { lineupSeason } from "@/lib/gameday-data";
 import { loadOwnTeams } from "../data";
-import { TeamPicker } from "../team-picker";
+import { TeamPicker, pickTeam } from "../team-picker";
 import { ApprovedClaimList, PendingClaimList, PendingParentList } from "../approvals";
 import { LeaderBadge } from "@/components/leader-badge";
 import { loadLeaderBadges } from "@/lib/leader-badges";
@@ -50,7 +50,7 @@ async function Roster({ searchParams }: Pick<PageProps<"/dugout/roster">, "searc
       </EmptyState>
     );
   }
-  const team = teams.find((t) => t.id === teamParam) ?? teams[0];
+  const team = pickTeam(teams, teamParam);
   const [seasonsResult, currentSeason, approvals, staffRequests, staffResult] = await Promise.all([
     supabase.from("seasons").select("*").order("start_date", { ascending: false, nullsFirst: false }).order("created_at", { ascending: false }),
     lineupSeason(supabase, team.id, null),
@@ -276,7 +276,7 @@ async function QuestionnaireTable({ teamId, seasonId }: { teamId: string; season
               .sort((a, b) => a.player!.last_name.localeCompare(b.player!.last_name))
               .map((r, i) => (
                 <tr key={i}>
-                  <td className={tdClass}>{`${r.player!.preferred_name || r.player!.first_name} ${r.player!.last_name}`}</td>
+                  <td className={tdClass}>{playerName(r.player!)}</td>
                   <td className={tdClass}>{r.top_size ?? "–"}</td>
                   <td className={tdClass}>{r.bottom_size ?? "–"}</td>
                   <td className={tdClass}>{r.jacket_size ?? "–"}</td>

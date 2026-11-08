@@ -8,7 +8,7 @@ import { StatTerm } from "@/components/stat-term";
 import { formatDay, todayISO } from "@/lib/dates";
 import { qabSummary } from "@/lib/box-score";
 import { loadOwnTeams } from "../../data";
-import { TeamPicker } from "../../team-picker";
+import { TeamPicker, pickTeam } from "../../team-picker";
 import { TrainingNav } from "../nav";
 import { loadTeamRoster } from "../data";
 import { removeBpRound } from "../actions";
@@ -33,7 +33,7 @@ async function Bp({ searchParams }: Pick<PageProps<"/dugout/training/bp">, "sear
   const supabase = await createClient();
   const teams = await loadOwnTeams(supabase);
   if (teams.length === 0) return <EmptyState>Add your team on the Teams page first.</EmptyState>;
-  const team = teams.find((t) => t.id === teamParam) ?? teams[0];
+  const team = pickTeam(teams, teamParam);
   const roster = await loadTeamRoster(supabase, team.id);
   const { data } = roster.length
     ? await supabase

@@ -4,7 +4,7 @@
 // count), tap Hit or Missed; at the end, her command by pitch type and Save.
 import Link from "next/link";
 import { useActionState, useState, useTransition } from "react";
-import { Field, FormMessage, buttonClass, inputClass, secondaryButtonClass } from "@/components/ui";
+import { Field, FormMessage, buttonClass, fieldClass, inputClass, secondaryButtonClass } from "@/components/ui";
 import { ZoneGrid } from "@/components/zone-grid";
 import { INTENT_LABEL, commandByPitch, sessionPct, zoneLabel, type ResultPitch, type ScriptPitch } from "@/lib/bullpen";
 import { initialFormState } from "@/lib/form";
@@ -146,7 +146,7 @@ export function GamePlanForm({
             <textarea name="fix" rows={2} maxLength={500} defaultValue={plan?.fix ?? ""} className={inputClass} />
           </Field>
           <Field label="Strike % (optional)">
-            <input name="strike_pct" inputMode="numeric" defaultValue={plan?.strike_pct ?? ""} className={`${inputClass} w-24`} />
+            <input name="strike_pct" inputMode="numeric" defaultValue={plan?.strike_pct ?? ""} className={`${fieldClass} w-24`} />
           </Field>
         </>
       )}

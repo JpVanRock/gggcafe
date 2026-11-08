@@ -118,7 +118,7 @@ export function LogSessionForm({ playerId, today, daysBack }: { playerId: string
           maxLength={LOG_NOTE_MAX}
           rows={2}
           placeholder="What you worked on: 100 tee swings, 60-pitch bullpen, lesson with Coach K..."
-          className={`${inputClass} w-full`}
+          className={inputClass}
         />
       </label>
 

@@ -3,8 +3,12 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-export const inputClass =
-  "w-full rounded-md border border-navy-600 bg-navy-950 px-3 py-2 text-ink outline-none placeholder:text-muted/60 focus:border-pink focus:ring-2 focus:ring-pink/30";
+/** A form field's look without a width: for inputs that set their own (w-20, w-14...). */
+export const fieldClass =
+  "rounded-md border border-navy-600 bg-navy-950 px-3 py-2 text-ink outline-none placeholder:text-muted/60 focus:border-pink focus:ring-2 focus:ring-pink/30";
+
+/** A full-width form field. Don't add another w-* to it (both would apply and full width wins): use fieldClass. */
+export const inputClass = `w-full ${fieldClass}`;
 
 /** Primary action: the logo's neon yellow. */
 export const buttonClass =

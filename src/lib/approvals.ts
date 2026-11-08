@@ -1,5 +1,6 @@
 import "server-only";
-import type { createClient } from "@/lib/supabase/server";
+import { cache } from "react";
+import { createClient } from "@/lib/supabase/server";
 import { compareJersey, playerName } from "@/lib/softball";
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
@@ -64,6 +65,12 @@ export async function countWaiting(supabase: Supabase): Promise<number> {
   );
   return teams + ((staff ?? []) as unknown[]).length;
 }
+
+/**
+ * The waiting count for this request, fetched once: the top menu and the Dugout tabs
+ * both show it, and React's cache() shares one result between them.
+ */
+export const getWaitingCount = cache(async () => countWaiting(await createClient()));
 
 export async function loadStaffRequests(supabase: Supabase): Promise<StaffRequestRow[]> {
   const { data } = await supabase.rpc("staff_requests_to_decide");

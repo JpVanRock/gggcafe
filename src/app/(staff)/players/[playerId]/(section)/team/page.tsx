@@ -14,6 +14,7 @@ import { pledgeStatus } from "@/lib/culture";
 import { GoalsBoard } from "@/app/(staff)/dugout/culture-team";
 import { loadTeamExtras } from "../../team-culture-data";
 import { PledgeForm } from "../../team-culture-client";
+import { playerName } from "@/lib/softball";
 
 export const metadata: Metadata = { title: "Team Standards & Culture · GGG.Cafe" };
 
@@ -96,7 +97,7 @@ async function Team({ params }: Pick<PageProps<"/players/[playerId]/team">, "par
                             lines={pledge?.lines ?? {}}
                             signedName={pledge?.signed_name ?? null}
                             signedAt={pledge?.signed_at ?? null}
-                            defaultName={`${player.preferred_name || player.first_name} ${player.last_name}`}
+                            defaultName={playerName(player)}
                           />
                         ) : (
                           <ul className="flex flex-col gap-1 text-sm">

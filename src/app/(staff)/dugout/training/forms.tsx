@@ -3,7 +3,7 @@
 // Forms for Coaches Dugout → Training: phases, the backward-planned roadmap, team
 // routines, testing results, rating bands and the draft setup.
 import { useActionState, useMemo, useState } from "react";
-import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, buttonClass, fieldClass, inputClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import { WEEKDAYS } from "@/lib/dates";
 import { TRAINING_CATEGORIES, TRAINING_CATEGORY_LABEL, type TrainingCategory } from "@/lib/achievements";
@@ -259,7 +259,7 @@ export function ResultsForm({ roster, today }: { roster: RosterPlayer[]; today: 
                   </td>
                   {tests.map((t) => (
                     <td key={t.key} className="px-1 py-1.5">
-                      <input name={`v:${p.id}:${t.key}`} inputMode="decimal" aria-label={`${p.name}: ${t.name}`} className={`${inputClass} w-20 py-1 tabular-nums`} />
+                      <input name={`v:${p.id}:${t.key}`} inputMode="decimal" aria-label={`${p.name}: ${t.name}`} className={`${fieldClass} w-20 py-1 tabular-nums`} />
                     </td>
                   ))}
                 </tr>
@@ -302,7 +302,7 @@ export function BandsForm({ ageGroup, bands }: { ageGroup: string; bands: { key:
                   </td>
                   {row.cutoffs.map((c, i) => (
                     <td key={i} className="px-1 py-2">
-                      <input name={`c:${t.key}:${i}`} defaultValue={c} inputMode="decimal" aria-label={`${t.name} cutoff ${i + 1}`} className={`${inputClass} w-20 py-1 tabular-nums`} />
+                      <input name={`c:${t.key}:${i}`} defaultValue={c} inputMode="decimal" aria-label={`${t.name} cutoff ${i + 1}`} className={`${fieldClass} w-20 py-1 tabular-nums`} />
                     </td>
                   ))}
                   <td className="px-2 py-2">
@@ -335,7 +335,7 @@ export function SquadsForm({ teamId, roster }: { teamId: string; roster: RosterP
     <form action={action} className="flex flex-col gap-4">
       <input type="hidden" name="team_id" value={teamId} />
       <Field label="How many squads?">
-        <select value={count} onChange={(e) => setCount(Number(e.target.value))} className={`${inputClass} w-24`}>
+        <select value={count} onChange={(e) => setCount(Number(e.target.value))} className={`${fieldClass} w-24`}>
           {Array.from({ length: SQUAD_MAX - SQUAD_MIN + 1 }, (_, i) => i + SQUAD_MIN).map((n) => (
             <option key={n} value={n}>
               {n}

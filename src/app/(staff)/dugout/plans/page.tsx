@@ -8,7 +8,7 @@ import { Disclosure, EmptyState, Loading } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import { PRACTICE_SETTING_LABEL, durationLabel, practiceRange, type PracticeSetting } from "@/lib/dugout";
 import { loadOwnTeams } from "../data";
-import { TeamPicker } from "../team-picker";
+import { TeamPicker, pickTeam } from "../team-picker";
 import { NewPlanForm } from "./new-plan-form";
 import { PlansNav } from "./plans-nav";
 
@@ -102,7 +102,7 @@ async function Plans({ searchParams }: Pick<PageProps<"/dugout/plans">, "searchP
       </EmptyState>
     );
   }
-  const team = teams.find((t) => t.id === teamParam) ?? teams[0];
+  const team = pickTeam(teams, teamParam);
   const today = todayISO();
 
   const { data } = await supabase

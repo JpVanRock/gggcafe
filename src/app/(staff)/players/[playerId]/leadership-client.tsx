@@ -388,7 +388,7 @@ export function PlanForm({
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
-  const field = `${inputClass} w-full`;
+  const field = inputClass;
   const heading = "mb-2 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
 
   function save(commit = false) {

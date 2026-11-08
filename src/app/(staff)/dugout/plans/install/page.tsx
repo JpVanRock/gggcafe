@@ -11,7 +11,7 @@ import {
   groupInstallItems, installPace, installProgress, type InstallCategory, type InstallIqTrack, type InstallStatus,
 } from "@/lib/install";
 import { loadOwnTeams } from "../../data";
-import { TeamPicker } from "../../team-picker";
+import { TeamPicker, pickTeam } from "../../team-picker";
 import { PlansNav } from "../plans-nav";
 import { loadStarterInstall, removeInstallItem, setInstallStatus } from "./actions";
 import { AddInstallItemForm } from "./forms";
@@ -95,7 +95,7 @@ async function Install({ searchParams }: Pick<PageProps<"/dugout/plans/install">
   if (teams.length === 0) {
     return <EmptyState>Add your team on the Teams page first (mark it as one of our teams).</EmptyState>;
   }
-  const team = teams.find((t) => t.id === teamParam) ?? teams[0];
+  const team = pickTeam(teams, teamParam);
   const today = todayISO();
 
   const [itemsResult, gameResult, phaseResult] = await Promise.all([

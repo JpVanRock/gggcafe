@@ -6,9 +6,10 @@ import { createClient } from "@/lib/supabase/server";
 import { Card, Disclosure, EmptyState, Loading, sectionLabelClass } from "@/components/ui";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { formatDay, todayISO } from "@/lib/dates";
+import { isUuid } from "@/lib/softball";
 import { CONFIDENCE_LABEL, SCOUT_CATEGORY_LABEL } from "@/lib/playbook";
 import { loadOwnTeams } from "../../data";
-import { TeamPicker } from "../../team-picker";
+import { TeamPicker, pickTeam } from "../../team-picker";
 import { PlaybookNav } from "../nav";
 import { removeScoutReport } from "../actions";
 import { ScoutNoteForm, ScoutingForm } from "../forms";
@@ -43,12 +44,21 @@ async function Scouting({ searchParams }: Pick<PageProps<"/dugout/playbook/scout
   const supabase = await createClient();
   const teams = await loadOwnTeams(supabase);
   if (teams.length === 0) return <EmptyState>Add your team on the Teams page first (mark it as one of our teams).</EmptyState>;
-  const team = teams.find((t) => t.id === teamParam) ?? teams[0];
+  const team = pickTeam(teams, teamParam);
   const today = todayISO();
 
-  const [oppResult, reportResult, gameResult] = await Promise.all([
+  // Every opponent's note count (one small column), but full notes only for the one picked.
+  const [oppResult, countResult, reportResult, gameResult] = await Promise.all([
     supabase.from("teams").select("id, name").eq("is_own_team", false).order("name"),
-    supabase.from("scouting_reports").select("id, subject_team_id, category, title, body, confidence, observed_on, created_at").order("observed_on", { ascending: false, nullsFirst: false }).order("created_at", { ascending: false }),
+    supabase.from("scouting_reports").select("subject_team_id"),
+    isUuid(opp)
+      ? supabase
+          .from("scouting_reports")
+          .select("id, subject_team_id, category, title, body, confidence, observed_on, created_at")
+          .eq("subject_team_id", opp)
+          .order("observed_on", { ascending: false, nullsFirst: false })
+          .order("created_at", { ascending: false })
+      : Promise.resolve({ data: [] }),
     supabase
       .from("games")
       .select("id, game_date, home_team_id, away_team_id, home:teams!home_team_id(name), away:teams!away_team_id(name)")
@@ -63,7 +73,7 @@ async function Scouting({ searchParams }: Pick<PageProps<"/dugout/playbook/scout
     return { id: g.id, opponent: opponent ?? "TBD", label: `${formatDay(g.game_date)} · ${g.home_team_id === team.id ? "vs" : "@"} ${opponent ?? "TBD"}` };
   });
   const count = new Map<string, number>();
-  for (const r of reports) count.set(r.subject_team_id, (count.get(r.subject_team_id) ?? 0) + 1);
+  for (const r of (countResult.data ?? []) as { subject_team_id: string }[]) count.set(r.subject_team_id, (count.get(r.subject_team_id) ?? 0) + 1);
   const selected = opponents.find((o) => o.id === opp) ?? null;
   const theirs = selected ? reports.filter((r) => r.subject_team_id === selected.id) : [];
   const href = (id: string) => `/dugout/playbook/scouting?team=${team.id}&opp=${id}`;

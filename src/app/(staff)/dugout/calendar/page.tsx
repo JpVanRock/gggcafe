@@ -7,7 +7,7 @@ import { EmptyState, Loading, pillQuietClass } from "@/components/ui";
 import { formatLongDate, todayISO } from "@/lib/dates";
 import { monthGrid, monthLabel, monthOf, shiftMonth, type EventKind } from "@/lib/dugout";
 import { loadOwnTeams } from "../data";
-import { TeamPicker } from "../team-picker";
+import { TeamPicker, pickTeam } from "../team-picker";
 import { CalendarView, type CalEvent, type CalGame } from "./calendar";
 import { OffseasonForm, OffseasonPanel } from "./offseason";
 
@@ -62,7 +62,7 @@ async function Calendar({ searchParams }: Pick<PageProps<"/dugout/calendar">, "s
       </EmptyState>
     );
   }
-  const team = teams.find((t) => t.id === teamParam) ?? teams[0];
+  const team = pickTeam(teams, teamParam);
   const today = todayISO();
   const month = monthOf(monthParam, today);
   const days = monthGrid(month);

@@ -10,7 +10,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { useRouter } from "next/navigation";
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Card, inputClass, pillButtonClass, pillOutlineClass, sectionLabelClass } from "@/components/ui";
+import { Card, fieldClass, inputClass, pillButtonClass, pillOutlineClass, sectionLabelClass } from "@/components/ui";
 import { formatLongDate } from "@/lib/dates";
 import {
   BASE_RUNNING_LABEL, GAME_JOB_STARTERS, HITTING_TYPE_LABEL, MAX_ROTATIONS, PITCHES, ROTATION_SPOTS, dpFlexProblems, fieldingPlayers, percent,
@@ -403,7 +403,7 @@ export function LineupBuilder({
                             value={spot}
                             onChange={(e) => setSpot(r, id, e.target.value)}
                             aria-label={`${p.name}, rotation ${r}`}
-                            className={`${small} w-[4.5rem] text-center ${spot === "P" ? "border-pink font-bold" : ""}`}
+                            className={`${fieldClass} w-[4.5rem] px-2 py-1 text-sm text-center ${spot === "P" ? "border-pink font-bold" : ""}`}
                           >
                             <option value="">—</option>
                             {ROTATION_SPOTS.map((s) => (
