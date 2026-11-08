@@ -123,3 +123,43 @@ export async function actorCheck(): Promise<string | null> {
   if ((await getMyPlayerIds()).length > 0) return null;
   return "You don't have permission to change this.";
 }
+
+// ---------------------------------------------------------------------------
+// Mentors (not staff): an admin approves them; coaches assign their players.
+// ---------------------------------------------------------------------------
+
+export type MentorRecord = { userId: string; displayName: string; specialty: string | null; canSchedule: boolean };
+
+/** The signed-in user's mentor record, if an admin approved her. */
+export const getMentor = cache(async (): Promise<MentorRecord | null> => {
+  const user = await getCurrentUser();
+  if (!user) return null;
+  const supabase = await createClient();
+  const { data } = await supabase.from("mentors").select("user_id, display_name, specialty, can_schedule").eq("user_id", user.id).maybeSingle();
+  if (!data) return null;
+  return {
+    userId: data.user_id as string,
+    displayName: data.display_name as string,
+    specialty: (data.specialty as string | null) ?? null,
+    canSchedule: Boolean(data.can_schedule),
+  };
+});
+
+/** Player ids assigned to the signed-in mentor. */
+export const getMenteeIds = cache(async (): Promise<string[]> => {
+  const mentor = await getMentor();
+  if (!mentor) return [];
+  const supabase = await createClient();
+  const { data } = await supabase.from("mentor_players").select("player_id").eq("mentor_id", mentor.userId);
+  return ((data ?? []) as { player_id: string }[]).map((r) => r.player_id);
+});
+
+/** For mentor actions: an error message unless she's an approved mentor and (if given) the player is hers. */
+export async function mentorCheck(playerId?: string): Promise<string | null> {
+  const user = await getCurrentUser();
+  if (!user) return "Your session has ended. Sign in again.";
+  const mentor = await getMentor();
+  if (!mentor) return "Only approved mentors can do that.";
+  if (playerId && !(await getMenteeIds()).includes(playerId)) return "That player isn't one of yours.";
+  return null;
+}

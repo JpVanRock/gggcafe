@@ -24,6 +24,8 @@ import { AdvancedLocked, AdvancedSummary, LEVEL_LABEL, advancedHref } from "./ad
 import type { AdvancedBook } from "./advanced-data";
 import type { LessonWork } from "@/lib/leadership-guide";
 import { PlayerName } from "./player-name";
+import { MentorAlerts } from "./mentor-messages";
+import type { MentorMessage } from "@/lib/message-photos";
 import { leadershipHref } from "./leadership";
 
 /** The cafe-menu player dashboard: header, TWIS, then the menu boards. */
@@ -44,6 +46,7 @@ export function PlayerMenu({
   advanced,
   leadership = null,
   leader = false,
+  mentorMessages = null,
   isAdmin = false,
   canManage = editor,
   isSelf = false,
@@ -68,6 +71,8 @@ export function PlayerMenu({
   leadership?: LessonWork[] | null;
   /** she earned the Leader Badge (only coaches/admins and she herself are told) */
   leader?: boolean;
+  /** messages from her mentors: new ones show as alerts at the top */
+  mentorMessages?: { unread: MentorMessage[]; total: number; photoUrls: Map<string, string> } | null;
   /** admins see an unlock control while G3 Advanced is locked */
   isAdmin?: boolean;
   /** coach/admin only: profile edits, question bank, Dugout links */
@@ -231,6 +236,15 @@ export function PlayerMenu({
       </header>
 
       <div className="flex flex-col gap-3">
+        {mentorMessages && (
+          <MentorAlerts
+            playerId={player.id}
+            unread={mentorMessages.unread}
+            total={mentorMessages.total}
+            photoUrls={mentorMessages.photoUrls}
+            canDismiss={isSelf}
+          />
+        )}
         <DugoutStrip teams={dugout} canEdit={canManage} teamHref={`${base}/team`} leaderboardHref={`${base}/leaderboard`} activityHref={`${base}/log`} />
         <TwisBoard
           playerId={player.id}

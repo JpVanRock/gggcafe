@@ -19,6 +19,7 @@ export const FEATURE_SECTIONS: { title: string; features: Feature[] }[] = [
     features: [
       { name: "Player menu dashboard", detail: "Her cafe-menu home: photo, walk-up songs, every menu board.", standard: "yes", advanced: "yes" },
       { name: "From the Dugout", detail: "Team Standards and Team Culture from her coaches.", standard: "yes", advanced: "yes" },
+      { name: "Messages from her mentors", detail: "Alerts at the top of her menu: notes, photos and drills to try, from mentors her coach assigned.", standard: "yes", advanced: "yes" },
       { name: "This Week in Softball (TWIS)", detail: "Practices, games and her activities for the week, with check-offs.", standard: "yes", advanced: "yes" },
       { name: "Pop Report", detail: "Profile, teams, measurements and her Preferred Hitting Style.", standard: "yes", advanced: "yes" },
       { name: "Movement Preferences", detail: "Her move dial and at-bat focus tip in the Pop Report, set by her coaches.", standard: "no", advanced: "yes" },
@@ -118,6 +119,14 @@ export const FAQ: { q: string; a: string[] }[] = [
     a: [
       "Most points Monday to Sunday, with at least 10, named the Tuesday after. Nobody wins twice until every teammate has won once, and never twice within six weeks.",
       "Coaches and admins get a notification (the bell in the top menu) for each new Player of the Week.",
+    ],
+  },
+  {
+    q: "What can a mentor see and do?",
+    a: [
+      "Mentors (a mentor, a pitching or hitting coach…) sign up and pick \"Mentor\"; an admin approves them in Coaches Dugout → Mentors, and a coach assigns their players.",
+      "A mentor sees only her players' Goals, Pop Report (Movement Preferences only with G3 Advanced) and Mental GP, read-only. She can message them with a photo or a drill (from the Drill Library, or one she adds to it). If an admin turns on calendar dates, she can add dates to their This Week in Softball.",
+      "Mentors aren't staff and see nothing else. Coaches and admins can read and remove every message.",
     ],
   },
   {

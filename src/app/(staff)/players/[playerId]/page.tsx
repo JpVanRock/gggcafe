@@ -14,6 +14,7 @@ import { PlayerMenu } from "./player-menu";
 import { loadAdvanced } from "./advanced-data";
 import { loadLeaderCertificate, loadLeadership } from "./leadership-data";
 import { signedPhotoUrls } from "@/lib/player-photos";
+import { MESSAGE_COLUMNS, signedMessagePhotoUrls, type MentorMessage } from "@/lib/message-photos";
 
 export const metadata: Metadata = { title: "Player · GGG.Cafe" };
 
@@ -57,6 +58,13 @@ async function PlayerDashboard({ params, searchParams }: Pick<PageProps<"/player
     loadLeaderCertificate(supabase, player.id),
   ]);
   const photoUrl = player.photo_path ? ((await signedPhotoUrls(supabase, [player.photo_path])).get(player.photo_path) ?? null) : null;
+  // Mentor messages: new ones show as alerts at the top of her menu
+  const [{ data: unreadRows }, { count: messageCount }] = await Promise.all([
+    supabase.from("mentor_messages").select(MESSAGE_COLUMNS).eq("player_id", player.id).is("read_at", null).order("created_at", { ascending: false }).limit(10),
+    supabase.from("mentor_messages").select("id", { count: "exact", head: true }).eq("player_id", player.id),
+  ]);
+  const unread = (unreadRows ?? []) as MentorMessage[];
+  const messagePhotos = await signedMessagePhotoUrls(supabase, unread.map((m) => m.photo_path));
 
   return (
     <PlayerMenu
@@ -78,6 +86,7 @@ async function PlayerDashboard({ params, searchParams }: Pick<PageProps<"/player
       advanced={advanced}
       leadership={leadership.open ? leadership.work : null}
       leader={Boolean(certificate)}
+      mentorMessages={{ unread, total: messageCount ?? 0, photoUrls: messagePhotos }}
       isAdmin={access.user.staff?.role === "admin"}
     />
   );

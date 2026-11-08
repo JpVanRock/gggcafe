@@ -176,7 +176,9 @@ export async function loadTwisWeek(supabase: Supabase, playerId: string, monday:
     const tag =
       a.source === "leadership-checkin"
         ? "Leadership"
-        : a.category
+        : a.source === "mentor"
+          ? "Mentor"
+          : a.category
           ? TRAINING_CATEGORY_LABEL[a.category].title.split(" ")[0]
           : (a.pillar?.title ?? "My activity");
     if (a.days.length === 0) {

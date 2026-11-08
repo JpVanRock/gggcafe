@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
-import { canEdit, getCurrentUser, type StaffRole } from "@/lib/auth";
+import { canEdit, getCurrentUser, getMentor, type StaffRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Card, Loading, PageHeader } from "@/components/ui";
 import { addDays, formatDay, todayISO } from "@/lib/dates";
@@ -37,6 +37,7 @@ async function Dashboard() {
     ]);
     const role = (jwt?.claims?.user_metadata as { role?: string } | undefined)?.role;
     if ((claims ?? []).length > 0 || role === "player") redirect("/me");
+    if (role === "mentor" || (await getMentor())) redirect("/mentor");
     if (parent || role === "parent") redirect("/family");
     return (
       <>

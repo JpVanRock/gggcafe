@@ -12,6 +12,7 @@ const TABS = [
   { href: "/dugout/drills", label: "Drill Library", match: (p: string) => p.startsWith("/dugout/drills") },
   { href: "/dugout/budget", label: "Team Budget", match: (p: string) => p.startsWith("/dugout/budget") },
   { href: "/dugout/parents", label: "Parents", match: (p: string) => p.startsWith("/dugout/parents") },
+  { href: "/dugout/mentors", label: "Mentors", match: (p: string) => p.startsWith("/dugout/mentors") },
 ] as const;
 
 /** Header tabs across the Coaches Dugout (the current tab is underlined). */

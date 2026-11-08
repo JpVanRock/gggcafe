@@ -8,38 +8,41 @@ export type RegisterState = {
   error: string | null;
   /** set when Supabase sent a confirmation email instead of signing her in */
   checkEmail?: boolean;
-  values: { role: "player" | "parent"; name: string; email: string; code: string; child: string; team: string };
+  values: { role: "player" | "parent" | "mentor"; name: string; email: string; code: string; child: string; team: string; specialty: string };
 };
 
 /**
- * Sign-up for players and parents.
+ * Sign-up for players, parents and mentors.
  * Player: creates the account, then /me shows her team's welcome message and
  * asks her to claim her profile (a coach approves it).
  * Parent: creates the account, her parent profile and the request to join the
  * team with its code (a coach approves it), then /family.
+ * Mentor: creates the account, then /mentor waits for an admin to approve her.
  * If the project requires email confirmation, they confirm first and finish there.
  */
 export async function registerAccount(_prev: RegisterState, fd: FormData): Promise<RegisterState> {
   const values = {
-    role: (fd.get("role") === "parent" ? "parent" : "player") as "player" | "parent",
+    role: (fd.get("role") === "parent" ? "parent" : fd.get("role") === "mentor" ? "mentor" : "player") as "player" | "parent" | "mentor",
     name: String(fd.get("name") ?? "").trim(),
     email: String(fd.get("email") ?? "").trim(),
     code: String(fd.get("code") ?? "").trim(),
     child: String(fd.get("child") ?? "").trim(),
     team: String(fd.get("team") ?? "").trim(),
+    specialty: String(fd.get("specialty") ?? "").trim().slice(0, 60),
   };
   const player = values.role === "player";
+  const mentor = values.role === "mentor";
   const password = String(fd.get("password") ?? "");
   const fail = (error: string): RegisterState => ({ error, values });
 
   if (!values.name || values.name.length > 80) return fail("Enter your name.");
-  if (player && !/\s/.test(values.name)) return fail("Enter your first and last name.");
+  if ((player || mentor) && !/\s/.test(values.name)) return fail("Enter your first and last name.");
   if (!/^\S+@\S+\.\S+$/.test(values.email)) return fail("Enter a valid email address.");
   if (password.length < 8) return fail("Use a password of at least 8 characters.");
   if (password !== String(fd.get("confirm") ?? "")) return fail("The two passwords don't match.");
   if (player && !/^[0-9a-f-]{36}$/.test(values.team)) return fail("Choose your team.");
-  if (!player && !values.code) return fail("Enter the team code from your coach.");
-  if (!player && (!values.child || values.child.length > 80)) return fail("Enter your daughter's first and last name.");
+  if (!player && !mentor && !values.code) return fail("Enter the team code from your coach.");
+  if (!player && !mentor && (!values.child || values.child.length > 80)) return fail("Enter your daughter's first and last name.");
 
   const h = await headers();
   const host = h.get("x-forwarded-host") ?? h.get("host") ?? "gggcafe.vercel.app";
@@ -50,8 +53,8 @@ export async function registerAccount(_prev: RegisterState, fd: FormData): Promi
     email: values.email,
     password,
     options: {
-      data: { display_name: values.name, role: values.role },
-      emailRedirectTo: `${origin}/auth/confirm?next=${player ? "/me" : "/family"}`,
+      data: { display_name: values.name, role: values.role, ...(mentor && values.specialty ? { specialty: values.specialty } : {}) },
+      emailRedirectTo: `${origin}/auth/confirm?next=${player ? "/me" : mentor ? "/mentor" : "/family"}`,
     },
   });
   if (error) {
@@ -76,6 +79,8 @@ export async function registerAccount(_prev: RegisterState, fd: FormData): Promi
 
   // Players: the welcome message and claim form are on /me.
   if (player) redirect(`/me?team=${values.team}`);
+  // Mentors: an admin approves them; /mentor says so.
+  if (mentor) redirect("/mentor");
 
   await supabase.from("parent_accounts").insert({ display_name: values.name });
   const { error: linkError } = await supabase.rpc("request_parent_link", { p_code: values.code, p_child_name: values.child });
