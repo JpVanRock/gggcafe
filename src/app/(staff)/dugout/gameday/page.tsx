@@ -11,6 +11,7 @@ import { loadOwnTeams } from "../data";
 import { TeamPicker } from "../team-picker";
 import { CardsForm, NewLineupForm } from "./forms";
 import { GamedayNav } from "./nav";
+import { StatTerm } from "@/components/stat-term";
 
 export const metadata: Metadata = { title: "GameDay · Coaches Dugout · GGG.Cafe" };
 
@@ -136,9 +137,15 @@ async function Gameday({ searchParams }: Pick<PageProps<"/dugout/gameday">, "sea
                   <th className={thClass}>Player</th>
                   <th className={thClass}>Hitting type</th>
                   <th className={thClass}>Base running</th>
-                  <th className={thClass}>AVG</th>
-                  <th className={thClass}>OBP</th>
-                  <th className={thClass}>K%</th>
+                  <th className={thClass}>
+                    <StatTerm k="AVG" />
+                  </th>
+                  <th className={thClass}>
+                    <StatTerm k="OBP" />
+                  </th>
+                  <th className={thClass}>
+                    <StatTerm k="K%" />
+                  </th>
                 </tr>
               </thead>
               <tbody>

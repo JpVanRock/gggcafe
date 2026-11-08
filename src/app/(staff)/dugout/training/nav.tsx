@@ -4,6 +4,7 @@ const PAGES = [
   { key: "roadmap", href: "/dugout/training", label: "Roadmap & routines", head: false },
   { key: "testing", href: "/dugout/training/testing", label: "Testing", head: false },
   { key: "bullpens", href: "/dugout/training/bullpens", label: "Bullpens", head: false },
+  { key: "bp", href: "/dugout/training/bp", label: "BP rounds", head: false },
   { key: "draft", href: "/dugout/training/draft", label: "Offseason draft", head: true },
 ] as const;
 

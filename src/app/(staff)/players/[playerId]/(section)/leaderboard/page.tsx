@@ -9,6 +9,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { SpeedStripes } from "@/components/athletic";
 import { squadStandings, type SquadRow } from "@/lib/training-plan";
+import { StatTerm } from "@/components/stat-term";
 import { EmptyState, Loading, buttonClass, tableClass, tdClass, thClass } from "@/components/ui";
 import { loadTeamDugout } from "../../data";
 import { loadLeaderboard, loadTeamSessions } from "../../leaderboard-data";
@@ -106,6 +107,15 @@ async function Leaderboard({ params, searchParams }: Pick<PageProps<"/players/[p
   // the offseason draft: squads score their players' points
   const squads = squadStandings(((await supabase.rpc("team_squads", { p_team_id: team.id })).data ?? []) as SquadRow[], board.players);
   const mySquad = squads.find((sq) => sq.members.includes(player.id));
+  // BP production (Phase 9): the top five hitters with 20+ graded swings
+  const bpLeaders = ((await supabase.rpc("team_bp_leaders", { p_team_id: team.id })).data ?? []) as {
+    player_id: string;
+    first_name: string;
+    last_name: string;
+    jersey_number: string | null;
+    swings: number;
+    production: number;
+  }[];
   const nameOf = (id: string) => {
     const r = board.players.find((p) => p.player_id === id);
     return r ? `${r.first_name} ${r.last_name}` : "a player";
@@ -285,6 +295,34 @@ async function Leaderboard({ params, searchParams }: Pick<PageProps<"/players/[p
             </table>
           </div>
         </section>
+
+        {bpLeaders.length > 0 && (
+          <section>
+            <h2 className={heading}>
+              BP production · <StatTerm k="PROD" />
+            </h2>
+            <ol className="grid gap-1.5 sm:grid-cols-2">
+              {bpLeaders.map((r, i) => (
+                <li
+                  key={r.player_id}
+                  className={`flex items-baseline justify-between gap-3 rounded-lg border px-3 py-2 text-sm ${r.player_id === player.id ? "border-pink" : "border-navy-700"}`}
+                >
+                  <span>
+                    <span className="mr-2 font-display font-bold text-pink-soft tabular-nums">{i + 1}</span>
+                    <span className="font-semibold">
+                      {r.first_name} {r.last_name}
+                    </span>
+                    {r.jersey_number && <span className="ml-1.5 font-mono text-xs text-muted">#{r.jersey_number}</span>}
+                  </span>
+                  <span className="font-display tabular-nums">
+                    <span className="text-lg font-bold text-highlight">{Number(r.production).toFixed(2)}</span>
+                    <span className="ml-1.5 text-xs text-muted">{r.swings} swings</span>
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
 
         {board.weeks.length > 0 && (
           <section>

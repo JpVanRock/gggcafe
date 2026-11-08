@@ -1,5 +1,6 @@
 "use client";
 
+import { StatTerm } from "@/components/stat-term";
 import { useActionState } from "react";
 import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
 import { BASE_RUNNING, BASE_RUNNING_LABEL, HITTING_TYPES, HITTING_TYPE_LABEL, MAX_ROTATIONS, percent, rate } from "@/lib/gameday";
@@ -36,9 +37,15 @@ export function CardsForm({ teamId, seasonId, players }: { teamId: string; seaso
               <th className="py-2 pr-3">Player</th>
               <th className="py-2 pr-3">Hitting type</th>
               <th className="py-2 pr-3">Base running</th>
-              <th className="py-2 pr-2">AVG</th>
-              <th className="py-2 pr-2">OBP</th>
-              <th className="py-2 pr-2">K%</th>
+              <th className="py-2 pr-2">
+                <StatTerm k="AVG" />
+              </th>
+              <th className="py-2 pr-2">
+                <StatTerm k="OBP" />
+              </th>
+              <th className="py-2 pr-2">
+                <StatTerm k="K%" />
+              </th>
             </tr>
           </thead>
           <tbody>

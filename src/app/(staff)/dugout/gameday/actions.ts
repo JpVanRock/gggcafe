@@ -14,6 +14,10 @@ import {
 } from "@/lib/gameday";
 import { lineupSeason, loadGamedayRoster, loadLineup } from "@/lib/gameday-data";
 import { DEPTH_POSITIONS, type DepthPosition } from "@/lib/playbook";
+import {
+  BATTING_COLUMNS, FIELDING_COLUMNS, PITCHING_COLUMNS, battingIsEmpty, boxProblems, fieldingIsEmpty,
+  type BattingLine, type BoxScore, type FieldingLine,
+} from "@/lib/box-score";
 import { loadCoachingStaff } from "@/lib/practice-plans";
 import { emailConfigured, escapeHtml, sendEmail } from "@/lib/email";
 import { lineupFilename, renderLineupPdf } from "@/lib/pdf/lineup-pdf";
@@ -381,4 +385,59 @@ export async function fillDepthFromPositions(fd: FormData) {
   }
   if (rows.length) await supabase.from("depth_chart").insert(rows);
   refresh();
+}
+
+// ---------------------------------------------------------------------------
+// Box scores: one team's lines for one game, saved together
+// ---------------------------------------------------------------------------
+
+const count = (v: unknown, max = 99) => (Number.isInteger(v) && (v as number) >= 0 && (v as number) <= max ? (v as number) : 0);
+
+export async function saveBoxScore(gameId: string, teamId: string, body: string): Promise<{ error: string | null }> {
+  const denied = await headCoachCheck();
+  if (denied) return { error: denied };
+  if (!isUuid(gameId) || !isUuid(teamId)) return { error: "Unknown game." };
+  let raw: BoxScore;
+  try {
+    raw = JSON.parse(body);
+  } catch {
+    return { error: "Couldn't read the box score. Reload the page and try again." };
+  }
+  const box: BoxScore = {
+    us: raw.us === null || raw.us === undefined ? null : count(raw.us),
+    them: raw.them === null || raw.them === undefined ? null : count(raw.them),
+    batting: (raw.batting ?? [])
+      .filter((b) => isUuid(b.player_id))
+      .map((b) => ({ ...Object.fromEntries(BATTING_COLUMNS.map((k) => [k, count(b[k])])), player_id: b.player_id }) as BattingLine)
+      .filter((b) => !battingIsEmpty(b)),
+    pitching: (raw.pitching ?? [])
+      .filter((p) => isUuid(p.player_id))
+      .map((p) => ({
+        player_id: p.player_id,
+        outs: count(p.outs, 60),
+        ...(Object.fromEntries(PITCHING_COLUMNS.map((k) => [k, count(p[k], 200)])) as Record<(typeof PITCHING_COLUMNS)[number], number>),
+        pitches: p.pitches === null || p.pitches === undefined ? null : count(p.pitches, 400),
+        strikes: p.strikes === null || p.strikes === undefined ? null : count(p.strikes, 400),
+        decision: p.decision === "W" || p.decision === "L" || p.decision === "S" ? p.decision : null,
+        starter: Boolean(p.starter),
+      })),
+    fielding: (raw.fielding ?? [])
+      .filter((f) => isUuid(f.player_id))
+      .map((f) => ({ ...Object.fromEntries(FIELDING_COLUMNS.map((k) => [k, count(f[k])])), player_id: f.player_id }) as FieldingLine)
+      .filter((f) => !fieldingIsEmpty(f)),
+    grades: (raw.grades ?? []).filter((g) => isUuid(g.player_id) && Number.isInteger(g.pa_no) && g.pa_no >= 1 && g.pa_no <= 15 && Number.isInteger(g.grade)),
+  };
+  const ids = new Set([...box.batting, ...box.pitching, ...box.fielding].map((l) => l.player_id));
+  if (ids.size === 0) return { error: "Enter at least one player's line." };
+  const problems = boxProblems(box, () => "A player");
+  if (problems.length) return { error: problems[0] };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("save_box_score", { p_game_id: gameId, p_team_id: teamId, p_box: box });
+  if (error) {
+    if (error.code === "23514") return { error: "One of the lines doesn't add up (check hits, at-bats and plate appearances)." };
+    return { error: friendlyDbError(error) };
+  }
+  refresh();
+  return { error: null };
 }

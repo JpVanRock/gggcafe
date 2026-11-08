@@ -14,6 +14,7 @@ import { lineupSeason } from "@/lib/gameday-data";
 import { saveQuestionnaire } from "../../family-actions";
 import { QuestionnaireForm } from "@/components/family-forms";
 import { Disclosure } from "@/components/ui";
+import { StatsCard, loadPlayerStats } from "../../stats-card";
 
 export const metadata: Metadata = { title: "Pop Report · GGG.Cafe" };
 
@@ -47,6 +48,10 @@ async function Pop({ params }: Pick<PageProps<"/players/[playerId]/pop">, "param
   // Phase 6: her preseason questionnaire (her current own team and season; she and coaches)
   const ownTeam = (await loadTeamDugout(supabase, player.id))[0]?.team ?? null;
   const season = ownTeam ? await lineupSeason(supabase, ownTeam.id, null) : null;
+  const [stats, seasonName] = await Promise.all([
+    loadPlayerStats(supabase, player.id, season),
+    season ? supabase.from("seasons").select("name").eq("id", season).maybeSingle().then((r) => (r.data as { name: string } | null)?.name ?? null) : Promise.resolve(null),
+  ]);
   const questionnaire =
     ownTeam && season && access.canAct
       ? (((await supabase.from("player_questionnaires").select("*").eq("player_id", player.id).eq("team_id", ownTeam.id).eq("season_id", season).maybeSingle()).data ??
@@ -64,6 +69,7 @@ async function Pop({ params }: Pick<PageProps<"/players/[playerId]/pop">, "param
         styles={styles}
         movementAccess={movementAccess}
       />
+      <StatsCard stats={stats} seasonLabel={seasonName} />
       {ownTeam && season && access.canAct && (
         <section className="mt-10 flex flex-col gap-3">
           <h2 className="font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">Preseason questionnaire · {ownTeam.name}</h2>

@@ -10,6 +10,7 @@ import { friendlyDbError, isoDate, oneOf, text, type FormState } from "@/lib/for
 import { isUuid } from "@/lib/softball";
 import { TRAINING_CATEGORIES } from "@/lib/achievements";
 import { cleanScript } from "@/lib/bullpen";
+import { parseSwings } from "@/lib/box-score";
 import { todayISO } from "@/lib/dates";
 import { PHASE_KINDS, SQUAD_MAX, SQUAD_MIN, TESTS, onTheClock, suggestRoadmap, testByKey, tierFor, validCutoffs } from "@/lib/training-plan";
 
@@ -317,5 +318,34 @@ export async function deleteBullpenScript(fd: FormData) {
   if (!isUuid(id)) return;
   const supabase = await createClient();
   await supabase.from("bullpen_scripts").delete().eq("id", id);
+  refresh();
+}
+
+// ---------------------------------------------------------------------------
+// BP rounds (Phase 9): a 0-5 grade on every swing, production = the average
+// ---------------------------------------------------------------------------
+
+export async function saveBpRound(_prev: FormState, fd: FormData): Promise<FormState> {
+  const denied = await editorCheck();
+  if (denied) return { error: denied };
+  const playerId = text(fd, "player_id");
+  const date = isoDate(fd, "round_date") ?? todayISO();
+  const grades = parseSwings(String(fd.get("grades") ?? ""));
+  const note = text(fd, "note");
+  if (!isUuid(playerId)) return { error: "Pick the hitter." };
+  if (!grades) return { error: "Grade at least one swing (0 to 5), up to 100." };
+  if (note && note.length > 200) return { error: "Keep the note to 200 characters." };
+  const supabase = await createClient();
+  const { error } = await supabase.from("bp_rounds").insert({ player_id: playerId, round_date: date, grades, note });
+  if (error) return { error: friendlyDbError(error) };
+  refresh();
+  return { error: null, saved: true };
+}
+
+export async function removeBpRound(fd: FormData) {
+  const id = text(fd, "id");
+  if ((await editorCheck()) || !isUuid(id)) return;
+  const supabase = await createClient();
+  await supabase.from("bp_rounds").delete().eq("id", id);
   refresh();
 }

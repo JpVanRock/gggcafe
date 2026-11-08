@@ -289,7 +289,18 @@ tests/unit/              node --test unit tests (npm run test:unit)
 - Staff duties & standards (`/dugout/roster/staff`, linked from Roster; head-coach writes, every coach reads):
   `staff_duties` (phase practice/pregame/game/postgame/season, duty, owner) and `staff_standards` (commitment,
   pre_practice). Starters and helpers in `src/lib/staff-duties.ts` (no imports, unit-tested).
-- DB tests: `tests/db/gameday_production.test.sql`.
+- Box scores (migration 20261109090000): GameDay → Box scores (`/dugout/gameday/box`, `box/[gameId]`, `box-form.tsx`):
+  batting, pitching (IP typed "4.2", stored as outs), fielding, the final score (marks the game final) and an optional
+  0-5 grade per plate appearance (`pa_grades`), all saved by `save_box_score` (invoker, one transaction, RLS). Order comes
+  from the game's GameDay lineup (`gameday_lineups.game_id`) when there is one. Checks in `boxProblems()` mirror the DB.
+- Quality at-bats and BP production: `QAB_SCALE` (fastpitch: an executed slap or bunt is a 5), 3+ = quality; `qab_season`
+  view. BP rounds (Training → BP rounds, `/dugout/training/bp`, keypad `bp-form.tsx`): `bp_rounds.grades` 0-5 per swing;
+  production = average grade. Leaderboard: top five with 20+ swings in the offseason window (`team_bp_leaders`, definer).
+- "How it's figured": `src/lib/stat-formulas.ts` (`STAT_INFO`; ERA and per-7 on 7 innings) + `components/stat-term.tsx`
+  (tap the abbreviation). Used on her stats card (`players/[playerId]/stats-card.tsx`, Pop Report: players now read their
+  own batting/pitching/fielding lines), GameDay player cards, BP rounds and the Leaderboard.
+- Logic in `src/lib/box-score.ts` (no imports, unit-tested). DB tests: `tests/db/gameday_production.test.sql`,
+  `tests/db/box_scores.test.sql`.
 
 ## Access FAQ (`/faq`, admins only, user 2026-11-08)
 - Every player feature side by side for Standard Access (approved claim) and Advanced Access (G3

@@ -40,7 +40,8 @@ export const FEATURE_SECTIONS: { title: string; features: Feature[] }[] = [
     features: [
       { name: "Performance Training", detail: "Workout, hitting, fielding, pitching and catching routines, with achievements.", standard: "yes", advanced: "yes" },
       { name: "+ Activity", detail: "Log a training session, workout or private lesson in a few taps.", standard: "yes", advanced: "yes" },
-      { name: "Offseason Leaderboard", detail: "Team standings by points: sessions, workouts, lessons and unlocks.", standard: "yes", advanced: "yes" },
+      { name: "Offseason Leaderboard", detail: "Team standings by points: sessions, workouts, lessons and unlocks, plus the top five in BP production (20+ graded swings).", standard: "yes", advanced: "yes" },
+      { name: "Season stats card", detail: "Her hitting, pitching and fielding from box scores on her Pop Report, quality at-bat % and production, BP production; tap any stat to see how it's figured (ERA on 7 innings).", standard: "yes", advanced: "yes" },
       { name: "Player of the Week", detail: "Most points that week; a teammate who has not won yet goes first.", standard: "yes", advanced: "yes" },
       { name: "Training phase in TWIS", detail: "Her team's roadmap phase and week (Build · Week 3 of 9) with its focus.", standard: "yes", advanced: "yes" },
       { name: "Team routines", detail: "Routines her coaches push to the team; she checks them off in TWIS but can't change them.", standard: "yes", advanced: "yes" },
