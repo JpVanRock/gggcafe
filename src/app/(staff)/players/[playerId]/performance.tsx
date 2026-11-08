@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { ConfirmSubmit } from "@/components/confirm-submit";
+import { RatingChip } from "@/components/rating-chip";
 import { Disclosure, EmptyState, secondaryButtonClass } from "@/components/ui";
 import {
   TRAINING_CATEGORY_LABEL, categoriesFor, evaluateAchievements, streaks, weeklyStats,
@@ -7,6 +9,7 @@ import {
 import { WEEKDAYS, formatLongDate, weekStart } from "@/lib/dates";
 import { deleteActivity, endActivity } from "./actions";
 import type { Performance, RoutineRow } from "./data";
+import type { MyTesting } from "./testing-data";
 import { DetailHeading, MenuItem } from "./menu";
 import { RoutineForm } from "./performance-client";
 
@@ -130,17 +133,20 @@ function AchievementBadge({ a }: { a: AchievementProgress }) {
   );
 }
 
-function RoutineCard({ r, today, canEdit }: { r: RoutineRow; today: string; canEdit: boolean }) {
+function RoutineCard({ r, today, canEdit, playerId }: { r: RoutineRow; today: string; canEdit: boolean; playerId: string }) {
+  // pushed from Coaches Dugout → Training: changed or ended there, for the whole team
+  const fromCoach = r.source === "coach";
   return (
-    <li className="rounded-xl border border-navy-700 bg-navy-950/40 p-3">
+    <li className={`rounded-xl border bg-navy-950/40 p-3 ${fromCoach ? "border-pink/50" : "border-navy-700"}`}>
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="font-semibold">{r.title}</p>
           <p className="mt-0.5 text-xs text-muted">
             {daysText(r.days)} · since {short(r.starts_on)}
+            {fromCoach && <span className="ml-1.5 rounded border border-pink px-1 py-px font-mono text-[10px] font-bold tracking-wider text-pink-soft uppercase">From your coach</span>}
           </p>
         </div>
-        {canEdit && (
+        {canEdit && !fromCoach && (
           <div className="flex items-center gap-2">
             {(!r.ends_on || r.ends_on >= today) && (
               <form action={endActivity}>
@@ -170,6 +176,11 @@ function RoutineCard({ r, today, canEdit }: { r: RoutineRow; today: string; canE
           Watch it ↗
         </a>
       )}
+      {r.drill?.guide && (
+        <Link href={`/players/${playerId}/mental/session/${r.drill.guide}`} className="mt-2 inline-block text-sm font-semibold text-pink-soft hover:underline">
+          Start the session →
+        </Link>
+      )}
     </li>
   );
 }
@@ -180,12 +191,15 @@ export function PerformanceDetail({
   summary,
   today,
   canEdit,
+  testing = null,
 }: {
   playerId: string;
   perf: Performance;
   summary: Summary;
   today: string;
   canEdit: boolean;
+  /** her athletic testing results (Coaches Dugout → Training → Testing) */
+  testing?: MyTesting | null;
 }) {
   const stats: [string, string][] = [
     ["This week", summary.week.planned ? `${summary.week.done}/${summary.week.planned}` : "–"],
@@ -210,6 +224,40 @@ export function PerformanceDetail({
       <p className="-mt-4 text-xs text-muted">
         A streak week means 80% or more of the planned routines were checked off in TWIS.
       </p>
+
+      {testing && testing.results.length > 0 && (
+        <section>
+          <DetailHeading>Athletic testing{testing.composite !== null && ` · score ${testing.composite}`}</DetailHeading>
+          <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {testing.results.map((r) => {
+              const change = r.previous === null ? null : Math.round((r.value - r.previous) * 100) / 100;
+              const better = change !== null && change !== 0 && (r.test.better === "higher" ? change > 0 : change < 0);
+              return (
+                <li key={r.test.key} className="flex items-center justify-between gap-3 rounded-xl border border-navy-700 p-3">
+                  <span className="min-w-0">
+                    <span className="block text-sm font-semibold">{r.test.name}</span>
+                    <span className="font-display text-xl font-bold text-highlight tabular-nums">
+                      {r.value}
+                      <span className="ml-1 text-xs font-normal text-muted">{r.test.unit}</span>
+                    </span>
+                    {change !== null && change !== 0 && (
+                      <span className={`ml-2 font-mono text-xs ${better ? "text-highlight" : "text-muted"}`}>
+                        {change > 0 ? "+" : ""}
+                        {change} since last
+                      </span>
+                    )}
+                  </span>
+                  <RatingChip rating={r.rating} />
+                </li>
+              );
+            })}
+          </ul>
+          <p className="mt-2 text-xs text-muted">
+            Your latest result in each test, rated against {testing.ageGroup ?? "13U-14U"} bands. Beat your own last result; that&apos;s the
+            only comparison that counts.
+          </p>
+        </section>
+      )}
 
       <section>
         <DetailHeading>
@@ -237,7 +285,7 @@ export function PerformanceDetail({
             ) : (
               <ul className="grid gap-3 md:grid-cols-2">
                 {routines.map((r) => (
-                  <RoutineCard key={r.id} r={r} today={today} canEdit={canEdit} />
+                  <RoutineCard key={r.id} r={r} today={today} canEdit={canEdit} playerId={playerId} />
                 ))}
               </ul>
             )}

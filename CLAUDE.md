@@ -170,6 +170,27 @@ tests/unit/              node --test unit tests (npm run test:unit)
   for the course. Only append course steps at the end (saved places are step numbers).
 - DB tests: `tests/db/mental.test.sql`.
 
+## Offseason training (SB Blueprint Phase 2, user 2026-11-08; migration 20261109010000)
+- Coaches Dugout → Training (`dugout/training`, all coaches; sub-menu `nav.tsx`), logic in `src/lib/training-plan.ts`
+  (no imports, unit-tested):
+  - Roadmap: `training_phases` per team (kinds testing/build/sport/preseason/inseason/recovery); "Plan it backward from
+    the championship" (`suggestRoadmap`: in-season from the first game, 3-week preseason, retest week, 6 weeks
+    sport-specific, testing week then build). Players read their team's phases; TWIS shows "Build · Week 3 of 9" and the
+    focus (`TwisWeek.phase`); the Dugout Calendar labels each phase's first day and outlines testing weeks.
+  - Team routines (`team_routines`): copied into `player_activities` (source 'coach', `team_routine_id`) for the current
+    roster by `sync_team_routine()`, re-synced on save and by a trigger on `roster_entries` (new players get them; players
+    who leave have theirs ended). Restrictive RLS: players check them off but can't add, change or remove coach
+    routines ("From your coach" in Performance Training and Activities). Remove = copies end, check-offs stay.
+  - Testing (`/dugout/training/testing`): ten tests (`TESTS`; metrics added by the migration) saved as measurements
+    (context "Testing"), rated 1-5 (Building..Elite) against starter bands for girls by age tier, or the coach's own
+    (`test_bands`, per age group); composite = average rating on 100. Coaches see the team table; a player sees only her
+    own (Performance Training, `testing-data.ts`). No public rankings.
+  - Library: starter conditioning and landing/ACL drills (`drills.focus`: speed, agility, core, power, med-ball, landing).
+  - Offseason draft (`/dugout/training/draft`, head coach/admin; user: the head coach names captains): `offseason_squads`
+    + `offseason_squad_members` (captain = pick 0, snake order `onTheClock`), head-coach writes; players see squads via
+    `team_squads()`; squad points = sum of members' Leaderboard points (`squadStandings`), shown on the Leaderboard.
+- DB tests: `tests/db/training.test.sql`.
+
 ## Access FAQ (`/faq`, admins only, user 2026-11-08)
 - Every player feature side by side for Standard Access (approved claim) and Advanced Access (G3
   Advanced), marked with softballs (`components/softball-icon.tsx`: included / not included / "Coach's

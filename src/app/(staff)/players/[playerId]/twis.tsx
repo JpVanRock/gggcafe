@@ -49,6 +49,14 @@ export function TwisBoard({
             TWIS
           </h2>
           <p className="mt-2 font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">This Week in Softball</p>
+          {week.phase && (
+            <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1" title={week.phase.focus ?? undefined}>
+              <span className="rounded border border-neon px-2 py-0.5 font-mono text-[11px] font-bold tracking-wider text-highlight uppercase">
+                {week.phase.name} · Week {week.phase.week} of {week.phase.of}
+              </span>
+              {week.phase.focus && <span className="text-xs text-muted">{week.phase.focus}</span>}
+            </p>
+          )}
         </div>
         <nav aria-label="Choose week" className="flex flex-wrap items-center gap-2 font-mono text-sm">
           <Link href={href(addDays(week.monday, -7))} className={secondaryButtonClass} aria-label="Previous week">
@@ -117,6 +125,9 @@ export function ActivitiesManager({
                   </p>
                   {a.details && <p className="mt-1 text-sm text-ink/80">{a.details}</p>}
                 </div>
+                {a.source === "coach" ? (
+                  <span className="rounded border border-pink px-1.5 py-px font-mono text-[10px] font-bold tracking-wider text-pink-soft uppercase">From your coach</span>
+                ) : (
                 <div className="flex items-center gap-2">
                   {(!a.ends_on || a.ends_on >= today) && (
                     <form action={endActivity}>
@@ -136,6 +147,7 @@ export function ActivitiesManager({
                     </ConfirmSubmit>
                   </form>
                 </div>
+                )}
               </li>
             ))}
           </ul>

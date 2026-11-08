@@ -30,6 +30,7 @@ const TAB_NOTE: Record<string, string> = {
   "/dugout": "What your team stands for",
   "/dugout/calendar": "Dates that show in TWIS",
   "/dugout/plans": "Build, print and share",
+  "/dugout/training": "Roadmap, team routines, testing",
   "/dugout/gameday": "Lineups and defensive rotations",
   "/dugout/drills": "Every drill, tagged",
   "/dugout/budget": "Fees, payments and expenses",

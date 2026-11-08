@@ -38,6 +38,7 @@ export const DUGOUT_TABS = [
   { href: "/dugout", label: "Culture", headOnly: true },
   { href: "/dugout/calendar", label: "Calendar", headOnly: false },
   { href: "/dugout/plans", label: "Practice Plans", headOnly: false },
+  { href: "/dugout/training", label: "Training", headOnly: false },
   { href: "/dugout/gameday", label: "GameDay", headOnly: true },
   { href: "/dugout/drills", label: "Drill Library", headOnly: false },
   { href: "/dugout/budget", label: "Team Budget", headOnly: false },
@@ -47,7 +48,7 @@ export const DUGOUT_TABS = [
 
 export type DugoutTab = (typeof DUGOUT_TABS)[number];
 
-/** The tabs a role sees. Assistants skip Culture, GameDay, Parents and Mentors; everyone else sees all. */
+/** The tabs a role sees. Assistants skip Culture, GameDay, Parents and Mentors (and the draft inside Training); everyone else sees all. */
 export function dugoutTabsFor(role: StaffRole | null | undefined): DugoutTab[] {
   return DUGOUT_TABS.filter((t) => !(t.headOnly && role === "assistant"));
 }

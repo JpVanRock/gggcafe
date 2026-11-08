@@ -8,6 +8,7 @@ import {
 } from "@/lib/leaderboard";
 import { createClient } from "@/lib/supabase/server";
 import { SpeedStripes } from "@/components/athletic";
+import { squadStandings, type SquadRow } from "@/lib/training-plan";
 import { EmptyState, Loading, buttonClass, tableClass, tdClass, thClass } from "@/components/ui";
 import { loadTeamDugout } from "../../data";
 import { loadLeaderboard, loadTeamSessions } from "../../leaderboard-data";
@@ -102,6 +103,9 @@ async function Leaderboard({ params, searchParams }: Pick<PageProps<"/players/[p
   const off = board.offseason;
   const span = off.ends_on ? `${formatDay(off.starts_on)} – ${formatLongDate(off.ends_on)}` : `Since ${formatLongDate(off.starts_on)}`;
   const recent = access.canManage ? await loadTeamSessions(supabase, board.players.map((p) => p.player_id), addDays(board.today, -14)) : [];
+  // the offseason draft: squads score their players' points
+  const squads = squadStandings(((await supabase.rpc("team_squads", { p_team_id: team.id })).data ?? []) as SquadRow[], board.players);
+  const mySquad = squads.find((sq) => sq.members.includes(player.id));
   const nameOf = (id: string) => {
     const r = board.players.find((p) => p.player_id === id);
     return r ? `${r.first_name} ${r.last_name}` : "a player";
@@ -183,6 +187,36 @@ async function Leaderboard({ params, searchParams }: Pick<PageProps<"/players/[p
             </span>
           </Link>
         </div>
+
+        {/* the offseason draft */}
+        {squads.length > 0 && (
+          <section>
+            <h2 className={heading}>Squads</h2>
+            <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {squads.map((sq, i) => (
+                <li
+                  key={sq.id}
+                  className={`relative overflow-hidden rounded-2xl border p-4 ${sq.id === mySquad?.id ? "border-2 border-pink" : i === 0 ? "border-neon" : "border-navy-600"}`}
+                >
+                  <p className="flex items-baseline justify-between gap-2">
+                    <span className="font-display text-2xl font-bold tracking-wide uppercase">{sq.name}</span>
+                    <span className="font-display text-3xl font-black text-highlight tabular-nums">{sq.points}</span>
+                  </p>
+                  <p className="font-mono text-[11px] tracking-wider text-muted uppercase">
+                    {i === 0 ? "Leading · " : ""}+{sq.weekPoints} this week{sq.id === mySquad?.id ? " · your squad" : ""}
+                  </p>
+                  <p className="mt-3 text-sm text-ink/90">
+                    {sq.members
+                      .map((id) => board.players.find((p) => p.player_id === id))
+                      .filter((p): p is NonNullable<typeof p> => Boolean(p))
+                      .map((p) => `${p.first_name}${p.player_id === sq.captain_id ? " (C)" : ""}`)
+                      .join(", ")}
+                  </p>
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
 
         {/* this week's race */}
         <section>

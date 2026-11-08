@@ -7,6 +7,7 @@ import type { TeamCulture, TeamStandard } from "@/components/team-standards";
 import { HITTING_KEYS, MOVEMENT_KEYS, type Values } from "@/lib/movement";
 import { MENTAL_FIELDS, type MentalPlan } from "./shared";
 import { TRAINING_CATEGORY_LABEL, type Check, type Routine, type TrainingCategory } from "@/lib/achievements";
+import { phaseOn, phaseWeek } from "@/lib/training-plan";
 
 export { MENTAL_FIELDS, type MentalField, type MentalPlan } from "./shared";
 
@@ -48,6 +49,8 @@ export type TwisWeek = {
   cells: TwisCell[]; // Monday..Sunday, then "any day this week"
   done: number;
   total: number;
+  /** her team's training phase that week (Coaches Dugout → Training) */
+  phase?: { name: string; focus: string | null; week: number; of: number } | null;
 };
 
 type GameRow = {
@@ -100,6 +103,9 @@ export async function loadTwisWeek(supabase: Supabase, playerId: string, monday:
   const teamIds = [...new Set(((rosterData ?? []) as { team_id: string }[]).map((r) => r.team_id))];
   const teamList = teamIds.join(",");
 
+  const phasesPromise = teamIds.length
+    ? supabase.from("training_phases").select("name, focus, starts_on, ends_on").in("team_id", teamIds).lte("starts_on", sunday).gte("ends_on", monday)
+    : Promise.resolve({ data: [] });
   const [eventsResult, gamesResult, activitiesResult, checksResult] = await Promise.all([
     teamIds.length
       ? supabase
@@ -210,7 +216,15 @@ export async function loadTwisWeek(supabase: Supabase, playerId: string, monday:
   cells.push({ key: "any", date: null, items: anyDay });
 
   const all = cells.flatMap((c) => c.items);
-  return { monday, cells, done: all.filter((i) => i.checked).length, total: all.length };
+  const phases = ((await phasesPromise).data ?? []) as { name: string; focus: string | null; starts_on: string; ends_on: string }[];
+  const phase = phaseOn(phases, monday) ?? phaseOn(phases, sunday);
+  return {
+    monday,
+    cells,
+    done: all.filter((i) => i.checked).length,
+    total: all.length,
+    phase: phase ? { name: phase.name, focus: phase.focus, ...phaseWeek(phase, phase.starts_on > monday ? phase.starts_on : monday) } : null,
+  };
 }
 
 /** Activities that apply at some point between the two dates. */
@@ -317,7 +331,9 @@ export type DrillInfo = {
 export type RoutineRow = Routine & {
   title: string;
   details: string | null;
-  drill: DrillInfo | null;
+  drill: (DrillInfo & { guide?: string | null }) | null;
+  /** 'coach': pushed by her coaches from Coaches Dugout → Training (she can't change it) */
+  source?: string | null;
 };
 
 export type Performance = {
@@ -331,7 +347,7 @@ export async function loadPerformance(supabase: Supabase, playerId: string): Pro
   const [routinesResult, libraryResult, earnedResult] = await Promise.all([
     supabase
       .from("player_activities")
-      .select("id, title, details, days, starts_on, ends_on, category, drill:drills(name, description, equipment, video_url)")
+      .select("id, title, details, days, starts_on, ends_on, category, source, drill:drills(name, description, equipment, video_url, guide)")
       .eq("player_id", playerId)
       .not("category", "is", null)
       .order("created_at"),

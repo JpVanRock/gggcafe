@@ -187,6 +187,7 @@ export function CalendarView({
   games,
   canEdit,
   offseason = null,
+  phases = [],
 }: {
   teamId: string;
   month: string;
@@ -197,6 +198,8 @@ export function CalendarView({
   canEdit: boolean;
   /** the team's Offseason Training window: its days get a neon edge, the first and last a label */
   offseason?: { startsOn: string; endsOn: string | null } | null;
+  /** training phases: the first day of each is labeled, testing weeks get a pink edge */
+  phases?: { name: string; testing: boolean; startsOn: string; endsOn: string }[];
 }) {
   const [mode, setMode] = useState<Mode>(null);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -284,12 +287,14 @@ export function CalendarView({
             const isToday = date === today;
             const off = offseason && date >= offseason.startsOn && (!offseason.endsOn || date <= offseason.endsOn);
             const offLabel = offseason && date === offseason.startsOn ? "Offseason starts" : offseason && date === offseason.endsOn ? "Offseason ends" : null;
+            const phaseStart = phases.find((p) => p.startsOn === date);
+            const testing = phases.some((p) => p.testing && p.startsOn <= date && date <= p.endsOn);
             return (
               <div
                 key={date}
                 className={`group relative min-h-28 border-navy-700 p-1.5 ${i % 7 ? "border-l" : ""} ${i >= 7 ? "border-t" : ""} ${
                   inMonth(date) ? "bg-navy-950" : "bg-navy-900/40"
-                } ${off ? "shadow-[inset_0_-3px_0_rgb(231_251_6/0.55)]" : ""}`}
+                } ${off ? "shadow-[inset_0_-3px_0_rgb(231_251_6/0.55)]" : ""} ${testing ? "outline outline-1 -outline-offset-1 outline-pink/60" : ""}`}
               >
                 <div className="mb-1 flex items-center justify-between">
                   <span
@@ -313,6 +318,11 @@ export function CalendarView({
                 <div className="flex flex-col gap-1">
                   {offLabel && (
                     <span className="rounded bg-neon px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wider text-on-accent uppercase">{offLabel}</span>
+                  )}
+                  {phaseStart && (
+                    <span className="rounded border border-pink px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wider text-pink-soft uppercase">
+                      {phaseStart.name} begins
+                    </span>
                   )}
                   {g.map((game) => (
                     <GameChip key={game.id} game={game} onOpen={() => setMode({ type: "game", game })} />
@@ -344,6 +354,7 @@ export function CalendarView({
                 <h3 className={`mb-2 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] uppercase ${date === today ? "text-highlight" : "text-pink-soft"}`}>
                   {dayLabel(date)}
                   {date === today && " · Today"}
+                  {phases.find((p) => p.startsOn === date) && ` · ${phases.find((p) => p.startsOn === date)!.name} begins`}
                 </h3>
                 <div className="flex flex-col gap-1.5">
                   {g.map((game) => (

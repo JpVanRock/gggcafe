@@ -68,7 +68,7 @@ async function Calendar({ searchParams }: Pick<PageProps<"/dugout/calendar">, "s
   const days = monthGrid(month);
   const [from, to] = [days[0], days[days.length - 1]];
 
-  const [eventsResult, gamesResult, plansResult, staffResult, offseasonResult] = await Promise.all([
+  const [eventsResult, gamesResult, plansResult, staffResult, offseasonResult, phasesResult] = await Promise.all([
     supabase
       .from("team_events")
       .select("id, kind, title, event_date, start_time, end_time, location, notes, series_id, created_by, updated_by")
@@ -86,7 +86,15 @@ async function Calendar({ searchParams }: Pick<PageProps<"/dugout/calendar">, "s
     supabase.from("practice_plans").select("id, practice_date").eq("team_id", team.id).gte("practice_date", from).lte("practice_date", to),
     supabase.from("staff").select("user_id, display_name"),
     supabase.from("team_offseason").select("starts_on, ends_on").eq("team_id", team.id).maybeSingle(),
+    supabase.from("training_phases").select("name, kind, starts_on, ends_on").eq("team_id", team.id).lte("starts_on", to).gte("ends_on", from),
   ]);
+  // training phases (Coaches Dugout → Training): each one's first day is labeled; testing weeks are marked
+  const phases = ((phasesResult.data ?? []) as { name: string; kind: string; starts_on: string; ends_on: string }[]).map((p) => ({
+    name: p.name,
+    testing: p.kind === "testing",
+    startsOn: p.starts_on,
+    endsOn: p.ends_on,
+  }));
   const offseason = (offseasonResult.data as { starts_on: string; ends_on: string | null } | null) ?? null;
 
   const names = new Map(((staffResult.data ?? []) as { user_id: string; display_name: string }[]).map((s) => [s.user_id, s.display_name]));
@@ -171,6 +179,7 @@ async function Calendar({ searchParams }: Pick<PageProps<"/dugout/calendar">, "s
         games={games}
         canEdit={editor}
         offseason={offseason ? { startsOn: offseason.starts_on, endsOn: offseason.ends_on } : null}
+        phases={phases}
       />
       {editor && <p className="text-xs text-muted">Tap + on a day to add a practice, workout, lesson or meeting. Tap an event to change or remove it.</p>}
     </div>

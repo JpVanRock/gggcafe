@@ -38,6 +38,10 @@ export const FEATURE_SECTIONS: { title: string; features: Feature[] }[] = [
       { name: "+ Activity", detail: "Log a training session, workout or private lesson in a few taps.", standard: "yes", advanced: "yes" },
       { name: "Offseason Leaderboard", detail: "Team standings by points: sessions, workouts, lessons and unlocks.", standard: "yes", advanced: "yes" },
       { name: "Player of the Week", detail: "Most points that week; a teammate who has not won yet goes first.", standard: "yes", advanced: "yes" },
+      { name: "Training phase in TWIS", detail: "Her team's roadmap phase and week (Build · Week 3 of 9) with its focus.", standard: "yes", advanced: "yes" },
+      { name: "Team routines", detail: "Routines her coaches push to the team; she checks them off in TWIS but can't change them.", standard: "yes", advanced: "yes" },
+      { name: "Athletic testing results", detail: "Her latest result in each test, rated Building to Elite for her age group, with a score. Only she and her coaches see them.", standard: "yes", advanced: "yes" },
+      { name: "Offseason squads", detail: "Her squad and every squad's points on the Leaderboard, after the head coach runs the draft.", standard: "yes", advanced: "yes" },
     ],
   },
   {

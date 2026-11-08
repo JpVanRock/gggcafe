@@ -102,6 +102,8 @@ export const SECTIONS: { title: string; rows: Row[] }[] = [
       row("Calendar", "Practices and events that show in TWIS; offseason dates.", ["yes", "yes", "view", "no", "no"], "Players see the dates in TWIS."),
       row("Practice Plans", "Build, finalize, print and share practice plans.", ["yes", "part", "no", "no", "no"],
         "Assistants view and print every plan but change only the plans they write; the head coach's plans are view only."),
+      row("Training", "The season roadmap, team routines, athletic testing and the offseason draft.", ["yes", "part", "view", "no", "no"],
+        "Assistants plan phases, push routines and run testing; the draft is head coach only. Players see their phase, routines and results."),
       row("GameDay", "Player cards, lineups and defensive rotations, the lineup card.", ["yes", "no", "no", "no", "no"]),
       row("Drill Library", "Every drill, tagged, with video links.", ["yes", "yes", "no", "no", "part"], "Mentors pick drills to suggest and can add new ones."),
       row("Team Budget", "Fees, payments, income and expenses.", ["yes", "yes", "no", "view", "no"], "Parents see team totals only, with no names."),
