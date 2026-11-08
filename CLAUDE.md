@@ -151,6 +151,13 @@ tests/unit/              node --test unit tests (npm run test:unit)
 - Coaches/admins fill dashboards in; players with an approved claim can open and edit their own (see
   Player accounts below).
 
+## Access FAQ (`/faq`, admins only, user 2026-11-08)
+- Every player feature side by side for Standard Access (approved claim) and Advanced Access (G3
+  Advanced), marked with softballs (`components/softball-icon.tsx`: included / not included / "Coach's
+  OK" when a coach or admin must also pick or confirm her), then common questions. Content in
+  `src/lib/access-faq.ts` (unit-tested): update it whenever a feature or its access changes. Admins
+  get an FAQ link in the top menu; everyone else gets a 404.
+
 ## Offseason Training Leaderboard and + Activity (user, 2026-11-08)
 - The "From the Dugout" strip on her dashboard has two more pills: Leaderboard
   (`/players/[id]/leaderboard?team=`) and + Activity (`/players/[id]/log`, log a session in a few taps).

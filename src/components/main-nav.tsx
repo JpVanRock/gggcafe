@@ -1,7 +1,7 @@
 // The top menu. Staff get the full menu (with a count of approvals waiting on the
 // Coaches Dugout) on every page, including the player (/me) and family (/family)
 // homes; everyone else gets `fallback`. Coaches and admins also get the
-// notifications bell (new Player of the Week...).
+// notifications bell (new Player of the Week...); admins get the Access FAQ.
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { canEdit, getCurrentUser } from "@/lib/auth";
@@ -47,6 +47,11 @@ export async function MainNav({ fallback = null }: { fallback?: ReactNode }) {
           )}
         </Link>
       ))}
+      {user.staff.role === "admin" && (
+        <Link href="/faq" className={linkClass}>
+          FAQ
+        </Link>
+      )}
       {editor && (
         <Link
           href="/notifications"
