@@ -26,6 +26,22 @@ export default function LeaderboardPage({ params, searchParams }: PageProps<"/pl
 }
 
 const heading = "mb-3 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
+
+/** The board's rallying cry (user, 2026-11-08: "This is meant to be fun"). */
+function BestVersion() {
+  return (
+    <header className="text-center">
+      <p className="flex items-center justify-center gap-3 font-mono text-xs tracking-[0.35em] text-pink-soft uppercase">
+        <SpeedStripes className="h-3 w-9 text-pink" />
+        Offseason Training
+        <SpeedStripes className="h-3 w-9 -scale-x-100 text-pink" />
+      </p>
+      <h2 className="mt-3 bg-linear-to-r from-highlight via-highlight to-pink bg-clip-text pb-1 font-display text-4xl leading-none font-black tracking-tight text-transparent uppercase italic sm:text-6xl">
+        Be the Best Version of You
+      </h2>
+    </header>
+  );
+}
 const STATUS_LABEL = { eligible: "In the running", "named-this-round": "Named this round" } as const;
 
 async function Leaderboard({ params, searchParams }: Pick<PageProps<"/players/[playerId]/leaderboard">, "params" | "searchParams">) {
@@ -68,14 +84,10 @@ async function Leaderboard({ params, searchParams }: Pick<PageProps<"/players/[p
       <SectionShell title="Leaderboard" subtitle={`${team.name} · Offseason Training`}>
         <div className="flex flex-col gap-6">
           {teamPills}
+          <BestVersion />
           <EmptyState>
             {board ? "Offseason Training hasn't started yet. Your coach sets the dates, and the leaderboard opens then." : "You can only see your own team's leaderboard."}
           </EmptyState>
-          {access.canManage && board && (
-            <Link href={`/dugout/calendar?team=${team.id}`} className="self-start text-sm text-pink hover:underline">
-              Coaches: set the offseason dates in the Coaches Dugout calendar →
-            </Link>
-          )}
         </div>
       </SectionShell>
     );
@@ -99,6 +111,8 @@ async function Leaderboard({ params, searchParams }: Pick<PageProps<"/players/[p
     <SectionShell title="Leaderboard" subtitle={`${team.name} · Offseason Training · ${span}`}>
       <div className="flex flex-col gap-10">
         {teamPills}
+
+        <BestVersion />
 
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
           {/* Player of the Week */}
@@ -124,7 +138,7 @@ async function Leaderboard({ params, searchParams }: Pick<PageProps<"/players/[p
             )}
             <div className="mt-5">
               <p className="font-mono text-[11px] tracking-wider text-muted uppercase">
-                Round {round} · {named.size} of {board.players.length} named · everyone gets her week
+                Round {round} · {named.size} of {board.players.length} named
               </p>
               <ul className="mt-2 flex flex-wrap gap-1.5">
                 {board.players
@@ -196,7 +210,7 @@ async function Leaderboard({ params, searchParams }: Pick<PageProps<"/players/[p
           </ol>
           <p className="mt-2 text-xs text-muted">
             Most points Monday to Sunday wins ({POTW_MIN} or more), named the Tuesday after. Each player is named once every {POTW_COOLDOWN_WEEKS} weeks at
-            most, and nobody wins twice until everyone has had her week.
+            most, and nobody wins twice until every teammate has won once.
           </p>
         </section>
 
@@ -209,12 +223,11 @@ async function Leaderboard({ params, searchParams }: Pick<PageProps<"/players/[p
                 <tr>
                   <th className={thClass}>Rank</th>
                   <th className={thClass}>Player</th>
-                  <th className={`${thClass} text-right`}>Points</th>
                   <th className={`${thClass} text-right`}>Training</th>
                   <th className={`${thClass} text-right`}>Workouts</th>
                   <th className={`${thClass} text-right`}>Lessons</th>
                   <th className={`${thClass} text-right`}>Unlocks</th>
-                  <th className={`${thClass} text-right`}>POTW</th>
+                  <th className={`${thClass} text-right`} title="Total points this offseason">Total</th>
                 </tr>
               </thead>
               <tbody>
@@ -227,12 +240,11 @@ async function Leaderboard({ params, searchParams }: Pick<PageProps<"/players/[p
                       </span>
                       {r.jersey_number && <span className="ml-2 font-mono text-xs text-muted">#{r.jersey_number}</span>}
                     </td>
-                    <td className={`${tdClass} text-right font-display text-lg font-bold tabular-nums`}>{r.points}</td>
                     <td className={`${tdClass} text-right tabular-nums`}>{r.training}</td>
                     <td className={`${tdClass} text-right tabular-nums`}>{r.workouts}</td>
                     <td className={`${tdClass} text-right tabular-nums`}>{r.lessons}</td>
                     <td className={`${tdClass} text-right tabular-nums`}>{r.unlocks}</td>
-                    <td className={`${tdClass} text-right tabular-nums`}>{r.times_named || "–"}</td>
+                    <td className={`${tdClass} text-right font-display text-xl font-bold text-highlight tabular-nums`}>{r.points}</td>
                   </tr>
                 ))}
               </tbody>
@@ -262,12 +274,6 @@ async function Leaderboard({ params, searchParams }: Pick<PageProps<"/players/[p
 
         {access.canManage && (
           <section className="flex flex-col gap-5 rounded-xl border border-navy-700 p-4">
-            <p className="text-sm text-muted">
-              Offseason dates: {span}.{" "}
-              <Link href={`/dugout/calendar?team=${team.id}`} className="text-pink hover:underline">
-                Change them in the Coaches Dugout calendar →
-              </Link>
-            </p>
             <div>
               <p className={heading}>Sessions logged in the last two weeks</p>
               {recent.length === 0 ? (

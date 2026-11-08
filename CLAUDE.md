@@ -168,6 +168,13 @@ tests/unit/              node --test unit tests (npm run test:unit)
   the team this season): names, numbers, points, weekly points, Players of the Week. Points and rules are
   in SQL (migration 20261108124500) and mirrored in `src/lib/leaderboard.ts` (no imports, unit-tested):
   change both together. DB tests: `tests/db/leaderboard.test.sql`.
+- Page (user, 2026-11-08: "meant to be fun"): "Be the Best Version of You" header; standings end with
+  Total (cumulative offseason points), no Player of the Week count column. The offseason dates appear only
+  at the very top (subtitle); no links to change them on this page.
+- Notifications (`notifications`, migration 20261108150000): each user sees and marks read only their own;
+  only the database writes them. A new Player of the Week notifies every coach and admin. Coaches/admins
+  get a bell with the unread count in the top menu (`unread_notifications()`, which first decides finished
+  weeks for every team in its offseason) and the list at `/notifications` (opening it marks them read).
 
 ## G3 Advanced (Level 2, `/players/[id]/advanced`)
 - The advanced tier (user, 2026-11-07): admin-approved per player now, a paid subscription later

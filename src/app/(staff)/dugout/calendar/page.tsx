@@ -9,7 +9,7 @@ import { monthGrid, monthLabel, monthOf, shiftMonth, type EventKind } from "@/li
 import { loadOwnTeams } from "../data";
 import { TeamPicker } from "../team-picker";
 import { CalendarView, type CalEvent, type CalGame } from "./calendar";
-import { OffseasonForm } from "./offseason";
+import { OffseasonForm, OffseasonPanel } from "./offseason";
 
 export const metadata: Metadata = { title: "Calendar · Coaches Dugout · GGG.Cafe" };
 
@@ -149,22 +149,18 @@ async function Calendar({ searchParams }: Pick<PageProps<"/dugout/calendar">, "s
           </Link>
         </nav>
       </div>
-      <section aria-label="Offseason Training" className="flex flex-col gap-3 rounded-2xl border border-neon/50 bg-neon/5 p-4 sm:p-5">
-        <div>
-          <h3 className="font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">Offseason Training</h3>
-          <p className="mt-1 text-sm">
-            {offseason
-              ? offseason.ends_on
-                ? `${formatLongDate(offseason.starts_on)} – ${formatLongDate(offseason.ends_on)}`
-                : `Started ${formatLongDate(offseason.starts_on)} · no end date yet`
-              : "Not set. The players' Leaderboard opens once you set a start date."}
-          </p>
-          <p className="mt-1 text-xs text-muted">
-            Only sessions and unlocks between these dates count on the players&apos; Leaderboard and for Player of the Week.
-          </p>
-        </div>
+      <OffseasonPanel
+        status={
+          offseason
+            ? offseason.ends_on
+              ? `${formatLongDate(offseason.starts_on)} – ${formatLongDate(offseason.ends_on)}`
+              : `Started ${formatLongDate(offseason.starts_on)} · no end date yet`
+            : "Not set. The players' Leaderboard opens once you set a start date."
+        }
+      >
+        <p className="text-xs text-muted">Only sessions and unlocks between these dates count on the players&apos; Leaderboard and for Player of the Week.</p>
         {editor && <OffseasonForm key={`${team.id}-${offseason?.starts_on}-${offseason?.ends_on}`} teamId={team.id} startsOn={offseason?.starts_on ?? null} endsOn={offseason?.ends_on ?? null} />}
-      </section>
+      </OffseasonPanel>
       <CalendarView
         key={`${team.id}-${month}`}
         teamId={team.id}

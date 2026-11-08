@@ -113,6 +113,34 @@ select pg_temp.expect('seven weeks decided once', (select count(*) from public.t
 reset role;
 select pg_temp.expect('seven weeks decided once (staff view)', (select count(*) from public.team_player_of_week), 7::bigint);
 
+-- Each new Player of the Week notified every coach and admin (five winners), not view-only staff
+select pg_temp.expect('coach notified of five Players of the Week',
+  (select count(*) from public.notifications where user_id = 'bbbbbbbb-0000-0000-0000-000000000002' and kind = 'player-of-the-week'), 5::bigint);
+select pg_temp.expect('viewer not notified',
+  (select count(*) from public.notifications where user_id = 'bbbbbbbb-0000-0000-0000-000000000004'), 0::bigint);
+select pg_temp.expect('first one names Avery',
+  (select title from public.notifications where user_id = 'bbbbbbbb-0000-0000-0000-000000000002' order by created_at, title limit 1) like 'Player of the Week: %', true);
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"bbbbbbbb-0000-0000-0000-000000000002"}', false);
+select pg_temp.expect('coach bell: five unread', public.unread_notifications(), 5);
+update public.notifications set read_at = now() where read_at is null;
+select pg_temp.expect('coach bell: all read', public.unread_notifications(), 0);
+do $$ begin
+  update public.notifications set title = 'changed';
+  raise exception 'FAIL: a coach rewrote a notification';
+exception when insufficient_privilege then null;
+end $$;
+do $$ begin
+  insert into public.notifications (user_id, kind, title) values ('bbbbbbbb-0000-0000-0000-000000000002', 'player-of-the-week', 'fake');
+  raise exception 'FAIL: a user wrote a notification';
+exception when insufficient_privilege then null;
+end $$;
+reset role;
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"bbbbbbbb-0000-0000-0000-000000000004"}', false);
+select pg_temp.expect('viewer sees none of the coach''s notifications', (select count(*) from public.notifications), 0::bigint);
+reset role;
+
 -- Another team's player can't see it; view-only staff can
 set role authenticated;
 select set_config('request.jwt.claims', '{"sub":"bbbbbbbb-0000-0000-0000-000000000003"}', false);
@@ -161,6 +189,7 @@ select pg_temp.expect('she removed them', (select count(*) from public.training_
 reset role;
 
 -- Clean up
+delete from public.notifications where user_id::text like 'bbbbbbbb-%';
 delete from public.training_logs where player_id::text like '00000000-0000-0000-0000-0000000000c%';
 delete from public.twis_checks where activity_id::text like 'bbbbbbbb-%';
 delete from public.player_activities where id::text like 'bbbbbbbb-%';
