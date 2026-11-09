@@ -13,7 +13,8 @@
     "db:types": "bash scripts/db-types.sh",
     "db:check": "bash scripts/db-check.sh",
     "test:unit": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test 'tests/unit/*.test.ts'",
-    "test:pages": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-pages.mjs"
+    "test:pages": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-pages.mjs",
+    "db:new:definer": "bash scripts/db-new-definer.sh"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

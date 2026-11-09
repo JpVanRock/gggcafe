@@ -80,7 +80,12 @@ tests/unit/              node --test unit tests (npm run test:unit)
 - Every new table: `select private.apply_staff_rls('public.<table>');` (staff read, coach/admin write).
   Exceptions need their own explicit policies and a reason.
 - Every view: `with (security_invoker = true)`, so RLS applies to the caller.
-- Security-definer helpers go in the `private` schema (not exposed by the API) with `set search_path = ''`.
+- Security-definer functions go in the `private` schema (not exposed by the API) with `set search_path = ''`, check
+  the caller first, and get their public wrapper and grants from `select private.expose('private.fn(args)')`
+  (add `array['anon', 'authenticated']` only for signed-out pages). Start one with `npm run db:new:definer <name>`
+  (template `supabase/templates/definer-function.sql`). `tests/db/zz_functions.test.sql` fails on a definer function
+  in public, one without the search_path, one everyone can run, or anything signed-out visitors can call beyond
+  sign-up. A new private helper used by RLS needs `grant execute … to authenticated` (PUBLIC no longer has it).
 - Run `npm run db:test` before `npm run db:push`. It checks stat math, RLS on every table,
   security_invoker on every view, and the viewer/coach/admin access rules.
 - Never edit an applied migration; add a new one (`npm run db:new <name>`).
@@ -555,8 +560,8 @@ tests/unit/              node --test unit tests (npm run test:unit)
   `actForCheck(playerId)` / `actorCheck()` in `src/lib/auth.ts`.
 - Softball IQ integrity: answer keys (`correct_index`, `explanation`) are not column-readable by anyone;
   `record_iq_answer()` grades and records every answer, `iq_answer_key()` returns keys (all for staff,
-  answered ones for a player); `start_iq_level`/`finish_iq_level`/`iq_review_status` are definer
-  wrappers that check `private.can_act_for()`. Players can't write answers or awards directly.
+  answered ones for a player); `start_iq_level`/`finish_iq_level`/`iq_review_status` are private
+  definer functions (behind `private.expose` wrappers) that check `private.can_act_for()`. Players can't write answers or awards directly.
 - DB tests: `tests/db/players.test.sql`.
 
 ## Coaches Dugout (`/dugout`, nav "Coaches Dugout")
