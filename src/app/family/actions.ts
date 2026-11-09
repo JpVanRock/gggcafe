@@ -7,6 +7,7 @@ import { text, type FormState } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import { isValidUsername, normalizeUsername } from "@/lib/player-logins";
 import { cleanMedical, cleanQuestionnaire } from "@/lib/family";
+import { STALE, failed, must, runAction } from "@/lib/actions";
 
 /** Creates her parent profile if needed, then asks to join a team with its code. */
 export async function joinTeam(_prev: FormState, fd: FormData): Promise<FormState> {
@@ -122,11 +123,14 @@ export async function saveMedicalAsParent(_prev: FormState, fd: FormData): Promi
   return { error: null, saved: true };
 }
 
-export async function markPacketRead(fd: FormData) {
-  const user = await getCurrentUser();
-  const itemId = text(fd, "item_id");
-  if (!user || !itemId || !isUuid(itemId)) return;
-  const supabase = await createClient();
-  await supabase.from("parent_packet_reads").upsert({ parent_id: user.id, item_id: itemId }, { onConflict: "parent_id,item_id" });
-  refresh();
+export async function markPacketRead(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const user = await getCurrentUser();
+    const itemId = text(fd, "item_id");
+    if (!user) return failed("Your session has ended. Sign in again.");
+    if (!itemId || !isUuid(itemId)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("parent_packet_reads").upsert({ parent_id: user.id, item_id: itemId }, { onConflict: "parent_id,item_id" }));
+    refresh();
+  });
 }

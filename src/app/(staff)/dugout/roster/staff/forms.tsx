@@ -11,6 +11,7 @@ export type DutyRow = { id: string; phase: DutyPhase; duty: string; owner: strin
 /** The whole matrix in one form: an owner for every job, saved together. */
 export function DutyMatrixForm({ duties, names }: { duties: DutyRow[]; names: string[] }) {
   const [state, action, pending] = useActionState(saveDutyOwners, initialFormState);
+  const [removed, remove] = useActionState(removeDuty, initialFormState);
   return (
     <form action={action} className="flex flex-col gap-5">
       <datalist id="staff-names">
@@ -31,7 +32,7 @@ export function DutyMatrixForm({ duties, names }: { duties: DutyRow[]; names: st
                     <span className="truncate">{d.duty}</span>
                     <input type="hidden" name={`was_${d.id}`} value={d.owner ?? ""} />
                     <input name={`owner_${d.id}`} defaultValue={d.owner ?? ""} maxLength={60} list="staff-names" placeholder="Who" aria-label={`Who: ${d.duty}`} className={`${inputClass} px-2 py-1 text-sm`} />
-                    <button type="submit" formAction={removeDuty} name="remove" value={d.id} aria-label={`Remove ${d.duty}`} className="rounded px-1.5 text-muted hover:text-danger">
+                    <button type="submit" formAction={remove} name="remove" value={d.id} aria-label={`Remove ${d.duty}`} className="rounded px-1.5 text-muted hover:text-danger">
                       ✕
                     </button>
                   </li>
@@ -45,7 +46,7 @@ export function DutyMatrixForm({ duties, names }: { duties: DutyRow[]; names: st
         <button type="submit" disabled={pending} className={buttonClass}>
           {pending ? "Saving…" : "Save who does what"}
         </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <FormMessage error={state.error ?? removed.error} saved={state.saved} />
       </div>
     </form>
   );

@@ -10,6 +10,7 @@ import { quizScore } from "@/lib/playbook";
 import { loadTeamRoster } from "../../../training/data";
 import { deleteQuiz, publishQuiz, removeQuizQuestion } from "../../actions";
 import { QuizQuestionForm } from "../../forms";
+import { ActionForm } from "@/components/action-form";
 
 export const metadata: Metadata = { title: "Team Quiz · Coaches Dugout · GGG.Cafe" };
 
@@ -65,20 +66,20 @@ export default async function QuizPage({ params }: PageProps<"/dugout/playbook/q
         </div>
         {editor && (
           <div className="flex flex-wrap items-center gap-3">
-            <form action={publishQuiz}>
+            <ActionForm action={publishQuiz}>
               <input type="hidden" name="id" value={quiz.id} />
               <input type="hidden" name="publish" value={quiz.published_at ? "0" : "1"} />
               <button type="submit" disabled={!quiz.published_at && questions.length === 0} className={quiz.published_at ? secondaryButtonClass : buttonClass}>
                 {quiz.published_at ? "Take it back to draft" : "Publish to players"}
               </button>
-            </form>
-            <form action={deleteQuiz}>
+            </ActionForm>
+            <ActionForm action={deleteQuiz}>
               <input type="hidden" name="id" value={quiz.id} />
               <input type="hidden" name="team_id" value={quiz.team_id} />
               <ConfirmSubmit message={`Delete “${quiz.title}” and every player's answers?`} className="text-sm text-muted hover:text-danger">
                 Delete quiz
               </ConfirmSubmit>
-            </form>
+            </ActionForm>
           </div>
         )}
       </header>
@@ -105,12 +106,12 @@ export default async function QuizPage({ params }: PageProps<"/dugout/playbook/q
                   {q.play && <p className="mt-1 text-xs text-pink-soft">Play: {q.play.name}</p>}
                 </div>
                 {editor && (
-                  <form action={removeQuizQuestion}>
+                  <ActionForm action={removeQuizQuestion}>
                     <input type="hidden" name="id" value={q.id} />
                     <ConfirmSubmit message="Remove this question (and the answers to it)?" className="text-xs text-muted hover:text-danger">
                       Remove
                     </ConfirmSubmit>
-                  </form>
+                  </ActionForm>
                 )}
               </li>
             ))}

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { friendlyDbError, isoDate, oneOf, text, type FormState } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import { EXPENSE_CATEGORIES, INCOME_CATEGORIES, PAYMENT_METHODS, centsToDollars, parseMoney } from "@/lib/budget";
+import { STALE, failed, must, runAction } from "@/lib/actions";
 
 function scope(fd: FormData) {
   const team_id = text(fd, "team_id");
@@ -118,11 +119,14 @@ export async function addEntry(_prev: FormState, fd: FormData): Promise<FormStat
   return { error: null, saved: true };
 }
 
-export async function deleteEntry(fd: FormData) {
-  if (await headCoachCheck()) return;
-  const id = text(fd, "id");
-  if (!isUuid(id)) return;
-  const supabase = await createClient();
-  await supabase.from("budget_entries").delete().eq("id", id);
-  refresh();
+export async function deleteEntry(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("budget_entries").delete().eq("id", id));
+    refresh();
+  });
 }

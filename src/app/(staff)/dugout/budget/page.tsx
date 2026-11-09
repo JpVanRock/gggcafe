@@ -13,6 +13,7 @@ import { loadDugoutTeam } from "../data";
 import { NoOwnTeam, TeamPicker } from "../team-picker";
 import { deleteEntry } from "./actions";
 import { AdjustmentForm, EntryForm, FeesForm, PaymentForm, type BudgetPlayer } from "./forms";
+import { ActionForm } from "@/components/action-form";
 
 export const metadata: Metadata = { title: "Team Budget · Coaches Dugout · GGG.Cafe" };
 
@@ -269,12 +270,12 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
                       <td className={`${tdClass} text-right font-semibold tabular-nums ${e.balance < 0 ? "text-danger" : ""}`}>{money(e.balance)}</td>
                       {editor && (
                         <td className={tdClass}>
-                          <form action={deleteEntry}>
+                          <ActionForm action={deleteEntry}>
                             <input type="hidden" name="id" value={e.id} />
                             <ConfirmSubmit message={`Remove “${item}” (${money(e.cents)}) from the ledger?`} className="text-xs text-danger hover:underline">
                               Remove
                             </ConfirmSubmit>
-                          </form>
+                          </ActionForm>
                         </td>
                       )}
                     </tr>

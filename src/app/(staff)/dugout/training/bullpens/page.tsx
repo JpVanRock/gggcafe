@@ -9,6 +9,7 @@ import { NoOwnTeam, TeamPicker } from "../../team-picker";
 import { TrainingNav } from "../nav";
 import { deleteBullpenScript } from "../actions";
 import { BullpenBuilder } from "../bullpen-builder";
+import { ActionForm } from "@/components/action-form";
 
 export const metadata: Metadata = { title: "Bullpens · Training · Coaches Dugout · GGG.Cafe" };
 
@@ -57,12 +58,12 @@ export default async function BullpensPage({ searchParams }: PageProps<"/dugout/
                     {s.notes && <p className="mt-1 text-sm text-ink/90">{s.notes}</p>}
                   </div>
                   {editor && (
-                    <form action={deleteBullpenScript}>
+                    <ActionForm action={deleteBullpenScript}>
                       <input type="hidden" name="id" value={s.id} />
                       <ConfirmSubmit message={`Remove "${s.name}"? Sessions already thrown stay.`} className="text-xs text-danger hover:underline">
                         Remove
                       </ConfirmSubmit>
-                    </form>
+                    </ActionForm>
                   )}
                 </div>
                 <ol className="mt-3 flex flex-wrap gap-1.5 text-xs">

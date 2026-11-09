@@ -6,6 +6,7 @@ import { formatDay } from "@/lib/dates";
 import { ROLE_LABEL, type StaffRole } from "@/lib/roles";
 import type { StaffRequestRow } from "@/lib/approvals";
 import { decideStaffRequest, removeStaff, setStaffRole } from "./actions";
+import { ActionForm } from "@/components/action-form";
 
 const item = "rounded-xl border border-pink/50 bg-navy-950/40 p-4";
 
@@ -22,7 +23,7 @@ export function PendingStaffList({ requests }: { requests: StaffRequestRow[] }) 
             {r.team_name && ` · ${r.team_name}`}
             {r.note && ` · ${r.note}`} · asked {formatDay(r.requested_at.slice(0, 10))}
           </p>
-          <form action={decideStaffRequest} className="mt-3 flex flex-wrap items-center gap-2">
+          <ActionForm action={decideStaffRequest} className="mt-3 flex flex-wrap items-center gap-2">
             <input type="hidden" name="user_id" value={r.user_id} />
             <button type="submit" name="decision" value="approve" className={buttonClass}>
               Approve
@@ -30,7 +31,7 @@ export function PendingStaffList({ requests }: { requests: StaffRequestRow[] }) 
             <button type="submit" name="decision" value="decline" className={secondaryButtonClass}>
               Decline
             </button>
-          </form>
+          </ActionForm>
         </li>
       ))}
     </ul>
@@ -53,7 +54,7 @@ export function StaffList({ staff, isAdmin, meId }: { staff: StaffMember[]; isAd
           </span>
           {isAdmin && s.role !== "admin" && s.user_id !== meId && (
             <span className="flex flex-wrap items-center gap-3">
-              <form action={setStaffRole} className="flex items-center gap-2">
+              <ActionForm action={setStaffRole} className="flex items-center gap-2">
                 <input type="hidden" name="user_id" value={s.user_id} />
                 <select name="role" defaultValue={s.role} aria-label={`${s.display_name}'s role`} className={`${inputClass} py-1 text-xs`}>
                   <option value="coach">Head Coach</option>
@@ -63,13 +64,13 @@ export function StaffList({ staff, isAdmin, meId }: { staff: StaffMember[]; isAd
                 <button type="submit" className="text-xs text-pink hover:underline">
                   Save
                 </button>
-              </form>
-              <form action={removeStaff}>
+              </ActionForm>
+              <ActionForm action={removeStaff}>
                 <input type="hidden" name="user_id" value={s.user_id} />
                 <ConfirmSubmit message={`Take ${s.display_name} off the coaching staff? Their account stays; they lose staff access.`} className="text-xs text-danger hover:underline">
                   Remove
                 </ConfirmSubmit>
-              </form>
+              </ActionForm>
             </span>
           )}
         </li>

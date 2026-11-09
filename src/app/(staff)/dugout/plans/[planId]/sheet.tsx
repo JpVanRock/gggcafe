@@ -7,6 +7,7 @@ import { PRACTICE_SETTING_LABEL, durationLabel, equipmentChecklist, planTimeline
 import type { PracticePlan, RosterPlayer, StaffContact } from "@/lib/practice-plans";
 import { deletePracticePlan, reopenPracticePlan, sharePracticePlan } from "../actions";
 import { ShareButton } from "./share-button";
+import { ActionForm } from "@/components/action-form";
 
 /** A finalized plan (or any plan, for viewers): read-only, with Print and Share. */
 export function PlanSheet({
@@ -60,21 +61,21 @@ export function PlanSheet({
             <ShareButton planId={plan.id} action={sharePracticePlan} returnPath={`/dugout/plans/${plan.id}`} staff={staff} label={plan.shared_at ? "Share again" : "Share"} className={pillOutlineClass} emailReady={emailReady} />
           )}
           {canEdit && final && (
-            <form action={reopenPracticePlan}>
+            <ActionForm action={reopenPracticePlan}>
               <input type="hidden" name="id" value={plan.id} />
               <button type="submit" className={pillQuietClass}>
                 Reopen to edit
               </button>
-            </form>
+            </ActionForm>
           )}
           {canEdit && (
-            <form action={deletePracticePlan} className="ml-auto">
+            <ActionForm action={deletePracticePlan} className="ml-auto">
               <input type="hidden" name="id" value={plan.id} />
               <input type="hidden" name="team_id" value={plan.team.id} />
               <ConfirmSubmit message="Delete this practice plan? This can't be undone." className="text-xs text-danger hover:underline">
                 Delete plan
               </ConfirmSubmit>
-            </form>
+            </ActionForm>
           )}
         </div>
       </header>

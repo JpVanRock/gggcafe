@@ -15,6 +15,7 @@ import { MENTAL_FIELDS } from "./shared";
 import { HITTING, HITTING_KEYS, MOVEMENT, MOVEMENT_KEYS, changes, cleanValues, type Values } from "@/lib/movement";
 import { CHAPTERS, type BoxMarks } from "@/lib/scorebook";
 import { GAME_COUNT, GAME_PLAYS, canonicalMarks } from "@/lib/scorebook-game";
+import { STALE, failed, must, runAction } from "@/lib/actions";
 
 // ---------------------------------------------------------------------------
 // TWIS check-offs
@@ -100,29 +101,35 @@ export async function addActivity(_prev: FormState, fd: FormData): Promise<FormS
 }
 
 /** Stop an ongoing activity from today on. Past check-offs stay. */
-export async function endActivity(fd: FormData): Promise<void> {
-  if (await actorCheck()) return;
-  const id = text(fd, "id");
-  if (!isUuid(id)) return;
-  const supabase = await createClient();
-  const today = todayISO();
-  const { data } = await supabase.from("player_activities").select("starts_on").eq("id", id).maybeSingle();
-  if (!data) return;
-  // Ends yesterday, so it's gone from today on; one that hasn't started yet ends on its start date.
-  const yesterday = addDays(today, -1);
-  const endsOn = yesterday < data.starts_on ? data.starts_on : yesterday;
-  await supabase.from("player_activities").update({ ends_on: endsOn }).eq("id", id);
-  refresh();
+export async function endActivity(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await actorCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    const today = todayISO();
+    const { data } = await supabase.from("player_activities").select("starts_on").eq("id", id).maybeSingle();
+    if (!data) return failed(STALE);
+    // Ends yesterday, so it's gone from today on; one that hasn't started yet ends on its start date.
+    const yesterday = addDays(today, -1);
+    const endsOn = yesterday < data.starts_on ? data.starts_on : yesterday;
+    must(await supabase.from("player_activities").update({ ends_on: endsOn }).eq("id", id));
+    refresh();
+  });
 }
 
 /** Remove an activity entirely, with its check-offs (for ones added by mistake). */
-export async function deleteActivity(fd: FormData): Promise<void> {
-  if (await actorCheck()) return;
-  const id = text(fd, "id");
-  if (!isUuid(id)) return;
-  const supabase = await createClient();
-  await supabase.from("player_activities").delete().eq("id", id);
-  refresh();
+export async function deleteActivity(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await actorCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("player_activities").delete().eq("id", id));
+    refresh();
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -289,26 +296,32 @@ export async function saveSmartGoal(_prev: FormState, fd: FormData): Promise<For
   return { error: null, saved: true };
 }
 
-export async function setSmartGoalStatus(fd: FormData): Promise<void> {
-  if (await actorCheck()) return;
-  const id = text(fd, "id");
-  const achieved = fd.get("status") === "achieved";
-  if (!isUuid(id)) return;
-  const supabase = await createClient();
-  await supabase
-    .from("development_goals")
-    .update({ status: achieved ? "achieved" : "active", achieved_on: achieved ? todayISO() : null })
-    .eq("id", id);
-  refresh();
+export async function setSmartGoalStatus(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await actorCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "id");
+    const achieved = fd.get("status") === "achieved";
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase
+      .from("development_goals")
+      .update({ status: achieved ? "achieved" : "active", achieved_on: achieved ? todayISO() : null })
+      .eq("id", id));
+    refresh();
+  });
 }
 
-export async function deleteSmartGoal(fd: FormData): Promise<void> {
-  if (await actorCheck()) return;
-  const id = text(fd, "id");
-  if (!isUuid(id)) return;
-  const supabase = await createClient();
-  await supabase.from("development_goals").delete().eq("id", id);
-  refresh();
+export async function deleteSmartGoal(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await actorCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("development_goals").delete().eq("id", id));
+    refresh();
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -513,13 +526,16 @@ export async function saveIqQuestion(_prev: FormState, fd: FormData): Promise<Fo
   return { error: null, saved: true };
 }
 
-export async function setIqQuestionActive(fd: FormData): Promise<void> {
-  if (await editorCheck()) return;
-  const id = text(fd, "id");
-  if (!isUuid(id)) return;
-  const supabase = await createClient();
-  await supabase.from("iq_questions").update({ active: fd.get("active") === "true" }).eq("id", id);
-  refresh();
+export async function setIqQuestionActive(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await editorCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("iq_questions").update({ active: fd.get("active") === "true" }).eq("id", id));
+    refresh();
+  });
 }
 
 // ---------------------------------------------------------------------------

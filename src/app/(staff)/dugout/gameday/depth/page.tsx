@@ -9,6 +9,7 @@ import { loadDugoutTeam } from "../../data";
 import { NoOwnTeam, TeamPicker } from "../../team-picker";
 import { GamedayNav } from "../nav";
 import { addToDepth, fillDepthFromPositions, moveInDepth, removeFromDepth } from "../actions";
+import { ActionForm } from "@/components/action-form";
 
 export const metadata: Metadata = { title: "Depth Chart · GameDay · GGG.Cafe" };
 
@@ -43,12 +44,12 @@ export default async function DepthChartPage({ searchParams }: PageProps<"/dugou
           <p className="mt-1 text-sm text-muted">Who plays where, best first. The lineup builder fills a rotation from it (&ldquo;Depth chart&rdquo; under each rotation).</p>
         </div>
         {editor && roster.length > 0 && (
-          <form action={fillDepthFromPositions}>
+          <ActionForm action={fillDepthFromPositions}>
             {fields({})}
             <button type="submit" className={buttonClass}>
               {rows.length ? "Add anyone missing from their positions" : "Start from player positions"}
             </button>
-          </form>
+          </ActionForm>
         )}
       </div>
       {roster.length === 0 ? (
@@ -71,24 +72,24 @@ export default async function DepthChartPage({ searchParams }: PageProps<"/dugou
                         <span className="min-w-0 flex-1 truncate">{byId.get(r.player_id)?.short}</span>
                         {editor && (
                           <span className="flex items-center">
-                            <form action={moveInDepth}>
+                            <ActionForm action={moveInDepth}>
                               {fields({ position: pos, player_id: r.player_id, dir: "up" })}
                               <button type="submit" disabled={i === 0} aria-label="Move up" className={iconButton}>
                                 ↑
                               </button>
-                            </form>
-                            <form action={moveInDepth}>
+                            </ActionForm>
+                            <ActionForm action={moveInDepth}>
                               {fields({ position: pos, player_id: r.player_id, dir: "down" })}
                               <button type="submit" disabled={i === list.length - 1} aria-label="Move down" className={iconButton}>
                                 ↓
                               </button>
-                            </form>
-                            <form action={removeFromDepth}>
+                            </ActionForm>
+                            <ActionForm action={removeFromDepth}>
                               {fields({ position: pos, player_id: r.player_id })}
                               <button type="submit" aria-label="Take off the chart" className={`${iconButton} hover:text-danger`}>
                                 ✕
                               </button>
-                            </form>
+                            </ActionForm>
                           </span>
                         )}
                       </li>
@@ -96,7 +97,7 @@ export default async function DepthChartPage({ searchParams }: PageProps<"/dugou
                   </ol>
                 )}
                 {editor && others.length > 0 && (
-                  <form action={addToDepth} className="mt-3 flex gap-2">
+                  <ActionForm action={addToDepth} className="mt-3 flex gap-2">
                     {fields({ position: pos })}
                     <select name="player_id" required defaultValue="" aria-label={`Add a player at ${pos}`} className={`${inputClass} px-2 py-1 text-sm`}>
                       <option value="" disabled>
@@ -111,7 +112,7 @@ export default async function DepthChartPage({ searchParams }: PageProps<"/dugou
                     <button type="submit" className="shrink-0 rounded-full border border-navy-600 px-3 text-xs font-semibold hover:border-pink hover:bg-pink hover:text-on-accent">
                       Add
                     </button>
-                  </form>
+                  </ActionForm>
                 )}
               </section>
             );

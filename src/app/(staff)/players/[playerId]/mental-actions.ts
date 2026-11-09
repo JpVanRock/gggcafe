@@ -13,6 +13,7 @@ import {
   ADJUSTMENT_MAX, INTENSITY_CONTEXTS, JOURNAL_LIMITS, SCAN_NOTE_MAX, SIGNALS, SIGNAL_MAX, isValidScan, monthStart, sessionBySlug,
 } from "@/lib/mental";
 import { setTwisCheck } from "./actions";
+import { STALE, failed, must, runAction } from "@/lib/actions";
 
 async function playerFrom(fd: FormData): Promise<{ playerId: string } | { error: string }> {
   const playerId = text(fd, "player_id");
@@ -69,13 +70,16 @@ export async function logIntensity(_prev: FormState, fd: FormData): Promise<Form
   return { error: null, saved: true };
 }
 
-export async function removeIntensityCheck(fd: FormData) {
-  const who = await playerFrom(fd);
-  const id = text(fd, "id");
-  if ("error" in who || !isUuid(id)) return;
-  const supabase = await createClient();
-  await supabase.from("mental_intensity_checks").delete().eq("id", id).eq("player_id", who.playerId);
-  refresh();
+export async function removeIntensityCheck(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const who = await playerFrom(fd);
+    const id = text(fd, "id");
+    if ("error" in who) return failed(who.error);
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("mental_intensity_checks").delete().eq("id", id).eq("player_id", who.playerId));
+    refresh();
+  });
 }
 
 /** This month's self-scan (one per month; saving again replaces it). */

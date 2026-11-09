@@ -22,6 +22,7 @@ import { suggestDefense, type DepthChart } from "@/lib/playbook";
 import type { StaffContact } from "@/lib/practice-plans";
 import { ShareButton } from "../../plans/[planId]/share-button";
 import { deleteLineup, finalizeLineup, saveLineup, shareLineup } from "../actions";
+import { ActionForm } from "@/components/action-form";
 
 const labelClass = "font-mono text-[10px] font-bold tracking-wider text-muted uppercase";
 const small = `${inputClass} px-2 py-1 text-sm`;
@@ -530,13 +531,13 @@ export function LineupBuilder({
             beforeSend={flush}
           />
           <span className="text-xs text-muted">Print opens the lineup card PDF. Share emails it to the coaching staff.</span>
-          <form action={deleteLineup} className="ml-auto">
+          <ActionForm action={deleteLineup} className="ml-auto">
             <input type="hidden" name="id" value={lineup.id} />
             <input type="hidden" name="team_id" value={lineup.team.id} />
             <ConfirmSubmit message="Delete this draft lineup? This can't be undone." className="text-xs text-danger hover:underline">
               Delete draft
             </ConfirmSubmit>
-          </form>
+          </ActionForm>
         </div>
         {problems.map((p) => (
           <p key={p} className="text-sm text-pink-soft">

@@ -12,6 +12,7 @@ import { TrainingNav } from "../nav";
 import { loadTeamRoster } from "../data";
 import { removeBpRound } from "../actions";
 import { BpRoundForm } from "./bp-form";
+import { ActionForm } from "@/components/action-form";
 
 export const metadata: Metadata = { title: "BP Rounds · Training · Coaches Dugout · GGG.Cafe" };
 
@@ -105,12 +106,12 @@ export default async function BpPage({ searchParams }: PageProps<"/dugout/traini
                     </span>
                   </span>
                   {editor && (
-                    <form action={removeBpRound}>
+                    <ActionForm action={removeBpRound}>
                       <input type="hidden" name="id" value={r.id} />
                       <ConfirmSubmit message="Remove this BP round?" className="text-xs text-muted hover:text-danger">
                         Remove
                       </ConfirmSubmit>
-                    </form>
+                    </ActionForm>
                   )}
                 </li>
               );

@@ -13,6 +13,7 @@ import { cleanScript } from "@/lib/bullpen";
 import { parseSwings } from "@/lib/box-score";
 import { todayISO } from "@/lib/dates";
 import { PHASE_KINDS, SQUAD_MAX, SQUAD_MIN, TESTS, onTheClock, suggestRoadmap, testByKey, tierFor, validCutoffs } from "@/lib/training-plan";
+import { STALE, failed, must, runAction } from "@/lib/actions";
 
 const category_is_pitching = (fd: FormData) => fd.get("category") === "pitching";
 
@@ -46,13 +47,16 @@ export async function savePhase(_prev: FormState, fd: FormData): Promise<FormSta
   return { error: null, saved: true };
 }
 
-export async function deletePhase(fd: FormData) {
-  if (await editorCheck()) return;
-  const id = text(fd, "id");
-  if (!isUuid(id)) return;
-  const supabase = await createClient();
-  await supabase.from("training_phases").delete().eq("id", id);
-  refresh();
+export async function deletePhase(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await editorCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("training_phases").delete().eq("id", id));
+    refresh();
+  });
 }
 
 /** Builds a roadmap backward from the first game and the championship (replacing the current one if asked). */
@@ -129,28 +133,35 @@ export async function saveTeamRoutine(_prev: TrainingState, fd: FormData): Promi
 }
 
 /** Ends a team routine today (or on its first day, if it hasn't started); every copy ends too. */
-export async function endTeamRoutine(fd: FormData) {
-  if (await editorCheck()) return;
-  const id = text(fd, "id");
-  if (!isUuid(id)) return;
-  const supabase = await createClient();
-  const { data } = await supabase.from("team_routines").select("starts_on").eq("id", id).maybeSingle();
-  if (!data) return;
-  const today = todayISO();
-  await supabase.from("team_routines").update({ ends_on: (data.starts_on as string) > today ? data.starts_on : today }).eq("id", id);
-  await supabase.rpc("sync_team_routine", { p_routine_id: id });
-  refresh();
+export async function endTeamRoutine(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await editorCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    const { data } = await supabase.from("team_routines").select("starts_on").eq("id", id).maybeSingle();
+    if (!data) return failed(STALE);
+    const today = todayISO();
+    must(await supabase.from("team_routines").update({ ends_on: (data.starts_on as string) > today ? data.starts_on : today }).eq("id", id));
+    must(await supabase.rpc("sync_team_routine", { p_routine_id: id }));
+    refresh();
+  });
 }
 
 /** Removes the template; players' copies end today and keep their check-offs. */
-export async function deleteTeamRoutine(fd: FormData) {
-  if (await editorCheck()) return;
-  const id = text(fd, "id");
-  if (!isUuid(id)) return;
-  await endTeamRoutine(fd);
-  const supabase = await createClient();
-  await supabase.from("team_routines").delete().eq("id", id);
-  refresh();
+export async function deleteTeamRoutine(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await editorCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "id");
+    if (!isUuid(id)) return failed(STALE);
+    const ended = await endTeamRoutine({ error: null }, fd);
+    if (ended.error) return ended;
+    const supabase = await createClient();
+    must(await supabase.from("team_routines").delete().eq("id", id));
+    refresh();
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -246,48 +257,57 @@ export async function createSquads(_prev: FormState, fd: FormData): Promise<Form
 }
 
 /** The squad on the clock picks this player (snake order). */
-export async function draftPick(fd: FormData) {
-  if (await headCoachCheck()) return;
-  const teamId = text(fd, "team_id");
-  const playerId = text(fd, "player_id");
-  if (!isUuid(teamId) || !isUuid(playerId)) return;
-  const supabase = await createClient();
-  const [{ data: squads }, { data: members }] = await Promise.all([
-    supabase.from("offseason_squads").select("id, pick_order").eq("team_id", teamId).order("pick_order"),
-    supabase.from("offseason_squad_members").select("pick_no").eq("team_id", teamId).gt("pick_no", 0),
-  ]);
-  const list = (squads ?? []) as { id: string }[];
-  if (list.length === 0) return;
-  const picks = (members ?? []).length;
-  const squad = list[onTheClock(list.length, picks)];
-  await supabase.from("offseason_squad_members").insert({ team_id: teamId, player_id: playerId, squad_id: squad.id, pick_no: picks + 1 });
-  refresh();
+export async function draftPick(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    const teamId = text(fd, "team_id");
+    const playerId = text(fd, "player_id");
+    if (!isUuid(teamId) || !isUuid(playerId)) return failed(STALE);
+    const supabase = await createClient();
+    const [{ data: squads }, { data: members }] = await Promise.all([
+      supabase.from("offseason_squads").select("id, pick_order").eq("team_id", teamId).order("pick_order"),
+      supabase.from("offseason_squad_members").select("pick_no").eq("team_id", teamId).gt("pick_no", 0),
+    ]);
+    const list = (squads ?? []) as { id: string }[];
+    if (list.length === 0) return failed("Set up the squads and their captains first.");
+    const picks = (members ?? []).length;
+    const squad = list[onTheClock(list.length, picks)];
+    must(await supabase.from("offseason_squad_members").insert({ team_id: teamId, player_id: playerId, squad_id: squad.id, pick_no: picks + 1 }));
+    refresh();
+  });
 }
 
-export async function undoPick(fd: FormData) {
-  if (await headCoachCheck()) return;
-  const teamId = text(fd, "team_id");
-  if (!isUuid(teamId)) return;
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("offseason_squad_members")
-    .select("player_id, pick_no")
-    .eq("team_id", teamId)
-    .gt("pick_no", 0)
-    .order("pick_no", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (data) await supabase.from("offseason_squad_members").delete().eq("team_id", teamId).eq("player_id", data.player_id);
-  refresh();
+export async function undoPick(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    const teamId = text(fd, "team_id");
+    if (!isUuid(teamId)) return failed(STALE);
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("offseason_squad_members")
+      .select("player_id, pick_no")
+      .eq("team_id", teamId)
+      .gt("pick_no", 0)
+      .order("pick_no", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (data) await supabase.from("offseason_squad_members").delete().eq("team_id", teamId).eq("player_id", data.player_id);
+    refresh();
+  });
 }
 
-export async function resetDraft(fd: FormData) {
-  if (await headCoachCheck()) return;
-  const teamId = text(fd, "team_id");
-  if (!isUuid(teamId)) return;
-  const supabase = await createClient();
-  await supabase.from("offseason_squads").delete().eq("team_id", teamId);
-  refresh();
+export async function resetDraft(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    const teamId = text(fd, "team_id");
+    if (!isUuid(teamId)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("offseason_squads").delete().eq("team_id", teamId));
+    refresh();
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -312,13 +332,16 @@ export async function saveBullpenScript(input: { id?: string | null; teamId: str
   return { error: null };
 }
 
-export async function deleteBullpenScript(fd: FormData) {
-  if (await editorCheck()) return;
-  const id = text(fd, "id");
-  if (!isUuid(id)) return;
-  const supabase = await createClient();
-  await supabase.from("bullpen_scripts").delete().eq("id", id);
-  refresh();
+export async function deleteBullpenScript(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await editorCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("bullpen_scripts").delete().eq("id", id));
+    refresh();
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -342,10 +365,14 @@ export async function saveBpRound(_prev: FormState, fd: FormData): Promise<FormS
   return { error: null, saved: true };
 }
 
-export async function removeBpRound(fd: FormData) {
-  const id = text(fd, "id");
-  if ((await editorCheck()) || !isUuid(id)) return;
-  const supabase = await createClient();
-  await supabase.from("bp_rounds").delete().eq("id", id);
-  refresh();
+export async function removeBpRound(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const id = text(fd, "id");
+    const denied = await editorCheck();
+    if (denied) return failed(denied);
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("bp_rounds").delete().eq("id", id));
+    refresh();
+  });
 }

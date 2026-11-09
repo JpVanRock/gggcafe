@@ -43,6 +43,12 @@ tests/unit/              node --test unit tests (npm run test:unit)
   `const { teams, team } = dugout` (`dugout/data.ts`, `dugout/team-picker.tsx`); `<TeamPicker>`; a tab's sub-menu is
   `<PillNav items={teamPages(PAGES, teamId)}>` (`components/pill-nav.tsx`).
 - Server actions that append to an ordered list: `nextPosition(supabase, table, column, value)` (`src/lib/db.ts`).
+- Every server action reports back. Form actions are `(prev: FormState, fd: FormData) => Promise<FormState>`: wrap the
+  body in `runAction(async () => {…})`, return `failed(message)` for a check that fails (`failed(denied)` for
+  permission, `failed(STALE)` for a malformed or stale form), and wrap writes in `must(await supabase…)` so a database
+  error becomes a message (`src/lib/actions.ts`). A form without its own client component uses
+  `<ActionForm action={…}>` (`components/action-form.tsx`), which shows the message after its controls. Never
+  `return;` silently.
 - Names: `playerName()` in `src/lib/softball.ts`.
 - Rosters: `src/lib/roster.ts`. A team's players: `loadRoster(supabase, teamId, { seasonId?, order? })` (active, current
   season by default); the season: `currentSeason()` / `seasonOrCurrent()` (the database's `team_current_season`, the

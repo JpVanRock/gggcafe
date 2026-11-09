@@ -27,6 +27,7 @@ import { deletePracticePlan, finalizePracticePlan, savePracticePlan, sharePracti
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { formatLongDate } from "@/lib/dates";
 import { ShareButton } from "./share-button";
+import { ActionForm } from "@/components/action-form";
 
 type Block = PlanBlock & { key: string };
 type Setup = {
@@ -950,13 +951,13 @@ export function PlanBuilder({
             beforeSend={flush}
           />
           <span className="text-xs text-muted">Print opens the PDF. Share emails it to the coaching staff.</span>
-          <form action={deletePracticePlan} className="ml-auto">
+          <ActionForm action={deletePracticePlan} className="ml-auto">
             <input type="hidden" name="id" value={plan.id} />
             <input type="hidden" name="team_id" value={plan.team.id} />
             <ConfirmSubmit message="Delete this draft practice plan? This can't be undone." className="text-xs text-danger hover:underline">
               Delete draft
             </ConfirmSubmit>
-          </form>
+          </ActionForm>
         </div>
         {problems.length > 0 && (
           <ul className="text-sm text-pink-soft">

@@ -14,6 +14,7 @@ import { deleteTeamEvent, removeFromRoster } from "../actions";
 import { LogoUpload } from "./logo-upload";
 import { ClaimsCard } from "./claims";
 import { loadTeamApprovals, type ClaimRow, type SpotOption } from "@/lib/approvals";
+import { ActionForm } from "@/components/action-form";
 import {
   ExistingRosterPlayerForm, GameForm, NewRosterPlayerForm, RosterEntryEditor, SeasonForm, TeamEventForm, TeamForm,
 } from "../forms";
@@ -231,12 +232,12 @@ export default async function TeamPage({
                             <summary className={`${secondaryButtonClass} cursor-pointer list-none`}>Edit</summary>
                             <div className="mt-2 flex flex-col gap-2 rounded-md border border-navy-700 p-3">
                               <RosterEntryEditor id={r.id} jersey={r.jersey_number} active={r.active} />
-                              <form action={removeFromRoster}>
+                              <ActionForm action={removeFromRoster}>
                                 <input type="hidden" name="id" value={r.id} />
                                 <button type="submit" className="text-xs text-danger hover:underline">
                                   Remove from {season.name} roster
                                 </button>
-                              </form>
+                              </ActionForm>
                             </div>
                           </details>
                         </td>
@@ -287,7 +288,7 @@ export default async function TeamPage({
                   <span className="font-medium">{row.title}</span>
                   <span className="text-muted">{[row.time, row.where].filter(Boolean).join(" · ")}</span>
                   {editor && row.eventId && (
-                    <form action={deleteTeamEvent} className="ml-auto">
+                    <ActionForm action={deleteTeamEvent} className="ml-auto">
                       <input type="hidden" name="id" value={row.eventId} />
                       <ConfirmSubmit
                         message={`Remove ${row.title} on ${formatDay(row.date)}? Players' check-offs for it go too.`}
@@ -295,7 +296,7 @@ export default async function TeamPage({
                       >
                         Remove
                       </ConfirmSubmit>
-                    </form>
+                    </ActionForm>
                   )}
                 </li>
               ))}

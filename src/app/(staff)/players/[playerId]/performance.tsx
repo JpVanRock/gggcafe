@@ -12,6 +12,7 @@ import type { Performance, RoutineRow } from "./data";
 import type { MyTesting } from "./testing-data";
 import { DetailHeading, MenuItem } from "./menu";
 import { RoutineForm } from "./performance-client";
+import { ActionForm } from "@/components/action-form";
 
 const monthDay = new Intl.DateTimeFormat("en-US", { timeZone: "UTC", month: "short", day: "numeric" });
 const short = (iso: string) => monthDay.format(new Date(`${iso}T00:00:00Z`));
@@ -149,14 +150,14 @@ function RoutineCard({ r, today, canEdit, playerId }: { r: RoutineRow; today: st
         {canEdit && !fromCoach && (
           <div className="flex items-center gap-2">
             {(!r.ends_on || r.ends_on >= today) && (
-              <form action={endActivity}>
+              <ActionForm action={endActivity}>
                 <input type="hidden" name="id" value={r.id} />
                 <button type="submit" className={secondaryButtonClass}>
                   End
                 </button>
-              </form>
+              </ActionForm>
             )}
-            <form action={deleteActivity}>
+            <ActionForm action={deleteActivity}>
               <input type="hidden" name="id" value={r.id} />
               <ConfirmSubmit
                 message={`Delete “${r.title}” and its check-offs? Use End to keep the history (achievements already earned stay either way).`}
@@ -164,7 +165,7 @@ function RoutineCard({ r, today, canEdit, playerId }: { r: RoutineRow; today: st
               >
                 Delete
               </ConfirmSubmit>
-            </form>
+            </ActionForm>
           </div>
         )}
       </div>

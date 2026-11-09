@@ -17,6 +17,7 @@ import { loadCoachingStaff, loadPlanRoster, loadPracticePlan, type PracticePlan 
 import { emailConfigured, escapeHtml, sendEmail } from "@/lib/email";
 import { NOTE_LIMITS, cleanNote } from "@/lib/install";
 import { practicePlanFilename, renderPracticePlanPdf } from "@/lib/pdf/practice-plan-pdf";
+import { STALE, failed, must, runAction } from "@/lib/actions";
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
@@ -185,21 +186,29 @@ export async function finalizePracticePlan(planId: string): Promise<{ error: str
   return { error: null };
 }
 
-export async function reopenPracticePlan(fd: FormData) {
-  const id = text(fd, "id");
-  if (!isUuid(id) || (await planEditCheck(id))) return;
-  const supabase = await createClient();
-  await supabase.from("practice_plans").update({ status: "draft", finalized_at: null }).eq("id", id);
-  refresh();
+export async function reopenPracticePlan(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const id = text(fd, "id");
+    if (!isUuid(id)) return failed(STALE);
+    const denied = await planEditCheck(id);
+    if (denied) return failed(denied);
+    const supabase = await createClient();
+    must(await supabase.from("practice_plans").update({ status: "draft", finalized_at: null }).eq("id", id));
+    refresh();
+  });
 }
 
-export async function deletePracticePlan(fd: FormData) {
-  const id = text(fd, "id");
-  const teamId = text(fd, "team_id");
-  if (!isUuid(id) || (await planEditCheck(id))) return;
-  const supabase = await createClient();
-  await supabase.from("practice_plans").delete().eq("id", id);
-  redirect(isUuid(teamId) ? `/dugout/plans?team=${teamId}` : "/dugout/plans");
+export async function deletePracticePlan(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const id = text(fd, "id");
+    const teamId = text(fd, "team_id");
+    if (!isUuid(id)) return failed(STALE);
+    const denied = await planEditCheck(id);
+    if (denied) return failed(denied);
+    const supabase = await createClient();
+    must(await supabase.from("practice_plans").delete().eq("id", id));
+    redirect(isUuid(teamId) ? `/dugout/plans?team=${teamId}` : "/dugout/plans");
+  });
 }
 
 // ---------------------------------------------------------------------------

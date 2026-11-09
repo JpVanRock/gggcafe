@@ -10,6 +10,7 @@ import { TrainingNav } from "../nav";
 import { loadSquads, loadTeamRoster } from "../data";
 import { draftPick, resetDraft, undoPick } from "../actions";
 import { SquadsForm } from "../forms";
+import { ActionForm } from "@/components/action-form";
 
 export const metadata: Metadata = { title: "Offseason draft · Training · Coaches Dugout · GGG.Cafe" };
 
@@ -69,14 +70,14 @@ export default async function DraftPage({ searchParams }: PageProps<"/dugout/tra
               <ul className="flex flex-wrap gap-2">
                 {remaining.map((p) => (
                   <li key={p.id}>
-                    <form action={draftPick}>
+                    <ActionForm action={draftPick}>
                       <input type="hidden" name="team_id" value={team.id} />
                       <input type="hidden" name="player_id" value={p.id} />
                       <button type="submit" className="rounded-full border border-navy-600 px-3 py-1.5 text-sm font-semibold transition hover:border-pink hover:bg-pink hover:text-on-accent">
                         {p.number && <span className="mr-1 font-display tabular-nums">#{p.number}</span>}
                         {p.name}
                       </button>
-                    </form>
+                    </ActionForm>
                   </li>
                 ))}
               </ul>
@@ -109,19 +110,19 @@ export default async function DraftPage({ searchParams }: PageProps<"/dugout/tra
 
           <div className="flex flex-wrap items-center gap-3">
             {picks > 0 && (
-              <form action={undoPick}>
+              <ActionForm action={undoPick}>
                 <input type="hidden" name="team_id" value={team.id} />
                 <button type="submit" className={secondaryButtonClass}>
                   Undo last pick
                 </button>
-              </form>
+              </ActionForm>
             )}
-            <form action={resetDraft} className="ml-auto">
+            <ActionForm action={resetDraft} className="ml-auto">
               <input type="hidden" name="team_id" value={team.id} />
               <ConfirmSubmit message="Start the draft over? Every squad and pick is removed (points stay with the players)." className="text-xs text-danger hover:underline">
                 Start over
               </ConfirmSubmit>
-            </form>
+            </ActionForm>
           </div>
         </>
       )}

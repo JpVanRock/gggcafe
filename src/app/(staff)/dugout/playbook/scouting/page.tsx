@@ -12,6 +12,7 @@ import { NoOwnTeam, TeamPicker } from "../../team-picker";
 import { PlaybookNav } from "../nav";
 import { removeScoutReport } from "../actions";
 import { ScoutNoteForm, ScoutingForm } from "../forms";
+import { ActionForm } from "@/components/action-form";
 
 export const metadata: Metadata = { title: "Scouting · Coaches Dugout · GGG.Cafe" };
 
@@ -127,12 +128,12 @@ export default async function ScoutingPage({ searchParams }: PageProps<"/dugout/
                               <div className="flex items-baseline justify-between gap-2">
                                 <p className="font-semibold text-ink">{r.title}</p>
                                 {editor && (
-                                  <form action={removeScoutReport}>
+                                  <ActionForm action={removeScoutReport}>
                                     <input type="hidden" name="id" value={r.id} />
                                     <ConfirmSubmit message={`Remove “${r.title}”?`} className="text-xs text-muted hover:text-danger">
                                       Remove
                                     </ConfirmSubmit>
-                                  </form>
+                                  </ActionForm>
                                 )}
                               </div>
                               <p className="mt-1 whitespace-pre-line text-ink/90">{r.body}</p>

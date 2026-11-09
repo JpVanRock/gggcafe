@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { allOf, friendlyDbError, text, type FormState } from "@/lib/form";
 import { DRILL_TAGS } from "@/lib/dugout";
 import { isUuid } from "@/lib/softball";
+import { STALE, failed, must, runAction } from "@/lib/actions";
 
 const DUPLICATE = "A drill with that name is already in the library.";
 
@@ -45,11 +46,14 @@ export async function saveDrill(_prev: FormState, fd: FormData): Promise<FormSta
   return { error: null, saved: true };
 }
 
-export async function deleteDrill(fd: FormData) {
-  if (await editorCheck()) return;
-  const id = text(fd, "id");
-  if (!isUuid(id)) return;
-  const supabase = await createClient();
-  await supabase.from("practice_drills").delete().eq("id", id);
-  refresh();
+export async function deleteDrill(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await editorCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("practice_drills").delete().eq("id", id));
+    refresh();
+  });
 }

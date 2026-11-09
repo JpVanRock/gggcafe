@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { friendlyDbError, oneOf, text, type FormState } from "@/lib/form";
 import { isUuid, playerName } from "@/lib/softball";
 import { GOAL_PHASES, MOTTO_MAX, SPOTLIGHT } from "@/lib/culture";
+import { STALE, failed, must, runAction } from "@/lib/actions";
 
 export async function saveTeamDugout(_prev: FormState, fd: FormData): Promise<FormState> {
   const denied = await headCoachCheck();
@@ -88,22 +89,28 @@ export async function saveGoal(_prev: FormState, fd: FormData): Promise<FormStat
   return { error: null, saved: true };
 }
 
-export async function setGoalAchieved(fd: FormData) {
-  if (await headCoachCheck()) return;
-  const id = text(fd, "id");
-  if (!isUuid(id)) return;
-  const supabase = await createClient();
-  await supabase.from("team_goals").update({ achieved_at: fd.get("achieved") === "on" ? new Date().toISOString() : null }).eq("id", id);
-  refresh();
+export async function setGoalAchieved(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("team_goals").update({ achieved_at: fd.get("achieved") === "on" ? new Date().toISOString() : null }).eq("id", id));
+    refresh();
+  });
 }
 
-export async function deleteGoal(fd: FormData) {
-  if (await headCoachCheck()) return;
-  const id = text(fd, "id");
-  if (!isUuid(id)) return;
-  const supabase = await createClient();
-  await supabase.from("team_goals").delete().eq("id", id);
-  refresh();
+export async function deleteGoal(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("team_goals").delete().eq("id", id));
+    refresh();
+  });
 }
 
 export async function saveSpotlight(_prev: FormState, fd: FormData): Promise<FormState> {
@@ -140,11 +147,14 @@ export async function saveSpotlight(_prev: FormState, fd: FormData): Promise<For
   return { error: null, saved: true };
 }
 
-export async function deleteSpotlight(fd: FormData) {
-  if (await headCoachCheck()) return;
-  const id = text(fd, "id");
-  if (!isUuid(id)) return;
-  const supabase = await createClient();
-  await supabase.from("player_spotlights").delete().eq("id", id);
-  refresh();
+export async function deleteSpotlight(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("player_spotlights").delete().eq("id", id));
+    refresh();
+  });
 }

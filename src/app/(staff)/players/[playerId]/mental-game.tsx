@@ -13,6 +13,7 @@ import { IntensityForm, ScanForm, SignalsForm } from "./mental-game-client";
 import type { IntensityCheck, MentalScan } from "./mental-data";
 import type { MentalPlan } from "./shared";
 import { DetailHeading } from "./menu";
+import { ActionForm } from "@/components/action-form";
 
 // Cards stay in brand colors; only the small signal light uses traffic colors (red is the brand pink).
 const DOT: Record<"green" | "yellow" | "red", string> = { green: "bg-[#2bd576]", yellow: "bg-[#ffc93c]", red: "bg-pink" };
@@ -126,13 +127,13 @@ export function MentalTools({
                     </span>
                     {c.adjustment && <span className="text-ink/90">{c.adjustment}</span>}
                     {canEdit && (
-                      <form action={removeIntensityCheck} className="ml-auto">
+                      <ActionForm action={removeIntensityCheck} className="ml-auto">
                         <input type="hidden" name="player_id" value={playerId} />
                         <input type="hidden" name="id" value={c.id} />
                         <ConfirmSubmit message="Remove this check?" className="text-xs text-muted hover:text-danger">
                           Remove
                         </ConfirmSubmit>
-                      </form>
+                      </ActionForm>
                     )}
                   </li>
                 );

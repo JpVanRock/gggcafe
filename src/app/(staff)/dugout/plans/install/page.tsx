@@ -14,6 +14,7 @@ import { NoOwnTeam, TeamPicker } from "../../team-picker";
 import { PlansNav } from "../plans-nav";
 import { loadStarterInstall, removeInstallItem, setInstallStatus } from "./actions";
 import { AddInstallItemForm } from "./forms";
+import { ActionForm } from "@/components/action-form";
 
 export const metadata: Metadata = { title: "Install Checklist · Coaches Dugout · GGG.Cafe" };
 
@@ -54,7 +55,7 @@ function StatusControl({ item, editor }: { item: ItemRow; editor: boolean }) {
     );
   }
   return (
-    <form action={setInstallStatus} className="flex flex-wrap gap-1" aria-label={`Status of ${item.title}`}>
+    <ActionForm action={setInstallStatus} className="flex flex-wrap gap-1" aria-label={`Status of ${item.title}`}>
       <input type="hidden" name="id" value={item.id} />
       {INSTALL_STATUSES.map((s) => {
         const on = s === item.status;
@@ -73,7 +74,7 @@ function StatusControl({ item, editor }: { item: ItemRow; editor: boolean }) {
           </button>
         );
       })}
-    </form>
+    </ActionForm>
   );
 }
 
@@ -199,12 +200,12 @@ export default async function InstallPage({ searchParams }: PageProps<"/dugout/p
         <EmptyState>
           No install checklist yet.
           {editor && (
-            <form action={loadStarterInstall} className="mt-3">
+            <ActionForm action={loadStarterInstall} className="mt-3">
               <input type="hidden" name="team_id" value={team.id} />
               <button type="submit" className={buttonClass}>
                 Load the starter checklist ({STARTER_ITEMS.length} items)
               </button>
-            </form>
+            </ActionForm>
           )}
         </EmptyState>
       ) : (
@@ -233,12 +234,12 @@ export default async function InstallPage({ searchParams }: PageProps<"/dugout/p
                               <div className="flex items-start justify-between gap-3">
                                 <p className="text-sm font-medium text-ink">{item.title}</p>
                                 {editor && (
-                                  <form action={removeInstallItem}>
+                                  <ActionForm action={removeInstallItem}>
                                     <input type="hidden" name="id" value={item.id} />
                                     <ConfirmSubmit message={`Remove “${item.title}” from the checklist?`} className="text-xs text-muted hover:text-danger">
                                       Remove
                                     </ConfirmSubmit>
-                                  </form>
+                                  </ActionForm>
                                 )}
                               </div>
                               <StatusControl item={item} editor={editor} />
@@ -269,12 +270,12 @@ export default async function InstallPage({ searchParams }: PageProps<"/dugout/p
         <Disclosure summary="Add to the checklist">
           <AddInstallItemForm teamId={team.id} situationGroups={situationGroups} />
           {items.length < STARTER_ITEMS.length && (
-            <form action={loadStarterInstall} className="mt-4">
+            <ActionForm action={loadStarterInstall} className="mt-4">
               <input type="hidden" name="team_id" value={team.id} />
               <button type="submit" className="text-sm font-semibold text-pink-soft hover:underline">
                 Add any starter items we don&apos;t have yet
               </button>
-            </form>
+            </ActionForm>
           )}
         </Disclosure>
       )}

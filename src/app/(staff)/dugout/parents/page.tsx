@@ -12,6 +12,7 @@ import { loadTeamApprovals } from "@/lib/approvals";
 import { PACKET_KIND_LABEL, type PacketKind } from "@/lib/family";
 import { addStarterTips, deletePacketItem } from "./actions";
 import { PacketItemForm } from "./packet-forms";
+import { ActionForm } from "@/components/action-form";
 
 export const metadata: Metadata = { title: "Parents · Coaches Dugout · GGG.Cafe" };
 
@@ -61,19 +62,19 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
                 {code.slice(0, 3)}-{code.slice(3)}
               </p>
               <div className="flex flex-wrap gap-2">
-                <form action={setParentCode}>
+                <ActionForm action={setParentCode}>
                   <input type="hidden" name="team_id" value={team.id} />
                   <ConfirmSubmit message="Make a new code? The old code stops working. Parents already approved keep access." className={pillQuietClass}>
                     New code
                   </ConfirmSubmit>
-                </form>
-                <form action={setParentCode}>
+                </ActionForm>
+                <ActionForm action={setParentCode}>
                   <input type="hidden" name="team_id" value={team.id} />
                   <input type="hidden" name="mode" value="off" />
                   <ConfirmSubmit message="Turn off parent sign-up for this team? Parents already approved keep access." className={pillQuietClass}>
                     Turn off
                   </ConfirmSubmit>
-                </form>
+                </ActionForm>
               </div>
             </div>
             <p className="text-sm text-muted">
@@ -87,12 +88,12 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
             <p className="text-sm text-muted">
               Parent sign-up is off for {team.name}. Turn it on to get a team code to send parents.
             </p>
-            <form action={setParentCode}>
+            <ActionForm action={setParentCode}>
               <input type="hidden" name="team_id" value={team.id} />
               <button type="submit" className={buttonClass}>
                 Turn on parent sign-up
               </button>
-            </form>
+            </ActionForm>
           </div>
         )}
       </Card>
@@ -118,12 +119,12 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
                   </p>
                   <p className="text-sm text-muted">Parent of {l.player_id ? (nameOf.get(l.player_id) ?? l.child_name) : l.child_name}</p>
                 </div>
-                <form action={removeParentLink}>
+                <ActionForm action={removeParentLink}>
                   <input type="hidden" name="link_id" value={l.link_id} />
                   <ConfirmSubmit message={`Remove ${l.parent_name}'s access to ${team.name}?`} className="text-xs text-danger hover:underline">
                     Remove access
                   </ConfirmSubmit>
-                </form>
+                </ActionForm>
               </li>
             ))}
           </ul>
@@ -138,12 +139,12 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
                 <span>
                   {l.parent_name} <span className="text-muted">· {l.email} · for {l.child_name}</span>
                 </span>
-                <form action={removeParentLink}>
+                <ActionForm action={removeParentLink}>
                   <input type="hidden" name="link_id" value={l.link_id} />
                   <button type="submit" className="text-xs text-muted hover:text-danger">
                     Clear
                   </button>
-                </form>
+                </ActionForm>
               </li>
             ))}
           </ul>
@@ -178,12 +179,12 @@ async function PacketSection({ teamId }: { teamId: string }) {
               <p className="mt-1 font-semibold">{it.title}</p>
               <p className="mt-1 line-clamp-3 text-sm whitespace-pre-wrap text-ink/90">{it.body}</p>
               <div className="mt-2 flex flex-wrap items-center gap-3">
-                <form action={deletePacketItem}>
+                <ActionForm action={deletePacketItem}>
                   <input type="hidden" name="id" value={it.id} />
                   <ConfirmSubmit message={`Remove "${it.title}" from the packet?`} className="text-xs text-muted hover:text-danger">
                     Remove
                   </ConfirmSubmit>
-                </form>
+                </ActionForm>
                 <div className="w-full">
                   <Disclosure summary="Edit">
                     <PacketItemForm teamId={teamId} item={it} />
@@ -197,12 +198,12 @@ async function PacketSection({ teamId }: { teamId: string }) {
       <Disclosure summary="Add to the packet" open={list.length === 0}>
         <PacketItemForm teamId={teamId} />
       </Disclosure>
-      <form action={addStarterTips}>
+      <ActionForm action={addStarterTips}>
         <input type="hidden" name="team_id" value={teamId} />
         <button type="submit" className="text-sm font-semibold text-pink hover:underline">
           + Add the starter &ldquo;how to help her&rdquo; tips
         </button>
-      </form>
+      </ActionForm>
     </section>
   );
 }

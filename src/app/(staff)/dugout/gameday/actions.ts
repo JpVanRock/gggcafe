@@ -23,6 +23,7 @@ import { loadCoachingStaff } from "@/lib/practice-plans";
 import { emailConfigured, escapeHtml, sendEmail } from "@/lib/email";
 import { lineupFilename, renderLineupPdf } from "@/lib/pdf/lineup-pdf";
 import type { ShareResult } from "../plans/actions";
+import { STALE, failed, must, runAction } from "@/lib/actions";
 
 // ---------------------------------------------------------------------------
 // Player cards (hitting type, base running, typed stats) for a team + season
@@ -210,23 +211,29 @@ export async function finalizeLineup(lineupId: string): Promise<{ error: string 
   return { error: null };
 }
 
-export async function reopenLineup(fd: FormData) {
-  if (await headCoachCheck()) return;
-  const id = text(fd, "id");
-  if (!isUuid(id)) return;
-  const supabase = await createClient();
-  await supabase.from("gameday_lineups").update({ status: "draft", finalized_at: null }).eq("id", id);
-  refresh();
+export async function reopenLineup(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("gameday_lineups").update({ status: "draft", finalized_at: null }).eq("id", id));
+    refresh();
+  });
 }
 
-export async function deleteLineup(fd: FormData) {
-  if (await headCoachCheck()) return;
-  const id = text(fd, "id");
-  const teamId = text(fd, "team_id");
-  if (!isUuid(id)) return;
-  const supabase = await createClient();
-  await supabase.from("gameday_lineups").delete().eq("id", id);
-  redirect(isUuid(teamId) ? `/dugout/gameday?team=${teamId}` : "/dugout/gameday");
+export async function deleteLineup(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "id");
+    const teamId = text(fd, "team_id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("gameday_lineups").delete().eq("id", id));
+    redirect(isUuid(teamId) ? `/dugout/gameday?team=${teamId}` : "/dugout/gameday");
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -321,71 +328,88 @@ async function depthRows(supabase: Awaited<ReturnType<typeof createClient>>, tea
   return (data ?? []) as DepthRow[];
 }
 
-export async function addToDepth(fd: FormData) {
-  const teamId = text(fd, "team_id");
-  const position = text(fd, "position");
-  const playerId = text(fd, "player_id");
-  if ((await headCoachCheck()) || !isUuid(teamId) || !isUuid(playerId) || !DEPTH_POSITIONS.includes(position as DepthPosition)) return;
-  const supabase = await createClient();
-  const rows = await depthRows(supabase, teamId, position!);
-  if (rows.some((r) => r.player_id === playerId) || rows.length >= 30) return;
-  await supabase.from("depth_chart").insert({ team_id: teamId, position: position!, player_id: playerId, rank: (rows.at(-1)?.rank ?? 0) + 1 });
-  refresh();
+export async function addToDepth(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const teamId = text(fd, "team_id");
+    const position = text(fd, "position");
+    const playerId = text(fd, "player_id");
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    if (!isUuid(teamId) || !isUuid(playerId) || !DEPTH_POSITIONS.includes(position as DepthPosition)) return failed(STALE);
+    const supabase = await createClient();
+    const rows = await depthRows(supabase, teamId, position!);
+    if (rows.some((r) => r.player_id === playerId)) return; // already on the chart: nothing to do
+    if (rows.length >= 30) return failed("Up to 30 players at one position.");
+    must(await supabase.from("depth_chart").insert({ team_id: teamId, position: position!, player_id: playerId, rank: (rows.at(-1)?.rank ?? 0) + 1 }));
+    refresh();
+  });
 }
 
-export async function moveInDepth(fd: FormData) {
-  const teamId = text(fd, "team_id");
-  const position = text(fd, "position");
-  const playerId = text(fd, "player_id");
-  const dir = text(fd, "dir") === "up" ? -1 : 1;
-  if ((await headCoachCheck()) || !isUuid(teamId) || !isUuid(playerId) || !position) return;
-  const supabase = await createClient();
-  const rows = await depthRows(supabase, teamId, position);
-  const i = rows.findIndex((r) => r.player_id === playerId);
-  const j = i + dir;
-  if (i < 0 || j < 0 || j >= rows.length) return;
-  await supabase.from("depth_chart").update({ rank: rows[j].rank }).match({ team_id: teamId, position, player_id: rows[i].player_id });
-  await supabase.from("depth_chart").update({ rank: rows[i].rank }).match({ team_id: teamId, position, player_id: rows[j].player_id });
-  refresh();
+export async function moveInDepth(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const teamId = text(fd, "team_id");
+    const position = text(fd, "position");
+    const playerId = text(fd, "player_id");
+    const dir = text(fd, "dir") === "up" ? -1 : 1;
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    if (!isUuid(teamId) || !isUuid(playerId) || !position) return failed(STALE);
+    const supabase = await createClient();
+    const rows = await depthRows(supabase, teamId, position);
+    const i = rows.findIndex((r) => r.player_id === playerId);
+    const j = i + dir;
+    if (i < 0 || j < 0 || j >= rows.length) return failed(STALE);
+    must(await supabase.from("depth_chart").update({ rank: rows[j].rank }).match({ team_id: teamId, position, player_id: rows[i].player_id }));
+    must(await supabase.from("depth_chart").update({ rank: rows[i].rank }).match({ team_id: teamId, position, player_id: rows[j].player_id }));
+    refresh();
+  });
 }
 
-export async function removeFromDepth(fd: FormData) {
-  const teamId = text(fd, "team_id");
-  const position = text(fd, "position");
-  const playerId = text(fd, "player_id");
-  if ((await headCoachCheck()) || !isUuid(teamId) || !isUuid(playerId) || !position) return;
-  const supabase = await createClient();
-  await supabase.from("depth_chart").delete().match({ team_id: teamId, position, player_id: playerId });
-  refresh();
+export async function removeFromDepth(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const teamId = text(fd, "team_id");
+    const position = text(fd, "position");
+    const playerId = text(fd, "player_id");
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    if (!isUuid(teamId) || !isUuid(playerId) || !position) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("depth_chart").delete().match({ team_id: teamId, position, player_id: playerId }));
+    refresh();
+  });
 }
 
 /** Start the depth chart from each player's listed positions (primary first), skipping anyone already there. */
-export async function fillDepthFromPositions(fd: FormData) {
-  const teamId = text(fd, "team_id");
-  if ((await headCoachCheck()) || !isUuid(teamId)) return;
-  const supabase = await createClient();
-  const seasonId = await seasonOrCurrent(supabase, teamId, null);
-  if (!seasonId) return;
-  const [roster, existing] = await Promise.all([loadGamedayRoster(supabase, teamId, seasonId), depthRows(supabase, teamId)]);
-  const have = new Set(existing.map((r) => `${r.position}|${r.player_id}`));
-  const next = new Map<string, number>();
-  for (const r of existing) next.set(r.position, Math.max(next.get(r.position) ?? 0, r.rank));
-  const rows: { team_id: string; position: string; player_id: string; rank: number }[] = [];
-  // primary positions first for everyone, then secondary ones
-  for (const pass of [0, 1]) {
-    for (const p of roster) {
-      const list = (pass === 0 ? p.positions.slice(0, 1) : p.positions.slice(1)).filter((x): x is DepthPosition => DEPTH_POSITIONS.includes(x as DepthPosition));
-      for (const pos of list) {
-        if (have.has(`${pos}|${p.id}`)) continue;
-        have.add(`${pos}|${p.id}`);
-        const rank = (next.get(pos) ?? 0) + 1;
-        next.set(pos, rank);
-        rows.push({ team_id: teamId, position: pos, player_id: p.id, rank });
+export async function fillDepthFromPositions(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const teamId = text(fd, "team_id");
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    if (!isUuid(teamId)) return failed(STALE);
+    const supabase = await createClient();
+    const seasonId = await seasonOrCurrent(supabase, teamId, null);
+    if (!seasonId) return failed("There's no roster for this season yet.");
+    const [roster, existing] = await Promise.all([loadGamedayRoster(supabase, teamId, seasonId), depthRows(supabase, teamId)]);
+    const have = new Set(existing.map((r) => `${r.position}|${r.player_id}`));
+    const next = new Map<string, number>();
+    for (const r of existing) next.set(r.position, Math.max(next.get(r.position) ?? 0, r.rank));
+    const rows: { team_id: string; position: string; player_id: string; rank: number }[] = [];
+    // primary positions first for everyone, then secondary ones
+    for (const pass of [0, 1]) {
+      for (const p of roster) {
+        const list = (pass === 0 ? p.positions.slice(0, 1) : p.positions.slice(1)).filter((x): x is DepthPosition => DEPTH_POSITIONS.includes(x as DepthPosition));
+        for (const pos of list) {
+          if (have.has(`${pos}|${p.id}`)) continue;
+          have.add(`${pos}|${p.id}`);
+          const rank = (next.get(pos) ?? 0) + 1;
+          next.set(pos, rank);
+          rows.push({ team_id: teamId, position: pos, player_id: p.id, rank });
+        }
       }
     }
-  }
-  if (rows.length) await supabase.from("depth_chart").insert(rows);
-  refresh();
+    if (rows.length) await supabase.from("depth_chart").insert(rows);
+    refresh();
+  });
 }
 
 // ---------------------------------------------------------------------------

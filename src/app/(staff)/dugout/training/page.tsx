@@ -12,6 +12,7 @@ import { TrainingNav } from "./nav";
 import { loadRoadmap } from "./data";
 import { deletePhase, deleteTeamRoutine, endTeamRoutine } from "./actions";
 import { PhaseForm, SuggestForm, TeamRoutineForm } from "./forms";
+import { ActionForm } from "@/components/action-form";
 
 export const metadata: Metadata = { title: "Training · Coaches Dugout · GGG.Cafe" };
 
@@ -73,19 +74,19 @@ export default async function TrainingPage({ searchParams }: PageProps<"/dugout/
       {editor && (
         <div className="flex items-center gap-3">
           {live && (
-            <form action={endTeamRoutine}>
+            <ActionForm action={endTeamRoutine}>
               <input type="hidden" name="id" value={r.id} />
               <ConfirmSubmit message={`End "${r.title}" for every player today? Their check-offs stay.`} className="text-xs text-muted hover:text-ink">
                 End now
               </ConfirmSubmit>
-            </form>
+            </ActionForm>
           )}
-          <form action={deleteTeamRoutine}>
+          <ActionForm action={deleteTeamRoutine}>
             <input type="hidden" name="id" value={r.id} />
             <ConfirmSubmit message={`Remove "${r.title}"? Players' copies end today and keep their check-offs.`} className="text-xs text-danger hover:underline">
               Remove
             </ConfirmSubmit>
-          </form>
+          </ActionForm>
         </div>
       )}
     </li>
@@ -140,12 +141,12 @@ export default async function TrainingPage({ searchParams }: PageProps<"/dugout/
                         {formatDay(p.starts_on)} – {formatDay(p.ends_on)} · {weeks} week{weeks === 1 ? "" : "s"} · {PHASE_INFO[p.kind].label}
                       </span>
                       {editor && (
-                        <form action={deletePhase} className="ml-auto">
+                        <ActionForm action={deletePhase} className="ml-auto">
                           <input type="hidden" name="id" value={p.id} />
                           <ConfirmSubmit message={`Remove the ${p.name} phase? Team routines in it stay.`} className="text-xs text-muted hover:text-danger">
                             Remove
                           </ConfirmSubmit>
-                        </form>
+                        </ActionForm>
                       )}
                     </div>
                     {p.focus && <p className="mt-1 text-sm text-ink/90">{p.focus}</p>}

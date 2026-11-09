@@ -7,6 +7,7 @@ import { usernameFromEmail } from "@/lib/player-logins";
 import { nameKey, type ClaimRow, type ParentLinkRow, type ParentMatch, type SpotOption } from "@/lib/approvals";
 import { decidePlayerClaim, removePlayerClaim } from "../teams/actions";
 import { decideParentLink } from "./parents/actions";
+import { ActionForm } from "@/components/action-form";
 
 const item = "rounded-xl border border-pink/50 bg-navy-950/40 p-4";
 
@@ -24,7 +25,7 @@ export function PendingClaimList({ claims, spots }: { claims: ClaimRow[]; spots:
             Player claiming her profile · {c.season_name} · asked {formatDay(c.requested_at.slice(0, 10))}
             {!c.roster_entry_id && " · didn't match a spot by name and number"}
           </p>
-          <form action={decidePlayerClaim} className="mt-3 flex flex-wrap items-center gap-2">
+          <ActionForm action={decidePlayerClaim} className="mt-3 flex flex-wrap items-center gap-2">
             <input type="hidden" name="claim_id" value={c.claim_id} />
             <select
               name="roster_entry_id"
@@ -50,7 +51,7 @@ export function PendingClaimList({ claims, spots }: { claims: ClaimRow[]; spots:
             <button type="submit" name="decision" value="decline" formNoValidate className={secondaryButtonClass}>
               Decline
             </button>
-          </form>
+          </ActionForm>
         </li>
       ))}
     </ul>
@@ -70,12 +71,12 @@ export function ApprovedClaimList({ claims, spots }: { claims: ClaimRow[]; spots
               · {usernameFromEmail(c.email) ? `username ${usernameFromEmail(c.email)} (made by her parent)` : c.email} · {c.season_name}
             </span>
           </span>
-          <form action={removePlayerClaim}>
+          <ActionForm action={removePlayerClaim}>
             <input type="hidden" name="claim_id" value={c.claim_id} />
             <ConfirmSubmit message={`Remove ${c.typed_name}'s access to her profile for ${c.season_name}?`} className="text-xs text-danger hover:underline">
               Remove access
             </ConfirmSubmit>
-          </form>
+          </ActionForm>
         </li>
       ))}
     </ul>
@@ -95,7 +96,7 @@ export function PendingParentList({ links, players }: { links: ParentLinkRow[]; 
           <p className="mt-0.5 text-sm text-muted">
             Parent of <span className="text-ink">{l.child_name}</span> · asked {formatDay(l.requested_at.slice(0, 10))}
           </p>
-          <form action={decideParentLink} className="mt-3 flex flex-wrap items-center gap-2">
+          <ActionForm action={decideParentLink} className="mt-3 flex flex-wrap items-center gap-2">
             <input type="hidden" name="link_id" value={l.link_id} />
             <select name="player_id" required defaultValue={guess(l.child_name)} aria-label={`Which player is ${l.child_name}?`} className={`${inputClass} max-w-xs`}>
               <option value="" disabled>
@@ -113,7 +114,7 @@ export function PendingParentList({ links, players }: { links: ParentLinkRow[]; 
             <button type="submit" name="decision" value="decline" formNoValidate className={secondaryButtonClass}>
               Decline
             </button>
-          </form>
+          </ActionForm>
         </li>
       ))}
     </ul>

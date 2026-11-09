@@ -8,6 +8,7 @@ import { nextPosition } from "@/lib/db";
 import { checkbox, friendlyDbError, isoDate, oneOf, text, wholeNumber, type FormState } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import { PLAY_CATEGORIES, PLAY_CATEGORY_LABEL, SCOUT_PROMPTS, parseChoices } from "@/lib/playbook";
+import { STALE, failed, must, runAction } from "@/lib/actions";
 
 const SCOUT_CATEGORIES = ["team_overview", "hitter_tendencies", "pitcher_tendencies", "defense", "baserunning", "coaching_tendencies", "other"] as const;
 
@@ -46,32 +47,40 @@ export async function savePlay(_prev: FormState, fd: FormData): Promise<FormStat
   return { error: null, saved: true };
 }
 
-export async function removePlay(fd: FormData) {
-  const id = text(fd, "id");
-  if ((await editorCheck()) || !isUuid(id)) return;
-  const supabase = await createClient();
-  await supabase.from("playbook_plays").delete().eq("id", id);
-  refresh();
+export async function removePlay(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const id = text(fd, "id");
+    const denied = await editorCheck();
+    if (denied) return failed(denied);
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("playbook_plays").delete().eq("id", id));
+    refresh();
+  });
 }
 
 /** Put a play on the team's install checklist (so practices can cover it). */
-export async function addPlayToInstall(fd: FormData) {
-  const id = text(fd, "id");
-  const teamId = text(fd, "team_id");
-  if ((await editorCheck()) || !isUuid(id) || !isUuid(teamId)) return;
-  const supabase = await createClient();
-  const { data } = await supabase.from("playbook_plays").select("name, category").eq("id", id).maybeSingle();
-  if (!data) return;
-  const play = data as { name: string; category: (typeof PLAY_CATEGORIES)[number] };
-  await supabase.from("install_items").insert({
-    team_id: teamId,
-    category: "situation",
-    group_name: PLAY_CATEGORY_LABEL[play.category].slice(0, 40),
-    title: play.name,
-    play_id: id,
-    position: await nextPosition(supabase, "install_items", "team_id", teamId),
+export async function addPlayToInstall(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const id = text(fd, "id");
+    const teamId = text(fd, "team_id");
+    const denied = await editorCheck();
+    if (denied) return failed(denied);
+    if (!isUuid(id) || !isUuid(teamId)) return failed(STALE);
+    const supabase = await createClient();
+    const { data } = await supabase.from("playbook_plays").select("name, category").eq("id", id).maybeSingle();
+    if (!data) return failed(STALE);
+    const play = data as { name: string; category: (typeof PLAY_CATEGORIES)[number] };
+    must(await supabase.from("install_items").insert({
+      team_id: teamId,
+      category: "situation",
+      group_name: PLAY_CATEGORY_LABEL[play.category].slice(0, 40),
+      title: play.name,
+      play_id: id,
+      position: await nextPosition(supabase, "install_items", "team_id", teamId),
+    }));
+    refresh();
   });
-  refresh();
 }
 
 // ---------------------------------------------------------------------------
@@ -120,34 +129,46 @@ export async function addQuizQuestion(quizId: string, _prev: FormState, fd: Form
   return { error: null, saved: true };
 }
 
-export async function removeQuizQuestion(fd: FormData) {
-  const id = text(fd, "id");
-  if ((await editorCheck()) || !isUuid(id)) return;
-  const supabase = await createClient();
-  await supabase.from("team_quiz_questions").delete().eq("id", id);
-  refresh();
+export async function removeQuizQuestion(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const id = text(fd, "id");
+    const denied = await editorCheck();
+    if (denied) return failed(denied);
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("team_quiz_questions").delete().eq("id", id));
+    refresh();
+  });
 }
 
-export async function publishQuiz(fd: FormData) {
-  const id = text(fd, "id");
-  const publish = text(fd, "publish") === "1";
-  if ((await editorCheck()) || !isUuid(id)) return;
-  const supabase = await createClient();
-  if (publish) {
-    const { count } = await supabase.from("team_quiz_questions").select("id", { count: "exact", head: true }).eq("quiz_id", id);
-    if (!count) return;
-  }
-  await supabase.from("team_quizzes").update({ published_at: publish ? new Date().toISOString() : null }).eq("id", id);
-  refresh();
+export async function publishQuiz(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const id = text(fd, "id");
+    const publish = text(fd, "publish") === "1";
+    const denied = await editorCheck();
+    if (denied) return failed(denied);
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    if (publish) {
+      const { count } = await supabase.from("team_quiz_questions").select("id", { count: "exact", head: true }).eq("quiz_id", id);
+      if (!count) return failed("Add a question before publishing the quiz.");
+    }
+    must(await supabase.from("team_quizzes").update({ published_at: publish ? new Date().toISOString() : null }).eq("id", id));
+    refresh();
+  });
 }
 
-export async function deleteQuiz(fd: FormData) {
-  const id = text(fd, "id");
-  const teamId = text(fd, "team_id");
-  if ((await editorCheck()) || !isUuid(id)) return;
-  const supabase = await createClient();
-  await supabase.from("team_quizzes").delete().eq("id", id);
-  redirect(isUuid(teamId) ? `/dugout/playbook/quizzes?team=${teamId}` : "/dugout/playbook/quizzes");
+export async function deleteQuiz(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const id = text(fd, "id");
+    const teamId = text(fd, "team_id");
+    const denied = await editorCheck();
+    if (denied) return failed(denied);
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("team_quizzes").delete().eq("id", id));
+    redirect(isUuid(teamId) ? `/dugout/playbook/quizzes?team=${teamId}` : "/dugout/playbook/quizzes");
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -209,10 +230,14 @@ export async function addScoutNote(_prev: FormState, fd: FormData): Promise<Form
   return { error: null, saved: true };
 }
 
-export async function removeScoutReport(fd: FormData) {
-  const id = text(fd, "id");
-  if ((await editorCheck()) || !isUuid(id)) return;
-  const supabase = await createClient();
-  await supabase.from("scouting_reports").delete().eq("id", id);
-  refresh();
+export async function removeScoutReport(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const id = text(fd, "id");
+    const denied = await editorCheck();
+    if (denied) return failed(denied);
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("scouting_reports").delete().eq("id", id));
+    refresh();
+  });
 }

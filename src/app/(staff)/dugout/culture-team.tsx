@@ -6,6 +6,7 @@ import { formatDay } from "@/lib/dates";
 import { GOAL_PHASE_LABEL, goalProgress, pledgeStatus, sortGoals, type TeamGoal } from "@/lib/culture";
 import { deleteGoal, deleteSpotlight, setGoalAchieved } from "./actions";
 import { GoalForm, SpotlightForm } from "./culture-forms";
+import { ActionForm } from "@/components/action-form";
 
 const heading = "font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
 
@@ -37,19 +38,19 @@ export function GoalsBoard({ goals, teamId, editor }: { goals: TeamGoal[]; teamI
             )}
             {editor && teamId && (
               <div className="mt-3 flex flex-wrap items-center gap-3">
-                <form action={setGoalAchieved}>
+                <ActionForm action={setGoalAchieved}>
                   <input type="hidden" name="id" value={g.id} />
                   {!g.achieved_at && <input type="hidden" name="achieved" value="on" />}
                   <button type="submit" className="text-xs font-semibold text-pink hover:underline">
                     {g.achieved_at ? "Mark not achieved" : "Mark achieved"}
                   </button>
-                </form>
-                <form action={deleteGoal}>
+                </ActionForm>
+                <ActionForm action={deleteGoal}>
                   <input type="hidden" name="id" value={g.id} />
                   <ConfirmSubmit message={`Remove the goal "${g.title}"?`} className="text-xs text-muted hover:text-danger">
                     Remove
                   </ConfirmSubmit>
-                </form>
+                </ActionForm>
                 <div className="w-full">
                   <Disclosure summary="Edit or update progress">
                     <GoalForm teamId={teamId} goal={g} />
@@ -137,12 +138,12 @@ export function CultureTeamSections({
                 <p className="mt-1 font-display text-lg font-bold tracking-wide uppercase">{s.headline}</p>
                 <p className="mt-1 line-clamp-3 text-sm text-ink/90">{s.body}</p>
                 {editor && (
-                  <form action={deleteSpotlight} className="mt-2">
+                  <ActionForm action={deleteSpotlight} className="mt-2">
                     <input type="hidden" name="id" value={s.id} />
                     <ConfirmSubmit message="Remove this spotlight?" className="text-xs text-muted hover:text-danger">
                       Remove
                     </ConfirmSubmit>
-                  </form>
+                  </ActionForm>
                 )}
               </li>
             ))}

@@ -18,6 +18,7 @@ import { LineupBuilder } from "./builder";
 import { SubTracker } from "./subs";
 import { gameJobsFromDuties, type DutyPhase } from "@/lib/staff-duties";
 import type { DepthChart, DepthPosition } from "@/lib/playbook";
+import { ActionForm } from "@/components/action-form";
 
 export const metadata: Metadata = { title: "Lineup · GameDay · GGG.Cafe" };
 
@@ -90,21 +91,21 @@ export default async function LineupPage({ params, searchParams }: PageProps<"/d
                 />
               )}
               {editor && lineup.status === "final" && (
-                <form action={reopenLineup}>
+                <ActionForm action={reopenLineup}>
                   <input type="hidden" name="id" value={lineup.id} />
                   <button type="submit" className={pillQuietClass}>
                     Reopen to edit
                   </button>
-                </form>
+                </ActionForm>
               )}
               {editor && (
-                <form action={deleteLineup} className="ml-auto">
+                <ActionForm action={deleteLineup} className="ml-auto">
                   <input type="hidden" name="id" value={lineup.id} />
                   <input type="hidden" name="team_id" value={lineup.team.id} />
                   <ConfirmSubmit message="Delete this lineup? This can't be undone." className="text-xs text-danger hover:underline">
                     Delete lineup
                   </ConfirmSubmit>
-                </form>
+                </ActionForm>
               )}
             </div>
           </header>

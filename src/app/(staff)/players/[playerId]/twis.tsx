@@ -6,6 +6,7 @@ import type { ActivityRow, TwisWeek } from "./data";
 import { DetailHeading } from "./menu";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { ActivityForm, TwisChecklist, type TwisCellView } from "./twis-client";
+import { ActionForm } from "@/components/action-form";
 
 const monthDay = new Intl.DateTimeFormat("en-US", { timeZone: "UTC", month: "short", day: "numeric" });
 
@@ -131,14 +132,14 @@ export function ActivitiesManager({
                 ) : (
                 <div className="flex items-center gap-2">
                   {(!a.ends_on || a.ends_on >= today) && (
-                    <form action={endActivity}>
+                    <ActionForm action={endActivity}>
                       <input type="hidden" name="id" value={a.id} />
                       <button type="submit" className={secondaryButtonClass}>
                         End
                       </button>
-                    </form>
+                    </ActionForm>
                   )}
-                  <form action={deleteActivity}>
+                  <ActionForm action={deleteActivity}>
                     <input type="hidden" name="id" value={a.id} />
                     <ConfirmSubmit
                       message={`Delete “${a.title}” and all its check-offs? Use End instead to keep the history.`}
@@ -146,7 +147,7 @@ export function ActivitiesManager({
                     >
                       Delete
                     </ConfirmSubmit>
-                  </form>
+                  </ActionForm>
                 </div>
                 )}
               </li>

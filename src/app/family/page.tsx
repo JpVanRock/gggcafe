@@ -14,6 +14,7 @@ import { CreatePlayerLoginForm, ResetPlayerPasswordForm } from "./player-login";
 import { MedicalForm, QuestionnaireForm } from "@/components/family-forms";
 import { markPacketRead, saveMedicalAsParent, saveQuestionnaireAsParent } from "./actions";
 import { PACKET_KIND_LABEL, medicalOnFile, type PacketKind, type Questionnaire } from "@/lib/family";
+import { ActionForm } from "@/components/action-form";
 
 export const metadata: Metadata = { title: "Family · GGG.Cafe" };
 
@@ -177,12 +178,12 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
                 {readIds.has(it.id) ? (
                   <p className="mt-2 text-xs text-muted">Read ✓</p>
                 ) : (
-                  <form action={markPacketRead} className="mt-2">
+                  <ActionForm action={markPacketRead} className="mt-2">
                     <input type="hidden" name="item_id" value={it.id} />
                     <button type="submit" className="text-sm font-semibold text-pink hover:underline">
                       Mark as read
                     </button>
-                  </form>
+                  </ActionForm>
                 )}
               </li>
             ))}

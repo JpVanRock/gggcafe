@@ -7,23 +7,28 @@ import { nextPosition } from "@/lib/db";
 import { friendlyDbError, oneOf, text, type FormState } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import { DUTY_PHASES, STARTER_COMMITMENT, STARTER_DUTIES, STARTER_PRE_PRACTICE, cleanLines } from "@/lib/staff-duties";
+import { STALE, failed, must, runAction } from "@/lib/actions";
 
 /** Load the starter matrix (skipping duties the team already has) and starter standards if none yet. */
-export async function loadStarterDuties(fd: FormData) {
-  const teamId = text(fd, "team_id");
-  if ((await headCoachCheck()) || !isUuid(teamId)) return;
-  const supabase = await createClient();
-  const [{ data }, { data: standards }] = await Promise.all([
-    supabase.from("staff_duties").select("phase, duty, position").eq("team_id", teamId),
-    supabase.from("staff_standards").select("team_id").eq("team_id", teamId).maybeSingle(),
-  ]);
-  const rows = (data ?? []) as { phase: string; duty: string; position: number }[];
-  const have = new Set(rows.map((r) => `${r.phase}|${r.duty}`));
-  let position = Math.max(-1, ...rows.map((r) => r.position)) + 1;
-  const add = STARTER_DUTIES.filter((d) => !have.has(`${d.phase}|${d.duty}`)).map((d) => ({ team_id: teamId, phase: d.phase, duty: d.duty, position: position++ }));
-  if (add.length) await supabase.from("staff_duties").insert(add);
-  if (!standards) await supabase.from("staff_standards").insert({ team_id: teamId, commitment: STARTER_COMMITMENT, pre_practice: STARTER_PRE_PRACTICE });
-  refresh();
+export async function loadStarterDuties(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const teamId = text(fd, "team_id");
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    if (!isUuid(teamId)) return failed(STALE);
+    const supabase = await createClient();
+    const [{ data }, { data: standards }] = await Promise.all([
+      supabase.from("staff_duties").select("phase, duty, position").eq("team_id", teamId),
+      supabase.from("staff_standards").select("team_id").eq("team_id", teamId).maybeSingle(),
+    ]);
+    const rows = (data ?? []) as { phase: string; duty: string; position: number }[];
+    const have = new Set(rows.map((r) => `${r.phase}|${r.duty}`));
+    let position = Math.max(-1, ...rows.map((r) => r.position)) + 1;
+    const add = STARTER_DUTIES.filter((d) => !have.has(`${d.phase}|${d.duty}`)).map((d) => ({ team_id: teamId, phase: d.phase, duty: d.duty, position: position++ }));
+    if (add.length) await supabase.from("staff_duties").insert(add);
+    if (!standards) await supabase.from("staff_standards").insert({ team_id: teamId, commitment: STARTER_COMMITMENT, pre_practice: STARTER_PRE_PRACTICE });
+    refresh();
+  });
 }
 
 /** Save the matrix's owners (owner_<id> fields): only the ones that changed (was_<id>), all at once. */
@@ -65,12 +70,16 @@ export async function addDuty(_prev: FormState, fd: FormData): Promise<FormState
   return { error: null, saved: true };
 }
 
-export async function removeDuty(fd: FormData) {
-  const id = text(fd, "remove");
-  if ((await headCoachCheck()) || !isUuid(id)) return;
-  const supabase = await createClient();
-  await supabase.from("staff_duties").delete().eq("id", id);
-  refresh();
+export async function removeDuty(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const id = text(fd, "remove");
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("staff_duties").delete().eq("id", id));
+    refresh();
+  });
 }
 
 export async function saveStaffStandards(_prev: FormState, fd: FormData): Promise<FormState> {

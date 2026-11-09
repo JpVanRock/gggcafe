@@ -9,6 +9,7 @@ import {
   checkbox, friendlyDbError, isoDate, oneOf, text, wholeNumber, type FormState,
 } from "@/lib/form";
 import { BATS, FORMATS, POSITIONS, THROWS, isUuid } from "@/lib/softball";
+import { STALE, failed, must, runAction } from "@/lib/actions";
 
 const JERSEY = /^\d{1,2}$/;
 const DUPLICATE_TEAM = "A team with that name and age group already exists.";
@@ -182,13 +183,16 @@ export async function updateRosterEntry(_prev: FormState, fd: FormData): Promise
 }
 
 /** Takes a player off this team's roster for the season. The player and their history stay. */
-export async function removeFromRoster(fd: FormData): Promise<void> {
-  if (await editorCheck()) return;
-  const id = text(fd, "id");
-  if (!isUuid(id)) return;
-  const supabase = await createClient();
-  await supabase.from("roster_entries").delete().eq("id", id);
-  refresh();
+export async function removeFromRoster(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await editorCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("roster_entries").delete().eq("id", id));
+    refresh();
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -221,13 +225,16 @@ export async function addTeamEvent(_prev: FormState, fd: FormData): Promise<Form
   return { error: null, saved: true };
 }
 
-export async function deleteTeamEvent(fd: FormData): Promise<void> {
-  if (await editorCheck()) return;
-  const id = text(fd, "id");
-  if (!isUuid(id)) return;
-  const supabase = await createClient();
-  await supabase.from("team_events").delete().eq("id", id);
-  refresh();
+export async function deleteTeamEvent(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await editorCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("team_events").delete().eq("id", id));
+    refresh();
+  });
 }
 
 export async function addGame(_prev: FormState, fd: FormData): Promise<FormState> {
@@ -294,32 +301,38 @@ export async function setTeamLogo(input: { teamId: string; path: string | null }
 // ---------------------------------------------------------------------------
 
 /** Approves a claim (matched to a spot on that season's roster) or declines it. */
-export async function decidePlayerClaim(fd: FormData) {
-  if (await editorCheck()) return;
-  const id = text(fd, "claim_id");
-  const entry = text(fd, "roster_entry_id");
-  if (!isUuid(id)) return;
-  const approve = fd.get("decision") === "approve";
-  if (approve && !isUuid(entry)) return;
-  const supabase = await createClient();
-  const { data: auth } = await supabase.auth.getClaims();
-  await supabase
-    .from("player_claims")
-    .update({
-      status: approve ? "approved" : "declined",
-      ...(approve ? { roster_entry_id: entry } : {}),
-      decided_by: auth?.claims?.sub ?? null,
-      decided_at: new Date().toISOString(),
-    })
-    .eq("id", id);
-  refresh();
+export async function decidePlayerClaim(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await editorCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "claim_id");
+    const entry = text(fd, "roster_entry_id");
+    if (!isUuid(id)) return failed(STALE);
+    const approve = fd.get("decision") === "approve";
+    if (approve && !isUuid(entry)) return failed(STALE);
+    const supabase = await createClient();
+    const { data: auth } = await supabase.auth.getClaims();
+    must(await supabase
+      .from("player_claims")
+      .update({
+        status: approve ? "approved" : "declined",
+        ...(approve ? { roster_entry_id: entry } : {}),
+        decided_by: auth?.claims?.sub ?? null,
+        decided_at: new Date().toISOString(),
+      })
+      .eq("id", id));
+    refresh();
+  });
 }
 
-export async function removePlayerClaim(fd: FormData) {
-  if (await editorCheck()) return;
-  const id = text(fd, "claim_id");
-  if (!isUuid(id)) return;
-  const supabase = await createClient();
-  await supabase.from("player_claims").delete().eq("id", id);
-  refresh();
+export async function removePlayerClaim(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await editorCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "claim_id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("player_claims").delete().eq("id", id));
+    refresh();
+  });
 }

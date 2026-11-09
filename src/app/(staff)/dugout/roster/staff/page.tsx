@@ -8,6 +8,7 @@ import { loadDugoutTeam } from "../../data";
 import { NoOwnTeam, TeamPicker } from "../../team-picker";
 import { loadStarterDuties } from "./actions";
 import { AddDutyForm, DutyMatrixForm, StaffStandardsForm, type DutyRow } from "./forms";
+import { ActionForm } from "@/components/action-form";
 
 export const metadata: Metadata = { title: "Staff Duties · Coaches Dugout · GGG.Cafe" };
 
@@ -47,12 +48,12 @@ export default async function StaffDutiesPage({ searchParams }: PageProps<"/dugo
         <EmptyState>
           Nothing set up yet.
           {head && (
-            <form action={loadStarterDuties} className="mt-3">
+            <ActionForm action={loadStarterDuties} className="mt-3">
               <input type="hidden" name="team_id" value={team.id} />
               <button type="submit" className={buttonClass}>
                 Load the starter matrix ({STARTER_DUTIES.length} jobs) and standards
               </button>
-            </form>
+            </ActionForm>
           )}
         </EmptyState>
       )}

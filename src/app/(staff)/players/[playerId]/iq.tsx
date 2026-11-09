@@ -12,6 +12,7 @@ import {
 import { DetailHeading, MenuItem } from "./menu";
 import { CourseCard, buildCourse } from "./scorebook";
 import { BADGE_TRACK_LABEL, type BadgeTrack } from "@/lib/iq-tracks";
+import { ActionForm } from "@/components/action-form";
 
 const QUIZ_POSITIONS: readonly Position[] = FIELD_POSITIONS;
 
@@ -363,13 +364,13 @@ export function IqDetail({
                       <p className="text-sm font-semibold">{q.question}</p>
                       <p className="mt-1 text-xs text-highlight">✓ {q.choices[q.correct_index]}</p>
                     </div>
-                    <form action={setIqQuestionActive}>
+                    <ActionForm action={setIqQuestionActive}>
                       <input type="hidden" name="id" value={q.id} />
                       <input type="hidden" name="active" value={q.active ? "false" : "true"} />
                       <button type="submit" className={secondaryButtonClass}>
                         {q.active ? "Hide" : "Show"}
                       </button>
-                    </form>
+                    </ActionForm>
                   </div>
                   <details className="mt-2">
                     <summary className="cursor-pointer text-xs text-muted hover:text-ink">Edit</summary>

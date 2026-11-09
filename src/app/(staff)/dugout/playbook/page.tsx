@@ -11,6 +11,7 @@ import { NoOwnTeam, TeamPicker } from "../team-picker";
 import { PlaybookNav } from "./nav";
 import { addPlayToInstall, removePlay } from "./actions";
 import { PlayForm, type PlayRow } from "./forms";
+import { ActionForm } from "@/components/action-form";
 
 export const metadata: Metadata = { title: "Playbook · Coaches Dugout · GGG.Cafe" };
 
@@ -90,13 +91,13 @@ export default async function PlaybookPage({ searchParams }: PageProps<"/dugout/
                           </Link>
                         ) : (
                           editor && (
-                            <form action={addPlayToInstall}>
+                            <ActionForm action={addPlayToInstall}>
                               <input type="hidden" name="id" value={p.id} />
                               <input type="hidden" name="team_id" value={team.id} />
                               <button type="submit" className="font-semibold text-pink-soft hover:underline">
                                 + Install checklist
                               </button>
-                            </form>
+                            </ActionForm>
                           )
                         )}
                         {e && e.times_called > 0 && (
@@ -112,12 +113,12 @@ export default async function PlaybookPage({ searchParams }: PageProps<"/dugout/
                               <PlayForm teamId={team.id} teamName={team.name} play={p} />
                             </Disclosure>
                           </div>
-                          <form action={removePlay}>
+                          <ActionForm action={removePlay}>
                             <input type="hidden" name="id" value={p.id} />
                             <ConfirmSubmit message={`Remove “${p.name}” from the playbook${p.team_id === null ? " for every team" : ""}?`} className="pt-2 text-xs text-muted hover:text-danger">
                               Remove
                             </ConfirmSubmit>
-                          </form>
+                          </ActionForm>
                         </div>
                       )}
                     </li>

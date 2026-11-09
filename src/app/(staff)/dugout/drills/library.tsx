@@ -7,6 +7,7 @@ import { Disclosure, EmptyState, Field, FormMessage, buttonClass, inputClass, se
 import { DRILL_TAGS, DRILL_TAG_LABEL, filterDrills, type DrillTag, type LibraryDrill } from "@/lib/dugout";
 import { initialFormState } from "@/lib/form";
 import { deleteDrill, saveDrill } from "./actions";
+import { ActionForm } from "@/components/action-form";
 
 /** Tag filter pills: "All" plus every tag, with counts. Shared with the plan builder. */
 export function TagFilter({
@@ -136,7 +137,7 @@ function DrillCard({ drill, canEdit }: { drill: LibraryDrill; canEdit: boolean }
           <button type="button" onClick={() => setEditing(true)} className={secondaryButtonClass}>
             Edit
           </button>
-          <form action={deleteDrill} className="ml-auto">
+          <ActionForm action={deleteDrill} className="ml-auto">
             <input type="hidden" name="id" value={drill.id} />
             <ConfirmSubmit
               message={`Delete “${drill.name}” from the library? Practice plans that use it keep their copy.`}
@@ -144,7 +145,7 @@ function DrillCard({ drill, canEdit }: { drill: LibraryDrill; canEdit: boolean }
             >
               Delete
             </ConfirmSubmit>
-          </form>
+          </ActionForm>
         </div>
       )}
     </li>

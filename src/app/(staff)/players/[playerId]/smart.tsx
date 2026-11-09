@@ -6,6 +6,7 @@ import { deleteSmartGoal, setSmartGoalStatus } from "./actions";
 import type { MetricOption, MetricProgress, SmartGoal } from "./data";
 import { DetailHeading, MenuItem } from "./menu";
 import { SmartGoalForm } from "./smart-client";
+import { ActionForm } from "@/components/action-form";
 
 const monthDay = new Intl.DateTimeFormat("en-US", { timeZone: "UTC", month: "short", day: "numeric" });
 const short = (iso: string) => monthDay.format(new Date(`${iso}T00:00:00Z`));
@@ -127,25 +128,25 @@ function SmartGoalCard({
 
       {canEdit && (
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <form action={setSmartGoalStatus}>
+          <ActionForm action={setSmartGoalStatus}>
             <input type="hidden" name="id" value={goal.id} />
             <input type="hidden" name="status" value={done ? "active" : "achieved"} />
             <button type="submit" className={secondaryButtonClass}>
               {done ? "Reopen" : "Mark achieved"}
             </button>
-          </form>
+          </ActionForm>
           <details className="w-full sm:w-auto sm:flex-1 [&[open]]:w-full">
             <summary className={`${secondaryButtonClass} cursor-pointer list-none`}>Edit</summary>
             <div className="mt-3 rounded-lg border border-navy-700 p-3">
               <SmartGoalForm playerId={playerId} goal={goal} metrics={metricOptions} />
             </div>
           </details>
-          <form action={deleteSmartGoal} className="ml-auto">
+          <ActionForm action={deleteSmartGoal} className="ml-auto">
             <input type="hidden" name="id" value={goal.id} />
             <ConfirmSubmit message={`Delete the goal “${goal.title}”?`} className="text-xs text-danger hover:underline">
               Delete
             </ConfirmSubmit>
-          </form>
+          </ActionForm>
         </div>
       )}
     </article>
