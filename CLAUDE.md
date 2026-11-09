@@ -212,7 +212,12 @@ like a sports brand or media-day graphics. Never childish or preschool.
   check uses `Date.now()`, which Cache Components rejects during prerender/prefetch. Keep it.
 - Password reset: /forgot-password emails a link (`resetPasswordForEmail`, redirect to
   /auth/confirm?next=/reset-password); /auth/confirm (route handler) signs her in from `?code=` or
-  `?token_hash=&type=`; /reset-password sets the new password. Supabase Auth URL config: Site URL
+  `?token_hash=&type=`; /reset-password sets the new password. The Supabase "Reset Password" email template links straight to
+  `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password` (user, 2026-11-09):
+  the default `{{ .ConfirmationURL }}` (PKCE `?code=`) only works in the browser that asked and within ~5 minutes.
+  Supabase's built-in email sends about 2 emails an hour for the whole project (resets + sign-up confirmations);
+  more needs custom SMTP in Supabase Auth settings. Per person: 4 reset emails per address every 20 minutes
+  (`allow_password_reset()`, signed-out callable; keeps only a SHA-256 of the address, for a day). Supabase Auth URL config: Site URL
   https://gggcafe.vercel.app, Redirect URLs https://gggcafe.vercel.app/** (localhost isn't listed).
 - Auth: `getCurrentUser()` in `src/lib/auth.ts` (verified claims + staff record). `src/proxy.ts`
   redirects signed-out visitors away from `/dashboard`; pages still check staff access themselves.

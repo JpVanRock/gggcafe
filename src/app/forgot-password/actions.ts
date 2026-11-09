@@ -30,12 +30,25 @@ export async function requestPasswordReset(
   const proto = h.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
 
   const supabase = await createClient();
+  // At most 4 reset emails per address every 20 minutes (the database counts; it fails open
+  // if it can't, and Supabase's own limits still apply).
+  const { data: allowed, error: limitError } = await supabase.rpc("allow_password_reset", { p_email: email });
+  if (limitError) console.error("Password reset limit check failed:", limitError);
+  if (allowed === false) {
+    return { sent: false, error: "That's 4 reset emails in 20 minutes. Check your inbox and spam folder, or try again in 20 minutes.", email };
+  }
+
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${proto}://${host}/auth/confirm?next=/reset-password`,
   });
 
   if (error?.status === 429) {
-    return { sent: false, error: "Too many reset requests. Wait a minute and try again.", email };
+    // Supabase: one email per address per minute ("…only request this after 42 seconds")
+    const seconds = /after (\d+) seconds?/i.exec(error.message)?.[1];
+    if (seconds) return { sent: false, error: `Wait ${seconds} seconds, then try again.`, email };
+    // Supabase's built-in email sends only a few emails an hour for the whole site
+    // (resets and sign-up confirmations together)
+    return { sent: false, error: "The site has sent too many emails in the last hour. Try again later; it can take up to an hour.", email };
   }
   // Same answer whether or not the email has an account, so the form can't be
   // used to find out who has one.

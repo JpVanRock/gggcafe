@@ -8,7 +8,7 @@
 do $$
 declare
   r record;
-  anon_ok text[] := array['signup_team'];
+  anon_ok text[] := array['signup_team', 'allow_password_reset'];
 begin
   for r in select p.oid::regprocedure as f from pg_proc p where p.pronamespace = 'public'::regnamespace and p.prosecdef loop
     raise exception 'FAIL: % is security definer in public: move it to private and use private.expose()', r.f;

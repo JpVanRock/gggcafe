@@ -5488,6 +5488,7 @@ export type Database = {
       }
     }
     Functions: {
+      allow_password_reset: { Args: { p_email: string | null }; Returns: boolean }
       answer_team_quiz: { Args: { p_player_id: string | null; p_question_id: string | null; p_chosen: number | null }; Returns: { is_correct: boolean; correct_index: number; explanation: string }[] }
       change_authors: { Args: { p_user_ids: string[] | null }; Returns: { user_id: string; name: string }[] }
       coaching_staff: { Args: Record<PropertyKey, never>; Returns: { user_id: string; display_name: string; email: string }[] }
