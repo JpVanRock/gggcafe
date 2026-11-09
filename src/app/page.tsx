@@ -24,7 +24,7 @@ export default function Home() {
         <div className="flex flex-col items-center">
           {/* one line at every width: the size follows the screen (12px floor, 20px max) */}
           <p className="text-[clamp(0.75rem,3.8vw,1.25rem)] font-medium whitespace-nowrap uppercase tracking-[0.14em] text-ink sm:tracking-[0.2em]">
-            Player development &amp; team <span aria-hidden>mgmt.</span>
+            Player development &amp; team <span aria-hidden>mgmt</span>
             <span className="sr-only">management</span>
           </p>
           {/* the brand kit's artwork (yellow at night, navy by day), apart from the logo: no lockup */}
