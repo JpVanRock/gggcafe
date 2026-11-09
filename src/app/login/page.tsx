@@ -35,13 +35,9 @@ export default function LoginPage() {
         <Link href="/forgot-password" className="text-pink-soft underline hover:text-ink">
           Forgot your password?
         </Link>
-        <p>
-          Players and parents:{" "}
-          <Link href="/register" className="text-pink-soft underline hover:text-ink">
-            create an account
-          </Link>
-        </p>
-        <p>Coaches: ask a GGG.Cafe admin for an account.</p>
+        <Link href="/register" className="text-pink-soft underline hover:text-ink">
+          Create an account
+        </Link>
       </div>
     </main>
   );
