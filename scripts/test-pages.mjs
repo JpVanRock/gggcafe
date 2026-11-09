@@ -53,12 +53,38 @@ async function check(route) {
   return streamed ? { route, ok: false, why: streamed, ms } : { route, ok: true, ms };
 }
 
+// The phone app (src/app/manifest.ts): pages link the manifest, it parses, its icons load and it
+// opens on a real page.
+async function checkApp() {
+  const route = "/manifest.webmanifest";
+  const started = Date.now();
+  const fail = (why) => [{ route, ok: false, why, ms: Date.now() - started }];
+  const home = await (await fetch(BASE + "/login")).text();
+  if (!home.includes('rel="manifest"')) return fail("pages don't link the manifest");
+  const r = await fetch(BASE + route);
+  if (r.status !== 200) return fail(`HTTP ${r.status}`);
+  let m;
+  try { m = await r.json(); } catch { return fail("not valid JSON"); }
+  if (!m.start_url || !samplePages().includes(m.start_url)) return fail(`start_url ${m.start_url} isn't a page`);
+  const results = [];
+  for (const purpose of ["any", "maskable"]) {
+    if (!m.icons?.some((i) => i.purpose === purpose && i.sizes === "512x512")) results.push(...fail(`no 512x512 ${purpose} icon`));
+  }
+  for (const icon of m.icons ?? []) {
+    const ir = await fetch(BASE + icon.src);
+    const ok = ir.status === 200 && (ir.headers.get("content-type") ?? "").includes(icon.type);
+    results.push({ route: icon.src, ok, why: ok ? undefined : `HTTP ${ir.status} ${ir.headers.get("content-type")}`, ms: 0 });
+  }
+  return [{ route, ok: true, ms: Date.now() - started }, ...results];
+}
+
 let site;
 try {
   site = await startSampleSite(PORT);
   BASE = site.base;
   const results = [];
   for (let i = 0; i < routes.length; i += 6) results.push(...(await Promise.all(routes.slice(i, i + 6).map(check))));
+  results.push(...(await checkApp()));
   await new Promise((r) => setTimeout(r, 300));
   const serverErrors = site.log.join("").split("\n").filter((l) => /⨯|\bError:/.test(l));
   for (const r of results) console.log(`${r.ok ? "ok  " : "FAIL"} ${String(r.ms).padStart(5)}ms  ${r.route}${r.why ? `  ${r.why}` : ""}`);

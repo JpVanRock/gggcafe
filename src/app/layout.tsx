@@ -33,6 +33,9 @@ const spaceMono = Space_Mono({
 export const metadata: Metadata = {
   title: "GGG.Cafe",
   description: "Softball player development and team management",
+  // Installed on an iPhone home screen (the rest is in manifest.ts): the name under the icon, and
+  // a dark status bar with white text, readable over Night Game and Day Game alike.
+  appleWebApp: { capable: true, title: "GGG.Cafe", statusBarStyle: "black" },
 };
 
 export const viewport: Viewport = {

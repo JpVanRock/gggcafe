@@ -190,4 +190,11 @@ export const QUESTIONS: { q: string; a: string[] }[] = [
     q: "How do I change someone's role or remove them?",
     a: ["Coaches Dugout → Roster → Coaching staff. Admins can switch anyone between Head Coach, Assistant Coach and Viewer, or remove them from the staff."],
   },
+  {
+    q: "Can people put GGG.Cafe on their phone like an app?",
+    a: [
+      "Yes, with nothing to download from an app store. iPhone: open the site in Safari, tap Share, then Add to Home Screen. Android: open it in Chrome and tap Install app (or Add to Home screen in the ⋮ menu).",
+      "It opens full screen with the GGG.Cafe icon and goes straight to each person's own home page. Everyone signs in once inside the app (an iPhone keeps home-screen apps signed in separately from Safari). Updates arrive on their own, and nothing is saved on the phone for offline use.",
+    ],
+  },
 ];

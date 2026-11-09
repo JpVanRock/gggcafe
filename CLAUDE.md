@@ -30,6 +30,9 @@ src/components/main-nav.tsx  top menu: staff get Dashboard/Coaches Dugout (opens
                          including /me and /family; players get "My profile". Every header is <SiteHeader>
                          (site-header.tsx): on phones the links fold behind a Menu button
 src/proxy.ts             refreshes the Supabase auth session each request (Next 16 "proxy", formerly middleware)
+src/app/manifest.ts      the phone app (installable web app; opens /dashboard, which routes each account home).
+                         Icons in public/icons/ (maskable = logo inside the 80% safe zone); iPhone settings are
+                         `appleWebApp` in the root layout. No service worker: nothing private is cached on phones
 supabase/migrations/     schema, applied in filename order
 supabase/seed.sql        fictional sample data — local tests only, never pushed
 tests/db/                SQL checks run by npm run db:test
@@ -78,7 +81,8 @@ tests/unit/              node --test unit tests (npm run test:unit)
 - `npm run lint`, `npx tsc --noEmit`, `npm run test:unit`, `npm run db:test`, `npm run build`, then
   `npm run test:pages` and `npm run test:a11y`. The page smoke test renders every page and PDF route of the build in sample-data mode
   (`GGG_SAMPLE_DATA=1`: fictional data in `src/lib/supabase/sample/`, signed in as a sample admin; never on Vercel)
-  and fails on an error page, a section that errors or 404s, a redirect to sign in, or a server error. A new dynamic
+  and fails on an error page, a section that errors or 404s, a redirect to sign in, or a server error; it also checks the app manifest
+  and its icons. A new dynamic
   route needs a sample value in `scripts/lib/sample-site.mjs` (`fill`) and, if it reads new tables, sample rows in
   `sample/data.ts`. To look at pages with sample data: launch config `site-sample` (port 3159) after a build.
   The accessibility check runs axe-core (WCAG 2.2 A/AA) on every sample page in headless Chrome (`CHROME_PATH`, or the
