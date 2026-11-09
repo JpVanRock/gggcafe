@@ -57,9 +57,9 @@ select pg_temp.expect('bad box rolls back', pg_temp.err($q$select public.save_bo
   '{"batting": [{"player_id": "00000000-0000-0000-0000-0000000000c1", "pa": 1, "ab": 1, "r": 0, "h": 2, "d": 0, "t": 0, "hr": 0, "rbi": 0, "bb": 0, "so": 0, "hbp": 0, "sac": 0, "sf": 0, "sb": 0, "cs": 0}]}')$q$), '23514');
 select pg_temp.expect('not a team in the game', pg_temp.err($q$select public.save_box_score('e5e5e5e5-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000a1', '{}')$q$), '22023');
 insert into public.bp_rounds (player_id, round_date, grades)
-values ('00000000-0000-0000-0000-0000000000c1', current_date, array_fill(4::smallint, array[24])),
-       ('00000000-0000-0000-0000-0000000000c2', current_date, array_fill(2::smallint, array[10]));
-select pg_temp.expect('swing grades 0-5', pg_temp.err($q$insert into public.bp_rounds (player_id, round_date, grades) values ('00000000-0000-0000-0000-0000000000c1', current_date, '{6}')$q$), '23514');
+values ('00000000-0000-0000-0000-0000000000c1', private.team_today(), array_fill(4::smallint, array[24])),
+       ('00000000-0000-0000-0000-0000000000c2', private.team_today(), array_fill(2::smallint, array[10]));
+select pg_temp.expect('swing grades 0-5', pg_temp.err($q$insert into public.bp_rounds (player_id, round_date, grades) values ('00000000-0000-0000-0000-0000000000c1', private.team_today(), '{6}')$q$), '23514');
 reset role;
 
 select pg_temp.expect('score set (away team)', (select away_score::text || '-' || home_score || ' ' || status from public.games where id = 'e5e5e5e5-0000-0000-0000-0000000000a1'), '6-2 final');
@@ -80,7 +80,7 @@ reset role;
 
 -- Clean up
 select set_config('request.jwt.claims', '', false);
-delete from public.bp_rounds where player_id in ('00000000-0000-0000-0000-0000000000c1', '00000000-0000-0000-0000-0000000000c2') and round_date = current_date;
+delete from public.bp_rounds where player_id in ('00000000-0000-0000-0000-0000000000c1', '00000000-0000-0000-0000-0000000000c2') and round_date = private.team_today();
 delete from public.games where id = 'e5e5e5e5-0000-0000-0000-0000000000a1';
 delete from public.player_claims where user_id::text like 'e5e5e5e5-%';
 delete from public.staff where user_id::text like 'e5e5e5e5-%';
