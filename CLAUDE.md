@@ -68,6 +68,14 @@ tests/unit/              node --test unit tests (npm run test:unit)
 - Load independent queries together (`Promise.all`); only what needs an earlier result waits for it (see the player
   dashboard, `players/[playerId]/page.tsx`: two rounds).
 
+## Checks (CI: .github/workflows/ci.yml runs all of these on every push)
+- `npm run lint`, `npx tsc --noEmit`, `npm run test:unit`, `npm run db:test`, `npm run build`, then
+  `npm run test:pages`: the page smoke test renders every page and PDF route of the build in sample-data mode
+  (`GGG_SAMPLE_DATA=1`: fictional data in `src/lib/supabase/sample/`, signed in as a sample admin; never on Vercel)
+  and fails on an error page, a section that errors or 404s, a redirect to sign in, or a server error. A new dynamic
+  route needs a sample value in `scripts/test-pages.mjs` (`fill`) and, if it reads new tables, sample rows in
+  `sample/data.ts`. To look at pages with sample data: launch config `site-sample` (port 3159) after a build.
+
 ## Database rules
 - Every new table: `select private.apply_staff_rls('public.<table>');` (staff read, coach/admin write).
   Exceptions need their own explicit policies and a reason.

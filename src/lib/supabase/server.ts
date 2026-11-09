@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import type { Database } from "./database.types";
 import { requireSupabaseConfig } from "./env";
+import { sampleDataEnabled } from "./sample/enabled";
 
 /**
  * Supabase client for Server Components, Server Actions and Route Handlers.
@@ -15,6 +16,8 @@ export async function createClient() {
   // which Cache Components forbids during (pre)rendering, and auth-dependent
   // data should never be prerendered or prefetched anyway.
   await connection();
+  // Sample-data mode (page smoke tests): fictional data, never on Vercel. See ./sample/enabled.ts.
+  if (sampleDataEnabled()) return (await import("./sample/client")).sampleClient() as unknown as ReturnType<typeof createServerClient<Database>>;
 
   const { url, key } = requireSupabaseConfig();
   const cookieStore = await cookies();

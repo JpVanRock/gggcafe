@@ -1,0 +1,33 @@
+# Every push and pull request: lint, types, unit tests, database tests (throwaway local Postgres,
+# no secrets), the production build, and the page smoke test (every page in sample-data mode).
+name: CI
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      # placeholders: nothing in CI talks to Supabase (pages run on fictional sample data)
+      NEXT_PUBLIC_SUPABASE_URL: https://ci-placeholder.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ci-placeholder
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx next typegen
+      - run: npm run lint
+      - run: npx tsc --noEmit
+      - run: npm run test:unit
+      - name: Put the runner's Postgres on PATH
+        run: echo "$(ls -d /usr/lib/postgresql/*/bin | sort -V | tail -1)" >> "$GITHUB_PATH"
+      - run: npm run db:test
+      - run: npm run build
+      - run: npm run test:pages

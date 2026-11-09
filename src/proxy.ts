@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { supabaseConfig } from "@/lib/supabase/env";
+import { sampleDataEnabled } from "@/lib/supabase/sample/enabled";
 
 /** Pages that need a signed-in user. The page itself still checks staff access. */
 const PROTECTED_PREFIXES = ["/dashboard", "/dugout", "/teams", "/players", "/family", "/me"];
@@ -14,6 +15,8 @@ const PROTECTED_PREFIXES = ["/dashboard", "/dugout", "/teams", "/players", "/fam
  */
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
+  // Sample-data mode (page smoke tests) is signed in as the sample admin: nothing to refresh or guard.
+  if (sampleDataEnabled()) return response;
 
   const config = supabaseConfig();
   if (!config) return response;
