@@ -9,7 +9,7 @@ import { OutlineText } from "@/components/athletic";
 import { buttonClass } from "@/components/ui";
 import { GAME_COUNT, GAME_PLAYS, gameStatuses } from "@/lib/scorebook-game";
 import type { IqData } from "./data";
-import type { Nameplate } from "./iq-client";
+import type { Nameplate } from "./iq-tests-client";
 
 export type CourseChapter = {
   n: number;

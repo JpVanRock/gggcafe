@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { EmptyState, secondaryButtonClass } from "@/components/ui";
 import { WEEKDAYS, addDays, formatDay, formatWeekRange, isoWeekday, weekStart } from "@/lib/dates";
-import { deleteActivity, endActivity } from "./actions";
+import { deleteActivity, endActivity } from "./twis-actions";
 import type { ActivityRow, TwisWeek } from "./data";
 import { DetailHeading } from "./menu";
 import { ConfirmSubmit } from "@/components/confirm-submit";

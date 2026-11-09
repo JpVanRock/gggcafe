@@ -8,7 +8,7 @@ import { friendlyDbError, text, type FormState } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import { isISODate, isoWeekday, todayISO, weekStart } from "@/lib/dates";
 import { cleanScript } from "@/lib/bullpen";
-import { setTwisCheck } from "./actions";
+import { setTwisCheck } from "./twis-actions";
 
 /** A thrown bullpen: each pitch hit or missed. Ticks today's TWIS routine for this script, if there is one. */
 export async function saveBullpenSession(input: {

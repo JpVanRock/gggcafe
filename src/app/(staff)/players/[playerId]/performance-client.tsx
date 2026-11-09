@@ -5,7 +5,7 @@ import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
 import { TRAINING_CATEGORY_LABEL, type TrainingCategory } from "@/lib/achievements";
 import { WEEKDAYS } from "@/lib/dates";
 import { initialFormState } from "@/lib/form";
-import { addRoutine } from "./actions";
+import { addRoutine } from "./training-actions";
 
 export function RoutineForm({
   playerId,

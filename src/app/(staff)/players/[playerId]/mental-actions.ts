@@ -4,15 +4,16 @@
 // checks, the monthly self-scan, guided sessions and the practice journal. The
 // player edits her own; coaches can too (actForCheck). RLS checks it again.
 import { refresh } from "next/cache";
-import { actForCheck } from "@/lib/auth";
+import { actForCheck, actorCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { friendlyDbError, text, type FormState } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
+import { MENTAL_FIELDS } from "./shared";
 import { isISODate, isoWeekday, todayISO, weekStart } from "@/lib/dates";
 import {
   ADJUSTMENT_MAX, INTENSITY_CONTEXTS, JOURNAL_LIMITS, SCAN_NOTE_MAX, SIGNALS, SIGNAL_MAX, isValidScan, monthStart, sessionBySlug,
 } from "@/lib/mental";
-import { setTwisCheck } from "./actions";
+import { setTwisCheck } from "./twis-actions";
 import { STALE, failed, must, runAction } from "@/lib/actions";
 
 async function playerFrom(fd: FormData): Promise<{ playerId: string } | { error: string }> {
@@ -168,3 +169,29 @@ export async function saveJournalWeek(_prev: FormState, fd: FormData): Promise<F
   refresh();
   return { error: null, saved: true };
 }
+
+// Mental GP
+// ---------------------------------------------------------------------------
+
+export async function saveMentalPlan(_prev: FormState, fd: FormData): Promise<FormState> {
+  const denied = await actorCheck();
+  if (denied) return { error: denied };
+
+  const playerId = text(fd, "player_id");
+  if (!isUuid(playerId)) return { error: "Unknown player." };
+  const notHers = await actForCheck(playerId);
+  if (notHers) return { error: notHers };
+
+  const values = Object.fromEntries(MENTAL_FIELDS.map((f) => [f.name, text(fd, f.name)]));
+  const supabase = await createClient();
+  const { data: auth } = await supabase.auth.getClaims();
+  const { error } = await supabase
+    .from("mental_game_plans")
+    .upsert({ player_id: playerId, ...values, updated_by: auth?.claims?.sub ?? null }, { onConflict: "player_id" });
+  if (error) return { error: friendlyDbError(error) };
+
+  refresh();
+  return { error: null, saved: true };
+}
+
+// ---------------------------------------------------------------------------

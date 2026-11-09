@@ -16,7 +16,7 @@ import {
   CLEAN_BOOK, GAMES, GAME_COUNT, GAME_PLAYS, PLAY_TOKENS, boxId, canonicalMarks, formatPlay, parseBoxId, parsePlay, runnersOn, teamsOf,
   type Club, type Team,
 } from "@/lib/scorebook-game";
-import { finishScorebookGame, scoreGamePlay, startScorebookGame, type GameRun } from "./actions";
+import { finishScorebookGame, scoreGamePlay, startScorebookGame, type GameRun } from "./scorebook-actions";
 
 type Draft = { marks: BoxMarks; tokens: string[] };
 type View = "intro" | "play" | "line" | "result";

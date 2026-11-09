@@ -22,7 +22,7 @@ import { CHAPTERS } from "@/lib/scorebook";
 import { formatLongDate } from "@/lib/dates";
 import type { AchievementProgress } from "@/lib/achievements";
 import type { IqData } from "./data";
-import type { Nameplate, PositionInfo } from "./iq-client";
+import type { Nameplate, PositionInfo } from "./iq-tests-client";
 import { GloveCase } from "./iq";
 import { DetailHeading, MenuItem } from "./menu";
 import { HexBadge } from "./performance";

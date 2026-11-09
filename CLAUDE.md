@@ -49,6 +49,12 @@ tests/unit/              node --test unit tests (npm run test:unit)
   error becomes a message (`src/lib/actions.ts`). A form without its own client component uses
   `<ActionForm action={…}>` (`components/action-form.tsx`), which shows the message after its controls. Never
   `return;` silently.
+- Player-area server actions live in one file per section in `players/[playerId]/`: `twis-actions` (check-offs,
+  activities), `goals-actions` (Harada, SMART, goal method), `mental-actions`, `training-actions` (routines),
+  `iq-actions` (practice, level tests, review), `scorebook-actions` (lessons, games), `pop-actions` (movement, hitting
+  style), plus the older feature files; shared helpers that aren't actions go in a plain server module
+  (`player-achievements.ts`). Softball IQ UI: `iq-quiz-client.tsx` (practice quiz, question bank) and
+  `iq-tests-client.tsx` (level tests), shared bits in `iq-shared.ts`.
 - Names: `playerName()` in `src/lib/softball.ts`.
 - Rosters: `src/lib/roster.ts`. A team's players: `loadRoster(supabase, teamId, { seasonId?, order? })` (active, current
   season by default); the season: `currentSeason()` / `seasonOrCurrent()` (the database's `team_current_season`, the
@@ -224,7 +230,7 @@ tests/unit/              node --test unit tests (npm run test:unit)
   `supabase/iq/offense.json` (written for GGG.Cafe: `playbook_page` null, ref "GGG.Cafe Offense IQ · topic"; diagrams can
   carry `count` {balls, strikes}, drawn by diamond.tsx). User's rule: the award is the MVP badge, no ring. A passed
   attempt unlocks the next level (`start_iq_level_unchecked`); `finish_iq_level_unchecked` gives no ring for
-  offense/battery. UI: `buildBadgeTracks` (iq.tsx) and `BadgeTrackPicker` (iq-client.tsx); Trophy Room labels the badges.
+  offense/battery. UI: `buildBadgeTracks` (iq.tsx) and `BadgeTrackPicker` (iq-tests-client.tsx); Trophy Room labels the badges.
 - New questions for the existing tracks: 7 baserunning reads (Levels 2-3, now 30 each) and 5 defensive situations on
   the Extra Credit Library's "Defense · Situations" shelf (the defense levels are at the cap).
 - My Zone (Standard): `hitting_zones` (hot/strong/weak cells 1-9, catcher's view, each cell in one list; she or a coach
@@ -584,7 +590,7 @@ tests/unit/              node --test unit tests (npm run test:unit)
   throwing routine), optional usual equipment and video link (`video_url`, https) copied into plans;
   "Watch the drill" shows in the library, builder, final plan and PDF.
 - Practice plans: setup (date, start time, indoor/outdoor, total time, location, focus), then the
-  builder (`plans/[planId]/builder.tsx`, @dnd-kit): drag library drills into the timeline (or + Add),
+  builder (`plans/[planId]/builder.tsx` with its parts `builder-library`, `builder-timeline`, `builder-field`, `builder-shared`; @dnd-kit): drag library drills into the timeline (or + Add),
   reorder, each drill needs a time limit (required to finalize), coaches (staff coaches/admins or a
   typed name) and optional equipment; custom blocks (water break) have no drill_id. Drills are
   copied into the plan (`practice_plan_drills`) so printed plans don't change with the library.

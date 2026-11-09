@@ -5,7 +5,7 @@ import { useActionState, useOptimistic, useState, useTransition } from "react";
 import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
 import { WEEKDAYS } from "@/lib/dates";
 import { initialFormState } from "@/lib/form";
-import { addActivity, setTwisCheck } from "./actions";
+import { addActivity, setTwisCheck } from "./twis-actions";
 import type { PracticeNote, TwisItem } from "./data";
 
 export type TwisCellView = {

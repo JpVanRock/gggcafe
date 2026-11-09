@@ -3,7 +3,7 @@
 import { useActionState, useOptimistic, useTransition } from "react";
 import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
-import { saveGoals, setGoalActionDone } from "./actions";
+import { saveGoals, setGoalActionDone } from "./goals-actions";
 import type { HaradaChart } from "./data";
 
 export function GoalActionCheckbox({ actionId, title, done }: { actionId: string; title: string; done: boolean }) {

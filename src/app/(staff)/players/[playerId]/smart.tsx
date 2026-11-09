@@ -2,7 +2,7 @@ import { ConfirmSubmit } from "@/components/confirm-submit";
 import { Disclosure, EmptyState, secondaryButtonClass } from "@/components/ui";
 import { formatLongDate } from "@/lib/dates";
 import { SKILL_AREA_LABEL, type SkillArea } from "@/lib/softball";
-import { deleteSmartGoal, setSmartGoalStatus } from "./actions";
+import { deleteSmartGoal, setSmartGoalStatus } from "./goals-actions";
 import type { MetricOption, MetricProgress, SmartGoal } from "./data";
 import { DetailHeading, MenuItem } from "./menu";
 import { SmartGoalForm } from "./smart-client";

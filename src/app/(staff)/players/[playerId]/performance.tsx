@@ -7,7 +7,7 @@ import {
   type AchievementProgress, type TrainingCategory,
 } from "@/lib/achievements";
 import { WEEKDAYS, formatLongDate, weekStart } from "@/lib/dates";
-import { deleteActivity, endActivity } from "./actions";
+import { deleteActivity, endActivity } from "./twis-actions";
 import type { Performance, RoutineRow } from "./data";
 import type { MyTesting } from "./testing-data";
 import { DetailHeading, MenuItem } from "./menu";

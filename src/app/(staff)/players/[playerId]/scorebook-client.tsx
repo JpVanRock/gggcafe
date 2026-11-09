@@ -10,10 +10,9 @@ import { ProgressBar } from "@/components/progress-bar";
 import { ManagerAward } from "@/components/manager-award";
 import { PositionField, ScoreBox, ScoreVisual } from "@/components/scorebook";
 import { CHAPTERS, CHAPTER_COUNT, PASS_PCT, QUIZ_LENGTH, playNotation, type Step, type Visual } from "@/lib/scorebook";
-import {
-  answerIqLevelQuestion, finishIqLevel, finishScorebookLessons, saveScorebookStep, startIqLevel, type LevelQuestion,
-} from "./actions";
-import type { Nameplate } from "./iq-client";
+import { answerIqLevelQuestion, finishIqLevel, startIqLevel, type LevelQuestion } from "./iq-actions";
+import { finishScorebookLessons, saveScorebookStep } from "./scorebook-actions";
+import type { Nameplate } from "./iq-tests-client";
 
 const LETTERS = ["A", "B", "C", "D"];
 

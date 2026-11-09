@@ -1,14 +1,12 @@
 import { Disclosure, secondaryButtonClass } from "@/components/ui";
 import { FIELD_POSITIONS, POSITION_LABEL, type Position } from "@/lib/softball";
-import { setIqQuestionActive } from "./actions";
+import { setIqQuestionActive } from "./iq-actions";
 import type { IqData, IqQuestion } from "./data";
 import { RingCase, TRACK_LABEL, type RingTrack } from "@/components/rings";
 import { GoldenGlove } from "@/components/golden-glove";
 import { formatLongDate } from "@/lib/dates";
-import {
-  IqQuestionForm, IqTests, QuizRunner, type BadgeTrackInfo, type LevelInfo, type LibraryInfo, type Nameplate,
-  type PositionInfo, type QuizInfo, type TrackInfo,
-} from "./iq-client";
+import { IqQuestionForm, QuizRunner, type QuizInfo } from "./iq-quiz-client";
+import { IqTests, type BadgeTrackInfo, type LevelInfo, type LibraryInfo, type Nameplate, type PositionInfo, type TrackInfo } from "./iq-tests-client";
 import { DetailHeading, MenuItem } from "./menu";
 import { CourseCard, buildCourse } from "./scorebook";
 import { BADGE_TRACK_LABEL, type BadgeTrack } from "@/lib/iq-tracks";

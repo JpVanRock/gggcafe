@@ -2,7 +2,7 @@ import { Disclosure, EmptyState } from "@/components/ui";
 import { MoveDial } from "@/components/move-dial";
 import { SpeedStripes } from "@/components/athletic";
 import { FOCUS_TIP, HITTING, MOVEMENT, changes, choiceOf, moveDial, type Category, type Values } from "@/lib/movement";
-import { saveHittingStyle, saveMovement } from "./actions";
+import { saveHittingStyle, saveMovement } from "./pop-actions";
 import type { StyleVersion } from "./data";
 import { DetailHeading } from "./menu";
 import { StyleForm } from "./movement-client";

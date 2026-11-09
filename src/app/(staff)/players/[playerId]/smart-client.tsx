@@ -4,7 +4,7 @@ import { useActionState, useOptimistic, useState, useTransition } from "react";
 import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import { GOAL_METHODS, GOAL_METHOD_LABEL, SKILL_AREAS, SKILL_AREA_LABEL, type GoalMethod } from "@/lib/softball";
-import { saveSmartGoal, setGoalMethod } from "./actions";
+import { saveSmartGoal, setGoalMethod } from "./goals-actions";
 import type { MetricOption, SmartGoal } from "./data";
 
 const METHOD_BLURB: Record<GoalMethod, string> = {

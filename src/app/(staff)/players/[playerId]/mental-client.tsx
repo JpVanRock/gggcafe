@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
-import { saveMentalPlan } from "./actions";
+import { saveMentalPlan } from "./mental-actions";
 import { MENTAL_FIELDS, type MentalPlan } from "./shared";
 
 export function MentalForm({ playerId, plan }: { playerId: string; plan: MentalPlan | null }) {
