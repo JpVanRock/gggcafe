@@ -5,7 +5,7 @@
 // graded in the database through the same test flow as the other IQ tests.
 import Link from "next/link";
 import { useState, useTransition } from "react";
-import { buttonClass, secondaryButtonClass, eyebrowClass } from "@/components/ui";
+import { buttonClass, secondaryButtonClass, eyebrowClass, cardClass } from "@/components/ui";
 import { ProgressBar } from "@/components/progress-bar";
 import { ManagerAward } from "@/components/manager-award";
 import { PositionField, ScoreBox, ScoreVisual } from "@/components/scorebook";
@@ -51,7 +51,7 @@ function LessonCheck({ check }: { check: NonNullable<Step["check"]> }) {
       {chosen !== null && (
         <div className="mt-3" aria-live="polite">
           <p className={`font-bold ${chosen === check.answer ? "text-highlight" : "text-pink-soft"}`}>{chosen === check.answer ? "Correct." : "Not quite."}</p>
-          <p className="mt-1 text-sm text-ink/90">{check.why}</p>
+          <p className="mt-1 text-base text-ink/90">{check.why}</p>
           {chosen !== check.answer && (
             <button type="button" onClick={() => setChosen(null)} className="mt-2 text-sm text-pink-soft underline">
               Try again
@@ -132,7 +132,7 @@ function LessonStep({ step }: { step: Step }) {
     <div>
       <h3 className="font-display text-2xl font-bold tracking-wide text-highlight uppercase">{step.title}</h3>
       {step.body.map((p, i) => (
-        <p key={i} className="mt-3 text-ink/90">
+        <p key={i} className="mt-3 max-w-prose text-ink/90">
           {p}
         </p>
       ))}
@@ -346,7 +346,7 @@ export function ChapterRunner({
     return (
       <div className="flex flex-col gap-5">
         {heading}
-        <div className="rounded-xl border border-navy-600 bg-navy-950/50 p-4 sm:p-6">
+        <div className={`${cardClass("inset")} p-4 sm:p-6`}>
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <span className="font-mono text-xs tracking-widest text-pink-soft uppercase">Chapter {n} quiz</span>
             <button type="button" onClick={() => setMode("ready")} className={secondaryButtonClass}>
@@ -406,7 +406,7 @@ export function ChapterRunner({
     return (
       <div className="flex flex-col gap-5">
         {heading}
-        <div className="flex flex-wrap items-center gap-6 rounded-xl border border-navy-600 bg-navy-950/50 p-6">
+        <div className={`${cardClass("inset")} flex flex-wrap items-center gap-6 p-6`}>
           <ManagerAward name={plate.name} earned={Boolean(earnedOn)} engrave={false} size={120} />
           <div className="min-w-56 flex-1">
             <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">Lessons done</p>
@@ -456,7 +456,7 @@ export function ChapterRunner({
         </div>
       )}
       <ProgressBar value={index + 1} max={chapter.steps.length} label={`Step ${index + 1} of ${chapter.steps.length}`} />
-      <article key={index} className="rounded-xl border border-navy-700 bg-navy-950/40 p-4 sm:p-6">
+      <article key={index} className={`${cardClass("inset")} p-4 sm:p-6`}>
         <LessonStep step={step} />
       </article>
       <nav className="flex flex-wrap items-center justify-between gap-3" aria-label="Lesson steps">

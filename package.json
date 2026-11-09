@@ -14,7 +14,9 @@
     "db:check": "bash scripts/db-check.sh",
     "test:unit": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test 'tests/unit/*.test.ts'",
     "test:pages": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-pages.mjs",
-    "db:new:definer": "bash scripts/db-new-definer.sh"
+    "db:new:definer": "bash scripts/db-new-definer.sh",
+    "test:a11y": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-a11y.mjs",
+    "screens": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/screens.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -32,6 +34,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "axe-core": "4.14.0",
     "eslint": "^9",
     "eslint-config-next": "16.4.5",
     "tailwindcss": "^4",

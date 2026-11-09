@@ -1,4 +1,4 @@
-import { Disclosure, EmptyState, eyebrowClass } from "@/components/ui";
+import { Disclosure, EmptyState, eyebrowClass, cardClass } from "@/components/ui";
 import { MoveDial } from "@/components/move-dial";
 import { SpeedStripes } from "@/components/athletic";
 import { FOCUS_TIP, HITTING, MOVEMENT, changes, choiceOf, moveDial, type Category, type Values } from "@/lib/movement";
@@ -46,7 +46,7 @@ function Cards({ categories, values }: { categories: Category[]; values: Values 
       {set.map((c) => {
         const o = choiceOf(categories, c.key, values[c.key])!;
         return (
-          <li key={c.key} className="rounded-xl border border-navy-700 bg-navy-950/40 p-3">
+          <li key={c.key} className={`${cardClass("inset")} p-3`}>
             <p className="font-mono text-2xs font-bold tracking-[0.15em] text-pink-soft uppercase">{c.title}</p>
             <p className="mt-1 text-lg leading-snug font-semibold text-highlight">{o.label}</p>
             {o.about && <p className="mt-1 text-sm text-muted">{o.about}</p>}
@@ -82,7 +82,7 @@ export function MovementSection({ playerId, versions, canManage }: { playerId: s
           </figure>
           <div className="flex flex-col gap-4">
             {focus && (
-              <div className="flex gap-3 rounded-xl border border-navy-700 bg-navy-950/40 p-3">
+              <div className={`${cardClass("inset")} flex gap-3 p-3`}>
                 <span aria-hidden className="mt-1 size-4 shrink-0 rounded-full" style={{ backgroundColor: focus.color }} />
                 <div>
                   <p className="flex items-center gap-2 font-mono text-2xs font-bold tracking-[0.15em] text-pink-soft uppercase">

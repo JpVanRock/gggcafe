@@ -10,7 +10,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { useRouter } from "next/navigation";
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Card, fieldClass, inputClass, pillButtonClass, pillOutlineClass, sectionLabelClass, TableScroll } from "@/components/ui";
+import { Card, fieldClass, inputClass, pillButtonClass, pillOutlineClass, sectionLabelClass, TableScroll, cardClass } from "@/components/ui";
 import { formatLongDate } from "@/lib/dates";
 import {
   BASE_RUNNING_LABEL, GAME_JOB_STARTERS, HITTING_TYPE_LABEL, MAX_ROTATIONS, PITCHES, ROTATION_SPOTS, dpFlexProblems, fieldingPlayers, percent,
@@ -443,7 +443,7 @@ export function LineupBuilder({
               </label>
             );
             return (
-              <li key={r} className="rounded-xl border border-navy-700 bg-navy-950/40 p-3">
+              <li key={r} className={`${cardClass("inset")} p-3`}>
                 <p className="mb-2 text-sm">
                   <span className="font-display font-bold text-highlight">R{r}</span>
                   <span className="ml-2 font-semibold">{pitcher ? byId.get(pitcher)?.short : <span className="text-pink-soft">No pitcher yet: set someone to P in R{r}</span>}</span>

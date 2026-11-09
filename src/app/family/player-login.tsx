@@ -6,6 +6,7 @@ import { useActionState } from "react";
 import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import { createPlayerLogin, resetPlayerPassword } from "./actions";
+import { SubmitButton } from "@/components/submit-button";
 
 function Passwords({ label }: { label: string }) {
   return (
@@ -44,25 +45,23 @@ export function CreatePlayerLoginForm({ playerId, firstName, suggestion }: { pla
         <button type="submit" disabled={pending} className={buttonClass}>
           {pending ? "Creating…" : `Create ${firstName}'s login`}
         </button>
-        <FormMessage error={state.error} />
+        <FormMessage error={state.error} fields={state.fields} />
       </div>
     </form>
   );
 }
 
 export function ResetPlayerPasswordForm({ playerId, firstName }: { playerId: string; firstName: string }) {
-  const [state, action, pending] = useActionState(resetPlayerPassword, initialFormState);
+  const [state, action] = useActionState(resetPlayerPassword, initialFormState);
   return (
     <form action={action} className="grid gap-4 sm:grid-cols-3">
       <input type="hidden" name="player_id" value={playerId} />
       <Passwords label={`${firstName}'s new password`} />
       <div className="flex items-end">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : "Set new password"}
-        </button>
+        <SubmitButton>Set new password</SubmitButton>
       </div>
       <div className="sm:col-span-3">
-        <FormMessage error={state.error} saved={state.saved} />
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );

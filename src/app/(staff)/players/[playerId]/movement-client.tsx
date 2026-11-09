@@ -1,9 +1,10 @@
 "use client";
 
 import { useActionState } from "react";
-import { FormMessage, buttonClass, inputClass } from "@/components/ui";
+import { FormMessage, inputClass } from "@/components/ui";
 import { initialFormState, type FormState } from "@/lib/form";
 import type { Category, Values } from "@/lib/movement";
+import { SubmitButton } from "@/components/submit-button";
 
 /**
  * Dropdowns for Movement Preferences (coach wording first) or Preferred
@@ -24,7 +25,7 @@ export function StyleForm({
   coachWords?: boolean;
   submitLabel: string;
 }) {
-  const [state, formAction, pending] = useActionState(action, initialFormState);
+  const [state, formAction] = useActionState(action, initialFormState);
   return (
     <form action={formAction} className="flex flex-col gap-4">
       <input type="hidden" name="player_id" value={playerId} />
@@ -47,15 +48,13 @@ export function StyleForm({
         ))}
       </div>
       <div className="flex flex-wrap items-center gap-3">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : submitLabel}
-        </button>
+        <SubmitButton>{submitLabel}</SubmitButton>
         {state.saved && !state.error ? (
           <p aria-live="polite" className="text-sm text-highlight">
             Saved. Earlier answers stay in the history.
           </p>
         ) : (
-          <FormMessage error={state.error} />
+          <FormMessage error={state.error} fields={state.fields} />
         )}
       </div>
     </form>

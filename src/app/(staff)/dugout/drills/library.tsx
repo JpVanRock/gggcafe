@@ -3,11 +3,12 @@
 import { useActionState, useState } from "react";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { DrillTags } from "@/components/drill-tags";
-import { Disclosure, EmptyState, Field, FormMessage, buttonClass, inputClass, secondaryButtonClass } from "@/components/ui";
+import { Disclosure, EmptyState, Field, FormMessage, inputClass, secondaryButtonClass, cardClass } from "@/components/ui";
 import { DRILL_TAGS, DRILL_TAG_LABEL, filterDrills, type DrillTag, type LibraryDrill } from "@/lib/dugout";
 import { initialFormState } from "@/lib/form";
 import { deleteDrill, saveDrill } from "./actions";
 import { ActionForm } from "@/components/action-form";
+import { SubmitButton } from "@/components/submit-button";
 
 /** Tag filter pills: "All" plus every tag, with counts. Shared with the plan builder. */
 export function TagFilter({
@@ -36,7 +37,7 @@ export function TagFilter({
               on ? "border-pink bg-pink text-on-accent" : "border-navy-600 text-muted hover:border-pink hover:text-ink"
             }`}
           >
-            {tag === "all" ? "All" : DRILL_TAG_LABEL[tag]} <span className="tabular-nums opacity-70">{count}</span>
+            {tag === "all" ? "All" : DRILL_TAG_LABEL[tag]} <span className="tabular-nums">{count}</span>
           </button>
         );
       })}
@@ -45,7 +46,7 @@ export function TagFilter({
 }
 
 function DrillForm({ drill, onDone }: { drill?: LibraryDrill; onDone?: () => void }) {
-  const [state, action, pending] = useActionState(async (prev: typeof initialFormState, fd: FormData) => {
+  const [state, action] = useActionState(async (prev: typeof initialFormState, fd: FormData) => {
     const result = await saveDrill(prev, fd);
     if (result.saved && onDone) onDone();
     return result;
@@ -88,15 +89,13 @@ function DrillForm({ drill, onDone }: { drill?: LibraryDrill; onDone?: () => voi
         <input name="video_url" type="url" maxLength={500} defaultValue={drill?.video_url ?? ""} placeholder="https://" className={inputClass} />
       </Field>
       <div className="flex flex-wrap items-center gap-3">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : drill ? "Save drill" : "Add to library"}
-        </button>
+        <SubmitButton>{drill ? "Save drill" : "Add to library"}</SubmitButton>
         {onDone && (
           <button type="button" onClick={onDone} className={secondaryButtonClass}>
             Cancel
           </button>
         )}
-        <FormMessage error={state.error} saved={state.saved && !drill} />
+        <FormMessage error={state.error} saved={state.saved && !drill} fields={state.fields} />
       </div>
     </form>
   );
@@ -112,7 +111,7 @@ function DrillCard({ drill, canEdit }: { drill: LibraryDrill; canEdit: boolean }
     );
   }
   return (
-    <li className="flex flex-col rounded-xl border border-navy-700 bg-navy-900/70 p-4">
+    <li className={`${cardClass("raised")} flex flex-col p-4`}>
       <p className="text-lg leading-snug font-semibold text-ink">{drill.name}</p>
       <DrillTags tags={drill.tags} className="mt-1.5" />
       {drill.description && <p className="mt-3 text-sm whitespace-pre-line text-muted">{drill.description}</p>}

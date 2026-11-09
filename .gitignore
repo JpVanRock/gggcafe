@@ -49,3 +49,6 @@ supabase/.branches/
 .venv/
 __pycache__/
 *.pyc
+
+# npm run screens output (CI keeps them as an artifact)
+/screens

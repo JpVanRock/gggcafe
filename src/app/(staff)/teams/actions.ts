@@ -5,9 +5,7 @@ import { redirect } from "next/navigation";
 import { editorCheck } from "@/lib/auth";
 import { readEventForm, timeOf, weeklyDates } from "@/lib/team-events";
 import { createClient } from "@/lib/supabase/server";
-import {
-  checkbox, friendlyDbError, isoDate, oneOf, text, wholeNumber, type FormState,
-} from "@/lib/form";
+import { checkbox, friendlyDbError, isoDate, oneOf, text, wholeNumber, type FormState, invalid } from "@/lib/form";
 import { BATS, FORMATS, POSITIONS, THROWS, isUuid } from "@/lib/softball";
 import { STALE, failed, must, runAction } from "@/lib/actions";
 
@@ -73,7 +71,7 @@ export async function createSeason(_prev: FormState, fd: FormData): Promise<Form
   const start_date = isoDate(fd, "start_date");
   const end_date = isoDate(fd, "end_date");
   const teamId = text(fd, "team_id");
-  if (!name) return { error: "Name the season, e.g. “Spring 2027”." };
+  if (!name) return invalid("name", "Name the season, e.g. “Spring 2027”.");
   if (start_date && end_date && end_date < start_date) {
     return { error: "The end date is before the start date." };
   }
@@ -104,10 +102,10 @@ export async function addNewPlayerToRoster(_prev: FormState, fd: FormData): Prom
   if (!first_name || !last_name) return { error: "Enter the player's first and last name." };
 
   const jersey = text(fd, "jersey_number");
-  if (jersey && !JERSEY.test(jersey)) return { error: "Jersey numbers are 0–99 (00 is fine)." };
+  if (jersey && !JERSEY.test(jersey)) return invalid("jersey_number", "Jersey numbers are 0–99 (00 is fine).");
 
   const grad_year = wholeNumber(fd, "grad_year", 2000, 2100);
-  if (grad_year === "invalid") return { error: "Grad year should be a year like 2030." };
+  if (grad_year === "invalid") return invalid("grad_year", "Grad year should be a year like 2030.");
 
   const supabase = await createClient();
   const { data: player, error: playerError } = await supabase
@@ -148,7 +146,7 @@ export async function addExistingPlayerToRoster(_prev: FormState, fd: FormData):
   if (!isUuid(playerId)) return { error: "Choose a player." };
 
   const jersey = text(fd, "jersey_number");
-  if (jersey && !JERSEY.test(jersey)) return { error: "Jersey numbers are 0–99 (00 is fine)." };
+  if (jersey && !JERSEY.test(jersey)) return invalid("jersey_number", "Jersey numbers are 0–99 (00 is fine).");
 
   const supabase = await createClient();
   const { error } = await supabase
@@ -167,7 +165,7 @@ export async function updateRosterEntry(_prev: FormState, fd: FormData): Promise
   const id = text(fd, "id");
   if (!isUuid(id)) return { error: "Unknown roster entry." };
   const jersey = text(fd, "jersey_number");
-  if (jersey && !JERSEY.test(jersey)) return { error: "Jersey numbers are 0–99 (00 is fine)." };
+  if (jersey && !JERSEY.test(jersey)) return invalid("jersey_number", "Jersey numbers are 0–99 (00 is fine).");
 
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -211,7 +209,7 @@ export async function addTeamEvent(_prev: FormState, fd: FormData): Promise<Form
   const event = readEventForm(fd);
   if (event.error !== null) return { error: event.error };
   const repeatUntil = isoDate(fd, "repeat_until");
-  if (repeatUntil && repeatUntil < event.event_date) return { error: "“Repeat until” is before the first date." };
+  if (repeatUntil && repeatUntil < event.event_date) return invalid("repeat_until", "“Repeat until” is before the first date.");
 
   const dates = weeklyDates(event.event_date, repeatUntil);
   const series_id = dates.length > 1 ? crypto.randomUUID() : null;
@@ -247,10 +245,10 @@ export async function addGame(_prev: FormState, fd: FormData): Promise<FormState
   if (!isUuid(opponentId)) return { error: "Choose the opponent. Add them on the Teams page first if they're new." };
   if (opponentId === teamId) return { error: "A team can't play itself." };
   const game_date = isoDate(fd, "game_date");
-  if (!game_date) return { error: "Pick the game date." };
+  if (!game_date) return invalid("game_date", "Pick the game date.");
   const seasonId = text(fd, "season_id");
   const innings = wholeNumber(fd, "scheduled_innings", 1, 15);
-  if (innings === "invalid") return { error: "Innings should be between 1 and 15." };
+  if (innings === "invalid") return invalid("scheduled_innings", "Innings should be between 1 and 15.");
   const home = fd.get("home_away") !== "away";
 
   const supabase = await createClient();

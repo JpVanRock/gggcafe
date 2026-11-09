@@ -1,16 +1,17 @@
 "use client";
 
 import { useActionState } from "react";
-import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, inputClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import { DUTY_PHASES, DUTY_PHASE_LABEL, type DutyPhase } from "@/lib/staff-duties";
 import { addDuty, removeDuty, saveDutyOwners, saveStaffStandards } from "./actions";
+import { SubmitButton } from "@/components/submit-button";
 
 export type DutyRow = { id: string; phase: DutyPhase; duty: string; owner: string | null };
 
 /** The whole matrix in one form: an owner for every job, saved together. */
 export function DutyMatrixForm({ duties, names }: { duties: DutyRow[]; names: string[] }) {
-  const [state, action, pending] = useActionState(saveDutyOwners, initialFormState);
+  const [state, action] = useActionState(saveDutyOwners, initialFormState);
   const [removed, remove] = useActionState(removeDuty, initialFormState);
   return (
     <form action={action} className="flex flex-col gap-5">
@@ -43,9 +44,7 @@ export function DutyMatrixForm({ duties, names }: { duties: DutyRow[]; names: st
         })}
       </div>
       <div className="flex items-center gap-4">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : "Save who does what"}
-        </button>
+        <SubmitButton>Save who does what</SubmitButton>
         <FormMessage error={state.error ?? removed.error} saved={state.saved} />
       </div>
     </form>
@@ -53,7 +52,7 @@ export function DutyMatrixForm({ duties, names }: { duties: DutyRow[]; names: st
 }
 
 export function AddDutyForm({ teamId }: { teamId: string }) {
-  const [state, action, pending] = useActionState(addDuty, initialFormState);
+  const [state, action] = useActionState(addDuty, initialFormState);
   return (
     <form action={action} className="grid gap-3 sm:grid-cols-[12rem_1fr_1fr_auto] sm:items-end">
       <input type="hidden" name="team_id" value={teamId} />
@@ -72,18 +71,16 @@ export function AddDutyForm({ teamId }: { teamId: string }) {
       <Field label="Who">
         <input name="owner" maxLength={60} list="staff-names" className={inputClass} />
       </Field>
-      <button type="submit" disabled={pending} className={buttonClass}>
-        {pending ? "Adding…" : "Add"}
-      </button>
+      <SubmitButton pendingLabel="Adding…">Add</SubmitButton>
       <div className="sm:col-span-4">
-        <FormMessage error={state.error} saved={state.saved} />
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );
 }
 
 export function StaffStandardsForm({ teamId, commitment, prePractice }: { teamId: string; commitment: string[]; prePractice: string[] }) {
-  const [state, action, pending] = useActionState(saveStaffStandards, initialFormState);
+  const [state, action] = useActionState(saveStaffStandards, initialFormState);
   return (
     <form action={action} className="grid gap-4 lg:grid-cols-2">
       <input type="hidden" name="team_id" value={teamId} />
@@ -94,10 +91,8 @@ export function StaffStandardsForm({ teamId, commitment, prePractice }: { teamId
         <textarea name="pre_practice" rows={8} defaultValue={prePractice.join("\n")} className={inputClass} />
       </Field>
       <div className="flex items-center gap-4 lg:col-span-2">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : "Save standards"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>Save standards</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );

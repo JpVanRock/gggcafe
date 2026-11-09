@@ -150,6 +150,11 @@ a {
   text-underline-offset: 3px;
 }
 
+/* A link inside a sentence is always underlined, so it never relies on color alone. */
+:is(p, dd) a.text-link {
+  text-decoration-line: underline;
+}
+
 /* Keep the page from scrolling behind an open pop-up */
 html:has(dialog[open]) {
   overflow: hidden;

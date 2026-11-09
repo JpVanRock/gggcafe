@@ -3,12 +3,13 @@
 // Forms for Coaches Dugout → Playbook: plays on the call sheet, team quizzes and the
 // scouting checklist.
 import { useActionState } from "react";
-import { Field, FormMessage, buttonClass, inputClass, sectionLabelClass } from "@/components/ui";
+import { Field, FormMessage, inputClass, sectionLabelClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import {
   CONFIDENCE_LABEL, PLAY_CATEGORIES, PLAY_CATEGORY_LABEL, SCOUT_CATEGORY_LABEL, SCOUT_PROMPTS, SIGN_RULE, type PlayCategory,
 } from "@/lib/playbook";
 import { addQuizQuestion, addScoutNote, createQuiz, savePlay, saveScouting } from "./actions";
+import { SubmitButton } from "@/components/submit-button";
 
 export type PlayRow = {
   id: string;
@@ -21,7 +22,7 @@ export type PlayRow = {
 };
 
 export function PlayForm({ teamId, teamName, play }: { teamId: string; teamName: string; play?: PlayRow }) {
-  const [state, action, pending] = useActionState(savePlay, initialFormState);
+  const [state, action] = useActionState(savePlay, initialFormState);
   return (
     <form action={action} className="grid gap-3 sm:grid-cols-2">
       <input type="hidden" name="team_id" value={teamId} />
@@ -60,17 +61,15 @@ export function PlayForm({ teamId, teamName, play }: { teamId: string; teamName:
         On the call sheet (players drill it)
       </label>
       <div className="flex items-center gap-4 sm:col-span-2">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : play ? "Save play" : "Add play"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>{play ? "Save play" : "Add play"}</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );
 }
 
 export function NewQuizForm({ teamId }: { teamId: string }) {
-  const [state, action, pending] = useActionState(createQuiz, initialFormState);
+  const [state, action] = useActionState(createQuiz, initialFormState);
   return (
     <form action={action} className="flex flex-wrap items-end gap-3">
       <input type="hidden" name="team_id" value={teamId} />
@@ -79,16 +78,14 @@ export function NewQuizForm({ teamId }: { teamId: string }) {
           <input name="title" required maxLength={80} placeholder="e.g. Bunt defense calls" className={inputClass} />
         </Field>
       </div>
-      <button type="submit" disabled={pending} className={buttonClass}>
-        {pending ? "Creating…" : "Create quiz"}
-      </button>
-      <FormMessage error={state.error} />
+      <SubmitButton pendingLabel="Creating…">Create quiz</SubmitButton>
+      <FormMessage error={state.error} fields={state.fields} />
     </form>
   );
 }
 
 export function QuizQuestionForm({ quizId, plays }: { quizId: string; plays: { id: string; name: string }[] }) {
-  const [state, action, pending] = useActionState(addQuizQuestion.bind(null, quizId), initialFormState);
+  const [state, action] = useActionState(addQuizQuestion.bind(null, quizId), initialFormState);
   return (
     <form action={action} className="grid gap-3 sm:grid-cols-2">
       <div className="sm:col-span-2">
@@ -128,10 +125,8 @@ export function QuizQuestionForm({ quizId, plays }: { quizId: string; plays: { i
         </Field>
       </div>
       <div className="flex items-center gap-4 sm:col-span-2">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Adding…" : "Add question"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton pendingLabel="Adding…">Add question</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );
@@ -148,7 +143,7 @@ export function ScoutingForm({
   defaultOpponent: string | null;
   today: string;
 }) {
-  const [state, action, pending] = useActionState(saveScouting, initialFormState);
+  const [state, action] = useActionState(saveScouting, initialFormState);
   const categories = [...new Set(SCOUT_PROMPTS.map((p) => p.category))];
   return (
     <form action={action} className="flex flex-col gap-5">
@@ -202,17 +197,15 @@ export function ScoutingForm({
         </fieldset>
       ))}
       <div className="flex items-center gap-4">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : "Save scouting report"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>Save scouting report</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );
 }
 
 export function ScoutNoteForm({ opponentId, today }: { opponentId: string; today: string }) {
-  const [state, action, pending] = useActionState(addScoutNote, initialFormState);
+  const [state, action] = useActionState(addScoutNote, initialFormState);
   return (
     <form action={action} className="grid gap-3 sm:grid-cols-3">
       <input type="hidden" name="opponent_id" value={opponentId} />
@@ -237,10 +230,8 @@ export function ScoutNoteForm({ opponentId, today }: { opponentId: string; today
         </Field>
       </div>
       <div className="flex items-center gap-4 sm:col-span-3">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : "Add note"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>Add note</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );

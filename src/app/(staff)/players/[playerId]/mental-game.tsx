@@ -3,7 +3,7 @@
 // journal. Server component; the forms are in mental-game-client.tsx.
 import Link from "next/link";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Disclosure, eyebrowClass } from "@/components/ui";
+import { Disclosure, eyebrowClass, cardClass } from "@/components/ui";
 import { formatDay } from "@/lib/dates";
 import {
   CONTEXT_LABEL, DEFAULT_ZONE, GUIDED_SESSIONS, SCAN_LABELS, SCAN_SKILLS, SIGNALS, monthStart, scanAverage, scanChange, scanExtremes, zoneStatus,
@@ -98,7 +98,7 @@ export function MentalTools({
         {canEdit && <IntensityForm playerId={playerId} zone={zone} />}
         {checks.length > 0 ? (
           <div className="flex flex-col gap-3">
-            <div className="relative flex h-28 items-end gap-1.5 rounded-xl border border-navy-700 bg-navy-950/40 px-3 pt-3 pb-2" aria-hidden>
+            <div className={`${cardClass("inset")} relative flex h-28 items-end gap-1.5 px-3 pt-3 pb-2`} aria-hidden>
               {/* her zone as a band */}
               <span
                 className="absolute inset-x-0 border-y border-dashed border-neon/40 bg-neon/5"

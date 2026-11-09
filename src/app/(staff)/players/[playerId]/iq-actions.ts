@@ -4,7 +4,7 @@
 import { refresh } from "next/cache";
 import { actForCheck, actorCheck, editorCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { friendlyDbError, oneOf, text, type FormState } from "@/lib/form";
+import { friendlyDbError, oneOf, text, type FormState, invalid } from "@/lib/form";
 import { FIELD_POSITIONS, POSITIONS, isUuid } from "@/lib/softball";
 import type { Enums } from "@/lib/supabase/database.types";
 import { CHAPTERS } from "@/lib/scorebook";
@@ -72,7 +72,7 @@ export async function saveIqQuestion(_prev: FormState, fd: FormData): Promise<Fo
   const id = text(fd, "id");
   const topic = oneOf(fd, "topic", IQ_TOPICS) ?? "general";
   const position = topic === "position" ? oneOf(fd, "position", POSITIONS) : null;
-  if (topic === "position" && !position) return { error: "Pick the position this question is for." };
+  if (topic === "position" && !position) return invalid("topic", "Pick the position this question is for.");
   const scenario = text(fd, "scenario");
   const question = text(fd, "question");
   if (!scenario || !question) return { error: "Describe the game situation and ask the question." };

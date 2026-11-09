@@ -1,10 +1,11 @@
 "use client";
 
 import { useActionState, useOptimistic, useTransition } from "react";
-import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, inputClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import { saveGoals, setGoalActionDone } from "./goals-actions";
 import type { HaradaChart } from "./data";
+import { SubmitButton } from "@/components/submit-button";
 
 export function GoalActionCheckbox({ actionId, title, done }: { actionId: string; title: string; done: boolean }) {
   const [isDone, setDone] = useOptimistic(done);
@@ -29,7 +30,7 @@ export function GoalActionCheckbox({ actionId, title, done }: { actionId: string
 }
 
 export function GoalsForm({ playerId, chart }: { playerId: string; chart: HaradaChart | null }) {
-  const [state, action, pending] = useActionState(saveGoals, initialFormState);
+  const [state, action] = useActionState(saveGoals, initialFormState);
   const pillar = (n: number) => chart?.pillars.find((p) => p.position === n);
 
   return (
@@ -90,10 +91,8 @@ export function GoalsForm({ playerId, chart }: { playerId: string; chart: Harada
       </div>
 
       <div className="sticky bottom-0 -mx-1 flex items-center gap-4 bg-navy-900/95 px-1 py-3">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : "Save goal chart"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>Save goal chart</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );

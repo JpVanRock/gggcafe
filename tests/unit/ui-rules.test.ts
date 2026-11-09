@@ -40,6 +40,16 @@ test("pink text uses the link token (brand pink is too faint on white in Day Gam
   assert.deepEqual(find(/(?<![\w-])text-pink(?![\w-])/), [], "use text-link (or text-pink-soft for labels)");
 });
 
+test("secondary text is text-muted at full strength (a faded grey fails contrast)", () => {
+  // placeholder:text-muted/60 is fine: the variant prefix is excluded
+  assert.deepEqual(find(/(?<![\w:/-])text-muted\/\d+/), [], "use text-muted, and dashed borders or a label for a locked or inactive state");
+});
+
+test("text on neon or pink fills is navy (text-on-accent)", () => {
+  // white on brand pink is 3.7:1, too faint for small text
+  assert.deepEqual(find(/\bbg-(?:pink|neon)\b[^"`]*\btext-white\b|\btext-white\b[^"`]*\bbg-(?:pink|neon)\b/), []);
+});
+
 test("no browser confirm boxes: use ConfirmSubmit or confirmAction", () => {
   assert.deepEqual(find(/window\.confirm\(/, (p) => p === "components/confirm-submit.tsx"), []);
 });

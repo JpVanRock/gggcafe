@@ -1,13 +1,14 @@
 "use client";
 
 import { useActionState } from "react";
-import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, inputClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import { joinTeam } from "./actions";
+import { SubmitButton } from "@/components/submit-button";
 
 /** Team code + daughter's name (and her own name the first time). */
 export function JoinForm({ askName, defaultName }: { askName: boolean; defaultName: string }) {
-  const [state, action, pending] = useActionState(joinTeam, initialFormState);
+  const [state, action] = useActionState(joinTeam, initialFormState);
   return (
     <form action={action} className="grid gap-4 sm:grid-cols-2">
       {askName && (
@@ -24,10 +25,8 @@ export function JoinForm({ askName, defaultName }: { askName: boolean; defaultNa
         <input name="child" required maxLength={80} autoComplete="off" className={inputClass} />
       </Field>
       <div className="flex flex-wrap items-center gap-3 sm:col-span-2">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Sending…" : "Ask to join"}
-        </button>
-        <FormMessage error={state.error} />
+        <SubmitButton pendingLabel="Sending…">Ask to join</SubmitButton>
+        <FormMessage error={state.error} fields={state.fields} />
       </div>
     </form>
   );

@@ -6,10 +6,11 @@
 // shows in each player's TWIS for that week.
 import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
-import { Field, FormMessage, inputClass, pillButtonClass, pillQuietClass, badgeClass } from "@/components/ui";
+import { Field, FormMessage, inputClass, pillButtonClass, pillQuietClass, badgeClass, cardClass, EmptyState } from "@/components/ui";
 import { EVENT_KINDS, EVENT_KIND_LABEL, clockLabel, parseClock, type EventKind } from "@/lib/dugout";
 import { initialFormState, type FormState } from "@/lib/form";
 import { deleteCalendarEvent, saveCalendarEvent } from "./actions";
+import { SubmitButton } from "@/components/submit-button";
 
 export type CalEvent = {
   id: string;
@@ -80,7 +81,7 @@ function GameChip({ game, onOpen }: { game: CalGame; onOpen: () => void }) {
 
 function EventForm({ mode, teamId, onDone }: { mode: { type: "add"; date: string } | { type: "event"; event: CalEvent }; teamId: string; onDone: () => void }) {
   const event = mode.type === "event" ? mode.event : null;
-  const [state, action, pending] = useActionState(async (prev: FormState, fd: FormData) => {
+  const [state, action] = useActionState(async (prev: FormState, fd: FormData) => {
     const result = await saveCalendarEvent(prev, fd);
     if (result.saved) onDone();
     return result;
@@ -132,10 +133,8 @@ function EventForm({ mode, teamId, onDone }: { mode: { type: "add"; date: string
           </Field>
         </div>
         <div className="flex flex-wrap items-center gap-3 sm:col-span-2">
-          <button type="submit" disabled={pending} className={pillButtonClass}>
-            {pending ? "Saving…" : event ? "Save changes" : "Add to calendar"}
-          </button>
-          <FormMessage error={state.error} />
+          <SubmitButton variant="pill">{event ? "Save changes" : "Add to calendar"}</SubmitButton>
+          <FormMessage error={state.error} fields={state.fields} />
         </div>
       </form>
 
@@ -156,7 +155,7 @@ function EventForm({ mode, teamId, onDone }: { mode: { type: "add"; date: string
           <button type="submit" disabled={deleting} className="rounded-full border border-danger/60 px-4 py-1.5 text-sm text-danger hover:bg-danger/10">
             {deleting ? "Removing…" : "Remove from calendar"}
           </button>
-          <FormMessage error={delState.error} />
+          <FormMessage error={delState.error} fields={delState.fields} />
         </form>
       )}
     </div>
@@ -299,7 +298,7 @@ export function CalendarView({
                 <div className="mb-1 flex items-center justify-between">
                   <span
                     className={`grid size-6 place-items-center rounded-full font-display text-xs tabular-nums ${
-                      isToday ? "bg-pink font-bold text-on-accent" : inMonth(date) ? "text-ink" : "text-muted/60"
+                      isToday ? "bg-pink font-bold text-on-accent" : inMonth(date) ? "text-ink" : "text-muted"
                     }`}
                   >
                     {Number(date.slice(8))}
@@ -345,12 +344,12 @@ export function CalendarView({
           </button>
         )}
         {agenda.length === 0 ? (
-          <p className="rounded-md border border-dashed border-navy-600 p-6 text-center text-sm text-muted">Nothing on the calendar this month.</p>
+          <EmptyState>Nothing on the calendar this month.</EmptyState>
         ) : (
           agenda.map((date) => {
             const { games: g, events: e } = byDay(date);
             return (
-              <section key={date} className="rounded-xl border border-navy-700 bg-navy-900/60 p-3">
+              <section key={date} className={`${cardClass("raised")} p-3`}>
                 <h3 className={`mb-2 font-mono text-2xs font-bold tracking-[0.2em] uppercase ${date === today ? "text-highlight" : "text-pink-soft"}`}>
                   {dayLabel(date)}
                   {date === today && " · Today"}

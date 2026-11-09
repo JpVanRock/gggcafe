@@ -4,7 +4,7 @@
 import { useDraggable } from "@dnd-kit/core";
 import { useState } from "react";
 import { DrillTags } from "@/components/drill-tags";
-import { Card, inputClass } from "@/components/ui";
+import { Card, inputClass, cardClass } from "@/components/ui";
 import { filterDrills, type DrillTag, type LibraryDrill } from "@/lib/dugout";
 import { TagFilter } from "../../drills/library";
 import { GripIcon, chip, labelClass } from "./builder-shared";
@@ -19,7 +19,7 @@ export function LibraryItem({ drill, onAdd }: { drill: LibraryDrill; onAdd: () =
     <li
       ref={setNodeRef}
       {...listeners}
-      className={`flex cursor-grab items-start gap-2 rounded-lg border border-navy-700 bg-navy-950/50 p-2.5 touch-manipulation hover:border-pink/70 ${
+      className={`flex cursor-grab items-start gap-2 ${cardClass("inset")} p-2.5 touch-manipulation hover:border-pink/70 ${
         isDragging ? "opacity-40" : ""
       }`}
     >

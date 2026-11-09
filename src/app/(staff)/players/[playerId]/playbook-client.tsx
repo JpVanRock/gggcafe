@@ -45,7 +45,6 @@ export function Flashcards({ cards }: { cards: CallCard[] }) {
       <button
         type="button"
         onClick={() => setDeck(flip)}
-        aria-label={deck.flipped ? `What to do on ${card.name}. Tap to see the call` : `${card.name}. Tap to see what to do`}
         className={`flex min-h-56 w-full flex-col items-center justify-center gap-3 rounded-2xl border p-6 text-center transition ${
           deck.flipped ? "border-pink bg-navy-900" : "border-navy-600 bg-navy-950/60 hover:border-pink"
         }`}
@@ -194,7 +193,7 @@ export function TeamQuizRunner({ playerId, quizId, questions, canAct }: { player
       {reveal && (
         <div className={`rounded-xl border px-4 py-3 text-sm ${a.is_correct ? "border-neon/60 text-ink" : "border-pink/60 text-ink"}`}>
           <p className="font-semibold">{a.is_correct ? "Right." : "Not this time."}</p>
-          {a.explanation && <p className="mt-1 text-muted">{a.explanation}</p>}
+          {a.explanation && <p className="mt-1 text-base text-ink/90">{a.explanation}</p>}
         </div>
       )}
       {error && (

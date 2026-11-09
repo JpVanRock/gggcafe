@@ -1,5 +1,6 @@
 # Every push and pull request: lint, types, unit tests, database tests (throwaway local Postgres,
-# no secrets), the production build, and the page smoke test (every page in sample-data mode).
+# no secrets), the production build, the page smoke test (every page in sample-data mode), and the
+# accessibility check (axe-core WCAG 2.2 A/AA in the runner's Chrome, Night and Day Game).
 name: CI
 on:
   push:
@@ -31,3 +32,15 @@ jobs:
       - run: npm run db:test
       - run: npm run build
       - run: npm run test:pages
+      - run: npm run test:a11y
+      # pictures of the key pages (phone and desktop, Night and Day Game) to review a change by eye;
+      # informational, so it never fails the build
+      - run: npm run screens
+        continue-on-error: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screens
+          path: screens/
+          retention-days: 14
+          if-no-files-found: ignore

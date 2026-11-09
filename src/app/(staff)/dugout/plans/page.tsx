@@ -3,7 +3,7 @@ import Link from "next/link";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { canEditPlanRole } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
-import { Disclosure, EmptyState, RECENT_LIMIT, ShowAllLink, badgeClass } from "@/components/ui";
+import { Disclosure, EmptyState, RECENT_LIMIT, ShowAllLink, badgeClass, cardClass } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import { PRACTICE_SETTING_LABEL, durationLabel, practiceRange, type PracticeSetting } from "@/lib/dugout";
 import { loadDugoutTeam } from "../data";
@@ -45,7 +45,7 @@ function PlanCard({ plan, viewOnly = false }: { plan: PlanRow; viewOnly?: boolea
     <li>
       <Link
         href={`/dugout/plans/${plan.id}`}
-        className="flex items-center gap-4 rounded-xl border border-navy-700 bg-navy-900/70 p-4 transition hover:border-pink hover:bg-navy-800"
+        className={`${cardClass("raised")} flex items-center gap-4 p-4 transition hover:border-pink hover:bg-navy-800`}
       >
         <div className="w-16 shrink-0 text-center">
           <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">{weekday}</p>

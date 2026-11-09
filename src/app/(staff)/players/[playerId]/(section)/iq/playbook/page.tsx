@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { EmptyState, sectionLabelClass } from "@/components/ui";
+import { EmptyState, sectionLabelClass, cardClass } from "@/components/ui";
 import { loadPlayer } from "../../../section-data";
 import { loadTeamPlaybook } from "../../../playbook-data";
 import { Flashcards } from "../../../playbook-client";
@@ -38,7 +38,7 @@ export default async function TeamPlaybookPage({ params }: PageProps<"/players/[
                   <li key={q.id}>
                     <Link
                       href={`/players/${player.id}/iq/playbook/${q.id}`}
-                      className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-navy-700 bg-navy-950/40 p-4 transition hover:border-pink"
+                      className={`${cardClass("inset")} flex flex-wrap items-center justify-between gap-3 p-4 transition hover:border-pink`}
                     >
                       <span>
                         <span className="block font-semibold text-ink">{q.title}</span>

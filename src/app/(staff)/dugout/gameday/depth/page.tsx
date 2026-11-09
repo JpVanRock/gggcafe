@@ -13,7 +13,7 @@ import { ActionForm } from "@/components/action-form";
 
 export const metadata: Metadata = { title: "Depth Chart · GameDay · GGG.Cafe" };
 
-const iconButton = "rounded px-1.5 text-muted hover:text-ink disabled:opacity-30";
+const iconButton = "inline-grid min-h-6 min-w-6 place-items-center rounded px-1.5 text-muted hover:text-ink disabled:opacity-30";
 
 export default async function DepthChartPage({ searchParams }: PageProps<"/dugout/gameday/depth">) {
   const user = await requireHeadCoachPage();

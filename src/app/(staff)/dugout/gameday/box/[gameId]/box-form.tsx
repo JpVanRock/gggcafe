@@ -233,10 +233,10 @@ export function BoxScoreForm({
                       </select>
                     </td>
                     <td className="px-1 text-center">
-                      <input type="checkbox" checked={p.starter} onChange={(e) => setPitch(i, { starter: e.target.checked })} aria-label="Started" className="accent-pink" />
+                      <input type="checkbox" checked={p.starter} onChange={(e) => setPitch(i, { starter: e.target.checked })} aria-label="Started" className="size-5 accent-pink" />
                     </td>
                     <td className="px-1">
-                      <button type="button" onClick={() => setPitching((list) => list.filter((_, k) => k !== i))} aria-label="Remove pitcher" className="text-muted hover:text-danger">
+                      <button type="button" onClick={() => setPitching((list) => list.filter((_, k) => k !== i))} aria-label="Remove pitcher" className="inline-grid min-h-6 min-w-6 place-items-center rounded text-muted hover:text-danger">
                         ✕
                       </button>
                     </td>

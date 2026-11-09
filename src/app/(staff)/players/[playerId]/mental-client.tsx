@@ -1,13 +1,14 @@
 "use client";
 
 import { useActionState } from "react";
-import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, inputClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import { saveMentalPlan } from "./mental-actions";
 import { MENTAL_FIELDS, type MentalPlan } from "./shared";
+import { SubmitButton } from "@/components/submit-button";
 
 export function MentalForm({ playerId, plan }: { playerId: string; plan: MentalPlan | null }) {
-  const [state, action, pending] = useActionState(saveMentalPlan, initialFormState);
+  const [state, action] = useActionState(saveMentalPlan, initialFormState);
   return (
     <form action={action} className="grid gap-4 md:grid-cols-2">
       <input type="hidden" name="player_id" value={playerId} />
@@ -23,10 +24,8 @@ export function MentalForm({ playerId, plan }: { playerId: string; plan: MentalP
         </div>
       ))}
       <div className="flex items-center gap-4 md:col-span-2">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : "Save Mental GP"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>Save Mental GP</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );

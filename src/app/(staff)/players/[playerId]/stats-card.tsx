@@ -6,6 +6,7 @@ import type { createClient } from "@/lib/supabase/server";
 import { StatTerm } from "@/components/stat-term";
 import { qabSummary } from "@/lib/box-score";
 import { rateLabel, type StatKey } from "@/lib/stat-formulas";
+import { cardClass } from "@/components/ui";
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
@@ -61,7 +62,7 @@ function Stat({ label, k, value }: { label?: string; k?: StatKey; value: ReactNo
 
 function Row({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="rounded-xl border border-navy-700 bg-navy-950/40 p-3">
+    <div className={`${cardClass("inset")} p-3`}>
       <p className="mb-2 font-mono text-2xs font-bold tracking-[0.18em] text-pink-soft uppercase">{title}</p>
       <dl className="flex flex-wrap gap-x-5 gap-y-3">{children}</dl>
     </div>

@@ -4,9 +4,14 @@ export type FormState = {
   error: string | null;
   /** set after a successful save that stays on the page */
   saved?: boolean;
+  /** which fields the error is about, by their form `name` (the form marks them and focuses the first) */
+  fields?: Record<string, string>;
 };
 
 export const initialFormState: FormState = { error: null };
+
+/** A check on one field failed: the message, tied to the field named `field` in the form. */
+export const invalid = (field: string, error: string): FormState => ({ error, fields: { [field]: error } });
 
 /** Trimmed text, or null when blank. */
 export function text(fd: FormData, name: string): string | null {

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { canEdit, isHeadCoach, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Disclosure, EmptyState, eyebrowClass } from "@/components/ui";
+import { Disclosure, EmptyState, eyebrowClass, cardClass } from "@/components/ui";
 import { WEEKDAYS, formatDay, todayISO } from "@/lib/dates";
 import { TRAINING_CATEGORY_LABEL } from "@/lib/achievements";
 import { PHASE_INFO, overlaps, phaseOn, phaseWeek } from "@/lib/training-plan";
@@ -60,7 +60,7 @@ export default async function TrainingPage({ searchParams }: PageProps<"/dugout/
   const ended = routines.filter((r) => r.ends_on && r.ends_on < today);
 
   const routineCard = (r: (typeof routines)[number], live: boolean) => (
-    <li key={r.id} className="flex flex-wrap items-start justify-between gap-3 rounded-xl border border-navy-700 bg-navy-900/60 p-4">
+    <li key={r.id} className={`${cardClass("raised")} flex flex-wrap items-start justify-between gap-3 p-4`}>
       <div className="min-w-0">
         <p className="font-semibold">{r.title}</p>
         <p className="mt-0.5 text-xs text-muted">

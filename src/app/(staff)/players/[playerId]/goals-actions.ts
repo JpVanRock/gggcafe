@@ -5,7 +5,7 @@ import { refresh } from "next/cache";
 import { actForCheck, actorCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { todayISO } from "@/lib/dates";
-import { friendlyDbError, isoDate, oneOf, text, type FormState } from "@/lib/form";
+import { friendlyDbError, isoDate, oneOf, text, type FormState, invalid } from "@/lib/form";
 import { GOAL_METHODS, SKILL_AREAS, isUuid, type GoalMethod } from "@/lib/softball";
 import { STALE, failed, must, runAction } from "@/lib/actions";
 
@@ -22,7 +22,7 @@ export async function saveGoals(_prev: FormState, fd: FormData): Promise<FormSta
   const notHers = await actForCheck(playerId);
   if (notHers) return { error: notHers };
   const main_goal = text(fd, "main_goal");
-  if (!main_goal) return { error: "Write the main goal first. It sits in the middle of the chart." };
+  if (!main_goal) return invalid("main_goal", "Write the main goal first. It sits in the middle of the chart.");
 
   const pillars = Array.from({ length: 8 }, (_, i) => ({
     position: i + 1,
@@ -104,11 +104,11 @@ export async function saveSmartGoal(_prev: FormState, fd: FormData): Promise<For
   const notHers = await actForCheck(playerId);
   if (notHers) return { error: notHers };
   const title = text(fd, "title");
-  if (!title) return { error: "Write the goal in a short sentence." };
+  if (!title) return invalid("title", "Write the goal in a short sentence.");
 
   const metricKey = text(fd, "metric_key");
   const target = decimal(fd, "target_value");
-  if (target === "invalid") return { error: "The target should be a number, like 63 or 2.85." };
+  if (target === "invalid") return invalid("target_value", "The target should be a number, like 63 or 2.85.");
   if (target !== null && !metricKey) return { error: "Pick which measurement the target is for." };
 
   const values = {

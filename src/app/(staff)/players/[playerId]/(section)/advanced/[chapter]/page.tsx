@@ -66,7 +66,7 @@ export default async function AdvancedChapterPage({ params }: PageProps<"/player
           chapter.why && (
             <section>
               <Heading>{chapter.kind === "intro" ? "Read this first" : "Why it matters"}</Heading>
-              <div className="flex max-w-3xl flex-col gap-4 text-ink/90">
+              <div className="flex max-w-prose flex-col gap-4 text-ink/90">
                 {chapter.why.map((p, i) => (
                   <p key={i}>{p}</p>
                 ))}

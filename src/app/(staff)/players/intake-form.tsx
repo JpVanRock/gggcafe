@@ -1,10 +1,11 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, inputClass } from "@/components/ui";
 import { initialFormState, type FormState } from "@/lib/form";
 import { createPlayer } from "./actions";
 import { PlayerFields } from "./player-fields";
+import { SubmitButton } from "@/components/submit-button";
 
 export type IntakeTeam = { id: string; name: string; age_group: string | null };
 
@@ -16,7 +17,7 @@ export type IntakeTeam = { id: string; name: string; age_group: string | null };
  */
 export function IntakeForm({ teams, fixedTeam }: { teams: IntakeTeam[]; fixedTeam?: { id: string; seasonId: string } }) {
   const [round, setRound] = useState(0);
-  const [state, action, pending] = useActionState(async (prev: FormState, fd: FormData) => {
+  const [state, action] = useActionState(async (prev: FormState, fd: FormData) => {
     const result = await createPlayer(prev, fd);
     if (result.saved) setRound((r) => r + 1);
     return result;
@@ -57,10 +58,8 @@ export function IntakeForm({ teams, fixedTeam }: { teams: IntakeTeam[]; fixedTea
     <form key={round} action={action} className="grid gap-6 sm:grid-cols-6">
       <PlayerFields required teamFields={teamFields} />
       <div className="flex flex-wrap items-center gap-4 sm:col-span-6">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : fixedTeam ? "Add to roster" : "Add player"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>{fixedTeam ? "Add to roster" : "Add player"}</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );

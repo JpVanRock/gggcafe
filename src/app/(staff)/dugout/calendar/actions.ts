@@ -3,7 +3,7 @@
 import { refresh } from "next/cache";
 import { editorCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { friendlyDbError, isoDate, text, type FormState } from "@/lib/form";
+import { friendlyDbError, isoDate, text, type FormState, invalid } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import { readEventForm, weeklyDates } from "@/lib/team-events";
 
@@ -30,7 +30,7 @@ export async function saveCalendarEvent(_prev: FormState, fd: FormData): Promise
     const teamId = text(fd, "team_id");
     if (!isUuid(teamId)) return { error: "Choose a team." };
     const repeatUntil = isoDate(fd, "repeat_until");
-    if (repeatUntil && repeatUntil < event.event_date) return { error: "“Repeat until” is before the first date." };
+    if (repeatUntil && repeatUntil < event.event_date) return invalid("repeat_until", "“Repeat until” is before the first date.");
     const dates = weeklyDates(event.event_date, repeatUntil);
     const series_id = dates.length > 1 ? crypto.randomUUID() : null;
     const { error } = await supabase

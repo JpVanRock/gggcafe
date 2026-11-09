@@ -1,11 +1,12 @@
 "use client";
 
 import { useActionState, useOptimistic, useState, useTransition } from "react";
-import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, inputClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import { GOAL_METHODS, GOAL_METHOD_LABEL, SKILL_AREAS, SKILL_AREA_LABEL, type GoalMethod } from "@/lib/softball";
 import { saveSmartGoal, setGoalMethod } from "./goals-actions";
 import type { MetricOption, SmartGoal } from "./data";
+import { SubmitButton } from "@/components/submit-button";
 
 const METHOD_BLURB: Record<GoalMethod, string> = {
   harada: "One big goal, 8 areas, up to 64 actions. The full commitment.",
@@ -70,7 +71,7 @@ export function SmartGoalForm({
   goal?: SmartGoal;
   metrics: MetricOption[];
 }) {
-  const [state, action, pending] = useActionState(saveSmartGoal, initialFormState);
+  const [state, action] = useActionState(saveSmartGoal, initialFormState);
   const letter = (l: string) => <span className="mr-1 font-mono font-bold text-highlight">{l}</span>;
 
   return (
@@ -134,10 +135,8 @@ export function SmartGoalForm({
       </fieldset>
 
       <div className="flex items-center gap-4 sm:col-span-2">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : goal ? "Save goal" : "Add SMART goal"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>{goal ? "Save goal" : "Add SMART goal"}</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );

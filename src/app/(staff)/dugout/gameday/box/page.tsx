@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { EmptyState, RECENT_LIMIT, ShowAllLink, badgeClass } from "@/components/ui";
+import { EmptyState, RECENT_LIMIT, ShowAllLink, badgeClass, cardClass } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import { loadDugoutTeam } from "../../data";
 import { NoOwnTeam, TeamPicker } from "../../team-picker";
@@ -66,7 +66,7 @@ export default async function BoxScoresPage({ searchParams }: PageProps<"/dugout
               <li key={g.id}>
                 <Link
                   href={`/dugout/gameday/box/${g.id}?team=${team.id}`}
-                  className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-navy-700 bg-navy-900/70 p-4 transition hover:border-pink hover:bg-navy-800"
+                  className={`${cardClass("raised")} flex flex-wrap items-center justify-between gap-3 p-4 transition hover:border-pink hover:bg-navy-800`}
                 >
                   <span>
                     <span className="block font-semibold text-ink">

@@ -9,6 +9,7 @@ import { ZoneGrid } from "@/components/zone-grid";
 import { INTENT_LABEL, commandByPitch, sessionPct, zoneLabel, type ResultPitch, type ScriptPitch } from "@/lib/bullpen";
 import { initialFormState } from "@/lib/form";
 import { saveBullpenSession, savePitcherPlan } from "./pitching-actions";
+import { SubmitButton } from "@/components/submit-button";
 
 export function BullpenRunner({ playerId, scriptId, pitches, canEdit, backHref }: { playerId: string; scriptId: string; pitches: ScriptPitch[]; canEdit: boolean; backHref: string }) {
   const [results, setResults] = useState<ResultPitch[]>([]);
@@ -118,7 +119,7 @@ export function GamePlanForm({
   /** the game is over: ask for the look-back too */
   after: boolean;
 }) {
-  const [state, action, pending] = useActionState(savePitcherPlan, initialFormState);
+  const [state, action] = useActionState(savePitcherPlan, initialFormState);
   return (
     <form action={action} className="grid gap-3 sm:grid-cols-2">
       <input type="hidden" name="player_id" value={playerId} />
@@ -151,10 +152,8 @@ export function GamePlanForm({
         </>
       )}
       <div className="flex items-center gap-4 sm:col-span-2">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : after ? "Save" : "Save my plan"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>{after ? "Save" : "Save my plan"}</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );

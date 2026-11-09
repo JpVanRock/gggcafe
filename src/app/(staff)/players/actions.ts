@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { editorCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import type { TablesInsert } from "@/lib/supabase/database.types";
-import { allOf, checkbox, friendlyDbError, isoDate, oneOf, text, wholeNumber, type FormState } from "@/lib/form";
+import { allOf, checkbox, friendlyDbError, isoDate, oneOf, text, wholeNumber, type FormState, invalid } from "@/lib/form";
 import { BATS, MAX_WALK_UP_SONGS, POSITIONS, THROWS, isUuid, type WalkUpSong } from "@/lib/softball";
 import { PHOTO_BUCKET } from "@/lib/player-photos";
 
@@ -90,8 +90,8 @@ export async function createPlayer(_prev: FormState, fd: FormData): Promise<Form
   const teamId = text(fd, "team_id");
   if (!isUuid(teamId)) return { error: "Choose her current team." };
   const jersey = text(fd, "jersey_number");
-  if (!jersey) return { error: "Enter her jersey number." };
-  if (!JERSEY.test(jersey)) return { error: "Jersey numbers are 0–99 (00 is fine)." };
+  if (!jersey) return invalid("jersey_number", "Enter her jersey number.");
+  if (!JERSEY.test(jersey)) return invalid("jersey_number", "Jersey numbers are 0–99 (00 is fine).");
 
   const supabase = await createClient();
   let seasonId = text(fd, "season_id");
@@ -178,7 +178,7 @@ export async function movePlayer(_prev: FormState, fd: FormData): Promise<FormSt
   if (!isUuid(playerId)) return { error: "Unknown player." };
   if (!isUuid(teamId)) return { error: "Choose her new team." };
   if (!isUuid(seasonId)) return { error: "Choose the season." };
-  if (jersey && !JERSEY.test(jersey)) return { error: "Jersey numbers are 0–99 (00 is fine)." };
+  if (jersey && !JERSEY.test(jersey)) return invalid("jersey_number", "Jersey numbers are 0–99 (00 is fine).");
 
   const supabase = await createClient();
   const { error: moveError } = await supabase

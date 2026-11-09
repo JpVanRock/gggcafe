@@ -29,7 +29,8 @@ fills, `text-pink-soft` for small pink labels. No zinc/gray/slate and no `dark:`
 | `fieldClass` / `inputClass` | | `inputClass` is full width; a control that sets its own width uses `fieldClass` + `w-*`. Every `<select>` gets the site's chevron and matches text boxes (globals.css). |
 | `buttonStyles(variant, extra?)` | `primary` `secondary` `pill` `pillOutline` `pillQuiet` `danger` `link` | For `<button>`, `<Link>` and `<label>`. `buttonClass`, `secondaryButtonClass`, `pill*Class` are the same looks. Disabled buttons turn grey. |
 | `SubmitButton` (`submit-button.tsx`) | `variant?`, `pendingLabel?` ("Saving…"), button props | Spinner + "Saving…" while its form's action runs; disabled meanwhile. With `name`/`value`, only the pressed one spins. |
-| `ActionForm` (`action-form.tsx`) | `action`, form props | Shows the action's error after the controls; `aria-busy` while saving, and its submit buttons dim and can't be pressed twice. |
+| `ActionForm` (`action-form.tsx`) | `action`, form props | Shows the action's error after the controls; `aria-busy` while saving, and its submit buttons dim and can't be pressed twice. When the action returns `invalid("field", message)`, that field turns red (`aria-invalid`), gets focus, and clears when edited. |
+| `FormMessage` (`form-message.tsx`) | `error`, `saved?`, `fields?` | The message under a client form; pass `fields={state.fields}` and it marks the named fields the same way. |
 | `ConfirmSubmit` (`confirm-submit.tsx`) | `message`, `confirmLabel?`, `tone?` (`danger`/`primary`), `className` | A submit button that asks first in the site's own dialog. Cancel has focus; Esc or a click outside cancels. |
 | `confirmAction(message, options?)` | | The same dialog from code: `if (!(await confirmAction("Remove this session?"))) return;`. Never `window.confirm` **(tested)**. |
 | `Badge` / `badgeClass(tone, size?)` | tone: `neutral` `ink` `pink` `pinkSolid` `neonOutline` `neon` `danger`; size `sm`/`md` | Status chips (Draft, Final, Game-ready). `md` (32px tall) for chips that are buttons. No hand-made chips **(tested)**. |
@@ -37,14 +38,23 @@ fills, `text-pink-soft` for small pink labels. No zinc/gray/slate and no `dark:`
 | `Eyebrow` / `eyebrowClass` | | The typewriter kicker above a title or group. |
 | `sectionLabelClass` | | Card and section headings (what `Card` uses). |
 | `Card` | `title?`, `actions?`, `tone?` (`raised`/`inset`), `className?` | `rounded-xl`; `inset` for a box inside a card. |
+| `cardClass(tone)` | `raised` / `inset` | The same box for a tile, list item or form that isn't a titled `Card`; add your own padding. The cafe-menu boards (`rounded-2xl`) keep their own looks. |
 | `Disclosure` | `summary`, `open?` | Collapsible form panels. |
-| `EmptyState` | `title?`, `children?`, `action?` | Say what will show up here, and give the action when the viewer can fix it. |
+| `EmptyState` | `title?`, `children?`, `action?` | A whole section or list with nothing in it: say what will show up here, and give the action when the viewer can fix it. Inside a card that has other content, one muted sentence (`text-sm text-muted`) is lighter and enough. |
 | `Loading` | `label?` | Every `loading.tsx`: a pulsing outline of a page (still for reduced motion); screen readers hear "Loading…". |
+| `TabRow` (`tab-row.tsx`) | `label`, `current?` | A tab row that scrolls sideways (Dugout tabs, player sections, age groups): fades at the edge that has more tabs, and scrolls the current tab into view. |
 | `TableScroll` | `label`, `className?` | Wraps a wide table: scrolls sideways on phones, focusable and named for keyboard and screen-reader users. |
 | `SiteHeader` (`site-header.tsx`) | `home`, `nav`, `account?` (Sign out), `count?`, `width?` | The one header for staff, player, family and mentor pages. On phones the links and account fold behind a Menu button (`HeaderMenu`) that carries the approvals/notifications count (`MenuCount`); from 640px up it is one row that sticks to the top. Header links use `navClass` and `navItemClass` (40px tap targets on phones). |
 | `NavLink` (`nav-link.tsx`) | `href`, `section?`, `exact?` | Header links; the current section is highlighted and `aria-current="page"`. `exact` for a home link. |
 | `SkipLink` | | First thing a keyboard user reaches; jumps to `<main id="main">`. Every layout's `<main>` has `id="main"`. |
 | `PageHeader`, `FormMessage`, `ShowAllLink`, `PillNav`, `Modal` | | Unchanged. |
+
+## Field errors
+
+In a form action, a check on one field returns `invalid("<the field's name>", "Pick the game date.")` (from
+`src/lib/form.ts`) instead of `{ error }`. The message shows where it always did, and the form also marks that
+field invalid (red border, announced as invalid), moves the cursor into it, and clears the mark as soon as it is
+edited (`components/field-errors.ts`). Hidden inputs are never marked.
 
 ## Usage
 
@@ -72,6 +82,15 @@ fills, `text-pink-soft` for small pink labels. No zinc/gray/slate and no `dark:`
   </ConfirmSubmit>
 </ActionForm>
 ```
+
+## Checks
+
+- `tests/unit/ui-rules.test.ts` (every push): the rules marked **(tested)** above, plus navy text on neon and pink fills.
+- `npm run test:a11y` (every push): axe-core's WCAG 2.2 A/AA rules on every sample-data page in headless Chrome, Night
+  Game, then contrast again in Day Game. Fails on critical or serious problems. Dim with a muted color or a dashed
+  outline, never with `opacity` on text (that is what failed contrast here).
+- `npm run screens`: the key pages at phone and desktop width in both themes, saved to `screens/` (CI artifact
+  `screens`); `-- --compare <dir>` marks the pixels that changed since an earlier run.
 
 ## Layout and motion
 

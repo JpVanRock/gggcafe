@@ -1,15 +1,16 @@
 "use client";
 
 import { useActionState } from "react";
-import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, inputClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import type { Player } from "@/lib/softball";
 import { updatePlayer } from "./actions";
 import { PlayerFields } from "./player-fields";
+import { SubmitButton } from "@/components/submit-button";
 
 /** "Edit profile" on the player dashboard. Team and jersey number live on the team page. */
 export function PlayerForm({ player, photoUrl }: { player: Player; photoUrl?: string | null }) {
-  const [state, action, pending] = useActionState(updatePlayer, initialFormState);
+  const [state, action] = useActionState(updatePlayer, initialFormState);
 
   return (
     <form action={action} className="grid gap-6 sm:grid-cols-6">
@@ -32,10 +33,8 @@ export function PlayerForm({ player, photoUrl }: { player: Player; photoUrl?: st
       </fieldset>
 
       <div className="flex items-center gap-4 sm:col-span-6">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : "Save changes"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>Save changes</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );

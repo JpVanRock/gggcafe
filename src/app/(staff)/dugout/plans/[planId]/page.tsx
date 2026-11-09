@@ -5,7 +5,7 @@ import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { isUuid } from "@/lib/softball";
 import { canEditPlanRole } from "@/lib/roles";
-import { Card, sectionLabelClass } from "@/components/ui";
+import { Card, sectionLabelClass, cardClass } from "@/components/ui";
 import { emailConfigured } from "@/lib/email";
 import type { LibraryDrill } from "@/lib/dugout";
 import { loadCoachNames, loadCoachingStaff, loadPlanRoster, loadPracticePlan } from "@/lib/practice-plans";
@@ -71,7 +71,7 @@ export default async function PracticePlanPage({ params, searchParams }: PagePro
       </Link>
       {typeof shared === "string" && plan.status === "final" && <SharedBanner shared={shared} />}
       {editor && !mine && (
-        <p className="rounded-xl border border-navy-600 bg-navy-900/70 px-4 py-3 text-sm text-muted">
+        <p className={`${cardClass("raised")} px-4 py-3 text-sm text-muted`}>
           Another coach&apos;s plan · view only. Assistant coaches change only the plans they write.
         </p>
       )}

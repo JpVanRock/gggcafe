@@ -1,4 +1,4 @@
-import { Disclosure } from "@/components/ui";
+import { Disclosure, cardClass } from "@/components/ui";
 import { formatLongDate } from "@/lib/dates";
 import type { HaradaChart, HaradaPillar } from "./data";
 import { GoalActionCheckbox, GoalsForm } from "./goals-client";
@@ -144,7 +144,7 @@ export function GoalsDetail({ playerId, chart, canEdit }: { playerId: string; ch
           <DetailHeading>Areas and actions</DetailHeading>
           <div className="grid gap-4 md:grid-cols-2">
             {chart.pillars.map((p) => (
-              <div key={p.id} className="rounded-xl border border-navy-700 bg-navy-950/40 p-4">
+              <div key={p.id} className={`${cardClass("inset")} p-4`}>
                 <div className="flex items-baseline justify-between gap-3">
                   <h4 className="font-semibold">{p.title}</h4>
                   <span className="font-mono text-sm text-highlight tabular-nums">

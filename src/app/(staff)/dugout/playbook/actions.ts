@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { editorCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { nextPosition } from "@/lib/db";
-import { checkbox, friendlyDbError, isoDate, oneOf, text, wholeNumber, type FormState } from "@/lib/form";
+import { checkbox, friendlyDbError, isoDate, oneOf, text, wholeNumber, type FormState, invalid } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import { PLAY_CATEGORIES, PLAY_CATEGORY_LABEL, SCOUT_PROMPTS, parseChoices } from "@/lib/playbook";
 import { STALE, failed, must, runAction } from "@/lib/actions";
@@ -27,10 +27,10 @@ export async function savePlay(_prev: FormState, fd: FormData): Promise<FormStat
   const situation = text(fd, "situation");
   const description = text(fd, "description");
   if (!isUuid(teamId)) return { error: "Choose a team." };
-  if (!name || name.length > 60) return { error: "Name the call, up to 60 characters." };
-  if (!category) return { error: "Pick what kind of play it is." };
-  if (situation && situation.length > 200) return { error: "Keep “when to call it” to 200 characters." };
-  if (!description || description.length > 1000) return { error: "Write what everyone does, up to 1,000 characters." };
+  if (!name || name.length > 60) return invalid("name", "Name the call, up to 60 characters.");
+  if (!category) return invalid("category", "Pick what kind of play it is.");
+  if (situation && situation.length > 200) return invalid("situation", "Keep “when to call it” to 200 characters.");
+  if (!description || description.length > 1000) return invalid("description", "Write what everyone does, up to 1,000 characters.");
 
   const row = {
     team_id: scope === "all" ? null : teamId,
@@ -93,7 +93,7 @@ export async function createQuiz(_prev: FormState, fd: FormData): Promise<FormSt
   const teamId = text(fd, "team_id");
   const title = text(fd, "title");
   if (!isUuid(teamId)) return { error: "Choose a team." };
-  if (!title || title.length > 80) return { error: "Give the quiz a title, up to 80 characters." };
+  if (!title || title.length > 80) return invalid("title", "Give the quiz a title, up to 80 characters.");
   const supabase = await createClient();
   const { data, error } = await supabase.from("team_quizzes").insert({ team_id: teamId, title }).select("id").single();
   if (error) return { error: friendlyDbError(error) };
@@ -109,10 +109,10 @@ export async function addQuizQuestion(quizId: string, _prev: FormState, fd: Form
   const correct = wholeNumber(fd, "correct", 1, 5);
   const explanation = text(fd, "explanation");
   const playId = text(fd, "play_id");
-  if (!question || question.length > 300) return { error: "Write the question, up to 300 characters." };
+  if (!question || question.length > 300) return invalid("question", "Write the question, up to 300 characters.");
   if (!Array.isArray(choices)) return { error: choices.error };
-  if (correct === null || correct === "invalid" || correct > choices.length) return { error: "Pick which choice is right." };
-  if (explanation && explanation.length > 500) return { error: "Keep the explanation to 500 characters." };
+  if (correct === null || correct === "invalid" || correct > choices.length) return invalid("correct", "Pick which choice is right.");
+  if (explanation && explanation.length > 500) return invalid("explanation", "Keep the explanation to 500 characters.");
 
   const supabase = await createClient();
   const { error } = await supabase.from("team_quiz_questions").insert({
@@ -218,9 +218,9 @@ export async function addScoutNote(_prev: FormState, fd: FormData): Promise<Form
   const title = text(fd, "title");
   const body = text(fd, "body");
   if (!isUuid(opponent)) return { error: "Choose the opponent." };
-  if (!category) return { error: "Pick a category." };
-  if (!title || title.length > 80) return { error: "Give the note a title, up to 80 characters." };
-  if (!body || body.length > 1000) return { error: "Write the note, up to 1,000 characters." };
+  if (!category) return invalid("category", "Pick a category.");
+  if (!title || title.length > 80) return invalid("title", "Give the note a title, up to 80 characters.");
+  if (!body || body.length > 1000) return invalid("body", "Write the note, up to 1,000 characters.");
   const supabase = await createClient();
   const { error } = await supabase
     .from("scouting_reports")

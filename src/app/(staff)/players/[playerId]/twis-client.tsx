@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useActionState, useOptimistic, useState, useTransition } from "react";
-import { Field, FormMessage, buttonClass, inputClass, badgeClass, type BadgeTone } from "@/components/ui";
+import { Field, FormMessage, inputClass, badgeClass, type BadgeTone } from "@/components/ui";
 import { WEEKDAYS } from "@/lib/dates";
 import { initialFormState } from "@/lib/form";
 import { addActivity, setTwisCheck } from "./twis-actions";
 import type { PracticeNote, TwisItem } from "./data";
+import { SubmitButton } from "@/components/submit-button";
 
 export type TwisCellView = {
   key: string;
@@ -94,7 +95,7 @@ export function TwisChecklist({ playerId, cells, canEdit }: { playerId: string; 
               <span className="font-mono text-xs text-muted">{cell.isToday ? "Today" : cell.sublabel}</span>
             </header>
             {cell.items.length === 0 && !cell.notes?.length ? (
-              <p className="mt-3 text-sm text-muted/70">{cell.isRestDay ? "Rest day" : "Nothing extra this week"}</p>
+              <p className="mt-3 text-sm text-muted">{cell.isRestDay ? "Rest day" : "Nothing extra this week"}</p>
             ) : cell.items.length === 0 ? null : (
               <ul className="mt-3 space-y-2.5">
                 {cell.items.map((item) => {
@@ -153,7 +154,7 @@ export function ActivityForm({
   defaultStart: string;
   pillars: { id: string; title: string }[];
 }) {
-  const [state, action, pending] = useActionState(addActivity, initialFormState);
+  const [state, action] = useActionState(addActivity, initialFormState);
   return (
     <form action={action} className="grid gap-4 sm:grid-cols-2">
       <input type="hidden" name="player_id" value={playerId} />
@@ -200,10 +201,8 @@ export function ActivityForm({
         </Field>
       </div>
       <div className="flex items-center gap-4 sm:col-span-2">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Adding…" : "Add to TWIS"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton pendingLabel="Adding…">Add to TWIS</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );

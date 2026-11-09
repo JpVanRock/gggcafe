@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { canEdit, isHeadCoach, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Disclosure, EmptyState } from "@/components/ui";
+import { Disclosure, EmptyState, cardClass } from "@/components/ui";
 import { INTENT_LABEL, type ScriptPitch } from "@/lib/bullpen";
 import { loadDugoutTeam } from "../../data";
 import { NoOwnTeam, TeamPicker } from "../../team-picker";
@@ -48,7 +48,7 @@ export default async function BullpensPage({ searchParams }: PageProps<"/dugout/
         ) : (
           <ul className="grid gap-3 md:grid-cols-2">
             {scripts.map((s) => (
-              <li key={s.id} className="rounded-xl border border-navy-700 bg-navy-900/60 p-4">
+              <li key={s.id} className={`${cardClass("raised")} p-4`}>
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-display text-lg font-bold tracking-wide uppercase">{s.name}</p>

@@ -1,10 +1,11 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, inputClass } from "@/components/ui";
 import { EXPENSE_CATEGORIES, INCOME_CATEGORIES, PAYMENT_METHODS, centsToDollars, money, parseMoney } from "@/lib/budget";
 import { initialFormState } from "@/lib/form";
 import { addEntry, recordPayment, saveAdjustment, saveFees } from "./actions";
+import { SubmitButton } from "@/components/submit-button";
 
 export type Scope = { teamId: string; seasonId: string };
 export type BudgetPlayer = { id: string; label: string };
@@ -22,7 +23,7 @@ const moneyInput = `${inputClass} tabular-nums`;
 
 /** The season's registration costs: what every player owes. */
 export function FeesForm({ scope, fees }: { scope: Scope; fees: { name: string; cents: number }[] }) {
-  const [state, action, pending] = useActionState(saveFees, initialFormState);
+  const [state, action] = useActionState(saveFees, initialFormState);
   const [rows, setRows] = useState(() =>
     (fees.length ? fees : [{ name: "Registration", cents: 0 }]).map((f, i) => ({ key: i, name: f.name, amount: f.cents ? centsToDollars(f.cents) : "" })),
   );
@@ -85,10 +86,8 @@ export function FeesForm({ scope, fees }: { scope: Scope; fees: { name: string; 
         </p>
       </div>
       <div className="flex flex-wrap items-center gap-3">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : "Save registration costs"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>Save registration costs</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );
@@ -110,7 +109,7 @@ function PlayerSelect({ players, name = "player_id" }: { players: BudgetPlayer[]
 }
 
 export function PaymentForm({ scope, players, today }: { scope: Scope; players: BudgetPlayer[]; today: string }) {
-  const [state, action, pending] = useActionState(recordPayment, initialFormState);
+  const [state, action] = useActionState(recordPayment, initialFormState);
   return (
     <form action={action} className="grid gap-4 sm:grid-cols-6">
       <Hidden scope={scope} />
@@ -145,17 +144,15 @@ export function PaymentForm({ scope, players, today }: { scope: Scope; players: 
         </Field>
       </div>
       <div className="flex flex-wrap items-center gap-3 sm:col-span-6">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : "Record payment"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>Record payment</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );
 }
 
 export function AdjustmentForm({ scope, players }: { scope: Scope; players: BudgetPlayer[] }) {
-  const [state, action, pending] = useActionState(saveAdjustment, initialFormState);
+  const [state, action] = useActionState(saveAdjustment, initialFormState);
   return (
     <form action={action} className="grid gap-4 sm:grid-cols-6">
       <Hidden scope={scope} />
@@ -186,17 +183,15 @@ export function AdjustmentForm({ scope, players }: { scope: Scope; players: Budg
         </Field>
       </div>
       <div className="flex flex-wrap items-center gap-3 sm:col-span-6">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : "Save"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>Save</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );
 }
 
 export function EntryForm({ scope, today }: { scope: Scope; today: string }) {
-  const [state, action, pending] = useActionState(addEntry, initialFormState);
+  const [state, action] = useActionState(addEntry, initialFormState);
   const [kind, setKind] = useState<"expense" | "income">("expense");
   const categories = kind === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
   return (
@@ -246,10 +241,8 @@ export function EntryForm({ scope, today }: { scope: Scope; today: string }) {
         </Field>
       </div>
       <div className="flex flex-wrap items-center gap-3 sm:col-span-6">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : kind === "income" ? "Add income" : "Add expense"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>{kind === "income" ? "Add income" : "Add expense"}</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );

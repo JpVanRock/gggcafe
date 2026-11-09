@@ -4,9 +4,10 @@
 // forms serve parents (/family), the player and coaches (Pop Report) and head coaches
 // (Dugout); the page passes the server action that saves for that person.
 import { useActionState } from "react";
-import { Field, FormMessage, buttonClass, fieldClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, fieldClass, inputClass } from "@/components/ui";
 import { initialFormState, type FormState } from "@/lib/form";
 import { MEDICAL_FIELDS, QUESTIONNAIRE_POSITIONS, SIZES, SIZE_LABEL, type Questionnaire } from "@/lib/family";
+import { SubmitButton } from "@/components/submit-button";
 
 type Action = (prev: FormState, fd: FormData) => Promise<FormState>;
 
@@ -36,7 +37,7 @@ function SizeSelect({ name, label, value }: { name: string; label: string; value
 }
 
 export function QuestionnaireForm({ action, hidden, values }: { action: Action; hidden: Record<string, string>; values: Partial<Questionnaire> | null }) {
-  const [state, formAction, pending] = useActionState(action, initialFormState);
+  const [state, formAction] = useActionState(action, initialFormState);
   return (
     <form action={formAction} className="grid gap-3 sm:grid-cols-4">
       <Hidden values={hidden} />
@@ -81,17 +82,15 @@ export function QuestionnaireForm({ action, hidden, values }: { action: Action; 
         </Field>
       </div>
       <div className="flex items-center gap-4 sm:col-span-4">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : "Save questionnaire"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>Save questionnaire</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );
 }
 
 export function MedicalForm({ action, hidden, values }: { action: Action; hidden: Record<string, string>; values: Record<string, string | null> | null }) {
-  const [state, formAction, pending] = useActionState(action, initialFormState);
+  const [state, formAction] = useActionState(action, initialFormState);
   return (
     <form action={formAction} className="grid gap-3 sm:grid-cols-3">
       <Hidden values={hidden} />
@@ -108,10 +107,8 @@ export function MedicalForm({ action, hidden, values }: { action: Action; hidden
       ))}
       <p className="text-xs text-muted sm:col-span-3">Only her head coach and her parents can see this card.</p>
       <div className="flex items-center gap-4 sm:col-span-3">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : "Save card"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>Save card</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );

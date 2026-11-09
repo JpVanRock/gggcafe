@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { headCoachCheck, getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { friendlyDbError, isoDate, text, wholeNumber, type FormState } from "@/lib/form";
+import { friendlyDbError, isoDate, text, wholeNumber, type FormState, invalid } from "@/lib/form";
 import { formatDay, formatLongDate } from "@/lib/dates";
 import { isUuid } from "@/lib/softball";
 import {
@@ -85,7 +85,7 @@ export async function createLineup(_prev: FormState, fd: FormData): Promise<Form
   const date = isoDate(fd, "game_date");
   const rotations = wholeNumber(fd, "rotations", 1, MAX_ROTATIONS);
   if (!isUuid(teamId)) return { error: "Choose a team." };
-  if (!date) return { error: "Pick the game date." };
+  if (!date) return invalid("game_date", "Pick the game date.");
   if (rotations === "invalid") return { error: `Rotations: 1 to ${MAX_ROTATIONS}.` };
 
   const supabase = await createClient();

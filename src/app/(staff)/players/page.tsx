@@ -5,6 +5,7 @@ import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { AGE_GROUPS, POSITION_LABEL, ageGroupOf, batsThrows, playerName, type AgeGroup, type Player } from "@/lib/softball";
 import { Card, EmptyState, Loading, PageHeader, buttonClass, inputClass, tableClass, tdClass, thClass, TableScroll } from "@/components/ui";
+import { TabRow } from "@/components/tab-row";
 
 export const metadata: Metadata = { title: "Players · GGG.Cafe" };
 
@@ -43,7 +44,7 @@ function AgeTabs({ counts, current, query }: { counts: Map<AgeGroup | "all", num
     return qs ? `/players?${qs}` : "/players";
   };
   return (
-    <nav aria-label="Age groups" className="-mx-4 overflow-x-auto px-4">
+    <TabRow label="Age groups" current={current}>
       <ul className="flex min-w-max gap-1 border-b border-navy-700">
         {(["all", ...AGE_GROUPS] as const).map((age) => {
           const on = age === current;
@@ -57,13 +58,13 @@ function AgeTabs({ counts, current, query }: { counts: Map<AgeGroup | "all", num
                 }`}
               >
                 {age === "all" ? "All" : age}
-                <span className="font-display text-xs font-normal tabular-nums opacity-70">{counts.get(age) ?? 0}</span>
+                <span className="font-display text-xs font-normal tabular-nums">{counts.get(age) ?? 0}</span>
               </Link>
             </li>
           );
         })}
       </ul>
-    </nav>
+    </TabRow>
   );
 }
 
@@ -162,7 +163,7 @@ async function PlayersContent({ searchParams }: Pick<PageProps<"/players">, "sea
                             {latest.jersey_number && ` #${latest.jersey_number}`}
                           </Link>
                         ) : (
-                          <span className="text-muted/70">Not on a roster</span>
+                          <span className="text-muted">Not on a roster</span>
                         )}
                       </td>
                     </tr>

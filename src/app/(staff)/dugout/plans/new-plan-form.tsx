@@ -1,10 +1,11 @@
 "use client";
 
 import { useActionState } from "react";
-import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, inputClass } from "@/components/ui";
 import { PRACTICE_SETTINGS, PRACTICE_SETTING_LABEL, TOTAL_TIME_OPTIONS, durationLabel } from "@/lib/dugout";
 import { initialFormState } from "@/lib/form";
 import { createPracticePlan } from "./actions";
+import { SubmitButton } from "@/components/submit-button";
 
 /** Pill radio buttons, e.g. Outdoor / Indoor. */
 export function SettingPills({ name, value, onChange }: { name: string; value?: string; onChange?: (v: string) => void }) {
@@ -30,7 +31,7 @@ export function SettingPills({ name, value, onChange }: { name: string; value?: 
 }
 
 export function NewPlanForm({ teamId, today }: { teamId: string; today: string }) {
-  const [state, action, pending] = useActionState(createPracticePlan, initialFormState);
+  const [state, action] = useActionState(createPracticePlan, initialFormState);
   return (
     <form action={action} className="grid gap-4 sm:grid-cols-2">
       <input type="hidden" name="team_id" value={teamId} />
@@ -60,10 +61,8 @@ export function NewPlanForm({ teamId, today }: { teamId: string; today: string }
         <input name="focus" maxLength={200} placeholder="Defense and relays" className={inputClass} />
       </Field>
       <div className="flex flex-wrap items-center gap-3 sm:col-span-2">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Setting up…" : "Start building"}
-        </button>
-        <FormMessage error={state.error} />
+        <SubmitButton pendingLabel="Setting up…">Start building</SubmitButton>
+        <FormMessage error={state.error} fields={state.fields} />
       </div>
     </form>
   );

@@ -10,20 +10,21 @@ import { TRAINING_CATEGORIES, TRAINING_CATEGORY_LABEL, type TrainingCategory } f
 import { PHASE_INFO, PHASE_KINDS, SQUAD_MAX, SQUAD_MIN, TESTS, type PhaseKind } from "@/lib/training-plan";
 import { createSquads, saveBands, savePhase, saveResults, saveTeamRoutine, suggestPhases, type TrainingState } from "./actions";
 import type { LibraryDrill, PhaseRow, RosterPlayer } from "./data";
+import { SubmitButton } from "@/components/submit-button";
 
 const FOCUS_LABEL: Record<string, string> = { speed: "Speed", agility: "Agility", core: "Core", power: "Power", "med-ball": "Med ball", landing: "Landing / ACL" };
 
 function Message({ state }: { state: TrainingState }) {
   return (
     <>
-      <FormMessage error={state.error} saved={state.saved && !state.message} />
+      <FormMessage error={state.error} saved={state.saved && !state.message} fields={state.fields} />
       {state.message && !state.error && <span className="text-sm font-semibold text-highlight">{state.message}</span>}
     </>
   );
 }
 
 export function PhaseForm({ teamId, phase }: { teamId: string; phase?: PhaseRow }) {
-  const [state, action, pending] = useActionState(savePhase, initialFormState);
+  const [state, action] = useActionState(savePhase, initialFormState);
   const [kind, setKind] = useState<PhaseKind>(phase?.kind ?? "build");
   return (
     <form action={action} className="grid gap-3 sm:grid-cols-2">
@@ -53,17 +54,15 @@ export function PhaseForm({ teamId, phase }: { teamId: string; phase?: PhaseRow 
         </Field>
       </div>
       <div className="flex items-center gap-4 sm:col-span-2">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : phase ? "Save phase" : "Add phase"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>{phase ? "Save phase" : "Add phase"}</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );
 }
 
 export function SuggestForm({ teamId, start, firstGame, hasPhases }: { teamId: string; start: string; firstGame: string | null; hasPhases: boolean }) {
-  const [state, action, pending] = useActionState(suggestPhases, initialFormState);
+  const [state, action] = useActionState(suggestPhases, initialFormState);
   return (
     <form action={action} className="grid gap-3 sm:grid-cols-3">
       <input type="hidden" name="team_id" value={teamId} />
@@ -86,10 +85,8 @@ export function SuggestForm({ teamId, start, firstGame, hasPhases }: { teamId: s
             <input type="checkbox" name="replace" className="size-4 accent-pink" /> Replace the current roadmap
           </label>
         )}
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Planning…" : "Plan the roadmap"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton pendingLabel="Planning…">Plan the roadmap</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );
@@ -109,7 +106,7 @@ export function TeamRoutineForm({
   scripts?: { id: string; name: string }[];
   today: string;
 }) {
-  const [state, action, pending] = useActionState(saveTeamRoutine, initialFormState);
+  const [state, action] = useActionState(saveTeamRoutine, initialFormState);
   const current = phases.find((p) => p.starts_on <= today && today <= p.ends_on) ?? phases.find((p) => p.starts_on > today) ?? null;
   const [phaseId, setPhaseId] = useState(current?.id ?? "");
   const [category, setCategory] = useState<TrainingCategory>("workout");
@@ -197,9 +194,7 @@ export function TeamRoutineForm({
         <input type="date" name="ends_on" defaultValue={phase?.ends_on ?? ""} key={`e-${phaseId}`} className={inputClass} />
       </Field>
       <div className="flex flex-wrap items-center gap-4 sm:col-span-2">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Pushing…" : "Push to the team"}
-        </button>
+        <SubmitButton pendingLabel="Pushing…">Push to the team</SubmitButton>
         <Message state={state} />
       </div>
     </form>
@@ -207,7 +202,7 @@ export function TeamRoutineForm({
 }
 
 export function ResultsForm({ roster, today }: { roster: RosterPlayer[]; today: string }) {
-  const [state, action, pending] = useActionState(saveResults, initialFormState);
+  const [state, action] = useActionState(saveResults, initialFormState);
   const [picked, setPicked] = useState<string[]>(["pro_agility", "sprint_20yd", "broad_jump"]);
   const tests = TESTS.filter((t) => picked.includes(t.key));
   return (
@@ -269,9 +264,7 @@ export function ResultsForm({ roster, today }: { roster: RosterPlayer[]; today: 
         </TableScroll>
       )}
       <div className="flex items-center gap-4">
-        <button type="submit" disabled={pending || tests.length === 0} className={buttonClass}>
-          {pending ? "Saving…" : "Save results"}
-        </button>
+        <SubmitButton disabled={tests.length === 0}>Save results</SubmitButton>
         <Message state={state} />
       </div>
     </form>
@@ -322,14 +315,14 @@ export function BandsForm({ ageGroup, bands }: { ageGroup: string; bands: { key:
         <button type="submit" disabled={pending} className={buttonClass}>
           {pending ? "Saving…" : `Save ${ageGroup} bands`}
         </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );
 }
 
 export function SquadsForm({ teamId, roster }: { teamId: string; roster: RosterPlayer[] }) {
-  const [state, action, pending] = useActionState(createSquads, initialFormState);
+  const [state, action] = useActionState(createSquads, initialFormState);
   const [count, setCount] = useState(Math.min(4, Math.max(SQUAD_MIN, Math.floor(roster.length / 3))));
   return (
     <form action={action} className="flex flex-col gap-4">
@@ -363,10 +356,8 @@ export function SquadsForm({ teamId, roster }: { teamId: string; roster: RosterP
         ))}
       </ol>
       <div className="flex items-center gap-4">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : "Set up the squads"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>Set up the squads</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );

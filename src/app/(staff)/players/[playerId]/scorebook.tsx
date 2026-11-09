@@ -6,7 +6,7 @@ import { formatLongDate } from "@/lib/dates";
 import { ProgressBar } from "@/components/progress-bar";
 import { ManagerAward } from "@/components/manager-award";
 import { OutlineText } from "@/components/athletic";
-import { buttonClass } from "@/components/ui";
+import { buttonClass, cardClass } from "@/components/ui";
 import { GAME_COUNT, GAME_PLAYS, gameStatuses } from "@/lib/scorebook-game";
 import type { IqData } from "./data";
 import type { Nameplate } from "./iq-tests-client";
@@ -104,7 +104,7 @@ function gameLine(game: Course["game"]) {
 export function CourseCard({ playerId, course, plate }: { playerId: string; course: Course; plate: Nameplate }) {
   const next = course.chapters.find((c) => c.n === course.next);
   return (
-    <div className="rounded-xl border border-navy-700 bg-navy-950/40 p-4">
+    <div className={`${cardClass("inset")} p-4`}>
       <div className="flex flex-wrap items-center gap-4">
         <ManagerAward name={plate.name} earned={course.done > 0} engrave={false} size={92} />
         <div className="min-w-56 flex-1">
@@ -131,7 +131,7 @@ export function CourseCard({ playerId, course, plate }: { playerId: string; cour
                 {String(c.n).padStart(2, "0")}
               </OutlineText>
               <span className="min-w-0 flex-1">
-                <span className="block text-sm font-semibold text-ink">{c.title}</span>
+                <span className={`block text-sm font-semibold ${locked ? "text-muted" : "text-ink"}`}>{c.title}</span>
                 <span className={`block font-mono text-2xs tracking-wider uppercase ${c.status === "complete" ? "text-highlight" : "text-muted"}`}>
                   {statusLine(c)}
                 </span>
@@ -142,7 +142,7 @@ export function CourseCard({ playerId, course, plate }: { playerId: string; cour
           return (
             <li key={c.n}>
               {locked ? (
-                <div className="flex items-center gap-3 rounded-lg border border-navy-700 px-3 py-2.5 opacity-50">{inner}</div>
+                <div className="flex items-center gap-3 rounded-lg border border-dashed border-navy-700 px-3 py-2.5">{inner}</div>
               ) : (
                 <Link
                   href={chapterHref(playerId, c.n)}
@@ -164,7 +164,7 @@ export function CourseCard({ playerId, course, plate }: { playerId: string; cour
                   XC
                 </OutlineText>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-semibold text-ink">Extra credit: keep the book for real games</span>
+                  <span className={`block text-sm font-semibold ${course.game.unlocked ? "text-ink" : "text-muted"}`}>Extra credit: keep the book for real games</span>
                   <span className={`block font-mono text-2xs tracking-wider uppercase ${course.game.clean ? "text-highlight" : "text-pink-soft"}`}>
                     {gameLine(course.game)}
                   </span>
@@ -180,7 +180,7 @@ export function CourseCard({ playerId, course, plate }: { playerId: string; cour
                 {inner}
               </Link>
             ) : (
-              <div className="flex items-center gap-3 rounded-lg border border-dashed border-navy-600 px-3 py-2.5 opacity-60">{inner}</div>
+              <div className="flex items-center gap-3 rounded-lg border border-dashed border-navy-600 px-3 py-2.5">{inner}</div>
             );
           })()}
         </li>

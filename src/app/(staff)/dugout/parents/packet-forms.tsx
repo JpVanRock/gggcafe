@@ -2,13 +2,14 @@
 
 // The parent welcome packet (Phase 6): add or edit an item.
 import { useActionState } from "react";
-import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, inputClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import { PACKET_KINDS, PACKET_KIND_LABEL, type PacketKind } from "@/lib/family";
 import { savePacketItem } from "./actions";
+import { SubmitButton } from "@/components/submit-button";
 
 export function PacketItemForm({ teamId, item }: { teamId: string; item?: { id: string; kind: PacketKind; title: string; body: string } }) {
-  const [state, action, pending] = useActionState(savePacketItem, initialFormState);
+  const [state, action] = useActionState(savePacketItem, initialFormState);
   return (
     <form action={action} className="grid gap-3 sm:grid-cols-3">
       <input type="hidden" name="team_id" value={teamId} />
@@ -33,10 +34,8 @@ export function PacketItemForm({ teamId, item }: { teamId: string; item?: { id: 
         </Field>
       </div>
       <div className="flex items-center gap-4 sm:col-span-3">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : item ? "Save" : "Add to the packet"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>{item ? "Save" : "Add to the packet"}</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );

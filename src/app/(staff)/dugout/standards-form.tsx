@@ -1,10 +1,11 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Card, Field, FormMessage, buttonClass, inputClass, secondaryButtonClass } from "@/components/ui";
+import { Card, Field, FormMessage, inputClass, secondaryButtonClass, cardClass } from "@/components/ui";
 import type { TeamCulture, TeamStandard } from "@/components/team-standards";
 import { initialFormState } from "@/lib/form";
 import { saveTeamDugout } from "./actions";
+import { SubmitButton } from "@/components/submit-button";
 
 type Row = TeamStandard & { key: number };
 
@@ -20,7 +21,7 @@ export function StandardsForm({
   culture: TeamCulture | null;
   standards: TeamStandard[];
 }) {
-  const [state, action, pending] = useActionState(saveTeamDugout, initialFormState);
+  const [state, action] = useActionState(saveTeamDugout, initialFormState);
   const [rows, setRows] = useState<Row[]>(() =>
     (standards.length ? standards : [{ title: "", detail: null }]).map((s, i) => ({ ...s, key: i })),
   );
@@ -45,7 +46,7 @@ export function StandardsForm({
           <p className="mb-4 text-sm text-muted">What every player on this team does, every day. Short and clear.</p>
           <ol className="flex flex-col gap-4">
             {rows.map((row, i) => (
-              <li key={row.key} className="rounded-xl border border-navy-700 bg-navy-950/40 p-3">
+              <li key={row.key} className={`${cardClass("inset")} p-3`}>
                 <div className="mb-2 flex items-center justify-between gap-2">
                   <span className="font-display text-sm font-bold text-highlight tabular-nums">
                     {String(i + 1).padStart(2, "0")}
@@ -113,10 +114,8 @@ export function StandardsForm({
       </div>
 
       <div className="flex flex-wrap items-center gap-4">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : "Save standards & culture"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>Save standards & culture</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );

@@ -336,7 +336,7 @@ export function IqDetail({
                 <p className="mt-1 text-ink/80 italic">{q.scenario}</p>
                 <p className="mt-1 font-semibold">{q.question}</p>
                 <p className="mt-2 text-highlight">✓ {q.choices[q.correct_index]}</p>
-                {q.explanation && <p className="mt-1 text-xs text-muted">{q.explanation}</p>}
+                {q.explanation && <p className="mt-1 text-muted">{q.explanation}</p>}
               </li>
             ))}
           </ul>
@@ -351,7 +351,7 @@ export function IqDetail({
             </Disclosure>
             <ul className="divide-y divide-navy-700">
               {iq.questions.map((q) => (
-                <li key={q.id} className={`py-3 ${q.active ? "" : "opacity-60"}`}>
+                <li key={q.id} className={`py-3 ${q.active ? "" : "border-l-2 border-dashed border-l-navy-600 pl-3"}`}>
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <p className={eyebrowClass}>

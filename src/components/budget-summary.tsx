@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 import { Modal } from "@/components/modal";
 import { formatDay } from "@/lib/dates";
 import { money, runningLedger, toCents, type EntryKind } from "@/lib/budget";
-import { TableScroll } from "@/components/ui";
+import { TableScroll, cardClass, EmptyState } from "@/components/ui";
 
 export type BudgetSummaryData = {
   team: string;
@@ -37,7 +37,7 @@ function Stat({
   action?: ReactNode;
 }) {
   return (
-    <div className="relative rounded-xl border border-navy-700 bg-navy-900/70 p-4">
+    <div className={`${cardClass("raised")} relative p-4`}>
       {action && <div className="absolute top-3 right-3">{action}</div>}
       <p className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">{label}</p>
       <p
@@ -124,7 +124,7 @@ export function BudgetSummary({ summary, showLedger = true }: { summary: BudgetS
           value={money(toCents(summary.fee_per_player))}
           note={summary.fees.length ? summary.fees.map((f) => `${f.name} ${money(toCents(f.amount))}`).join(" · ") : "Not set yet"}
         />
-        <div className="rounded-xl border border-navy-700 bg-navy-900/70 p-4">
+        <div className={`${cardClass("raised")} p-4`}>
           <p className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Collected</p>
           <p className="mt-1 font-display text-2xl font-bold text-highlight tabular-nums">{money(t.collected)}</p>
           <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-navy-800" aria-hidden>
@@ -154,7 +154,7 @@ export function BudgetSummary({ summary, showLedger = true }: { summary: BudgetS
         <section aria-label="Ledger">
           <h3 className="mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Ledger</h3>
           {ledger.length === 0 ? (
-            <p className="rounded-md border border-dashed border-navy-600 p-6 text-center text-sm text-muted">Nothing recorded yet.</p>
+            <EmptyState>Nothing recorded yet.</EmptyState>
           ) : (
             <TableScroll label="Ledger">
               <table className="w-full text-left text-sm">

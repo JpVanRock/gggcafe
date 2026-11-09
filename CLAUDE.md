@@ -50,7 +50,8 @@ tests/unit/              node --test unit tests (npm run test:unit)
 - Server actions that append to an ordered list: `nextPosition(supabase, table, column, value)` (`src/lib/db.ts`).
 - Every server action reports back. Form actions are `(prev: FormState, fd: FormData) => Promise<FormState>`: wrap the
   body in `runAction(async () => {…})`, return `failed(message)` for a check that fails (`failed(denied)` for
-  permission, `failed(STALE)` for a malformed or stale form), and wrap writes in `must(await supabase…)` so a database
+  permission, `failed(STALE)` for a malformed or stale form, `invalid("field", message)` from `src/lib/form.ts` when one
+  form field is wrong: the form marks and focuses that field), and wrap writes in `must(await supabase…)` so a database
   error becomes a message (`src/lib/actions.ts`). A form without its own client component uses
   `<ActionForm action={…}>` (`components/action-form.tsx`), which shows the message after its controls. Never
   `return;` silently.
@@ -75,11 +76,15 @@ tests/unit/              node --test unit tests (npm run test:unit)
 
 ## Checks (CI: .github/workflows/ci.yml runs all of these on every push)
 - `npm run lint`, `npx tsc --noEmit`, `npm run test:unit`, `npm run db:test`, `npm run build`, then
-  `npm run test:pages`: the page smoke test renders every page and PDF route of the build in sample-data mode
+  `npm run test:pages` and `npm run test:a11y`. The page smoke test renders every page and PDF route of the build in sample-data mode
   (`GGG_SAMPLE_DATA=1`: fictional data in `src/lib/supabase/sample/`, signed in as a sample admin; never on Vercel)
   and fails on an error page, a section that errors or 404s, a redirect to sign in, or a server error. A new dynamic
-  route needs a sample value in `scripts/test-pages.mjs` (`fill`) and, if it reads new tables, sample rows in
+  route needs a sample value in `scripts/lib/sample-site.mjs` (`fill`) and, if it reads new tables, sample rows in
   `sample/data.ts`. To look at pages with sample data: launch config `site-sample` (port 3159) after a build.
+  The accessibility check runs axe-core (WCAG 2.2 A/AA) on every sample page in headless Chrome (`CHROME_PATH`, or the
+  runner's google-chrome), then contrast again in Day Game; it fails on critical or serious problems (`scripts/test-a11y.mjs`).
+  `npm run screens` saves the key pages at phone and desktop width in both themes to `screens/` (`-- --compare <dir>` marks
+  what changed since an earlier run); CI keeps each run's screens as the `screens` artifact.
 
 ## Database rules
 - Every new table: `select private.apply_staff_rls('public.<table>');` (staff read, coach/admin write).

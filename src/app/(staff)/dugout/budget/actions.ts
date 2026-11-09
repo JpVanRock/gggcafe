@@ -3,7 +3,7 @@
 import { refresh } from "next/cache";
 import { headCoachCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { friendlyDbError, isoDate, oneOf, text, type FormState } from "@/lib/form";
+import { friendlyDbError, isoDate, oneOf, text, type FormState, invalid } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import { EXPENSE_CATEGORIES, INCOME_CATEGORIES, PAYMENT_METHODS, centsToDollars, parseMoney } from "@/lib/budget";
 import { STALE, failed, must, runAction } from "@/lib/actions";
@@ -52,7 +52,7 @@ export async function recordPayment(_prev: FormState, fd: FormData): Promise<For
   const cents = parseMoney(text(fd, "amount"));
   if (cents === null || cents === "invalid" || cents <= 0) return { error: "Enter the amount paid, like 250 or 125.50." };
   const entry_date = isoDate(fd, "entry_date");
-  if (!entry_date) return { error: "Pick the date it was paid." };
+  if (!entry_date) return invalid("entry_date", "Pick the date it was paid.");
 
   const supabase = await createClient();
   const { error } = await supabase.from("budget_entries").insert({
@@ -105,10 +105,10 @@ export async function addEntry(_prev: FormState, fd: FormData): Promise<FormStat
   const cents = parseMoney(text(fd, "amount"));
   if (cents === null || cents === "invalid" || cents <= 0) return { error: "Enter the amount, like 650 or 89.99." };
   const entry_date = isoDate(fd, "entry_date");
-  if (!entry_date) return { error: "Pick the date." };
+  if (!entry_date) return invalid("entry_date", "Pick the date.");
   const category = kind === "income" ? oneOf(fd, "category", INCOME_CATEGORIES) : oneOf(fd, "category", EXPENSE_CATEGORIES);
   const description = text(fd, "description");
-  if ((description ?? "").length > 300) return { error: "Keep the description to 300 characters." };
+  if ((description ?? "").length > 300) return invalid("description", "Keep the description to 300 characters.");
 
   const supabase = await createClient();
   const { error } = await supabase

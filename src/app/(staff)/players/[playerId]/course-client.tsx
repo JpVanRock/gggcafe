@@ -42,7 +42,7 @@ function QuickCheck({ check }: { check: NonNullable<CourseStep["check"]> }) {
       {chosen !== null && (
         <div className="mt-3" aria-live="polite">
           <p className={`font-bold ${chosen === check.answer ? "text-highlight" : "text-pink-soft"}`}>{chosen === check.answer ? "Correct." : "Not quite."}</p>
-          <p className="mt-1 text-sm text-ink/90">{check.why}</p>
+          <p className="mt-1 text-base text-ink/90">{check.why}</p>
           {chosen !== check.answer && (
             <button type="button" onClick={() => setChosen(null)} className="mt-2 text-sm text-pink-soft underline">
               Try again
@@ -118,7 +118,7 @@ export function CourseRunner({
               onClick={() => go(l.start)}
               aria-current={i === lessonNo ? "step" : undefined}
               className={`rounded-full border px-2.5 py-1 text-xs font-semibold transition ${
-                i === lessonNo ? "border-pink bg-pink text-on-accent" : open ? "border-navy-600 text-ink hover:border-pink" : "border-navy-700 text-muted/50"
+                i === lessonNo ? "border-pink bg-pink text-on-accent" : open ? "border-navy-600 text-ink hover:border-pink" : "border-dashed border-navy-700 text-muted"
               }`}
             >
               {l.name}
@@ -133,7 +133,7 @@ export function CourseRunner({
         </p>
         <h3 className="mt-1 font-display text-2xl font-bold tracking-wide text-highlight uppercase">{step.title}</h3>
         {step.body.map((p, i) => (
-          <p key={i} className="mt-3 max-w-3xl text-ink/90">
+          <p key={i} className="mt-3 max-w-prose text-ink/90">
             {p}
           </p>
         ))}

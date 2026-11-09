@@ -6,7 +6,7 @@
 // src/lib/scorebook-game.ts); nothing here names it until it's earned.
 import Link from "next/link";
 import { useState, useTransition } from "react";
-import { buttonClass, fieldClass, inputClass, secondaryButtonClass, eyebrowClass } from "@/components/ui";
+import { buttonClass, fieldClass, inputClass, secondaryButtonClass, eyebrowClass, cardClass } from "@/components/ui";
 import { ProgressBar } from "@/components/progress-bar";
 import { ScoreBox, ScoreSheet } from "@/components/scorebook";
 import { WorldSeriesTrophy } from "@/components/world-series-trophy";
@@ -341,7 +341,7 @@ export function GameRunner({
     return (
       <div className="flex flex-col gap-5">
         {header}
-        <div className="rounded-xl border border-navy-600 bg-navy-950/50 p-5 sm:p-6">
+        <div className={`${cardClass("inset")} p-5 sm:p-6`}>
           <p className="text-lg font-semibold">
             {TEAMS.V.name} at {TEAMS.H.name}. Two innings, {GAME_PLAYS} batters. You keep the book.
           </p>
@@ -500,7 +500,7 @@ export function GameRunner({
         {header}
         {status}
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          <div className="rounded-xl border border-navy-600 bg-navy-950/50 p-5">
+          <div className={`${cardClass("inset")} p-5`}>
             <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">Ballgame</p>
             <p className="mt-1 text-lg font-semibold">Fill in the line score from your book.</p>
             <p className="mt-1 text-sm text-muted">Count the shaded diamonds in each inning column, on each team&apos;s page.</p>
@@ -561,7 +561,7 @@ export function GameRunner({
       {status}
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <div className="flex flex-col gap-4">
-          <div className="rounded-xl border border-navy-600 bg-navy-950/50 p-4 sm:p-5">
+          <div className={`${cardClass("inset")} p-4 sm:p-5`}>
             <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">
               {halfLabel(call.team, call.inning)} · {TEAMS[call.team].name} batting · batter {call.n} of {GAME_PLAYS}
             </p>

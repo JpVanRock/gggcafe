@@ -5,7 +5,7 @@ import { refresh } from "next/cache";
 import { actForCheck, actorCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { todayISO } from "@/lib/dates";
-import { friendlyDbError, isoDate, oneOf, text, type FormState } from "@/lib/form";
+import { friendlyDbError, isoDate, oneOf, text, type FormState, invalid } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import { TRAINING_CATEGORIES, categoriesFor } from "@/lib/achievements";
 import type { Enums } from "@/lib/supabase/database.types";
@@ -35,7 +35,7 @@ export async function addRoutine(_prev: FormState, fd: FormData): Promise<FormSt
   const notHers = await actForCheck(playerId);
   if (notHers) return { error: notHers };
   const category = oneOf(fd, "category", TRAINING_CATEGORIES);
-  if (!category) return { error: "Unknown training category." };
+  if (!category) return invalid("category", "Unknown training category.");
 
   const supabase = await createClient();
   const { data: player } = await supabase
@@ -59,9 +59,9 @@ export async function addRoutine(_prev: FormState, fd: FormData): Promise<FormSt
     title = text(fd, "new_name");
     const description = text(fd, "new_description");
     if (!title) return { error: "Choose from the library, or name the new routine." };
-    if (!description) return { error: "Describe the new routine in a sentence so the player knows what to do." };
+    if (!description) return invalid("new_description", "Describe the new routine in a sentence so the player knows what to do.");
     const video_url = httpUrl(fd, "new_video_url");
-    if (video_url === "invalid") return { error: "The video link should start with https://" };
+    if (video_url === "invalid") return invalid("new_video_url", "The video link should start with https://");
     const AREA: Record<string, Enums<"skill_area">> = {
       workout: "strength_conditioning", stretching: "strength_conditioning", hitting: "hitting",
       fielding: "infield", pitching: "pitching", catching: "catching", mental: "mental",

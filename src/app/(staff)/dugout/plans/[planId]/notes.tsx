@@ -1,10 +1,11 @@
 "use client";
 
 import { useActionState } from "react";
-import { Field, FormMessage, buttonClass, inputClass, sectionLabelClass } from "@/components/ui";
+import { Field, FormMessage, inputClass, sectionLabelClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import { NOTE_LIMITS } from "@/lib/install";
 import { savePlanExtras } from "../actions";
+import { SubmitButton } from "@/components/submit-button";
 
 export type PlanNotes = { objective: string | null; rule_of_day: string | null; announcements: string | null; coach_notes: string | null };
 export type CuePlayer = { id: string; short: string };
@@ -30,7 +31,7 @@ export function PlanExtrasForm({
   installs: InstallChoice[];
   picked: string[];
 }) {
-  const [state, action, pending] = useActionState(savePlanExtras.bind(null, planId), initialFormState);
+  const [state, action] = useActionState(savePlanExtras.bind(null, planId), initialFormState);
   const groups = [...new Set(installs.map((i) => i.group))];
   return (
     <form action={action} className="flex flex-col gap-6">
@@ -96,10 +97,8 @@ export function PlanExtrasForm({
       </Field>
 
       <div className="flex items-center gap-4">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : "Save notes"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>Save notes</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );

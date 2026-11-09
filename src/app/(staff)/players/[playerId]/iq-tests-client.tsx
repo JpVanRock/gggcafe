@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { buttonClass, inputClass, secondaryButtonClass } from "@/components/ui";
+import { buttonClass, inputClass, secondaryButtonClass, cardClass } from "@/components/ui";
 
 import { POSITION_LABEL, type FieldPosition } from "@/lib/softball";
 import { Diamond, type DiamondSpec } from "@/components/diamond";
@@ -164,7 +164,7 @@ function BadgeTrackPicker({ tracks, actions }: { tracks: BadgeTrackInfo[]; actio
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       {tracks.map((t) => (
-        <section key={t.track} className="rounded-xl border border-navy-700 bg-navy-950/40 p-4">
+        <section key={t.track} className={`${cardClass("inset")} p-4`}>
           <h4 className="text-lg font-bold tracking-wide uppercase">{t.label}</h4>
           <p className="mt-0.5 text-xs text-muted">{t.blurb}</p>
           <ul className="mt-4 grid gap-2">
@@ -220,7 +220,7 @@ function TrackPicker({ tracks, actions }: { tracks: TrackInfo[]; actions: Action
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       {tracks.map((t) => (
-        <section key={t.track} className="rounded-xl border border-navy-700 bg-navy-950/40 p-4">
+        <section key={t.track} className={`${cardClass("inset")} p-4`}>
           <h4 className="text-lg font-bold tracking-wide uppercase">{t.label}</h4>
           <p className="mt-0.5 text-xs text-muted">{t.blurb}</p>
           <ul className="mt-4 grid gap-2">
@@ -277,7 +277,7 @@ function PositionPicker({ positions, plate, actions }: { positions: PositionInfo
   const key: TestKey = { track: "position", level: 1, position: p.position };
   const earned = positions.filter((x) => x.earnedOn);
   return (
-    <div className="rounded-xl border border-navy-700 bg-navy-950/40 p-4">
+    <div className={`${cardClass("inset")} p-4`}>
       <p className="text-sm text-muted">
         Pick a position: {p.questionCount || 21} questions on that position&apos;s job in every situation. Score {PASS_PCT}% or better
         {p.questionCount ? ` (${needed(p.questionCount)} of ${p.questionCount})` : ""} to earn the Golden Glove.
@@ -337,7 +337,7 @@ function LibraryPicker({ library, actions }: { library: LibraryInfo; actions: Ac
   const key: TestKey = { track: "extra", level: 1, position: null };
   const total = library.questionCount;
   return (
-    <div className="rounded-xl border border-navy-700 bg-navy-950/40 p-4">
+    <div className={`${cardClass("inset")} p-4`}>
       <div className="flex flex-wrap items-center gap-4">
         <ChampionsTrophy earned={Boolean(library.trophyEarnedOn)} size={110} />
         <div className="min-w-56 flex-1">
@@ -706,7 +706,7 @@ export function IqTests({
             {feedback && (
               <div className="mt-4" aria-live="polite">
                 <p className={`font-bold ${feedback.correct ? "text-highlight" : "text-pink-soft"}`}>{feedback.correct ? "Correct." : "Not quite."}</p>
-                {feedback.explanation && <p className="mt-1 text-sm text-ink/90">{feedback.explanation}</p>}
+                {feedback.explanation && <p className="mt-1 text-base text-ink/90">{feedback.explanation}</p>}
                 <button type="button" onClick={next} disabled={pending} className={`${buttonClass} mt-4`}>
                   {nextOpen(session.questions, session.done, session.index + 1) < session.questions.length
                     ? "Next question"

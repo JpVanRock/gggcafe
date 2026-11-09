@@ -94,11 +94,11 @@ export default async function AdvancedPage({ params }: PageProps<"/players/[play
             <li key={c.slug}>
               <Link
                 href={advancedHref(player.id, c.slug)}
-                className={`flex items-center gap-4 px-1 py-4 transition hover:bg-navy-800 ${c.status === "coming" ? "opacity-60" : ""}`}
+                className="flex items-center gap-4 px-1 py-4 transition hover:bg-navy-800"
               >
                 <span className="w-24 shrink-0 font-mono text-2xs tracking-wider text-muted uppercase">{chapterLabel(c, chapters)}</span>
                 <span className="min-w-0 flex-1">
-                  <span className="block font-semibold text-ink">
+                  <span className={`block font-semibold ${c.status === "coming" ? "text-muted" : "text-ink"}`}>
                     {c.title}
                     {c.kicker && <span className={`${eyebrowClass} ml-2`}>{c.kicker}</span>}
                   </span>

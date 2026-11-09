@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { canEdit, requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Card, Disclosure, EmptyState, RECENT_LIMIT, ShowAllLink, tableClass, tdClass, thClass, badgeClass, TableScroll } from "@/components/ui";
+import { Card, Disclosure, EmptyState, RECENT_LIMIT, ShowAllLink, tableClass, tdClass, thClass, badgeClass, TableScroll, cardClass } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import { BASE_RUNNING_LABEL, HITTING_TYPE_LABEL, percent, rate } from "@/lib/gameday";
 import { loadGamedayRoster } from "@/lib/gameday-data";
@@ -75,7 +75,7 @@ export default async function GamedayPage({ searchParams }: PageProps<"/dugout/g
                 <li key={l.id}>
                   <Link
                     href={`/dugout/gameday/${l.id}`}
-                    className="flex items-center gap-4 rounded-xl border border-navy-700 bg-navy-900/70 p-4 transition hover:border-pink hover:bg-navy-800"
+                    className={`${cardClass("raised")} flex items-center gap-4 p-4 transition hover:border-pink hover:bg-navy-800`}
                   >
                     <div className="w-16 shrink-0 text-center">
                       <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">{weekday}</p>

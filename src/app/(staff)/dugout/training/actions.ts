@@ -6,7 +6,7 @@
 import { refresh } from "next/cache";
 import { editorCheck, headCoachCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { friendlyDbError, isoDate, oneOf, text, type FormState } from "@/lib/form";
+import { friendlyDbError, isoDate, oneOf, text, type FormState, invalid } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import { TRAINING_CATEGORIES } from "@/lib/achievements";
 import { cleanScript } from "@/lib/bullpen";
@@ -35,10 +35,10 @@ export async function savePhase(_prev: FormState, fd: FormData): Promise<FormSta
   const endsOn = isoDate(fd, "ends_on");
   const focus = text(fd, "focus");
   if (!isUuid(teamId) || (id && !isUuid(id))) return { error: "Unknown team." };
-  if (!kind) return { error: "Pick the kind of phase." };
-  if (!name || name.length > 60) return { error: "Name the phase (60 characters at most)." };
+  if (!kind) return invalid("kind", "Pick the kind of phase.");
+  if (!name || name.length > 60) return invalid("name", "Name the phase (60 characters at most).");
   if (!startsOn || !endsOn || endsOn < startsOn) return { error: "Check the dates: the end can't be before the start." };
-  if (focus && focus.length > 300) return { error: "Keep the focus under 300 characters." };
+  if (focus && focus.length > 300) return invalid("focus", "Keep the focus under 300 characters.");
   const supabase = await createClient();
   const row = { team_id: teamId, kind, name, starts_on: startsOn, ends_on: endsOn, focus };
   const { error } = id ? await supabase.from("training_phases").update(row).eq("id", id) : await supabase.from("training_phases").insert(row);
@@ -101,8 +101,8 @@ export async function saveTeamRoutine(_prev: TrainingState, fd: FormData): Promi
   const endsOn = isoDate(fd, "ends_on");
   const days = [...new Set(fd.getAll("days").map(Number).filter((d) => Number.isInteger(d) && d >= 1 && d <= 7))].sort();
   if (!isUuid(teamId) || (phaseId && !isUuid(phaseId))) return { error: "Unknown team." };
-  if (!category) return { error: "Pick a category." };
-  if (!startsOn) return { error: "Pick the start date." };
+  if (!category) return invalid("category", "Pick a category.");
+  if (!startsOn) return invalid("starts_on", "Pick the start date.");
   if (endsOn && endsOn < startsOn) return { error: "The end can't be before the start." };
   if (details && details.length > 500) return { error: "Keep \"how much\" under 500 characters." };
   const supabase = await createClient();
@@ -173,7 +173,7 @@ export async function saveResults(_prev: TrainingState, fd: FormData): Promise<T
   const denied = await editorCheck();
   if (denied) return { error: denied };
   const measuredOn = isoDate(fd, "measured_on");
-  if (!measuredOn) return { error: "Pick the test date." };
+  if (!measuredOn) return invalid("measured_on", "Pick the test date.");
   const rows: { player_id: string; metric_key: string; value: number; measured_on: string; context: string }[] = [];
   for (const [name, raw] of fd.entries()) {
     if (!name.startsWith("v:") || typeof raw !== "string" || raw.trim() === "") continue;
@@ -197,7 +197,7 @@ export async function saveBands(_prev: FormState, fd: FormData): Promise<FormSta
   const denied = await editorCheck();
   if (denied) return { error: denied };
   const ageGroup = text(fd, "age_group");
-  if (!ageGroup || !/^\d{1,2}U$/.test(ageGroup)) return { error: "This team needs an age group first (team page)." };
+  if (!ageGroup || !/^\d{1,2}U$/.test(ageGroup)) return invalid("age_group", "This team needs an age group first (team page).");
   const supabase = await createClient();
   for (const test of TESTS) {
     if (fd.get(`reset:${test.key}`) === "on") {
@@ -357,7 +357,7 @@ export async function saveBpRound(_prev: FormState, fd: FormData): Promise<FormS
   const note = text(fd, "note");
   if (!isUuid(playerId)) return { error: "Pick the hitter." };
   if (!grades) return { error: "Grade at least one swing (0 to 5), up to 100." };
-  if (note && note.length > 200) return { error: "Keep the note to 200 characters." };
+  if (note && note.length > 200) return invalid("note", "Keep the note to 200 characters.");
   const supabase = await createClient();
   const { error } = await supabase.from("bp_rounds").insert({ player_id: playerId, round_date: date, grades, note });
   if (error) return { error: friendlyDbError(error) };

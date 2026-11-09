@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { dugoutTabsFor, type StaffRole } from "@/lib/roles";
 import { CountBadge } from "@/components/ui";
+import { TabRow } from "@/components/tab-row";
 
 /** A tab is current on its own page and below it (Culture only on /dugout itself). */
 const isCurrent = (href: string, path: string) => (href === "/dugout" ? path === "/dugout" : path.startsWith(href));
@@ -16,7 +17,7 @@ export function DugoutTabs({ badges, role }: { badges?: Record<string, number>; 
 /** The tabs for a given path; with no path (while the URL streams in) none is current. */
 export function TabList({ path = "", badges = {}, role }: { path?: string; badges?: Record<string, number>; role?: StaffRole }) {
   return (
-    <nav aria-label="Coaches Dugout" className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none]">
+    <TabRow label="Coaches Dugout" current={path}>
       <ul className="flex min-w-max gap-6 border-b border-navy-700">
         {dugoutTabsFor(role).map((tab) => {
           const active = isCurrent(tab.href, path);
@@ -40,6 +41,6 @@ export function TabList({ path = "", badges = {}, role }: { path?: string; badge
           );
         })}
       </ul>
-    </nav>
+    </TabRow>
   );
 }

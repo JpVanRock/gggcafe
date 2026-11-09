@@ -154,7 +154,7 @@ export default async function TeamPage({
                 href={`/teams/${team.id}?season=${s.id}`}
                 className={`rounded-full border px-3 py-1 text-sm ${
                   s.id === season?.id
-                    ? "border-pink bg-pink text-white"
+                    ? "border-pink bg-pink text-on-accent"
                     : "border-navy-600 hover:bg-navy-800"
                 }`}
               >
@@ -203,7 +203,7 @@ export default async function TeamPage({
                 </thead>
                 <tbody>
                   {roster.map((r) => (
-                    <tr key={r.id} className={r.active ? "" : "text-muted/70"}>
+                    <tr key={r.id} className={r.active ? "" : "text-muted"}>
                       <td className={`${tdClass} tabular-nums`}>{r.jersey_number ?? "–"}</td>
                       <td className={tdClass}>
                         <Link href={`/players/${r.player.id}`} className="font-medium hover:underline">

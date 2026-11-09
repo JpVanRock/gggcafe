@@ -156,7 +156,7 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
                   const claim = claimOf.get(r.id);
                   const parents = parentsOf.get(r.player.id) ?? 0;
                   return (
-                    <tr key={r.id} className={r.active ? "" : "text-muted/70"}>
+                    <tr key={r.id} className={r.active ? "" : "text-muted"}>
                       <td className={`${tdClass} font-display font-bold tabular-nums`}>{r.jersey_number ?? "–"}</td>
                       <td className={tdClass}>
                         <Link href={`/players/${r.player.id}`} className="font-medium hover:underline">

@@ -2,14 +2,15 @@
 
 // Grade a BP round swing by swing: tap 0-5 for each, undo the last, save the round.
 import { useActionState, useState } from "react";
-import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, inputClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import { QAB_SCALE, qabSummary } from "@/lib/box-score";
 import { saveBpRound } from "../actions";
+import { SubmitButton } from "@/components/submit-button";
 
 export function BpRoundForm({ players, today }: { players: { id: string; short: string }[]; today: string }) {
   const [swings, setSwings] = useState<number[]>([]);
-  const [state, action, pending] = useActionState(async (prev: typeof initialFormState, fd: FormData) => {
+  const [state, action] = useActionState(async (prev: typeof initialFormState, fd: FormData) => {
     const res = await saveBpRound(prev, fd);
     if (!res.error) setSwings([]);
     return res;
@@ -75,10 +76,8 @@ export function BpRoundForm({ players, today }: { players: { id: string; short: 
         {swings.length > 0 && <p className="mt-1 font-mono text-xs tracking-wider break-all text-muted">{swings.join(" ")}</p>}
       </div>
       <div className="flex items-center gap-4">
-        <button type="submit" disabled={pending || swings.length === 0} className={buttonClass}>
-          {pending ? "Saving…" : "Save round"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton disabled={swings.length === 0}>Save round</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );

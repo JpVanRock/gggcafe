@@ -4,7 +4,7 @@ import { refresh } from "next/cache";
 import { editorCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { nextPosition } from "@/lib/db";
-import { friendlyDbError, oneOf, text, type FormState } from "@/lib/form";
+import { friendlyDbError, oneOf, text, type FormState, invalid } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import { INSTALL_CATEGORIES, INSTALL_STATUSES, STARTER_ITEMS } from "@/lib/install";
 import { STALE, failed, must, runAction } from "@/lib/actions";
@@ -41,8 +41,8 @@ export async function addInstallItem(_prev: FormState, fd: FormData): Promise<Fo
   const group = text(fd, "group");
   const title = text(fd, "title");
   if (!isUuid(teamId) || !category) return { error: "Choose position or situation." };
-  if (!group || group.length > 40) return { error: "Name the group (a position or a situation), up to 40 characters." };
-  if (!title || title.length > 140) return { error: "Write what to install, up to 140 characters." };
+  if (!group || group.length > 40) return invalid("group", "Name the group (a position or a situation), up to 40 characters.");
+  if (!title || title.length > 140) return invalid("title", "Write what to install, up to 140 characters.");
 
   const supabase = await createClient();
   const position = await nextPosition(supabase, "install_items", "team_id", teamId);

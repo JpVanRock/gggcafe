@@ -3,10 +3,11 @@
 // Her commitment and the team pledge (Phase 5): an "I will..." line for each Team
 // Standard, then she types her name to sign.
 import { useActionState, useState } from "react";
-import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, inputClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import { LINE_MAX } from "@/lib/culture";
 import { savePledge } from "./culture-actions";
+import { SubmitButton } from "@/components/submit-button";
 
 export function PledgeForm({
   playerId,
@@ -25,7 +26,7 @@ export function PledgeForm({
   signedAt: string | null;
   defaultName: string;
 }) {
-  const [state, action, pending] = useActionState(savePledge, initialFormState);
+  const [state, action] = useActionState(savePledge, initialFormState);
   const [sign, setSign] = useState(Boolean(signedAt));
   return (
     <form action={action} className="flex flex-col gap-4">
@@ -50,10 +51,8 @@ export function PledgeForm({
         </Field>
       )}
       <div className="flex items-center gap-4">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : "Save my commitment"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>Save my commitment</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );

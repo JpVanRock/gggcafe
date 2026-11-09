@@ -5,7 +5,7 @@ import { refresh } from "next/cache";
 import { actForCheck, actorCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { addDays, isISODate, todayISO, weekStart } from "@/lib/dates";
-import { friendlyDbError, isoDate, text, type FormState } from "@/lib/form";
+import { friendlyDbError, isoDate, text, type FormState, invalid } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import type { TwisKind } from "./data";
 import { STALE, failed, must, runAction } from "@/lib/actions";
@@ -66,7 +66,7 @@ export async function addActivity(_prev: FormState, fd: FormData): Promise<FormS
   const notHers = await actForCheck(playerId);
   if (notHers) return { error: notHers };
   const title = text(fd, "title");
-  if (!title) return { error: "Name the activity, e.g. “Tee work” or “Long toss”." };
+  if (!title) return invalid("title", "Name the activity, e.g. “Tee work” or “Long toss”.");
 
   const days = fd
     .getAll("days")
@@ -75,7 +75,7 @@ export async function addActivity(_prev: FormState, fd: FormData): Promise<FormS
   const starts_on = isoDate(fd, "starts_on") ?? weekStart(todayISO());
   const thisWeekOnly = fd.get("this_week_only") === "on";
   const ends_on = thisWeekOnly ? addDays(weekStart(starts_on), 6) : isoDate(fd, "ends_on");
-  if (ends_on && ends_on < starts_on) return { error: "The end date is before the start date." };
+  if (ends_on && ends_on < starts_on) return invalid("ends_on", "The end date is before the start date.");
   const pillarId = text(fd, "pillar_id");
 
   const supabase = await createClient();

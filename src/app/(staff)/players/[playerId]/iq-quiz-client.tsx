@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState, useTransition } from "react";
-import { Field, FormMessage, buttonClass, inputClass, secondaryButtonClass } from "@/components/ui";
+import { Field, FormMessage, buttonClass, inputClass, secondaryButtonClass, cardClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import { POSITIONS, POSITION_LABEL } from "@/lib/softball";
 
@@ -9,6 +9,7 @@ import { answerIqQuestion, saveIqQuestion } from "./iq-actions";
 import type { IqQuestion } from "./data";
 
 import { LETTERS, plural, type Feedback } from "./iq-shared";
+import { SubmitButton } from "@/components/submit-button";
 
 // Softball IQ practice: the quiz runner and the question bank form (coaches).
 export type QuizQuestion = Pick<IqQuestion, "id" | "scenario" | "question" | "choices">;
@@ -33,7 +34,7 @@ export function QuizRunner({ playerId, quizzes, canEdit }: { playerId: string; q
     return (
       <div className="grid gap-3 sm:grid-cols-2">
         {quizzes.map((quiz) => (
-          <div key={quiz.key} className="flex flex-col justify-between gap-3 rounded-xl border border-navy-700 bg-navy-950/40 p-4">
+          <div key={quiz.key} className={`${cardClass("inset")} flex flex-col justify-between gap-3 p-4`}>
             <div>
               <div className="flex items-baseline justify-between gap-3">
                 <p className="font-bold tracking-wide uppercase">{quiz.label}</p>
@@ -97,7 +98,7 @@ export function QuizRunner({ playerId, quizzes, canEdit }: { playerId: string; q
   }
 
   return (
-    <div className="rounded-xl border border-navy-600 bg-navy-950/50 p-4 sm:p-6">
+    <div className={`${cardClass("inset")} p-4 sm:p-6`}>
       <div className="flex items-center justify-between gap-3 font-mono text-xs tracking-widest text-muted uppercase">
         <span className="text-pink-soft">{run.label}</span>
         <span>
@@ -145,7 +146,7 @@ export function QuizRunner({ playerId, quizzes, canEdit }: { playerId: string; q
       {feedback && (
         <div className="mt-4" aria-live="polite">
           <p className={`font-bold ${feedback.correct ? "text-highlight" : "text-pink-soft"}`}>{feedback.correct ? "Correct!" : "Not quite."}</p>
-          {feedback.explanation && <p className="mt-1 text-sm text-ink/90">{feedback.explanation}</p>}
+          {feedback.explanation && <p className="mt-1 text-base text-ink/90">{feedback.explanation}</p>}
           <div className="mt-4 flex gap-2">
             <button
               type="button"
@@ -168,7 +169,7 @@ export function QuizRunner({ playerId, quizzes, canEdit }: { playerId: string; q
 }
 
 export function IqQuestionForm({ question }: { question?: IqQuestion }) {
-  const [state, action, pending] = useActionState(saveIqQuestion, initialFormState);
+  const [state, action] = useActionState(saveIqQuestion, initialFormState);
   const [topic, setTopic] = useState<IqQuestion["topic"]>(question?.topic ?? "general");
 
   return (
@@ -250,10 +251,8 @@ export function IqQuestionForm({ question }: { question?: IqQuestion }) {
         </Field>
       </div>
       <div className="flex items-center gap-4 sm:col-span-2">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : question ? "Save question" : "Add question"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>{question ? "Save question" : "Add question"}</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );

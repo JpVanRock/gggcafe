@@ -6,7 +6,7 @@ const FILL: Record<ZoneState, string> = {
   hot: "bg-neon text-on-accent",
   strong: "bg-pink/25 text-ink border-pink",
   weak: "bg-navy-950 text-muted [background-image:repeating-linear-gradient(135deg,transparent_0_6px,rgb(254_31_124/0.25)_6px_8px)]",
-  none: "bg-navy-800/60 text-muted/60",
+  none: "bg-navy-800/60 text-muted",
 };
 const MARK: Record<ZoneState, string> = { hot: "My pitch", strong: "Handle", weak: "Work", none: "" };
 
@@ -28,7 +28,7 @@ export function ZoneGrid({
   onCell?: (cell: number) => void;
 }) {
   return (
-    <div className="grid grid-cols-3 gap-1 rounded-lg border-2 border-ink/70 p-1" style={{ width: size, height: size }}>
+    <div role="group" aria-label="Strike zone, catcher's view" className="grid grid-cols-3 gap-1 rounded-lg border-2 border-ink/70 p-1" style={{ width: size, height: size }}>
       {ZONE_CELLS.map((cell) => {
         const state = only ? (only.includes(cell) ? (stateOf(zones, cell) === "none" ? "strong" : stateOf(zones, cell)) : "none") : stateOf(zones, cell);
         const fight = battle.includes(cell);
@@ -41,7 +41,7 @@ export function ZoneGrid({
             {labels && MARK[state]}
           </button>
         ) : (
-          <span key={cell} aria-label={label} title={label} className={cls}>
+          <span key={cell} role="img" aria-label={label} title={label} className={cls}>
             {labels && (fight ? "Battle" : MARK[state])}
           </span>
         );

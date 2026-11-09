@@ -233,7 +233,7 @@ export default async function LeaderboardPage({ params, searchParams }: PageProp
               <li
                 key={r.player_id}
                 className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 ${r.player_id === player.id ? "border-pink" : "border-navy-700"} ${
-                  r.status === "eligible" ? "" : "opacity-70"
+                  r.status === "eligible" ? "" : "border-dashed"
                 }`}
               >
                 <span className="w-6 font-display text-lg font-bold text-highlight tabular-nums">{i + 1}</span>

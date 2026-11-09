@@ -2,13 +2,14 @@
 
 // Coaches Dugout → Culture (Phase 5): the season motto, Team Season Goals and Player Spotlights.
 import { useActionState } from "react";
-import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, inputClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import { GOAL_PHASES, GOAL_PHASE_LABEL, MOTTO_MAX, SPOTLIGHT, type TeamGoal } from "@/lib/culture";
 import { saveGoal, saveMotto, saveSpotlight } from "./actions";
+import { SubmitButton } from "@/components/submit-button";
 
 export function MottoForm({ teamId, motto }: { teamId: string; motto: string | null }) {
-  const [state, action, pending] = useActionState(saveMotto, initialFormState);
+  const [state, action] = useActionState(saveMotto, initialFormState);
   return (
     <form action={action} className="flex flex-wrap items-end gap-3">
       <input type="hidden" name="team_id" value={teamId} />
@@ -17,16 +18,14 @@ export function MottoForm({ teamId, motto }: { teamId: string; motto: string | n
           <input name="motto" maxLength={MOTTO_MAX} defaultValue={motto ?? ""} placeholder="Every pitch. Every rep. Together." className={inputClass} />
         </Field>
       </div>
-      <button type="submit" disabled={pending} className={buttonClass}>
-        {pending ? "Saving…" : "Save motto"}
-      </button>
-      <FormMessage error={state.error} saved={state.saved} />
+      <SubmitButton>Save motto</SubmitButton>
+      <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
     </form>
   );
 }
 
 export function GoalForm({ teamId, goal }: { teamId: string; goal?: TeamGoal }) {
-  const [state, action, pending] = useActionState(saveGoal, initialFormState);
+  const [state, action] = useActionState(saveGoal, initialFormState);
   return (
     <form action={action} className="grid gap-3 sm:grid-cols-6">
       <input type="hidden" name="team_id" value={teamId} />
@@ -63,17 +62,15 @@ export function GoalForm({ teamId, goal }: { teamId: string; goal?: TeamGoal }) 
         </Field>
       </div>
       <div className="flex items-center gap-4 sm:col-span-6">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : goal ? "Save goal" : "Add goal"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>{goal ? "Save goal" : "Add goal"}</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );
 }
 
 export function SpotlightForm({ teamId, roster }: { teamId: string; roster: { id: string; name: string; number: string | null }[] }) {
-  const [state, action, pending] = useActionState(saveSpotlight, initialFormState);
+  const [state, action] = useActionState(saveSpotlight, initialFormState);
   return (
     <form action={action} className="grid gap-3">
       <input type="hidden" name="team_id" value={teamId} />
@@ -99,10 +96,8 @@ export function SpotlightForm({ teamId, roster }: { teamId: string; roster: { id
         <textarea name="body" required rows={4} maxLength={SPOTLIGHT.body} className={inputClass} />
       </Field>
       <div className="flex items-center gap-4">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Publishing…" : "Publish spotlight"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton pendingLabel="Publishing…">Publish spotlight</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );

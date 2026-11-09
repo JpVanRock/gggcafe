@@ -72,14 +72,8 @@ export function Field({
   );
 }
 
-/** A server action's result under a form: the error in red, or "Saved." Announced by screen readers. */
-export function FormMessage({ error, saved }: { error: string | null; saved?: boolean }) {
-  return (
-    <p aria-live="polite" className={`min-h-5 text-sm ${error ? "text-danger" : "text-highlight"}`}>
-      {error ?? (saved ? "Saved." : "")}
-    </p>
-  );
-}
+/** A server action's result under a form (a client component: it also marks the fields an error names). */
+export { FormMessage } from "@/components/form-message";
 
 // ---- Buttons ----------------------------------------------------------------------------------
 
@@ -229,6 +223,14 @@ export function PageHeader({
 }
 
 /**
+ * A card's box for anything that isn't a titled <Card> (a list item, a tile, a form): `raised` sits
+ * on the page, `inset` is a quieter box inside a card. Add your own padding.
+ */
+export function cardClass(tone: "raised" | "inset" = "raised") {
+  return `rounded-xl border border-navy-700 ${tone === "inset" ? "bg-navy-950/40" : "bg-navy-900/70"}`;
+}
+
+/**
  * A card: a titled section of a page. `raised` (the default) sits on the page; `inset` is a
  * quieter box inside another card. Corners are rounded-xl (boards may go to rounded-2xl).
  */
@@ -246,9 +248,7 @@ export function Card({
   className?: string;
 }) {
   return (
-    <section
-      className={`rounded-xl border border-navy-700 p-4 ${tone === "inset" ? "bg-navy-950/40" : "bg-navy-900/70"} ${className}`}
-    >
+    <section className={`${cardClass(tone)} p-4 ${className}`}>
       {(title || actions) && (
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           {title && <h2 className={sectionLabelClass}>{title}</h2>}

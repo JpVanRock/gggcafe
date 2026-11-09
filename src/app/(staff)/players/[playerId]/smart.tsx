@@ -104,7 +104,7 @@ function SmartGoalCard({
             </dt>
             <dd className="text-sm leading-6">
               <span className="sr-only">{label}: </span>
-              {value ?? <span className="text-muted/70">Not filled in</span>}
+              {value ?? <span className="text-muted">Not filled in</span>}
             </dd>
           </div>
         ))}

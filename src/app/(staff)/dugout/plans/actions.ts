@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { editorCheck, getCurrentUser } from "@/lib/auth";
 import { canEditPlanRole } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
-import { friendlyDbError, isoDate, oneOf, text, wholeNumber, type FormState } from "@/lib/form";
+import { friendlyDbError, isoDate, oneOf, text, wholeNumber, type FormState, invalid } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import { formatDay, formatLongDate } from "@/lib/dates";
 import {
@@ -34,9 +34,9 @@ export async function createPracticePlan(_prev: FormState, fd: FormData): Promis
   const start = text(fd, "start_time");
   const total = wholeNumber(fd, "total_minutes", 15, 480);
   if (!isUuid(teamId)) return { error: "Choose a team." };
-  if (!date) return { error: "Pick the practice date." };
-  if (start && parseClock(start) === null) return { error: "Check the start time." };
-  if (total === null || total === "invalid") return { error: "Pick the total practice time." };
+  if (!date) return invalid("practice_date", "Pick the practice date.");
+  if (start && parseClock(start) === null) return invalid("start_time", "Check the start time.");
+  if (total === null || total === "invalid") return invalid("total_minutes", "Pick the total practice time.");
 
   const supabase = await createClient();
   const { data, error } = await supabase

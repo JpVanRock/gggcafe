@@ -3,7 +3,7 @@
 import { refresh } from "next/cache";
 import { headCoachCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { friendlyDbError, oneOf, text, type FormState } from "@/lib/form";
+import { friendlyDbError, oneOf, text, type FormState, invalid } from "@/lib/form";
 import { isUuid, playerName } from "@/lib/softball";
 import { GOAL_PHASES, MOTTO_MAX, SPOTLIGHT } from "@/lib/culture";
 import { STALE, failed, must, runAction } from "@/lib/actions";
@@ -26,8 +26,8 @@ export async function saveTeamDugout(_prev: FormState, fd: FormData): Promise<Fo
 
   const headline = text(fd, "headline");
   const statement = text(fd, "statement");
-  if ((headline ?? "").length > 120) return { error: "Keep the headline to 120 characters." };
-  if ((statement ?? "").length > 4000) return { error: "Keep the team culture description to 4,000 characters." };
+  if ((headline ?? "").length > 120) return invalid("headline", "Keep the headline to 120 characters.");
+  if ((statement ?? "").length > 4000) return invalid("statement", "Keep the team culture description to 4,000 characters.");
 
   const supabase = await createClient();
   const { error } = await supabase.rpc("save_team_dugout", {
@@ -78,9 +78,9 @@ export async function saveGoal(_prev: FormState, fd: FormData): Promise<FormStat
   const target = amount(fd, "target");
   const current = amount(fd, "current");
   if (!isUuid(teamId) || (id && !isUuid(id))) return { error: "Unknown team." };
-  if (!title || title.length > 140) return { error: "Write the goal (140 characters at most)." };
+  if (!title || title.length > 140) return invalid("title", "Write the goal (140 characters at most).");
   if (target === "invalid" || current === "invalid") return { error: "Target and progress are numbers." };
-  if (unit && unit.length > 20) return { error: "Keep the unit short (20 characters)." };
+  if (unit && unit.length > 20) return invalid("unit", "Keep the unit short (20 characters).");
   const supabase = await createClient();
   const row = { team_id: teamId, phase, title, target, current, unit, updated_at: new Date().toISOString() };
   const { error } = id ? await supabase.from("team_goals").update(row).eq("id", id) : await supabase.from("team_goals").insert({ ...row, position: Date.now() % 30000 });

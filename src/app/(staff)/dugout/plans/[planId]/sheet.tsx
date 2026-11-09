@@ -1,7 +1,7 @@
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { DrillTags } from "@/components/drill-tags";
 import { FieldLineup } from "@/components/practice-field";
-import { Card, EmptyState, pillButtonClass, pillOutlineClass, badgeClass } from "@/components/ui";
+import { Card, EmptyState, pillButtonClass, pillOutlineClass, badgeClass, cardClass } from "@/components/ui";
 import { formatLongDate } from "@/lib/dates";
 import { PRACTICE_SETTING_LABEL, durationLabel, equipmentChecklist, planTimeline, practiceRange, type PlanPosition } from "@/lib/dugout";
 import type { PracticePlan, RosterPlayer, StaffContact } from "@/lib/practice-plans";
@@ -91,7 +91,7 @@ export function PlanSheet({
         ) : (
           <ol className="flex flex-col gap-3">
             {plan.blocks.map((b, i) => (
-              <li key={i} className="grid gap-x-5 gap-y-2 rounded-xl border border-navy-700 bg-navy-900/70 p-4 sm:grid-cols-[10.5rem_1fr_auto]">
+              <li key={i} className={`${cardClass("raised")} grid gap-x-5 gap-y-2 p-4 sm:grid-cols-[10.5rem_1fr_auto]`}>
                 <p className="font-mono text-xs tracking-wider whitespace-nowrap text-pink-soft">
                   <span className="font-display font-bold text-highlight tabular-nums">{String(i + 1).padStart(2, "0")}</span>
                   {"  ·  "}

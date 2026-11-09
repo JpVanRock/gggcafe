@@ -6,7 +6,7 @@
 import { refresh } from "next/cache";
 import { actForCheck, actorCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { friendlyDbError, text, type FormState } from "@/lib/form";
+import { friendlyDbError, text, type FormState, invalid } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import { MENTAL_FIELDS } from "./shared";
 import { isISODate, isoWeekday, todayISO, weekStart } from "@/lib/dates";
@@ -58,7 +58,7 @@ export async function logIntensity(_prev: FormState, fd: FormData): Promise<Form
   const who = await playerFrom(fd);
   if ("error" in who) return { error: who.error };
   const value = level(fd, "level");
-  if (value === null) return { error: "Pick a number from 1 to 10." };
+  if (value === null) return invalid("level", "Pick a number from 1 to 10.");
   const context = INTENSITY_CONTEXTS.find((c) => c === fd.get("context")) ?? "game";
   const adjustment = text(fd, "adjustment");
   if (adjustment && adjustment.length > ADJUSTMENT_MAX) return { error: `Keep it under ${ADJUSTMENT_MAX} characters.` };
@@ -131,7 +131,7 @@ export async function saveJournalEntry(_prev: FormState, fd: FormData): Promise<
   const who = await playerFrom(fd);
   if ("error" in who) return { error: who.error };
   const date = text(fd, "entry_date");
-  if (!isISODate(date)) return { error: "Unknown day." };
+  if (!isISODate(date)) return invalid("entry_date", "Unknown day.");
   const purpose = text(fd, "purpose");
   const worked = text(fd, "worked");
   const fix = text(fd, "fix");
@@ -156,7 +156,7 @@ export async function saveJournalWeek(_prev: FormState, fd: FormData): Promise<F
   const who = await playerFrom(fd);
   if ("error" in who) return { error: who.error };
   const monday = text(fd, "week_start");
-  if (!isISODate(monday) || weekStart(monday) !== monday) return { error: "Unknown week." };
+  if (!isISODate(monday) || weekStart(monday) !== monday) return invalid("week_start", "Unknown week.");
   const lookBack = text(fd, "look_back");
   if ((lookBack?.length ?? 0) > JOURNAL_LIMITS.lookBack) return { error: `Keep it under ${JOURNAL_LIMITS.lookBack} characters.` };
   const supabase = await createClient();

@@ -3,7 +3,7 @@
 import { refresh } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { text, type FormState } from "@/lib/form";
+import { text, type FormState, invalid } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 
 export type ClaimState = FormState & { matched?: boolean };
@@ -16,8 +16,8 @@ export async function claimSpot(_prev: ClaimState, fd: FormData): Promise<ClaimS
   const name = text(fd, "name");
   const jersey = text(fd, "jersey");
   if (!isUuid(teamId)) return { error: "Choose your team." };
-  if (!name || !/\s/.test(name)) return { error: "Enter your first and last name." };
-  if (!jersey || !/^#?\d{1,2}$/.test(jersey)) return { error: "Enter your jersey number (0–99)." };
+  if (!name || !/\s/.test(name)) return invalid("name", "Enter your first and last name.");
+  if (!jersey || !/^#?\d{1,2}$/.test(jersey)) return invalid("jersey", "Enter your jersey number (0–99).");
 
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("request_player_claim", { p_team_id: teamId, p_name: name, p_jersey: jersey });

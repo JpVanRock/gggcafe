@@ -4,7 +4,7 @@ import { randomInt } from "node:crypto";
 import { refresh } from "next/cache";
 import { headCoachCheck, getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { friendlyDbError, text, type FormState } from "@/lib/form";
+import { friendlyDbError, text, type FormState, invalid } from "@/lib/form";
 import { PACKET_KINDS, PACKET_STARTERS } from "@/lib/family";
 import { isUuid } from "@/lib/softball";
 import { STALE, failed, must, runAction } from "@/lib/actions";
@@ -83,8 +83,8 @@ export async function savePacketItem(_prev: FormState, fd: FormData): Promise<Fo
   const title = text(fd, "title");
   const body = text(fd, "body");
   if (!isUuid(teamId) || (id && !isUuid(id))) return { error: "Unknown team." };
-  if (!title || title.length > 100) return { error: "Give it a title (100 characters at most)." };
-  if (!body || body.length > 3000) return { error: "Write the text (3000 characters at most)." };
+  if (!title || title.length > 100) return invalid("title", "Give it a title (100 characters at most).");
+  if (!body || body.length > 3000) return invalid("body", "Write the text (3000 characters at most).");
   const supabase = await createClient();
   const row = { team_id: teamId, kind, title, body, updated_at: new Date().toISOString() };
   const { error } = id

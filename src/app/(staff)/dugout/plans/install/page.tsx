@@ -63,7 +63,7 @@ function StatusControl({ item, editor }: { item: ItemRow; editor: boolean }) {
             name="status"
             value={s}
             aria-pressed={on}
-            className={`${badgeClass(on ? STATUS_TONE[s] : "neutral", "md")} transition ${on ? "" : "opacity-75 hover:border-pink hover:text-ink hover:opacity-100"}`}
+            className={`${badgeClass(on ? STATUS_TONE[s] : "neutral", "md")} transition ${on ? "" : "hover:border-pink hover:text-ink"}`}
           >
             {INSTALL_STATUS_LABEL[s]}
           </button>
@@ -245,7 +245,7 @@ export default async function InstallPage({ searchParams }: PageProps<"/dugout/p
                                       {formatDay(p.practice_date)}
                                     </Link>
                                   ))}
-                                  {item.iq_track && <span className="text-muted/80">Players can test it in {IQ_LABEL[item.iq_track]}</span>}
+                                  {item.iq_track && <span className="text-muted">Players can test it in {IQ_LABEL[item.iq_track]}</span>}
                                 </p>
                               )}
                             </li>

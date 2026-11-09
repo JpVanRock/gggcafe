@@ -1,11 +1,12 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, inputClass } from "@/components/ui";
 import { TRAINING_CATEGORY_LABEL, type TrainingCategory } from "@/lib/achievements";
 import { WEEKDAYS } from "@/lib/dates";
 import { initialFormState } from "@/lib/form";
 import { addRoutine } from "./training-actions";
+import { SubmitButton } from "@/components/submit-button";
 
 export function RoutineForm({
   playerId,
@@ -18,7 +19,7 @@ export function RoutineForm({
   library: { id: string; name: string }[];
   defaultStart: string;
 }) {
-  const [state, action, pending] = useActionState(addRoutine, initialFormState);
+  const [state, action] = useActionState(addRoutine, initialFormState);
   const [choice, setChoice] = useState(library.length ? "" : "new");
   const isNew = choice === "new";
   const label = TRAINING_CATEGORY_LABEL[category];
@@ -87,10 +88,8 @@ export function RoutineForm({
       </Field>
 
       <div className="flex items-center gap-4 sm:col-span-2">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Adding…" : "Add routine"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton pendingLabel="Adding…">Add routine</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );

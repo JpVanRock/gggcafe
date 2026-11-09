@@ -1,14 +1,18 @@
 // Athletic-brand graphic elements (think media-day graphics and team apparel),
 // used instead of cartoon doodles. Decorative only.
 
-/** Big outlined numerals or letters, like a jersey number in the background. */
+/**
+ * Big outlined numerals or letters, like a jersey number in the background. Text is drawn by a CSS
+ * pseudo-element, so it is pure decoration: screen readers skip it and contrast checks don't count it.
+ */
 export function OutlineText({ children, className = "", stroke = "var(--color-navy-600)" }: { children: React.ReactNode; className?: string; stroke?: string }) {
+  const cls = `pointer-events-none font-display leading-none font-bold text-transparent select-none ${className}`;
+  const style = { WebkitTextStroke: `1.5px ${stroke}` };
+  if (typeof children === "string" || typeof children === "number") {
+    return <span aria-hidden data-text={String(children)} className={`${cls} before:content-[attr(data-text)]`} style={style} />;
+  }
   return (
-    <span
-      aria-hidden
-      className={`pointer-events-none font-display leading-none font-bold text-transparent select-none ${className}`}
-      style={{ WebkitTextStroke: `1.5px ${stroke}` }}
-    >
+    <span aria-hidden className={cls} style={style}>
       {children}
     </span>
   );

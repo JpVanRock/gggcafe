@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { TabRow } from "@/components/tab-row";
 
 export const SECTIONS = [
   { slug: "goals", label: "Goals" },
@@ -25,7 +26,7 @@ function sectionsFor(advanced: boolean) {
 export function SectionNav({ playerId, path = "", advanced = false }: { playerId: string; path?: string; advanced?: boolean }) {
   const base = `/players/${playerId}`;
   return (
-    <nav aria-label="Player sections" className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none]">
+    <TabRow label="Player sections" current={path}>
       <ul className="flex min-w-max gap-5 border-b border-navy-700">
         {sectionsFor(advanced).map((s) => {
           const href = `${base}/${s.slug}`;
@@ -45,7 +46,7 @@ export function SectionNav({ playerId, path = "", advanced = false }: { playerId
           );
         })}
       </ul>
-    </nav>
+    </TabRow>
   );
 }
 

@@ -1,16 +1,17 @@
 "use client";
 
 import { useActionState } from "react";
-import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, inputClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import { movePlayer } from "./actions";
+import { SubmitButton } from "@/components/submit-button";
 
 export type MoveTeam = { id: string; name: string; organization: string | null; age_group: string | null; is_own_team: boolean };
 export type MoveSeason = { id: string; name: string };
 
 /** Coaches move a player to another team; her history stays on her profile. */
 export function MoveTeamForm({ playerId, teams, seasons }: { playerId: string; teams: MoveTeam[]; seasons: MoveSeason[] }) {
-  const [state, action, pending] = useActionState(movePlayer, initialFormState);
+  const [state, action] = useActionState(movePlayer, initialFormState);
   const ours = teams.filter((t) => t.is_own_team);
   const others = teams.filter((t) => !t.is_own_team);
   const label = (t: MoveTeam) => [t.name, t.age_group && !t.name.includes(t.age_group) ? t.age_group : null, t.organization].filter(Boolean).join(" · ");
@@ -63,10 +64,8 @@ export function MoveTeamForm({ playerId, teams, seasons }: { playerId: string; t
         account, she claims her new spot when she signs in.
       </p>
       <div className="flex flex-wrap items-center gap-3 sm:col-span-6">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Moving…" : "Move to this team"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton pendingLabel="Moving…">Move to this team</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
       <p className="text-xs text-muted sm:col-span-6">Need a team that isn&apos;t listed? Add it on the Teams page first.</p>
     </form>

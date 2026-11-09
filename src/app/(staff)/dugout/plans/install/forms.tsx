@@ -1,16 +1,17 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, inputClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import { INSTALL_CATEGORIES, INSTALL_CATEGORY_LABEL, type InstallCategory } from "@/lib/install";
 import { addInstallItem } from "./actions";
+import { SubmitButton } from "@/components/submit-button";
 
 const POSITION_GROUPS = ["P", "C", "1B", "2B", "SS", "3B", "OF"];
 
 /** Add one item to the team's install checklist. */
 export function AddInstallItemForm({ teamId, situationGroups }: { teamId: string; situationGroups: string[] }) {
-  const [state, action, pending] = useActionState(addInstallItem, initialFormState);
+  const [state, action] = useActionState(addInstallItem, initialFormState);
   const [category, setCategory] = useState<InstallCategory>("situation");
   const groups = category === "position" ? POSITION_GROUPS : situationGroups;
   return (
@@ -37,10 +38,8 @@ export function AddInstallItemForm({ teamId, situationGroups }: { teamId: string
         <input name="title" required maxLength={140} placeholder="e.g. Covering first on bunts" className={inputClass} />
       </Field>
       <div className="flex items-center gap-4 sm:col-span-3">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Adding…" : "Add to the checklist"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton pendingLabel="Adding…">Add to the checklist</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );

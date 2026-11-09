@@ -48,7 +48,7 @@ export function PositionBadge({ position, active = false }: { position: PlanPosi
   return (
     <span
       className={`grid h-7 w-7 place-items-center rounded-full border font-mono text-2xs font-bold ${
-        active ? "border-white bg-pink text-white" : "border-navy-600 bg-navy-700 text-ink"
+        active ? "border-white bg-pink text-on-accent" : "border-navy-600 bg-navy-700 text-ink"
       }`}
     >
       {position}

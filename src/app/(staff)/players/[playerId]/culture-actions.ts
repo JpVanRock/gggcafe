@@ -5,7 +5,7 @@
 import { refresh } from "next/cache";
 import { actForCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { friendlyDbError, text, type FormState } from "@/lib/form";
+import { friendlyDbError, text, type FormState, invalid } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import { seasonOrCurrent } from "@/lib/roster";
 import { cleanLines } from "@/lib/culture";
@@ -28,7 +28,7 @@ export async function savePledge(_prev: FormState, fd: FormData): Promise<FormSt
   const lines = cleanLines(raw, titles);
   const sign = fd.get("sign") === "on";
   const signedName = text(fd, "signed_name");
-  if (sign && (!signedName || signedName.length > 80)) return { error: "Type your name to sign." };
+  if (sign && (!signedName || signedName.length > 80)) return invalid("signed_name", "Type your name to sign.");
   const { data: existing } = await supabase
     .from("team_pledges")
     .select("signed_name, signed_at")

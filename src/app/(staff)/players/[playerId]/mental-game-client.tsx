@@ -9,6 +9,7 @@ import {
   SCAN_NOTE_MAX, SCAN_SKILLS, SIGNALS, SIGNAL_MAX, ZONE_TIP, zoneStatus,
 } from "@/lib/mental";
 import { logIntensity, saveJournalEntry, saveJournalWeek, saveScan, saveSignals } from "./mental-actions";
+import { SubmitButton } from "@/components/submit-button";
 
 const pill =
   "cursor-pointer rounded-full border border-navy-600 px-2.5 py-1 text-center text-sm font-semibold text-muted transition select-none has-checked:border-pink has-checked:bg-pink has-checked:text-on-accent has-focus-visible:ring-2 has-focus-visible:ring-pink/40";
@@ -19,7 +20,7 @@ type Signals = Partial<Record<"green_signs" | "yellow_signs" | "red_signs" | "ye
 };
 
 export function SignalsForm({ playerId, plan }: { playerId: string; plan: Signals | null }) {
-  const [state, action, pending] = useActionState(saveSignals, initialFormState);
+  const [state, action] = useActionState(saveSignals, initialFormState);
   return (
     <form action={action} className="flex flex-col gap-4">
       <input type="hidden" name="player_id" value={playerId} />
@@ -65,17 +66,15 @@ export function SignalsForm({ playerId, plan }: { playerId: string; plan: Signal
         <span className="pb-2 text-xs text-muted">Not sure yet? Leave it; your intensity checks will show you.</span>
       </fieldset>
       <div className="flex items-center gap-4">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : "Save my signals"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>Save my signals</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );
 }
 
 export function IntensityForm({ playerId, zone }: { playerId: string; zone: { low: number | null; high: number | null } }) {
-  const [state, action, pending] = useActionState(logIntensity, initialFormState);
+  const [state, action] = useActionState(logIntensity, initialFormState);
   const [value, setValue] = useState<number | null>(null);
   const status = value === null ? null : zoneStatus(value, zone);
   return (
@@ -119,10 +118,8 @@ export function IntensityForm({ playerId, zone }: { playerId: string; zone: { lo
         </Field>
       </div>
       <div className="flex items-center gap-4">
-        <button type="submit" disabled={pending || value === null} className={buttonClass}>
-          {pending ? "Saving…" : "Log it"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton disabled={value === null}>Log it</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );
@@ -195,7 +192,7 @@ export function JournalDayForm({
   date: string;
   entry: { purpose: string | null; worked: string | null; fix: string | null } | null;
 }) {
-  const [state, action, pending] = useActionState(saveJournalEntry, initialFormState);
+  const [state, action] = useActionState(saveJournalEntry, initialFormState);
   return (
     <form action={action} className="grid gap-3">
       <input type="hidden" name="player_id" value={playerId} />
@@ -212,17 +209,15 @@ export function JournalDayForm({
         </Field>
       </div>
       <div className="flex items-center gap-4">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : "Save"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>Save</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );
 }
 
 export function JournalWeekForm({ playerId, monday, lookBack }: { playerId: string; monday: string; lookBack: string | null }) {
-  const [state, action, pending] = useActionState(saveJournalWeek, initialFormState);
+  const [state, action] = useActionState(saveJournalWeek, initialFormState);
   return (
     <form action={action} className="grid gap-3">
       <input type="hidden" name="player_id" value={playerId} />
@@ -231,10 +226,8 @@ export function JournalWeekForm({ playerId, monday, lookBack }: { playerId: stri
         <textarea name="look_back" rows={4} maxLength={JOURNAL_LIMITS.lookBack} defaultValue={lookBack ?? ""} className={inputClass} />
       </Field>
       <div className="flex items-center gap-4">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : "Save my look-back"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>Save my look-back</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );

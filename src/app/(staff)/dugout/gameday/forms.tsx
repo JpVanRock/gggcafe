@@ -2,10 +2,11 @@
 
 import { StatTerm } from "@/components/stat-term";
 import { useActionState } from "react";
-import { Field, FormMessage, buttonClass, fieldClass, inputClass, TableScroll } from "@/components/ui";
+import { Field, FormMessage, fieldClass, inputClass, TableScroll } from "@/components/ui";
 import { BASE_RUNNING, BASE_RUNNING_LABEL, HITTING_TYPES, HITTING_TYPE_LABEL, MAX_ROTATIONS, percent, rate } from "@/lib/gameday";
 import { initialFormState } from "@/lib/form";
 import { createLineup, saveGamedayCards } from "./actions";
+import { SubmitButton } from "@/components/submit-button";
 
 export type CardPlayer = {
   id: string;
@@ -25,7 +26,7 @@ const stat = (n: number | null, k = false) => (n === null ? "" : k ? String(n) :
 
 /** One row per player: hitting type, base running, and stats (typed only when there are no box scores). */
 export function CardsForm({ teamId, seasonId, players }: { teamId: string; seasonId: string; players: CardPlayer[] }) {
-  const [state, action, pending] = useActionState(saveGamedayCards, initialFormState);
+  const [state, action] = useActionState(saveGamedayCards, initialFormState);
   return (
     <form action={action} className="flex flex-col gap-4">
       <input type="hidden" name="team_id" value={teamId} />
@@ -111,10 +112,8 @@ export function CardsForm({ teamId, seasonId, players }: { teamId: string; seaso
       </TableScroll>
       <p className="text-xs text-muted">Stats fill in from box scores once games are entered. Until then, type them in (AVG and OBP like .312, K% like 18.5).</p>
       <div className="flex flex-wrap items-center gap-3">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : "Save player cards"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>Save player cards</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );
@@ -131,7 +130,7 @@ export function NewLineupForm({
   today: string;
   games: { date: string; opponent: string }[];
 }) {
-  const [state, action, pending] = useActionState(createLineup, initialFormState);
+  const [state, action] = useActionState(createLineup, initialFormState);
   return (
     <form action={action} className="grid gap-4 sm:grid-cols-2">
       <input type="hidden" name="team_id" value={teamId} />
@@ -160,10 +159,8 @@ export function NewLineupForm({
         </select>
       </Field>
       <div className="flex flex-wrap items-center gap-3 sm:col-span-2">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Setting up…" : "Start the lineup"}
-        </button>
-        <FormMessage error={state.error} />
+        <SubmitButton pendingLabel="Setting up…">Start the lineup</SubmitButton>
+        <FormMessage error={state.error} fields={state.fields} />
       </div>
     </form>
   );

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
-import { Field, FormMessage, buttonClass, fieldClass, inputClass, secondaryButtonClass } from "@/components/ui";
+import { Field, FormMessage, fieldClass, inputClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import {
   AGE_GROUPS, BATS, BATS_LABEL, FORMATS, FORMAT_LABEL, POSITIONS, POSITION_LABEL, THROWS, THROWS_LABEL,
@@ -12,9 +12,10 @@ import {
   addExistingPlayerToRoster, addGame, addNewPlayerToRoster, addTeamEvent, createSeason, createTeam, updateRosterEntry,
   updateTeam,
 } from "./actions";
+import { SubmitButton } from "@/components/submit-button";
 
 export function TeamForm({ team }: { team?: Team }) {
-  const [state, action, pending] = useActionState(team ? updateTeam : createTeam, initialFormState);
+  const [state, action] = useActionState(team ? updateTeam : createTeam, initialFormState);
 
   return (
     <form action={action} className="grid gap-4 sm:grid-cols-2">
@@ -81,17 +82,15 @@ export function TeamForm({ team }: { team?: Team }) {
       </div>
 
       <div className="flex items-center gap-4 sm:col-span-2">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Saving…" : team ? "Save changes" : "Add team"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton>{team ? "Save changes" : "Add team"}</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );
 }
 
 export function SeasonForm({ teamId, next }: { teamId: string; next?: "intake" }) {
-  const [state, action, pending] = useActionState(createSeason, initialFormState);
+  const [state, action] = useActionState(createSeason, initialFormState);
   return (
     <form action={action} className="grid gap-4 sm:grid-cols-3">
       <input type="hidden" name="team_id" value={teamId} />
@@ -106,17 +105,15 @@ export function SeasonForm({ teamId, next }: { teamId: string; next?: "intake" }
         <input type="date" name="end_date" className={inputClass} />
       </Field>
       <div className="flex items-center gap-4 sm:col-span-3">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Creating…" : "Create season"}
-        </button>
-        <FormMessage error={state.error} />
+        <SubmitButton pendingLabel="Creating…">Create season</SubmitButton>
+        <FormMessage error={state.error} fields={state.fields} />
       </div>
     </form>
   );
 }
 
 export function NewRosterPlayerForm({ teamId, seasonId }: { teamId: string; seasonId: string }) {
-  const [state, action, pending] = useActionState(addNewPlayerToRoster, initialFormState);
+  const [state, action] = useActionState(addNewPlayerToRoster, initialFormState);
   return (
     <form action={action} className="grid gap-4 sm:grid-cols-4">
       <input type="hidden" name="team_id" value={teamId} />
@@ -162,10 +159,8 @@ export function NewRosterPlayerForm({ teamId, seasonId }: { teamId: string; seas
         <input name="grad_year" inputMode="numeric" maxLength={4} placeholder="2030" className={inputClass} />
       </Field>
       <div className="flex items-end gap-4 sm:col-span-3">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Adding…" : "Add to roster"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton pendingLabel="Adding…">Add to roster</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );
@@ -180,7 +175,7 @@ export function ExistingRosterPlayerForm({
   seasonId: string;
   players: { id: string; label: string }[];
 }) {
-  const [state, action, pending] = useActionState(addExistingPlayerToRoster, initialFormState);
+  const [state, action] = useActionState(addExistingPlayerToRoster, initialFormState);
   return (
     <form action={action} className="grid gap-4 sm:grid-cols-4">
       <input type="hidden" name="team_id" value={teamId} />
@@ -199,12 +194,10 @@ export function ExistingRosterPlayerForm({
         <input name="jersey_number" inputMode="numeric" maxLength={2} className={inputClass} />
       </Field>
       <div className="flex items-end">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Adding…" : "Add to roster"}
-        </button>
+        <SubmitButton pendingLabel="Adding…">Add to roster</SubmitButton>
       </div>
       <div className="sm:col-span-4">
-        <FormMessage error={state.error} saved={state.saved} />
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );
@@ -219,7 +212,7 @@ export function RosterEntryEditor({
   jersey: string | null;
   active: boolean;
 }) {
-  const [state, action, pending] = useActionState(updateRosterEntry, initialFormState);
+  const [state, action] = useActionState(updateRosterEntry, initialFormState);
   return (
     <form action={action} className="flex flex-wrap items-center gap-2">
       <input type="hidden" name="id" value={id} />
@@ -234,9 +227,7 @@ export function RosterEntryEditor({
       <label className="flex items-center gap-1.5 text-xs">
         <input type="checkbox" name="active" defaultChecked={active} /> Active
       </label>
-      <button type="submit" disabled={pending} className={secondaryButtonClass}>
-        {pending ? "…" : "Save"}
-      </button>
+      <SubmitButton variant="secondary" pendingLabel="…">Save</SubmitButton>
       {state.error && <span className="text-xs text-danger">{state.error}</span>}
     </form>
   );
@@ -251,7 +242,7 @@ const EVENT_KIND_OPTIONS = [
 ] as const;
 
 export function TeamEventForm({ teamId }: { teamId: string }) {
-  const [state, action, pending] = useActionState(addTeamEvent, initialFormState);
+  const [state, action] = useActionState(addTeamEvent, initialFormState);
   return (
     <form action={action} className="grid gap-4 sm:grid-cols-4">
       <input type="hidden" name="team_id" value={teamId} />
@@ -290,10 +281,8 @@ export function TeamEventForm({ teamId }: { teamId: string }) {
         </Field>
       </div>
       <div className="flex items-center gap-4 sm:col-span-4">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Adding…" : "Add to schedule"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton pendingLabel="Adding…">Add to schedule</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );
@@ -317,7 +306,7 @@ export function GameForm({
   seasonId: string | null;
   opponents: { id: string; name: string }[];
 }) {
-  const [state, action, pending] = useActionState(addGame, initialFormState);
+  const [state, action] = useActionState(addGame, initialFormState);
   if (opponents.length === 0) {
     return (
       <p className="text-sm text-muted">
@@ -376,10 +365,8 @@ export function GameForm({
         </Field>
       </div>
       <div className="flex items-center gap-4 sm:col-span-4">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "Adding…" : "Add game"}
-        </button>
-        <FormMessage error={state.error} saved={state.saved} />
+        <SubmitButton pendingLabel="Adding…">Add game</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
   );

@@ -10,6 +10,8 @@ import { SpeedStripes } from "./athletic";
 
 const NAVY = "#000A2D";
 const PINK = "#FE1F7C";
+/** small pink type on the cream paper: brand pink is 3.6:1 there, this is 5.6:1 */
+const PINK_TEXT = "#C2135D";
 const NEON = "#E7FB06";
 
 export type CertificateText = { title: string; honor: string; presented: string; completed: string; detail: string; creed: string };
@@ -77,7 +79,7 @@ export function LeadershipCertificate({
           <p className="mt-[1.8cqw] font-mono text-[1.15cqw] tracking-[0.3em] uppercase opacity-70">{text.presented}</p>
           <p className="mt-[0.8cqw] font-display text-[6.2cqw] leading-none font-bold tracking-tight uppercase">{name}</p>
           {sub && (
-            <p className="mt-[0.9cqw] font-mono text-[1.35cqw] font-bold tracking-[0.2em] uppercase" style={{ color: PINK }}>
+            <p className="mt-[0.9cqw] font-mono text-[1.35cqw] font-bold tracking-[0.2em] uppercase" style={{ color: PINK_TEXT }}>
               {sub}
             </p>
           )}
