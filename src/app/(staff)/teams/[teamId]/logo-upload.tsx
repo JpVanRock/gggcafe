@@ -8,7 +8,7 @@ import { setTeamLogo } from "../actions";
 const TYPES: Record<string, string> = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp" };
 const MAX_BYTES = 2 * 1024 * 1024;
 
-/** Coaches upload the team logo (Storage bucket team-logos). */
+/** Coaches upload the team logo (private Storage bucket team-logos; the page passes a signed link). */
 export function LogoUpload({ teamId, logoUrl }: { teamId: string; logoUrl: string | null }) {
   const input = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +40,7 @@ export function LogoUpload({ teamId, logoUrl }: { teamId: string; logoUrl: strin
 
   return (
     <div className="flex flex-wrap items-center gap-4">
-      {/* eslint-disable-next-line @next/next/no-img-element -- remote Storage URL, shown as-is */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- signed Storage URL, shown as-is */}
       <img
         src={logoUrl ?? "/brand/ggg-cafe-logo.webp"}
         alt={logoUrl ? "Team logo" : "GGG badge (used until a team logo is uploaded)"}
@@ -71,7 +71,7 @@ export function LogoUpload({ teamId, logoUrl }: { teamId: string; logoUrl: strin
                 startTransition(async () => {
                   const result = await setTeamLogo({ teamId, path: null });
                   setError(result.error);
-                  setStatus(result.error ? null : "Logo removed. Rings show the GGG badge again.");
+                  setStatus(result.error ? null : "Logo removed. The GGG badge shows instead.");
                 })
               }
             >

@@ -70,7 +70,9 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
   const packet = (packetResult.data ?? []) as { id: string; team_id: string; kind: PacketKind; title: string; body: string }[];
   const readIds = new Set(((readsResult.data ?? []) as { item_id: string }[]).map((r) => r.item_id));
   const links = (linksResult.data ?? []) as Link_[];
-  const metaName = ((claims?.claims?.user_metadata as { display_name?: string } | undefined)?.display_name ?? "").trim();
+  // what she typed on the sign-up page fills in the join form
+  const meta = (claims?.claims?.user_metadata ?? {}) as { display_name?: string; team_code?: string; child?: string };
+  const metaName = (meta.display_name ?? "").trim();
   const approvedTeams = [...new Map(links.filter((l) => l.status === "approved").map((l) => [l.team_id, l])).values()];
   const budgets = await Promise.all(
     approvedTeams.map(async (l) => ({
@@ -238,7 +240,7 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
       {links.length === 0 ? (
         <Card title="Join your daughter's team">
           <p className="mb-4 text-sm text-muted">Enter the team code from your coach. Your coach approves you, then the Team Budget shows here.</p>
-          <JoinForm askName={!account} defaultName={metaName} />
+          <JoinForm askName={!account} defaultName={metaName} defaultCode={meta.team_code} defaultChild={meta.child} />
         </Card>
       ) : (
         <Disclosure summary="Join another team">

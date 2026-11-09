@@ -43,7 +43,8 @@ export type Team = {
   is_own_team: boolean;
   home_field: string | null;
   notes: string | null;
-  logo_url: string | null;
+  /** path in the private team-logos bucket (signedLogoUrl) */
+  logo_path: string | null;
   /** shown to players when they claim their profile on this team */
   welcome_message: string | null;
 };

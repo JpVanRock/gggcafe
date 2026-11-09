@@ -1,8 +1,15 @@
 # Account types (user, 2026-11-08; migrations 20261108210000 + 20261108210100)
 - Five sign-ups at /register, each confirms its email first (Supabase Auth "Confirm email" is on; keep it on), each with
-  its own home: Head Coach (staff role `coach`, an admin approves) and Assistant Coach (role `assistant`, picks the team,
-  a head coach or admin approves) → /dashboard; Player → /me; Parent → /family; Mentor → /mentor. Admin (`admin`) isn't
+  its own home: Head Coach (staff role `coach`, an admin approves) and Assistant Coach (role `assistant`, a head coach or
+  admin approves) → /dashboard; Player → /me; Parent → /family; Mentor → /mentor. Admin (`admin`) isn't
   a sign-up: head coach + staff, mentors, G3 Advanced, FAQ. `viewer` stays as read-only staff (admins set it).
+- Account type is a dropdown (players and parents first). Team code (user, 2026-11-09; migration 20261109140000): one
+  6-character code per team (`teams.team_code`, unique, no 0/O/1/I; `CODE_TYPES` in account-types.ts). Players, parents
+  and assistant coaches enter it at sign-up; the action checks it with `signup_team(code)` (the only function signed-out
+  visitors call: returns that one team, nothing for a wrong code; there's no team list) and saves the team in the
+  account's metadata (`team`; parents also `team_code` + `child`, which fill in the /family join form). Coaches see the
+  code on the Roster and Parents tabs (`dugout/team-code.tsx`); head coaches make a new one or turn sign-up off
+  (`setTeamCode`, guarded by the `guard_team_code` trigger). Players without a team enter the code on /me (`findTeam`).
 - Coach sign-ups: metadata `role` head-coach/assistant-coach (+ `team`, `note`); the first /dashboard visit after
   confirming calls `request_staff_access()` (table `staff_requests`); `staff_requests_to_decide()` /
   `decide_staff_request()` (admins any, head coaches assistants) add the `staff` row. Roster tab: "Coaches signing up"

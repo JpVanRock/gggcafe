@@ -1,19 +1,18 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 import { canEdit, requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Card, EmptyState, pillQuietClass, Disclosure, eyebrowClass } from "@/components/ui";
+import { Card, EmptyState, Disclosure, eyebrowClass } from "@/components/ui";
 import { loadDugoutTeam } from "../data";
 import { NoOwnTeam, TeamPicker } from "../team-picker";
-import { removeParentLink, setParentCode } from "./actions";
+import { removeParentLink } from "./actions";
+import { TeamCodeCard } from "../team-code";
 import { PendingParentList } from "../approvals";
 import { loadTeamApprovals } from "@/lib/approvals";
 import { PACKET_KIND_LABEL, type PacketKind } from "@/lib/family";
 import { addStarterTips, deletePacketItem } from "./actions";
 import { PacketItemForm } from "./packet-forms";
 import { ActionForm } from "@/components/action-form";
-import { SubmitButton } from "@/components/submit-button";
 
 export const metadata: Metadata = { title: "Parents · Coaches Dugout · GGG.Cafe" };
 
@@ -34,15 +33,11 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
     );
   }
 
-  const h = await headers();
-  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "gggcafe.vercel.app";
-  const signUpUrl = `${host.startsWith("localhost") ? "http" : "https"}://${host}/register`;
-
   const [codeResult, approvals] = await Promise.all([
-    supabase.from("teams").select("parent_code").eq("id", team.id).maybeSingle(),
+    supabase.from("teams").select("team_code").eq("id", team.id).maybeSingle(),
     loadTeamApprovals(supabase, team.id),
   ]);
-  const code = (codeResult.data?.parent_code as string | null) ?? null;
+  const code = codeResult.data?.team_code ?? null;
   const links = approvals.parentLinks;
   const players = approvals.parentPlayers;
   const nameOf = new Map(players.map((p) => [p.id, p.label]));
@@ -55,49 +50,7 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
     <div className="flex flex-col gap-8">
       <TeamPicker teams={teams} current={team.id} basePath="/dugout/parents" />
 
-      <Card title="Parent sign-up">
-        {code ? (
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-              <p className="font-display text-4xl font-bold tracking-[0.2em] text-highlight tabular-nums" aria-label={`Team code ${code.split("").join(" ")}`}>
-                {code.slice(0, 3)}-{code.slice(3)}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <ActionForm action={setParentCode}>
-                  <input type="hidden" name="team_id" value={team.id} />
-                  <ConfirmSubmit message="Make a new code? The old code stops working. Parents already approved keep access." className={pillQuietClass}>
-                    New code
-                  </ConfirmSubmit>
-                </ActionForm>
-                <ActionForm action={setParentCode}>
-                  <input type="hidden" name="team_id" value={team.id} />
-                  <input type="hidden" name="mode" value="off" />
-                  <ConfirmSubmit message="Turn off parent sign-up for this team? Parents already approved keep access." className={pillQuietClass}>
-                    Turn off
-                  </ConfirmSubmit>
-                </ActionForm>
-              </div>
-            </div>
-            <p className="text-sm text-muted">
-              Send parents this code and the sign-up page, <span className="font-semibold text-ink">{signUpUrl}</span>. They create an
-              account, enter the code and their daughter&apos;s name, and you approve them below. Approved parents see the Team Budget as
-              team totals only.
-            </p>
-          </div>
-        ) : (
-          <div className="flex flex-col items-start gap-3">
-            <p className="text-sm text-muted">
-              Parent sign-up is off for {team.name}. Turn it on to get a team code to send parents.
-            </p>
-            <ActionForm action={setParentCode}>
-              <input type="hidden" name="team_id" value={team.id} />
-              <SubmitButton>
-                Turn on parent sign-up
-              </SubmitButton>
-            </ActionForm>
-          </div>
-        )}
-      </Card>
+      <TeamCodeCard team={team} code={code} head />
 
       <Card title={`Waiting for approval (${pending.length})`}>
         {pending.length === 0 ? (

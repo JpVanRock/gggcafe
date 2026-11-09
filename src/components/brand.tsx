@@ -50,12 +50,13 @@ export function SiteFooter() {
  * retype it in the font, never lock it up with a logo, don't stretch, outline or
  * add effects. No backing panel: it isn't a button.
  */
-export function Tagline({ width, className = "" }: { width: number; className?: string }) {
+export function Tagline({ width, eager = false, className = "" }: { width: number; /** near the top of the page: load right away */ eager?: boolean; className?: string }) {
   const height = Math.round((width * taglineArt.height) / taglineArt.width);
+  const loading = eager ? "eager" : undefined;
   return (
     <span className={`inline-block ${className}`}>
-      <Image src={taglineArt} alt="Elevate Together" width={width} height={height} className="day:hidden" />
-      <Image src={taglineNavyArt} alt="Elevate Together" width={width} height={height} className="hidden day:block" />
+      <Image src={taglineArt} alt="Elevate Together" width={width} height={height} loading={loading} className="day:hidden" />
+      <Image src={taglineNavyArt} alt="Elevate Together" width={width} height={height} loading={loading} className="hidden day:block" />
     </span>
   );
 }

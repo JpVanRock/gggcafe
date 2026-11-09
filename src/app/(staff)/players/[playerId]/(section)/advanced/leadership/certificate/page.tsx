@@ -6,6 +6,7 @@ import { LeadershipCertificate } from "@/components/leadership-certificate";
 import { formatLongDateAt } from "@/lib/dates";
 import { playerName } from "@/lib/softball";
 import { createClient } from "@/lib/supabase/server";
+import { signedLogoUrl } from "@/lib/team-logos";
 import { CERTIFICATE, GUIDE_TITLE, LADDER } from "@/lib/leadership-guide";
 import { PrintCertificateButton } from "../../../../leadership-client";
 import { leadershipContext, leadershipHref } from "../../../../leadership";
@@ -19,13 +20,16 @@ export default async function CertificatePage({ params }: PageProps<"/players/[p
   // only coaches/admins and the player herself can read it (RLS); everyone else gets a 404
   if (!certificate) notFound();
   const supabase = await createClient();
-  const { data: spot } = certificate.team
-    ? await supabase
-        .from("roster_entries")
-        .select("jersey_number, season:seasons(start_date)")
-        .eq("player_id", player.id)
-        .eq("team_id", certificate.team.id)
-    : { data: [] };
+  const [{ data: spot }, logoUrl] = await Promise.all([
+    certificate.team
+      ? supabase
+          .from("roster_entries")
+          .select("jersey_number, season:seasons(start_date)")
+          .eq("player_id", player.id)
+          .eq("team_id", certificate.team.id)
+      : Promise.resolve({ data: [] }),
+    signedLogoUrl(supabase, certificate.team?.logo_path),
+  ]);
   const number =
     ((spot ?? []) as { jersey_number: string | null; season: { start_date: string | null } | null }[])
       .sort((a, b) => (b.season?.start_date ?? "").localeCompare(a.season?.start_date ?? ""))
@@ -47,7 +51,7 @@ export default async function CertificatePage({ params }: PageProps<"/players/[p
           name={playerName(player)}
           number={number}
           teamName={certificate.team?.name ?? null}
-          logoUrl={certificate.team?.logo_url ?? null}
+          logoUrl={logoUrl}
           coachName={certificate.coachName}
           date={formatLongDateAt(certificate.awardedAt)}
           text={CERTIFICATE}

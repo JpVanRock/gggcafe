@@ -43,13 +43,13 @@ export async function loadLeadership(supabase: Supabase, playerId: string, hasAd
 export type LeaderCertificate = {
   awardedAt: string;
   coachName: string | null;
-  team: { id: string; name: string; logo_url: string | null } | null;
+  team: { id: string; name: string; logo_path: string | null } | null;
 };
 
 export async function loadLeaderCertificate(supabase: Supabase, playerId: string): Promise<LeaderCertificate | null> {
   const { data } = await supabase
     .from("player_leadership_certificates")
-    .select("awarded_at, coach_name, team:teams(id, name, logo_url)")
+    .select("awarded_at, coach_name, team:teams(id, name, logo_path)")
     .eq("player_id", playerId)
     .maybeSingle();
   if (!data) return null;

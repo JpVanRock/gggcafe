@@ -285,8 +285,7 @@ export async function setTeamLogo(input: { teamId: string; path: string | null }
   }
 
   const supabase = await createClient();
-  const logo_url = input.path ? supabase.storage.from("team-logos").getPublicUrl(input.path).data.publicUrl : null;
-  const { data, error } = await supabase.from("teams").update({ logo_url }).eq("id", input.teamId).select("id");
+  const { data, error } = await supabase.from("teams").update({ logo_path: input.path }).eq("id", input.teamId).select("id");
   if (error) return { error: friendlyDbError(error) };
   if (!data?.length) return { error: "That team no longer exists, or you can't edit it." };
 

@@ -32,7 +32,7 @@ insert into auth.users (id, email, raw_user_meta_data) values
 insert into public.staff (user_id, display_name, role) values
   ('dddddddd-0000-0000-0000-000000000001', 'Hana Head', 'coach'),
   ('dddddddd-0000-0000-0000-000000000003', 'Ada Admin', 'admin');
-create temp table saved_code as select parent_code from public.teams where id = '00000000-0000-0000-0000-0000000000b1';
+create temp table saved_code as select team_code from public.teams where id = '00000000-0000-0000-0000-0000000000b1';
 grant select on saved_code to authenticated;
 
 -- -----------------------------------------------------------------------------
@@ -87,7 +87,7 @@ reset role;
 -- The head coach sets the parent code and writes a practice plan (the seed has the culture)
 set role authenticated;
 select set_config('request.jwt.claims', '{"sub":"dddddddd-0000-0000-0000-000000000001"}', false);
-update public.teams set parent_code = 'TEST42' where id = '00000000-0000-0000-0000-0000000000b1';
+update public.teams set team_code = 'TEST42' where id = '00000000-0000-0000-0000-0000000000b1';
 insert into public.practice_plans (id, team_id, practice_date, total_minutes)
 values ('dddddddd-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000b1', '2026-11-20', 90);
 insert into public.practice_plan_drills (plan_id, position, name) values ('dddddddd-0000-0000-0000-0000000000a1', 1, 'Warm-up');
@@ -101,7 +101,7 @@ select pg_temp.expect('assistant reads the culture', (select headline from publi
 select pg_temp.expect('assistant can''t save the culture', pg_temp.err($$select public.save_team_dugout('00000000-0000-0000-0000-0000000000b1', 'Mine', null, '[]'::jsonb)$$), '42501');
 select pg_temp.expect('assistant can''t add GameDay cards', pg_temp.err($$insert into public.gameday_profiles (team_id, season_id, player_id) values ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000c1')$$), '42501');
 select pg_temp.expect('assistant can''t assign mentors', pg_temp.err($$insert into public.mentor_players (mentor_id, player_id) values ('dddddddd-0000-0000-0000-000000000006', '00000000-0000-0000-0000-0000000000c1')$$), '42501');
-select pg_temp.expect('assistant can''t change the parent code', pg_temp.err($$update public.teams set parent_code = 'ZZZZ99' where id = '00000000-0000-0000-0000-0000000000b1'$$), '42501');
+select pg_temp.expect('assistant can''t change the team code', pg_temp.err($$update public.teams set team_code = 'ZZZZ99' where id = '00000000-0000-0000-0000-0000000000b1'$$), '42501');
 select pg_temp.expect('assistant can''t remove a standard', pg_temp.err($$select public.save_team_dugout('00000000-0000-0000-0000-0000000000b1', 'Compete. Connect. Elevate.', null, '[]'::jsonb)$$), '42501');
 select pg_temp.expect('assistant reads the budget', pg_temp.err($$select count(*) from public.budget_entries$$), '');
 select pg_temp.expect('assistant can''t add to the budget', pg_temp.err($$insert into public.budget_entries (team_id, season_id, kind, entry_date, amount, description) values ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1', 'expense', '2026-11-21', 10, 'x')$$), '42501');
@@ -220,7 +220,7 @@ update public.roster_entries set active = true where player_id = '00000000-0000-
 -- Clean up
 -- -----------------------------------------------------------------------------
 select set_config('request.jwt.claims', '{"sub":"dddddddd-0000-0000-0000-000000000001"}', false);
-update public.teams set parent_code = (select parent_code from saved_code) where id = '00000000-0000-0000-0000-0000000000b1';
+update public.teams set team_code = (select team_code from saved_code) where id = '00000000-0000-0000-0000-0000000000b1';
 select set_config('request.jwt.claims', '', false);
 delete from public.team_events where title = 'Assistant practice';
 delete from public.practice_plans where id::text like 'dddddddd-%';

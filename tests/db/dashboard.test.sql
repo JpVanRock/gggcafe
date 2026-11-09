@@ -262,12 +262,12 @@ do $$ begin
 exception when check_violation then null;
 end $$;
 
--- Team logos
-select pg_temp.expect('team-logos bucket is public',
-  (select public from storage.buckets where id = 'team-logos'), true);
+-- Team logos: a private bucket, and teams keep the file path (the app signs links)
+select pg_temp.expect('team-logos bucket is private',
+  (select public from storage.buckets where id = 'team-logos'), false);
 do $$ begin
-  update public.teams set logo_url = 'http://insecure.example/logo.png' where id = '00000000-0000-0000-0000-0000000000b1';
-  raise exception 'FAIL: a non-https logo URL was accepted';
+  update public.teams set logo_path = 'https://example.com/logo.png' where id = '00000000-0000-0000-0000-0000000000b1';
+  raise exception 'FAIL: a URL was accepted as a logo path';
 exception when check_violation then null;
 end $$;
 

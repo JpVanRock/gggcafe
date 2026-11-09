@@ -1,6 +1,6 @@
 # Player accounts (claims) — user's choices: full edit, find her spot by name + jersey
-- Teams have a coach `welcome_message` (team form). Players sign up at `/register` (Player/Parent toggle;
-  players pick their team from `signup_teams()`), then `/me` shows the welcome message and "Claim my
+- Teams have a coach `welcome_message` (team form). Players sign up at `/register` (account type Player and the
+  team code, checked by `signup_team()`; the team is saved in her metadata), then `/me` shows the welcome message and "Claim my
   profile" (name + jersey; `request_player_claim()` matches her spot on the team's CURRENT season
   roster, else the coach matches it). Coaches approve on the team page (`teams/[teamId]/claims.tsx`,
   `team_player_claims()`); the nav shows a count and the dashboard a "Waiting for your approval" card

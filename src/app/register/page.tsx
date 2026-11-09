@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { Logo } from "@/components/brand";
 import { CornerThemeToggle } from "@/components/theme-toggle";
-import { createClient } from "@/lib/supabase/server";
-import { RegisterForm, type SignupTeam } from "./register-form";
+import { RegisterForm } from "./register-form";
 
 export const metadata: Metadata = { title: "Sign up · GGG.Cafe" };
 
@@ -19,14 +17,12 @@ export default function RegisterPage() {
         <h1 className="mt-6 text-2xl font-semibold tracking-[0.08em] text-highlight uppercase">Sign up</h1>
         <span aria-hidden className="mt-2 block h-0.5 w-12 rounded-full bg-pink" />
         <p className="mt-3 text-sm text-muted">
-          Pick your account type. You confirm your email first, then a coach or admin approves you. No email? A parent can make a
-          player&apos;s login from the family page.
+          Players, parents and assistant coaches need the team code from their coach. You confirm your email first, then a coach or
+          admin approves you. No email? A parent can make a player&apos;s login from the family page.
         </p>
       </header>
 
-      <Suspense fallback={<p className="text-center text-sm text-muted">Loading…</p>}>
-        <Form />
-      </Suspense>
+      <RegisterForm />
 
       <p className="text-center text-sm text-muted">
         Already have an account?{" "}
@@ -36,10 +32,4 @@ export default function RegisterPage() {
       </p>
     </main>
   );
-}
-
-async function Form() {
-  const supabase = await createClient();
-  const { data } = await supabase.rpc("signup_teams");
-  return <RegisterForm teams={(data ?? []) as SignupTeam[]} />;
 }

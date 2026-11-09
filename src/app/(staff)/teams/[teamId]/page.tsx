@@ -12,6 +12,7 @@ import { ConfirmSubmit } from "@/components/confirm-submit";
 import { addDays, formatDay, formatTime, todayISO } from "@/lib/dates";
 import { deleteTeamEvent, removeFromRoster } from "../actions";
 import { LogoUpload } from "./logo-upload";
+import { signedLogoUrl } from "@/lib/team-logos";
 import { ClaimsCard } from "./claims";
 import { loadTeamApprovals, type ClaimRow, type SpotOption } from "@/lib/approvals";
 import { ActionForm } from "@/components/action-form";
@@ -91,7 +92,7 @@ export default async function TeamPage({
   // Schedule: the next 8 weeks of practices/events and games
   const today = todayISO();
   const until = addDays(today, 56);
-  const [eventsResult, gamesResult, opponentsResult] = await Promise.all([
+  const [eventsResult, gamesResult, opponentsResult, logoUrl] = await Promise.all([
     supabase
       .from("team_events")
       .select("id, kind, title, event_date, start_time, end_time, location")
@@ -107,6 +108,7 @@ export default async function TeamPage({
     editor && team.is_own_team
       ? supabase.from("teams").select("id, name").eq("is_own_team", false).order("name")
       : Promise.resolve({ data: [] }),
+    team.is_own_team ? signedLogoUrl(supabase, team.logo_path) : Promise.resolve(null),
   ]);
   type ScheduleRow = { key: string; date: string; time: string | null; tag: string; title: string; where: string | null; eventId?: string };
   const schedule: ScheduleRow[] = [
@@ -314,10 +316,10 @@ export default async function TeamPage({
       {team.is_own_team && (
         <Card title="Team logo">
           {editor ? (
-            <LogoUpload teamId={team.id} logoUrl={team.logo_url} />
+            <LogoUpload teamId={team.id} logoUrl={logoUrl} />
           ) : (
-            // eslint-disable-next-line @next/next/no-img-element -- remote Storage URL
-            <img src={team.logo_url ?? "/brand/ggg-cafe-logo.webp"} alt="Team logo" className="size-20 rounded-full object-contain" />
+            // eslint-disable-next-line @next/next/no-img-element -- signed Storage URL
+            <img src={logoUrl ?? "/brand/ggg-cafe-logo.webp"} alt="Team logo" className="size-20 rounded-full object-contain" />
           )}
         </Card>
       )}

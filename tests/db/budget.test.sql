@@ -52,7 +52,7 @@ select pg_temp.expect('summary totals',
      from (select public.team_budget_summary('00000000-0000-0000-0000-0000000000b1') as s) q),
   '4 525.50 2002.00 825.50 300.00 650.00');
 -- Coach generates the parent code
-update public.teams set parent_code = 'ABC234' where id = '00000000-0000-0000-0000-0000000000b1';
+update public.teams set team_code = 'ABC234' where id = '00000000-0000-0000-0000-0000000000b1';
 reset role;
 
 -- ---------------------------------------------------------------------------
@@ -185,7 +185,7 @@ end $$;
 
 -- Clean up
 delete from public.budget_entries; delete from public.budget_adjustments; delete from public.budget_fees;
-update public.teams set parent_code = null;
+update public.teams set team_code = null;
 delete from public.parent_accounts where user_id::text like '44444444-%';
 delete from public.staff where user_id::text like '44444444-%';
 delete from auth.users where id::text like '44444444-%';

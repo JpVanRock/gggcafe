@@ -32,7 +32,7 @@ const spaceMono = Space_Mono({
 
 export const metadata: Metadata = {
   title: "GGG.Cafe",
-  description: "Softball player development and game strategy",
+  description: "Softball player development and team management",
 };
 
 export const viewport: Viewport = {

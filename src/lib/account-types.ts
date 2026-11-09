@@ -6,6 +6,8 @@
 
 export const SIGNUP_TYPES = ["head-coach", "assistant-coach", "player", "parent", "mentor"] as const;
 export type SignupType = (typeof SIGNUP_TYPES)[number];
+/** The account types that sign up with their team's code (teams.team_code). */
+export const CODE_TYPES: readonly SignupType[] = ["player", "parent", "assistant-coach"];
 
 export const SIGNUP_LABEL: Record<SignupType, string> = {
   "head-coach": "Head Coach",
@@ -34,13 +36,13 @@ export const ACCOUNT_TYPES: AccountType[] = [
   {
     key: "assistant-coach",
     label: "Assistant Coach",
-    signup: "Signs up with an email, picks the team and confirms the email; a head coach of that team (or an admin) approves.",
+    signup: "Signs up with an email and the team code from the head coach, and confirms the email; a head coach of that team (or an admin) approves.",
     home: "Assistant dashboard: this week, practice plans, their Dugout tabs",
   },
   {
     key: "player",
     label: "Player",
-    signup: "Signs up with an email and claims her spot on the roster (a coach approves), or her parent creates a username login for her.",
+    signup: "Signs up with an email and the team code, then claims her spot on the roster (a coach approves), or her parent creates a username login for her.",
     home: "Her player menu",
   },
   {
@@ -154,6 +156,14 @@ export const QUESTIONS: { q: string; a: string[] }[] = [
     a: [
       "So only real people with a working inbox get in. The link in the email finishes the sign-up; until it's opened, the account can't sign in.",
       "After confirming, every account still waits for a person to approve it: an admin for head coaches and mentors, a head coach for assistant coaches and parents, a coach for players.",
+    ],
+  },
+  {
+    q: "What is the team code, and who gets it?",
+    a: [
+      "Each team has one six-character code. Players, parents and assistant coaches choose their account type on the sign-up page and enter it; head coaches and mentors don't need one (an admin approves them).",
+      "Coaches see the code in Coaches Dugout → Roster (and Parents). A head coach turns sign-up on, makes a new code (the old one stops working) or turns it off; everyone already approved keeps access.",
+      "A code only lets someone ask to join: every sign-up still waits for approval. Signed-out visitors can't see the list of teams.",
     ],
   },
   {

@@ -1,6 +1,5 @@
 "use server";
 
-import { randomInt } from "node:crypto";
 import { refresh } from "next/cache";
 import { headCoachCheck, getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -8,30 +7,6 @@ import { friendlyDbError, text, type FormState, invalid } from "@/lib/form";
 import { PACKET_KINDS, PACKET_STARTERS } from "@/lib/family";
 import { isUuid } from "@/lib/softball";
 import { STALE, failed, must, runAction } from "@/lib/actions";
-
-// No 0/O or 1/I, so codes are easy to read aloud and type.
-const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-const newCode = () => Array.from({ length: 6 }, () => ALPHABET[randomInt(ALPHABET.length)]).join("");
-
-/** Turns parent sign-up on with a fresh code, or off (code = null). */
-export async function setParentCode(_prev: FormState, fd: FormData): Promise<FormState> {
-  return runAction(async () => {
-    const denied = await headCoachCheck();
-    if (denied) return failed(denied);
-    const teamId = text(fd, "team_id");
-    if (!isUuid(teamId)) return failed(STALE);
-    const supabase = await createClient();
-    if (fd.get("mode") === "off") {
-      must(await supabase.from("teams").update({ parent_code: null }).eq("id", teamId));
-    } else {
-      for (let tries = 0; tries < 5; tries++) {
-        const { error } = await supabase.from("teams").update({ parent_code: newCode() }).eq("id", teamId);
-        if (!error || error.code !== "23505") break; // 23505: code already used by another team, try again
-      }
-    }
-    refresh();
-  });
-}
 
 /** Approves a request (matched to one of the team's players) or declines it. */
 export async function decideParentLink(_prev: FormState, fd: FormData): Promise<FormState> {

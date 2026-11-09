@@ -4988,9 +4988,9 @@ export type Database = {
           notes: string | null
           created_at: string
           updated_at: string
-          logo_url: string | null
-          parent_code: string | null
+          team_code: string | null
           welcome_message: string | null
+          logo_path: string | null
         }
         Insert: {
           id?: string
@@ -5004,9 +5004,9 @@ export type Database = {
           notes?: string | null
           created_at?: string
           updated_at?: string
-          logo_url?: string | null
-          parent_code?: string | null
+          team_code?: string | null
           welcome_message?: string | null
+          logo_path?: string | null
         }
         Update: {
           id?: string
@@ -5020,9 +5020,9 @@ export type Database = {
           notes?: string | null
           created_at?: string
           updated_at?: string
-          logo_url?: string | null
-          parent_code?: string | null
+          team_code?: string | null
           welcome_message?: string | null
+          logo_path?: string | null
         }
         Relationships: []
       }
@@ -5524,7 +5524,7 @@ export type Database = {
       save_team_dugout: { Args: { p_team_id: string | null; p_headline: string | null; p_statement: string | null; p_standards: Json | null }; Returns: undefined }
       score_game_play: { Args: { p_run_id: string | null; p_play: number | null; p_boxes: Json | null }; Returns: { correct: boolean; wrong: string[]; answer: Json; next_play: number; first_try: number }[] }
       set_goal_method: { Args: { p_player_id: string | null; p_method: string | null }; Returns: undefined }
-      signup_teams: { Args: Record<PropertyKey, never>; Returns: { id: string; name: string; age_group: string }[] }
+      signup_team: { Args: { p_code: string | null }; Returns: { id: string; name: string }[] }
       staff_requests_to_decide: { Args: Record<PropertyKey, never>; Returns: { user_id: string; display_name: string; email: string; role: string; team_id: string; team_name: string; note: string; requested_at: string }[] }
       start_iq_level: { Args: { p_player_id: string | null; p_track: Database["public"]["Enums"]["iq_track"] | null; p_level: number | null; p_restart?: boolean | null; p_position?: Database["public"]["Enums"]["field_position"] | null }; Returns: string }
       start_scorebook_game: { Args: { p_player_id: string | null; p_game?: number | null; p_restart?: boolean | null }; Returns: Database["public"]["Tables"]["scorebook_game_runs"]["Row"][] }

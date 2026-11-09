@@ -533,7 +533,7 @@ export type Rostering = {
   id: string;
   jersey_number: string | null;
   active: boolean;
-  team: { id: string; name: string; short_name: string | null; is_own_team: boolean; logo_url: string | null } | null;
+  team: { id: string; name: string; short_name: string | null; is_own_team: boolean } | null;
   season: { name: string; start_date: string | null } | null;
 };
 
@@ -562,7 +562,7 @@ export async function loadPopReport(supabase: Supabase, playerId: string): Promi
   const [rosterResult, metricsResult, evalResult] = await Promise.all([
     supabase
       .from("roster_entries")
-      .select("id, jersey_number, active, team:teams(id, name, short_name, is_own_team, logo_url), season:seasons(name, start_date)")
+      .select("id, jersey_number, active, team:teams(id, name, short_name, is_own_team), season:seasons(name, start_date)")
       .eq("player_id", playerId),
     supabase.from("player_metric_progress").select("*").eq("player_id", playerId).order("metric_name"),
     supabase

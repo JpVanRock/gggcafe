@@ -22,11 +22,22 @@ values ('00000000-0000-0000-0000-00000000aa01', 'general', 'baserunning', 1, 'te
        ('00000000-0000-0000-0000-00000000aa02', 'general', 'baserunning', 1, 'test', 'q2', array['a', 'b'], 0, 'because a');
 update public.iq_questions set active = false where track = 'baserunning' and level = 1 and scenario <> 'test';
 
--- Sign-up page (signed out): our teams only
+-- Sign-up page (signed out): a team code finds its own team, nothing else does
+update public.teams set team_code = 'SQD234' where id = '00000000-0000-0000-0000-0000000000b1';
+update public.teams set team_code = 'OPP234' where id = '00000000-0000-0000-0000-0000000000b2';
 set role anon;
 select set_config('request.jwt.claims', '', false);
-select pg_temp.expect('sign-up lists our teams only', (select string_agg(name, ',') from public.signup_teams()), 'Sample Squad 14U');
+select pg_temp.expect('a team code finds its team', (select name from public.signup_team('sqd-234')), 'Sample Squad 14U');
+select pg_temp.expect('a wrong code finds nothing', (select count(*) from public.signup_team('ZZZ999')), 0::bigint);
+select pg_temp.expect('an empty code finds nothing', (select count(*) from public.signup_team('')), 0::bigint);
+select pg_temp.expect('an opponent''s code finds nothing', (select count(*) from public.signup_team('OPP234')), 0::bigint);
+do $$ begin
+  perform 1 from public.teams;
+  if found then raise exception 'FAIL: signed-out visitors can read teams'; end if;
+exception when insufficient_privilege then null;
+end $$;
 reset role;
+update public.teams set team_code = null where id in ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000b2');
 
 -- ---------------------------------------------------------------------------
 -- Claim, before approval

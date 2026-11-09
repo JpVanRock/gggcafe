@@ -107,6 +107,27 @@ begin
   get diagnostics n = row_count;
   perform pg_temp.expect('coach uploaded a team logo', n, 1);
 end $$;
+-- Team logos are private: any signed-in user loads them, signed-out visitors don't
+reset role;
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"55555555-0000-0000-0000-000000000099"}', false);
+select pg_temp.expect('a signed-in player or parent can load team logos',
+  (select count(*) from storage.objects where bucket_id = 'team-logos' and name = 'team/logo.png'), 1::bigint);
+reset role;
+set role anon;
+select set_config('request.jwt.claims', '', false);
+do $$
+declare n bigint := 0;
+begin
+  begin
+    select count(*) into n from storage.objects where bucket_id = 'team-logos';
+  exception when insufficient_privilege then n := 0;
+  end;
+  perform pg_temp.expect('signed-out visitors can''t load team logos', n, 0::bigint);
+end $$;
+reset role;
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"11111111-0000-0000-0000-000000000002"}', false);
 do $$ begin
   insert into storage.objects (bucket_id, name) values ('some-other-bucket', 'x.png');
   raise exception 'FAIL: coach could write to another bucket';

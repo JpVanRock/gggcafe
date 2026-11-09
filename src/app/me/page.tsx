@@ -7,9 +7,9 @@ import { createClient } from "@/lib/supabase/server";
 import { SpeedStripes } from "@/components/athletic";
 import { MainNav, MenuCount } from "@/components/main-nav";
 import { SiteHeader } from "@/components/site-header";
-import { Card, Loading, PageHeader, inputClass, secondaryButtonClass } from "@/components/ui";
+import { Card, Loading, PageHeader, secondaryButtonClass } from "@/components/ui";
 import { isUuid } from "@/lib/softball";
-import { ClaimForm } from "./claim-form";
+import { ClaimForm, TeamCodeForm } from "./claim-form";
 import { usernameFromEmail } from "@/lib/player-logins";
 
 export const metadata: Metadata = { title: "My profile · GGG.Cafe" };
@@ -84,7 +84,8 @@ async function Me({ searchParams }: Pick<PageProps<"/me">, "searchParams">) {
   const supabase = await createClient();
   const [{ data: claimsData }, { data: claimsJwt }] = await Promise.all([supabase.rpc("my_claims"), supabase.auth.getClaims()]);
   const claims = (claimsData ?? []) as Claim[];
-  const metaName = ((claimsJwt?.claims?.user_metadata as { display_name?: string } | undefined)?.display_name ?? "").trim();
+  const meta = (claimsJwt?.claims?.user_metadata ?? {}) as { display_name?: string; team?: string };
+  const metaName = (meta.display_name ?? "").trim();
 
   // Approved for this season: straight to her dashboard.
   const active = claims.find((c) => c.is_current && c.status === "approved" && c.player_id);
@@ -99,11 +100,12 @@ async function Me({ searchParams }: Pick<PageProps<"/me">, "searchParams">) {
   );
   const lapsedTeams = [...new Map(lapsed.map((c) => [c.team_id, c])).values()];
 
-  const chosenTeam = typeof teamParam === "string" && isUuid(teamParam) ? teamParam : null;
+  // the team from the link, else (before her first claim) the one her team code matched at sign-up
+  const chosenTeam =
+    typeof teamParam === "string" && isUuid(teamParam) ? teamParam : claims.length === 0 && isUuid(meta.team) ? meta.team : null;
   const welcome = chosenTeam
     ? ((await supabase.rpc("team_welcome", { p_team_id: chosenTeam })).data as { team_name: string; season_name: string | null; welcome_message: string | null }[] | null)?.[0] ?? null
     : null;
-  const teams = (await supabase.rpc("signup_teams")).data as { id: string; name: string; age_group: string | null }[] | null;
   const firstName = (metaName || claims[0]?.typed_name || "").split(" ")[0];
 
   return (
@@ -162,30 +164,9 @@ async function Me({ searchParams }: Pick<PageProps<"/me">, "searchParams">) {
       )}
 
       {!welcome && pending.length === 0 && lapsedTeams.length === 0 && declined.length === 0 && !active && (
-        <Card title="Choose your team">
-          {teams?.length ? (
-            <form method="get" className="flex flex-wrap items-end gap-3">
-              <label className="flex min-w-60 flex-1 flex-col gap-1.5">
-                <span className="text-sm font-medium">Team</span>
-                <select name="team" required defaultValue="" className={inputClass}>
-                  <option value="" disabled>
-                    Pick your team
-                  </option>
-                  {teams.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.name}
-                      {t.age_group && !t.name.includes(t.age_group) ? ` · ${t.age_group}` : ""}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <button type="submit" className={secondaryButtonClass}>
-                Continue →
-              </button>
-            </form>
-          ) : (
-            <p className="text-sm text-muted">No teams are set up for sign-up yet. Check with your coach.</p>
-          )}
+        <Card title="Find your team">
+          <p className="mb-4 text-sm text-muted">Enter the team code from your coach to claim your player profile.</p>
+          <TeamCodeForm />
         </Card>
       )}
     </div>

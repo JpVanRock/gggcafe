@@ -33,7 +33,7 @@ const players: Row[] = PLAYERS.map(([first, last, , pos, sec], i) => ({
   walk_up_songs: [], created_at: "2026-08-15T00:00:00Z", updated_at: "2026-08-15T00:00:00Z",
 }));
 const teams: Row[] = [
-  { id: T.us, name: "GGG Sample 14U", short_name: "GGG", organization: "GGG.Cafe", age_group: "14U", is_own_team: true, format: "fastpitch", logo_url: null, welcome_message: null, parent_code: null, home_field: null, notes: null },
+  { id: T.us, name: "GGG Sample 14U", short_name: "GGG", organization: "GGG.Cafe", age_group: "14U", is_own_team: true, format: "fastpitch", logo_path: null, welcome_message: null, team_code: "GGG234", home_field: null, notes: null },
   { id: T.storm, name: "Lakeside Storm", short_name: "Storm", is_own_team: false, age_group: "14U", format: "fastpitch" },
   { id: T.venom, name: "Valley Venom", short_name: "Venom", is_own_team: false, age_group: "14U", format: "fastpitch" },
   { id: T.rebels, name: "Ridgeline Rebels", short_name: "Rebels", is_own_team: false, age_group: "14U", format: "fastpitch" },
@@ -200,6 +200,7 @@ const leaderboard = () => {
 export function sampleRpc(name: string, args: Row = {}): unknown {
   switch (name) {
     case "team_current_season": return S.fall;
+    case "signup_team": return String(args.p_code ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "") === "GGG234" ? [{ id: T.us, name: "GGG Sample 14U" }] : [];
     case "team_bp_leaders": return [{ player_id: maya, first_name: "Maya", last_name: "Torres", jersey_number: "2", swings: 21, production: 3.95 }];
     case "team_leaderboard": return leaderboard();
     case "team_squads": return [];

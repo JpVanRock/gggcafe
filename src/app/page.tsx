@@ -1,9 +1,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
 import { supabaseConfig } from "@/lib/supabase/env";
-import { Logo } from "@/components/brand";
+import { Logo, Tagline } from "@/components/brand";
 import { CornerThemeToggle } from "@/components/theme-toggle";
 
 export default function Home() {
@@ -22,23 +21,16 @@ export default function Home() {
           priority
           className="h-48 w-48 shadow-[0_0_60px_rgba(254,31,124,0.35)] sm:h-60 sm:w-60"
         />
-        <div>
-          <p className="text-lg font-medium uppercase tracking-[0.2em] text-highlight sm:text-xl">
-            Player development &amp; game strategy
+        <div className="flex flex-col items-center">
+          <p className="text-lg font-medium text-balance uppercase tracking-[0.2em] text-highlight sm:text-xl">
+            Player development &amp; team management
           </p>
-          <p className="mt-3 text-muted">
-            Softball stats, scouting and progress tracking for our coaches and staff.
-          </p>
+          {/* the brand kit's artwork (yellow at night, navy by day), apart from the logo: no lockup */}
+          <Tagline width={260} eager className="mt-6" />
         </div>
         <Suspense fallback={<div className="h-12" />}>
           <AccountLink />
         </Suspense>
-
-        <footer className="mt-auto pt-8 text-xs text-muted">
-          <Suspense fallback={<span>Checking database…</span>}>
-            <DatabaseStatus />
-          </Suspense>
-        </footer>
       </div>
     </main>
   );
@@ -54,48 +46,5 @@ async function AccountLink() {
     >
       {user ? "Open dashboard" : "Sign in"}
     </Link>
-  );
-}
-
-async function DatabaseStatus() {
-  if (!supabaseConfig()) {
-    return (
-      <StatusLine ok={false}>
-        Not configured. Fill in <code>.env.local</code> (see{" "}
-        <code>.env.example</code>).
-      </StatusLine>
-    );
-  }
-
-  const supabase = await createClient();
-  // Signed-out visitors see zero rows (Row Level Security), but a successful
-  // query still proves the site can reach the database and the schema exists.
-  const { error } = await supabase
-    .from("teams")
-    .select("id", { count: "exact", head: true });
-
-  if (!error) {
-    return <StatusLine ok>Database connected. Schema is in place.</StatusLine>;
-  }
-  if (error.code === "PGRST205" || error.code === "42P01") {
-    return (
-      <StatusLine ok={false}>
-        Connected, but the schema isn&apos;t applied yet. Run{" "}
-        <code>npm run db:push</code>.
-      </StatusLine>
-    );
-  }
-  return <StatusLine ok={false}>Connection error: {error.message}</StatusLine>;
-}
-
-function StatusLine({ ok, children }: { ok: boolean; children: React.ReactNode }) {
-  return (
-    <p className="flex items-center justify-center gap-2">
-      <span
-        aria-hidden
-        className={`inline-block h-2 w-2 rounded-full ${ok ? "bg-neon" : "bg-pink"}`}
-      />
-      <span>{children}</span>
-    </p>
   );
 }

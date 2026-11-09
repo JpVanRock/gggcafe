@@ -12,6 +12,7 @@ import { ApprovedClaimList, PendingClaimList, PendingParentList } from "../appro
 import { LeaderBadge } from "@/components/leader-badge";
 import { loadLeaderBadges } from "@/lib/leader-badges";
 import { PendingStaffList, StaffList, type StaffMember } from "./staff";
+import { TeamCodeCard } from "../team-code";
 
 export const metadata: Metadata = { title: "Roster · Coaches Dugout · GGG.Cafe" };
 
@@ -33,12 +34,13 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
   const dugout = await loadDugoutTeam(supabase, teamParam);
   if (!dugout) return <NoOwnTeam />;
   const { teams, team } = dugout;
-  const [seasonsResult, currentSeason, approvals, staffRequests, staffResult] = await Promise.all([
+  const [seasonsResult, currentSeason, approvals, staffRequests, staffResult, codeResult] = await Promise.all([
     supabase.from("seasons").select("*").order("start_date", { ascending: false, nullsFirst: false }).order("created_at", { ascending: false }),
     seasonOrCurrent(supabase, team.id, null),
     editor ? loadTeamApprovals(supabase, team.id) : Promise.resolve(null),
     head ? loadStaffRequests(supabase) : Promise.resolve([]),
     supabase.from("staff").select("user_id, display_name, role"),
+    editor ? supabase.from("teams").select("team_code").eq("id", team.id).maybeSingle() : Promise.resolve({ data: null }),
   ]);
   // Coach sign-ups for this team, plus head-coach sign-ups (no team; admins only)
   const pendingStaff = staffRequests.filter((r) => r.team_id === team.id || r.team_id === null);
@@ -130,6 +132,8 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
           )}
         </section>
       )}
+
+      {editor && <TeamCodeCard team={team} code={codeResult.data?.team_code ?? null} head={head} />}
 
       <Card title={`${season?.name ?? ""} roster (${roster.filter((r) => r.active).length})`}>
         {roster.length === 0 ? (

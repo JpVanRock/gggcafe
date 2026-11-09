@@ -98,7 +98,7 @@
   `src/components/golden-glove.tsx` engraves her name, number, position and year on the gold plate
   as SVG text over the image) and `manager-of-the-year.webp` (shield plaque cut out of its dark studio
   background, floor reflection removed; `src/components/manager-award.tsx` engraves the year and her
-  name and number on the plate's YEAR and NAME lines). Team logos (`teams.logo_url`, `team-logos` bucket) are no longer on
+  name and number on the plate's YEAR and NAME lines). Team logos (`teams.logo_path`, private `team-logos` bucket) are no longer on
   the ring. Every test question has a `diagram` drawn by `src/components/diamond.tsx` (course quizzes:
   a scorebook box, page or field, `{"kind": ...}`): it shows the situation only, never the answer.
 - Coaches/admins fill dashboards in; players with an approved claim can open and edit their own (see

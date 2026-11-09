@@ -15,7 +15,7 @@ HOSTING:  Vercel team "GGG", project `gggcafe`, https://gggcafe.vercel.app. Ever
 
 ## Layout
 ```
-src/app/                 pages (App Router): /, /login and /register are public; /family is the parents' home,
+src/app/                 pages (App Router): /, /login and /register are public (sign-up needs a team code); /family is the parents' home,
                          /me the players' home (claims; then her dashboard at /players/[id])
 src/app/(staff)/         signed-in area with shared nav: dashboard (own view per role), teams, players
                          (each feature folder has page.tsx, actions.ts, client forms)
@@ -112,7 +112,9 @@ tests/unit/              node --test unit tests (npm run test:unit)
 - Paid content (`src/lib/advanced-book.ts`, `src/lib/leadership-guide.ts`) is imported by server code only.
 - Privacy: medical cards only for head coaches/admins and her approved parents; the Leader Badge and certificate only for
   coaches/admins and the player; Pop Report coach notes for coaches only; teammates see each other only through
-  definer functions (`team_leaderboard`, `team_yearbook`, `team_squads`); player photos are private (signed URLs).
+  definer functions (`team_leaderboard`, `team_yearbook`, `team_squads`); player photos are private (signed URLs); team
+  logos are signed-in only (private bucket, `signedLogoUrl()` in `src/lib/team-logos.ts`); signed-out visitors can't list
+  teams (sign-up checks one team code with `signup_team()`).
 - When a feature or its access changes, update `src/lib/access-faq.ts` and `src/lib/account-types.ts` (admin FAQ).
 - Copy for players: direct and confident, for teenage athletes; fastpitch terms (innings, the circle, the dugout).
 

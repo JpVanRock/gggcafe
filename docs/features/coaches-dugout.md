@@ -17,8 +17,9 @@
   imports; unit-tested). Head coaches/admins edit (user 2026-11-08: assistants view only; migration 20261109100000),
   other staff view.
 - Parents (user's choice: sign-in accounts, team totals only): parents sign up at `/register` (name,
-  email, password, team code, daughter's name) and land on `/family`. A coach turns on a 6-character
-  team code (`teams.parent_code`, Dugout → Parents) and approves each request by matching it to a
+  email, password, team code, daughter's name) and land on `/family`. A head coach turns on the team's
+  6-character team code (`teams.team_code`, Dugout → Roster or Parents; players and assistant coaches use the
+  same code, see account-types.md) and approves each request by matching it to a
   player (`parent_links`, status pending/approved/declined). Parents are not staff and can read no
   app tables; they get data only through security-definer functions: `parent_home()` (their links)
   and `team_budget_summary()` (staff, or approved parents of that team), which returns team totals,

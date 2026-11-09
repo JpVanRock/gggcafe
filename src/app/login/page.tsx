@@ -20,7 +20,7 @@ export default function LoginPage() {
         {/* The tagline sits apart from the logo, never as a lockup (brand kit rule) */}
         {/* yellow at night, navy by day; kept apart from the logo (no lockup) */}
         <h1 className="mt-8">
-          <Tagline width={280} />
+          <Tagline width={280} eager />
         </h1>
         <span aria-hidden className="mt-2 block h-0.5 w-12 rounded-full bg-pink" />
         <p className="mt-3 text-sm text-muted">Good Vibes Only</p>

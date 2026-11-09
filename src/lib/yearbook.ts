@@ -24,7 +24,7 @@ export type YearbookPhoto = {
 };
 export type YearbookData = {
   access: YearbookAccess;
-  team: { id: string; name: string; logo_url: string | null };
+  team: { id: string; name: string; logo_path: string | null };
   season: { id: string; name: string } | null;
   seasons: { id: string; name: string; photos: number }[];
   roster: { player_id: string; name: string; jersey: string | null }[];
