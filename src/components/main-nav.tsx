@@ -2,12 +2,15 @@
 // Coaches Dugout) on every page, including the player (/me) and family (/family)
 // homes; everyone else gets `fallback`. Head coaches and admins also get the
 // notifications bell (new Player of the Week...); admins get the FAQ.
-import type { ReactNode } from "react";
+// On phones the menu sits behind the header's Menu button; MenuCount puts the same
+// counts on that button.
+import { cache, type ReactNode } from "react";
 import { canEdit, getCurrentUser, isHeadCoach } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getWaitingCount } from "@/lib/approvals";
 import { CountBadge } from "@/components/ui";
 import { NavLink } from "@/components/nav-link";
+import { navClass, navItemClass } from "@/components/site-header";
 
 const NAV = [
   { href: "/dashboard", section: "/dashboard", label: "Dashboard" },
@@ -16,43 +19,46 @@ const NAV = [
   { href: "/players", section: "/players", label: "Players" },
 ] as const;
 
-const navClass = "flex flex-wrap gap-x-4 gap-y-1 text-sm font-medium uppercase tracking-wider";
+/** The signed-in staff member and their counts, fetched once per request (menu and Menu button share it). */
+const loadMenu = cache(async () => {
+  const user = await getCurrentUser();
+  if (!user?.staff) return null;
+  const editor = canEdit(user.staff.role);
+  const headCoach = isHeadCoach(user.staff.role);
+  const supabase = await createClient();
+  const [waiting, notes] = await Promise.all([
+    editor ? getWaitingCount() : 0,
+    // Player of the Week notices go to head coaches and admins
+    headCoach ? supabase.rpc("unread_notifications").then((r) => Number(r.data ?? 0)) : 0,
+  ]);
+  return { staff: user.staff, headCoach, waiting, unread: notes };
+});
 
 export async function MainNav({ fallback = null }: { fallback?: ReactNode }) {
-  const user = await getCurrentUser();
-  if (!user?.staff) return fallback;
-  let waiting = 0;
-  let unread = 0;
-  const editor = canEdit(user.staff.role);
-  if (editor) {
-    const supabase = await createClient();
-    const [count, { data: notes }] = await Promise.all([getWaitingCount(), supabase.rpc("unread_notifications")]);
-    waiting = count;
-    unread = Number(notes ?? 0);
-  }
+  const menu = await loadMenu();
+  if (!menu) return fallback;
+  const { staff, headCoach, waiting, unread } = menu;
   return (
     <nav aria-label="Main" className={navClass}>
       {NAV.map((item) => (
-        <NavLink key={item.href} href={item.href} section={item.section} className="inline-flex items-center gap-1.5">
+        <NavLink key={item.href} href={item.href} section={item.section} className={navItemClass}>
           {item.label}
           {item.href === "/dugout/roster" && <CountBadge count={waiting} label={`${waiting} approval${waiting === 1 ? "" : "s"} waiting`} />}
         </NavLink>
       ))}
-      {user.staff.role === "admin" && (
-        <NavLink href="/faq">FAQ</NavLink>
+      {staff.role === "admin" && (
+        <NavLink href="/faq" className={navItemClass}>
+          FAQ
+        </NavLink>
       )}
-      {/* Player of the Week notices go to head coaches and admins */}
-      {isHeadCoach(user.staff.role) && (
-        <NavLink
-          href="/notifications"
-          className="inline-flex items-center gap-1"
-          aria-label={unread ? `Notifications: ${unread} new` : "Notifications"}
-          title="Notifications"
-        >
+      {headCoach && (
+        <NavLink href="/notifications" className={navItemClass} aria-label={unread ? `Notifications: ${unread} new` : "Notifications"} title="Notifications">
           <svg viewBox="0 0 24 24" aria-hidden className="size-[1.1rem]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
             <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
           </svg>
+          {/* on phones the bell sits in a list, so it gets its name */}
+          <span className="sm:hidden">Notifications</span>
           <CountBadge count={unread} label={`${unread} new`} tone="neon" />
         </NavLink>
       )}
@@ -60,11 +66,20 @@ export async function MainNav({ fallback = null }: { fallback?: ReactNode }) {
   );
 }
 
+/** The phone Menu button's count: approvals waiting plus new notifications. */
+export async function MenuCount() {
+  const menu = await loadMenu();
+  const total = menu ? menu.waiting + menu.unread : 0;
+  return <CountBadge count={total} label={`${total} waiting for you`} />;
+}
+
 /** What players see in the staff area's menu. */
 export function PlayerNav() {
   return (
     <nav aria-label="Main" className={navClass}>
-      <NavLink href="/me">My profile</NavLink>
+      <NavLink href="/me" className={navItemClass}>
+        My profile
+      </NavLink>
     </nav>
   );
 }

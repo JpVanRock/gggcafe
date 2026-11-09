@@ -27,7 +27,8 @@ src/lib/softball.ts      positions, bats/throws, formats, row types (must match 
 src/lib/supabase/        server.ts (Server Components/Actions), client.ts (browser),
                          env.ts, database.types.ts (generated from the migrations: npm run db:types)
 src/components/main-nav.tsx  top menu: staff get Dashboard/Coaches Dugout (opens Roster)/Teams/Players on every page,
-                         including /me and /family; players get "My profile"
+                         including /me and /family; players get "My profile". Every header is <SiteHeader>
+                         (site-header.tsx): on phones the links fold behind a Menu button
 src/proxy.ts             refreshes the Supabase auth session each request (Next 16 "proxy", formerly middleware)
 supabase/migrations/     schema, applied in filename order
 supabase/seed.sql        fictional sample data — local tests only, never pushed

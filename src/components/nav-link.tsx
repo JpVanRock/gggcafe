@@ -9,6 +9,7 @@ import type { ReactNode } from "react";
 export function NavLink({
   href,
   section = href,
+  exact = false,
   className = "",
   children,
   ...rest
@@ -16,13 +17,15 @@ export function NavLink({
   href: string;
   /** the part of the site this link stands for, when wider than `href` (Coaches Dugout: "/dugout") */
   section?: string;
+  /** current only on this exact page, not below it (a home link) */
+  exact?: boolean;
   className?: string;
   children: ReactNode;
   "aria-label"?: string;
   title?: string;
 }) {
   const path = usePathname() ?? "";
-  const current = path === section || path.startsWith(`${section}/`);
+  const current = path === section || (!exact && path.startsWith(`${section}/`));
   return (
     <Link href={href} aria-current={current ? "page" : undefined} className={`${className} ${current ? "text-highlight" : "text-muted hover:text-highlight"}`} {...rest}>
       {children}

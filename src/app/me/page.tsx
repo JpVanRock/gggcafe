@@ -4,11 +4,9 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { signOut } from "@/app/auth/actions";
-import { Logo } from "@/components/brand";
 import { SpeedStripes } from "@/components/athletic";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { MainNav } from "@/components/main-nav";
+import { MainNav, MenuCount } from "@/components/main-nav";
+import { SiteHeader } from "@/components/site-header";
 import { Card, Loading, PageHeader, inputClass, secondaryButtonClass } from "@/components/ui";
 import { isUuid } from "@/lib/softball";
 import { ClaimForm } from "./claim-form";
@@ -19,24 +17,20 @@ export const metadata: Metadata = { title: "My profile · GGG.Cafe" };
 export default function MePage({ searchParams }: PageProps<"/me">) {
   return (
     <div className="flex flex-1 flex-col">
-      <header className="z-10 border-b border-pink/40 bg-navy-950/90 backdrop-blur sm:sticky sm:top-0">
-        <div className="mx-auto flex w-full max-w-3xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-2.5">
-          <Link href="/me" aria-label="GGG.Cafe" className="shrink-0">
-            <Logo size={44} className="h-11 w-11" />
-          </Link>
+      <SiteHeader
+        home={{ href: "/me", label: "GGG.Cafe" }}
+        width="narrow"
+        nav={
           <Suspense fallback={<span className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">Player</span>}>
             <MainNav fallback={<span className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">Player</span>} />
           </Suspense>
-          <div className="ml-auto flex items-center gap-4">
-            <ThemeToggle />
-            <form action={signOut}>
-              <button type="submit" className={secondaryButtonClass}>
-                Sign out
-              </button>
-            </form>
-          </div>
-        </div>
-      </header>
+        }
+        count={
+          <Suspense fallback={null}>
+            <MenuCount />
+          </Suspense>
+        }
+      />
       <main id="main" className="mx-auto w-full max-w-3xl flex-1 px-4 py-8">
         <Suspense fallback={<Loading />}>
           <Me searchParams={searchParams} />

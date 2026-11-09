@@ -41,7 +41,8 @@ fills, `text-pink-soft` for small pink labels. No zinc/gray/slate and no `dark:`
 | `EmptyState` | `title?`, `children?`, `action?` | Say what will show up here, and give the action when the viewer can fix it. |
 | `Loading` | `label?` | Every `loading.tsx`: a pulsing outline of a page (still for reduced motion); screen readers hear "Loading…". |
 | `TableScroll` | `label`, `className?` | Wraps a wide table: scrolls sideways on phones, focusable and named for keyboard and screen-reader users. |
-| `NavLink` (`nav-link.tsx`) | `href`, `section?` | Top-menu links; the current section is highlighted and `aria-current="page"`. |
+| `SiteHeader` (`site-header.tsx`) | `home`, `nav`, `account?` (Sign out), `count?`, `width?` | The one header for staff, player, family and mentor pages. On phones the links and account fold behind a Menu button (`HeaderMenu`) that carries the approvals/notifications count (`MenuCount`); from 640px up it is one row that sticks to the top. Header links use `navClass` and `navItemClass` (40px tap targets on phones). |
+| `NavLink` (`nav-link.tsx`) | `href`, `section?`, `exact?` | Header links; the current section is highlighted and `aria-current="page"`. `exact` for a home link. |
 | `SkipLink` | | First thing a keyboard user reaches; jumps to `<main id="main">`. Every layout's `<main>` has `id="main"`. |
 | `PageHeader`, `FormMessage`, `ShowAllLink`, `PillNav`, `Modal` | | Unchanged. |
 
@@ -74,7 +75,8 @@ fills, `text-pink-soft` for small pink labels. No zinc/gray/slate and no `dark:`
 
 ## Layout and motion
 
-- Phones: the site header scrolls away (it sticks only from 640px up), so content gets the screen.
+- Phones: the site header is one row (logo, Night/Day switch, Menu) and scrolls away; it sticks only from 640px
+  up. The Menu panel closes when a link is tapped or Esc is pressed.
 - Touch targets: anything you tap is at least 24px tall; chips that are buttons use `badgeClass(tone, "md")` (32px).
 - Motion: `motion-safe:` for animations; a global rule turns animations and transitions off for people whose
   device asks for less motion.

@@ -1,17 +1,12 @@
 // The family pages' header: logo, the menu (Home, and Yearbook when one of their
 // teams has it), theme, sign out. Staff see their own menu instead.
-import Link from "next/link";
 import { Suspense } from "react";
-import { signOut } from "@/app/auth/actions";
-import { Logo } from "@/components/brand";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { MainNav } from "@/components/main-nav";
-import { secondaryButtonClass } from "@/components/ui";
+import { MainNav, MenuCount } from "@/components/main-nav";
+import { NavLink } from "@/components/nav-link";
+import { SiteHeader, navClass, navItemClass } from "@/components/site-header";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth";
 import { yearbookTeams } from "@/lib/yearbook-data";
-
-const navClass = "flex flex-wrap gap-x-4 gap-y-1 text-sm font-medium uppercase tracking-wider";
 
 /** Parents' menu: Home, plus Yearbook when a daughter on one of their teams has G3 Advanced. */
 async function FamilyNav() {
@@ -22,44 +17,41 @@ async function FamilyNav() {
   const teamIds = [...new Set(((data ?? []) as { team_id: string; status: string }[]).filter((l) => l.status === "approved").map((l) => l.team_id))];
   const withYearbook = await yearbookTeams(supabase, teamIds);
   return (
-    <nav className={navClass}>
-      <Link href="/family" className="text-muted hover:text-highlight">
+    <nav aria-label="Main" className={navClass}>
+      <NavLink href="/family" exact className={navItemClass}>
         Home
-      </Link>
+      </NavLink>
       {withYearbook.length > 0 && (
-        <Link href="/family/yearbook" className="text-muted hover:text-highlight">
+        <NavLink href="/family/yearbook" className={navItemClass}>
           Yearbook
-        </Link>
+        </NavLink>
       )}
     </nav>
   );
 }
 
+const areaLabel = <span className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">Family</span>;
+
 export function FamilyHeader() {
   return (
-    <header className="z-10 border-b border-pink/40 bg-navy-950/90 backdrop-blur sm:sticky sm:top-0">
-      <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-2.5">
-        <Link href="/family" aria-label="GGG.Cafe family home" className="shrink-0">
-          <Logo size={44} className="h-11 w-11" />
-        </Link>
-        <Suspense fallback={<span className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">Family</span>}>
+    <SiteHeader
+      home={{ href: "/family", label: "GGG.Cafe family home" }}
+      nav={
+        <Suspense fallback={areaLabel}>
           <MainNav
             fallback={
-              <Suspense fallback={<span className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">Family</span>}>
+              <Suspense fallback={areaLabel}>
                 <FamilyNav />
               </Suspense>
             }
           />
         </Suspense>
-        <div className="ml-auto flex items-center gap-4">
-          <ThemeToggle />
-          <form action={signOut}>
-            <button type="submit" className={secondaryButtonClass}>
-              Sign out
-            </button>
-          </form>
-        </div>
-      </div>
-    </header>
+      }
+      count={
+        <Suspense fallback={null}>
+          <MenuCount />
+        </Suspense>
+      }
+    />
   );
 }
