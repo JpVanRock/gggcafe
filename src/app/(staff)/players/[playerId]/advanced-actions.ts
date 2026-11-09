@@ -6,7 +6,7 @@ import { refresh } from "next/cache";
 import { actForCheck, adminCheck, editorCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { friendlyDbError } from "@/lib/form";
-import { FIELD_POSITIONS, isUuid } from "@/lib/softball";
+import { FIELD_POSITIONS, isUuid, type FieldPosition } from "@/lib/softball";
 import { CHAPTERS, NOTES_MAX, cleanBookTitle, cleanMyHabits } from "@/lib/advanced-book";
 
 type Result = { error: string | null };
@@ -30,10 +30,11 @@ export async function setConfirmedPosition(input: { playerId: string; position: 
   const denied = await editorCheck();
   if (denied) return { error: denied };
   if (!isUuid(input.playerId) || !(FIELD_POSITIONS as readonly string[]).includes(input.position)) return { error: "Unknown position." };
+  const position = input.position as FieldPosition;
   const supabase = await createClient();
   const { error } = input.on
-    ? await supabase.from("player_confirmed_positions").upsert({ player_id: input.playerId, position: input.position }, { onConflict: "player_id,position" })
-    : await supabase.from("player_confirmed_positions").delete().eq("player_id", input.playerId).eq("position", input.position);
+    ? await supabase.from("player_confirmed_positions").upsert({ player_id: input.playerId, position }, { onConflict: "player_id,position" })
+    : await supabase.from("player_confirmed_positions").delete().eq("player_id", input.playerId).eq("position", position);
   if (error) return { error: friendlyDbError(error) };
   refresh();
   return { error: null };

@@ -67,7 +67,7 @@ async function Roster({ searchParams }: Pick<PageProps<"/dugout/roster">, "searc
   const { data: rosterData } = season
     ? await supabase.from("roster_entries").select("id, jersey_number, active, player:players(*)").eq("team_id", team.id).eq("season_id", season.id)
     : { data: [] };
-  const roster = ((rosterData ?? []) as unknown as RosterRow[])
+  const roster = ((rosterData ?? []) as RosterRow[])
     .filter((r) => r.player)
     .sort((a, b) => Number(b.active) - Number(a.active) || compareJersey(a.jersey_number, b.jersey_number) || a.player.last_name.localeCompare(b.player.last_name));
 
@@ -253,7 +253,7 @@ async function QuestionnaireTable({ teamId, seasonId }: { teamId: string; season
     .select("top_size, bottom_size, jacket_size, hat_size, numbers, positions, goals, player:players(first_name, preferred_name, last_name)")
     .eq("team_id", teamId)
     .eq("season_id", seasonId);
-  const rows = (data ?? []) as unknown as { top_size: string | null; bottom_size: string | null; jacket_size: string | null; hat_size: string | null; numbers: string[]; positions: string[]; goals: string | null; player: { first_name: string; preferred_name: string | null; last_name: string } | null }[];
+  const rows = (data ?? []) as { top_size: string | null; bottom_size: string | null; jacket_size: string | null; hat_size: string | null; numbers: string[]; positions: string[]; goals: string | null; player: { first_name: string; preferred_name: string | null; last_name: string } | null }[];
   if (rows.length === 0) return null;
   return (
     <Disclosure summary={`Preseason questionnaires (${rows.length})`}>

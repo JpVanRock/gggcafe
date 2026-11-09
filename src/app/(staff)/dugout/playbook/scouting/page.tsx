@@ -68,7 +68,7 @@ async function Scouting({ searchParams }: Pick<PageProps<"/dugout/playbook/scout
   ]);
   const opponents = (oppResult.data ?? []) as { id: string; name: string }[];
   const reports = (reportResult.data ?? []) as ReportRow[];
-  const games = ((gameResult.data ?? []) as unknown as { id: string; game_date: string; home_team_id: string; home: { name: string } | null; away: { name: string } | null }[]).map((g) => {
+  const games = ((gameResult.data ?? []) as { id: string; game_date: string; home_team_id: string; home: { name: string } | null; away: { name: string } | null }[]).map((g) => {
     const opponent = g.home_team_id === team.id ? g.away?.name : g.home?.name;
     return { id: g.id, opponent: opponent ?? "TBD", label: `${formatDay(g.game_date)} · ${g.home_team_id === team.id ? "vs" : "@"} ${opponent ?? "TBD"}` };
   });

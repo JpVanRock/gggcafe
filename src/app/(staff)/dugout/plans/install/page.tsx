@@ -114,7 +114,7 @@ async function Install({ searchParams }: Pick<PageProps<"/dugout/plans/install">
       .limit(1),
     supabase.from("training_phases").select("starts_on").eq("team_id", team.id).eq("kind", "inseason").gte("starts_on", today).order("starts_on").limit(1),
   ]);
-  const items = (itemsResult.data ?? []) as unknown as ItemRow[];
+  const items = (itemsResult.data ?? []) as ItemRow[];
   const opener =
     ((gameResult.data ?? [])[0] as { game_date: string } | undefined)?.game_date ??
     ((phaseResult.data ?? [])[0] as { starts_on: string } | undefined)?.starts_on ??
@@ -132,7 +132,7 @@ async function Install({ searchParams }: Pick<PageProps<"/dugout/plans/install">
           .order("practice_date"),
       ])
     : [{ data: [] }, { data: [] }];
-  const upcomingPlans = (plansResult.data ?? []) as unknown as PlanRow[];
+  const upcomingPlans = (plansResult.data ?? []) as PlanRow[];
   const practiceDates = [
     ...((eventsResult.data ?? []) as { event_date: string }[]).map((e) => e.event_date),
     ...upcomingPlans.map((p) => p.practice_date),

@@ -328,7 +328,7 @@ export async function addToDepth(fd: FormData) {
   const supabase = await createClient();
   const rows = await depthRows(supabase, teamId, position!);
   if (rows.some((r) => r.player_id === playerId) || rows.length >= 30) return;
-  await supabase.from("depth_chart").insert({ team_id: teamId, position, player_id: playerId, rank: (rows.at(-1)?.rank ?? 0) + 1 });
+  await supabase.from("depth_chart").insert({ team_id: teamId, position: position!, player_id: playerId, rank: (rows.at(-1)?.rank ?? 0) + 1 });
   refresh();
 }
 

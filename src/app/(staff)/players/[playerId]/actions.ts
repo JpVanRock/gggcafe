@@ -10,6 +10,7 @@ import {
   TRAINING_CATEGORIES, categoriesFor, evaluateAchievements, type Check, type Routine,
 } from "@/lib/achievements";
 import type { TwisKind } from "./data";
+import type { Enums } from "@/lib/supabase/database.types";
 import { MENTAL_FIELDS } from "./shared";
 import { HITTING, HITTING_KEYS, MOVEMENT, MOVEMENT_KEYS, changes, cleanValues, type Values } from "@/lib/movement";
 import { CHAPTERS, type BoxMarks } from "@/lib/scorebook";
@@ -37,7 +38,8 @@ export async function setTwisCheck(input: {
   const supabase = await createClient();
 
   if (checked) {
-    const { error } = await supabase.from("twis_checks").insert({ player_id: playerId, [column]: refId, on_date: onDate });
+    const ref = column === "game_id" ? { game_id: refId } : column === "team_event_id" ? { team_event_id: refId } : { activity_id: refId };
+    const { error } = await supabase.from("twis_checks").insert({ player_id: playerId, ...ref, on_date: onDate });
     // Already ticked (another tab, a double click) is fine.
     if (error && error.code !== "23505") return { error: friendlyDbError(error) };
   } else {
@@ -343,7 +345,7 @@ export async function addRoutine(_prev: FormState, fd: FormData): Promise<FormSt
     .eq("id", playerId)
     .maybeSingle();
   if (!player) return { error: "Unknown player." };
-  const positions = [player.primary_position, ...(player.secondary_positions ?? [])].filter(Boolean);
+  const positions = [player.primary_position, ...(player.secondary_positions ?? [])].filter((p) => p !== null);
   if (!categoriesFor(positions).includes(category)) {
     return { error: category === "pitching" ? "Pitching drills are for pitchers." : "Catching drills are for catchers." };
   }
@@ -361,7 +363,7 @@ export async function addRoutine(_prev: FormState, fd: FormData): Promise<FormSt
     if (!description) return { error: "Describe the new routine in a sentence so the player knows what to do." };
     const video_url = httpUrl(fd, "new_video_url");
     if (video_url === "invalid") return { error: "The video link should start with https://" };
-    const AREA: Record<string, string> = {
+    const AREA: Record<string, Enums<"skill_area">> = {
       workout: "strength_conditioning", stretching: "strength_conditioning", hitting: "hitting",
       fielding: "infield", pitching: "pitching", catching: "catching", mental: "mental",
     };
@@ -405,8 +407,8 @@ async function awardAchievements(supabase: Awaited<ReturnType<typeof createClien
     routines: routines as Routine[],
     checks: (checks ?? []) as Check[],
     today: todayISO(),
-    positions: [player.primary_position, ...(player.secondary_positions ?? [])].filter(Boolean),
-  }).filter((p) => p.unlockedOn);
+    positions: [player.primary_position, ...(player.secondary_positions ?? [])].filter((p) => p !== null),
+  }).filter((p): p is typeof p & { unlockedOn: string } => Boolean(p.unlockedOn));
   if (unlocked.length === 0) return;
   await supabase.from("player_achievements").upsert(
     unlocked.map((p) => ({ player_id: playerId, achievement_key: p.def.key, unlocked_on: p.unlockedOn })),
@@ -565,10 +567,11 @@ export async function startIqLevel(input: {
   const supabase = await createClient();
   const { data: attemptId, error } = await supabase.rpc("start_iq_level", {
     p_player_id: input.playerId,
-    p_track: input.track,
+    // both were checked against IQ_TRACKS / FIELD_POSITIONS above
+    p_track: input.track as Enums<"iq_track">,
     p_level: input.level,
     p_restart: Boolean(input.restart),
-    p_position: position,
+    p_position: position as Enums<"field_position"> | null,
   });
   if (error) {
     if (course && error.code === "P0001") return { error: `Chapter ${input.level} unlocks once Chapter ${input.level - 1} is complete.` };
@@ -889,12 +892,12 @@ export async function saveMovement(_prev: FormState, fd: FormData): Promise<Form
   if (!g3) return { error: "Movement Preferences is a G3 Advanced feature. Unlock G3 Advanced for her first." };
   const { data: latest } = await supabase
     .from("movement_preferences")
-    .select(MOVEMENT_KEYS.join(", "))
+    .select("*") // compared on MOVEMENT_KEYS only (a built column list can't be typed)
     .eq("player_id", playerId)
     .order("recorded_at", { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (latest && changes(MOVEMENT, latest as unknown as Values, values).length === 0) return { error: null, saved: true };
+  if (latest && changes(MOVEMENT, latest as Values, values).length === 0) return { error: null, saved: true };
   const { error } = await supabase.from("movement_preferences").insert({ player_id: playerId, ...values });
   if (error) return { error: friendlyDbError(error) };
   refresh();
@@ -910,12 +913,12 @@ export async function saveHittingStyle(_prev: FormState, fd: FormData): Promise<
   const supabase = await createClient();
   const { data: latest } = await supabase
     .from("hitting_styles")
-    .select(HITTING_KEYS.join(", "))
+    .select("*") // compared on HITTING_KEYS only (a built column list can't be typed)
     .eq("player_id", playerId)
     .order("recorded_at", { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (latest && changes(HITTING, latest as unknown as Values, values).length === 0) return { error: null, saved: true };
+  if (latest && changes(HITTING, latest as Values, values).length === 0) return { error: null, saved: true };
   const { error } = await supabase.from("hitting_styles").insert({ player_id: playerId, ...values });
   if (error) return { error: friendlyDbError(error) };
   refresh();

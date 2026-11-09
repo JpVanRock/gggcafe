@@ -62,7 +62,7 @@ async function Gameday({ searchParams }: Pick<PageProps<"/dugout/gameday">, "sea
     seasonId ? supabase.from("seasons").select("name").eq("id", seasonId).maybeSingle() : Promise.resolve({ data: null }),
   ]);
   const lineups = (lineupsResult.data ?? []) as LineupRow[];
-  const games = ((gamesResult.data ?? []) as unknown as { game_date: string; home_team_id: string; home: { name: string } | null; away: { name: string } | null }[]).map(
+  const games = ((gamesResult.data ?? []) as { game_date: string; home_team_id: string; home: { name: string } | null; away: { name: string } | null }[]).map(
     (g) => ({ date: g.game_date, opponent: (g.home_team_id === team.id ? g.away?.name : g.home?.name) ?? "" }),
   );
 

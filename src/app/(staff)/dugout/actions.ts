@@ -125,7 +125,7 @@ export async function saveSpotlight(_prev: FormState, fd: FormData): Promise<For
     .eq("active", true)
     .limit(1)
     .maybeSingle();
-  const entry = data as unknown as { jersey_number: string | null; player: { first_name: string; preferred_name: string | null; last_name: string } | null } | null;
+  const entry = data as { jersey_number: string | null; player: { first_name: string; preferred_name: string | null; last_name: string } | null } | null;
   if (!entry?.player) return { error: "She isn't on this team's roster." };
   const { error } = await supabase.from("player_spotlights").insert({
     team_id: teamId,

@@ -4,6 +4,7 @@ import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { editorCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import type { TablesInsert } from "@/lib/supabase/database.types";
 import { allOf, checkbox, friendlyDbError, isoDate, oneOf, text, wholeNumber, type FormState } from "@/lib/form";
 import { BATS, MAX_WALK_UP_SONGS, POSITIONS, THROWS, isUuid, type WalkUpSong } from "@/lib/softball";
 import { PHOTO_BUCKET } from "@/lib/player-photos";
@@ -52,14 +53,16 @@ function playerFields(fd: FormData) {
 
 type Fields = ReturnType<typeof playerFields>;
 
-function validate(fields: Fields): string | null {
-  if (!fields.values.first_name || !fields.values.last_name) return "Enter the player's first and last name.";
-  if (fields.grad_year === "invalid") return "Class year should be a year like 2030.";
+/** The checked player row ready to save, or what's wrong with the form. */
+function validate(fields: Fields): { error: string } | { row: TablesInsert<"players"> } {
+  const { first_name, last_name } = fields.values;
+  if (!first_name || !last_name) return { error: "Enter the player's first and last name." };
+  if (fields.grad_year === "invalid") return { error: "Class year should be a year like 2030." };
   const dob = fields.values.birth_date;
-  if (dob && (dob < "1990-01-01" || dob > new Date().toISOString().slice(0, 10))) return "Check the date of birth.";
-  if (!fields.photoOk) return "That photo didn't upload correctly. Pick it again.";
-  if (typeof fields.songs === "string") return fields.songs;
-  return null;
+  if (dob && (dob < "1990-01-01" || dob > new Date().toISOString().slice(0, 10))) return { error: "Check the date of birth." };
+  if (!fields.photoOk) return { error: "That photo didn't upload correctly. Pick it again." };
+  if (typeof fields.songs === "string") return { error: fields.songs };
+  return { row: { ...fields.values, first_name, last_name, grad_year: fields.grad_year, walk_up_songs: fields.songs } };
 }
 
 /** The intake form insists on these. */
@@ -79,8 +82,10 @@ export async function createPlayer(_prev: FormState, fd: FormData): Promise<Form
   if (denied) return { error: denied };
 
   const fields = playerFields(fd);
-  const invalid = validate(fields) ?? intakeMissing(fields);
-  if (invalid) return { error: invalid };
+  const checked = validate(fields);
+  if ("error" in checked) return checked;
+  const missing = intakeMissing(fields);
+  if (missing) return { error: missing };
 
   const teamId = text(fd, "team_id");
   if (!isUuid(teamId)) return { error: "Choose her current team." };
@@ -104,7 +109,7 @@ export async function createPlayer(_prev: FormState, fd: FormData): Promise<Form
 
   const { data: player, error } = await supabase
     .from("players")
-    .insert({ ...fields.values, grad_year: fields.grad_year, walk_up_songs: fields.songs })
+    .insert(checked.row)
     .select("id")
     .single();
   if (error) return { error: friendlyDbError(error) };
@@ -132,17 +137,15 @@ export async function updatePlayer(_prev: FormState, fd: FormData): Promise<Form
   const id = text(fd, "id");
   if (!isUuid(id)) return { error: "Unknown player." };
   const fields = playerFields(fd);
-  const invalid = validate(fields);
-  if (invalid) return { error: invalid };
+  const checked = validate(fields);
+  if ("error" in checked) return checked;
 
   const supabase = await createClient();
   const { data: before } = await supabase.from("players").select("photo_path").eq("id", id).maybeSingle();
   const { data, error } = await supabase
     .from("players")
     .update({
-      ...fields.values,
-      grad_year: fields.grad_year,
-      walk_up_songs: fields.songs,
+      ...checked.row,
       is_slapper: checkbox(fd, "is_slapper"),
       notes: text(fd, "notes"),
     })

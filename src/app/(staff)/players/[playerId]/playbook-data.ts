@@ -65,6 +65,6 @@ export async function loadTeamQuiz(supabase: Supabase, playerId: string, quizId:
     supabase.rpc("team_quiz_for", { p_player_id: playerId, p_quiz_id: quizId }),
   ]);
   if (!quiz || error) return null;
-  const q = quiz as unknown as { id: string; title: string; team: { name: string } | null };
+  const q = quiz as { id: string; title: string; team: { name: string } | null };
   return { id: q.id, title: q.title, team: q.team?.name ?? "", questions: (questions ?? []) as QuizQuestion[] };
 }

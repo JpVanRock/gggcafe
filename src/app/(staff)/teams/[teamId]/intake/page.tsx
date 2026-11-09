@@ -63,7 +63,7 @@ async function Intake({ params, searchParams }: Pick<PageProps<"/teams/[teamId]/
     supabase.from("roster_entries").select("id, jersey_number, player:players(*)").eq("team_id", team.id).eq("season_id", season.id),
     supabase.from("players").select("id, first_name, last_name, preferred_name").order("last_name").order("first_name"),
   ]);
-  const roster = ((rosterResult.data ?? []) as unknown as RosterRow[]).sort(
+  const roster = ((rosterResult.data ?? []) as RosterRow[]).sort(
     (a, b) => compareJersey(a.jersey_number, b.jersey_number) || a.player.last_name.localeCompare(b.player.last_name),
   );
   const onRoster = new Set(roster.map((r) => r.player.id));

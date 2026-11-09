@@ -114,7 +114,7 @@ export async function finishGuidedSession(input: { playerId: string; slug: strin
     .eq("drill.guide", input.slug)
     .lte("starts_on", today)
     .or(`ends_on.is.null,ends_on.gte.${today}`);
-  const routine = ((data ?? []) as unknown as { id: string; days: number[] }[]).find((r) => r.days.length === 0 || r.days.includes(isoWeekday(today)));
+  const routine = ((data ?? []) as { id: string; days: number[] }[]).find((r) => r.days.length === 0 || r.days.includes(isoWeekday(today)));
   if (!routine) return { error: null, checked: false };
   const onDate = routine.days.length === 0 ? weekStart(today) : today;
   const res = await setTwisCheck({ playerId: input.playerId, kind: "activity", refId: routine.id, onDate, checked: true });

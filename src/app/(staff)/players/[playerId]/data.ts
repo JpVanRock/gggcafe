@@ -158,7 +158,7 @@ export async function loadTwisWeek(supabase: Supabase, playerId: string, monday:
   const byDate = new Map<string, { sort: string; item: TwisItem }[]>(dates.map((d) => [d, []]));
   const anyDay: TwisItem[] = [];
 
-  for (const g of (gamesResult.data ?? []) as unknown as GameRow[]) {
+  for (const g of (gamesResult.data ?? []) as GameRow[]) {
     const home = teamIds.includes(g.home_team_id);
     const opponent = home ? g.away : g.home;
     const key = `g:${g.id}`;
@@ -264,7 +264,7 @@ export async function loadActivities(supabase: Supabase, playerId: string, from:
     .lte("starts_on", to)
     .or(`ends_on.is.null,ends_on.gte.${from}`)
     .order("created_at");
-  return (data ?? []) as unknown as ActivityRow[];
+  return (data ?? []) as ActivityRow[];
 }
 
 // ---------------------------------------------------------------------------
@@ -335,7 +335,7 @@ export async function loadSmartGoals(supabase: Supabase, playerId: string): Prom
     .eq("player_id", playerId)
     .order("target_date", { ascending: true, nullsFirst: false })
     .order("created_at");
-  return (data ?? []) as unknown as SmartGoal[];
+  return (data ?? []) as SmartGoal[];
 }
 
 export type MetricOption = { key: string; name: string; unit: string };
@@ -382,7 +382,7 @@ export async function loadPerformance(supabase: Supabase, playerId: string): Pro
     supabase.from("drills").select("id, name, category").order("name"),
     supabase.from("player_achievements").select("achievement_key, unlocked_on").eq("player_id", playerId),
   ]);
-  const routines = (routinesResult.data ?? []) as unknown as RoutineRow[];
+  const routines = (routinesResult.data ?? []) as RoutineRow[];
   const ids = routines.map((r) => r.id);
   const { data: checks } = ids.length
     ? await supabase.from("twis_checks").select("activity_id, on_date").in("activity_id", ids)
@@ -582,7 +582,7 @@ export async function loadPopReport(supabase: Supabase, playerId: string): Promi
   }
 
   return {
-    rosters: ((rosterResult.data ?? []) as unknown as Rostering[]).sort((a, b) =>
+    rosters: ((rosterResult.data ?? []) as Rostering[]).sort((a, b) =>
       (b.season?.start_date ?? "").localeCompare(a.season?.start_date ?? ""),
     ),
     metrics: (metricsResult.data ?? []) as MetricProgress[],
@@ -620,7 +620,7 @@ export async function loadTeamDugout(supabase: Supabase, playerId: string): Prom
     .eq("player_id", playerId)
     .eq("active", true);
   const teams = new Map<string, { id: string; name: string }>();
-  for (const r of (rosterData ?? []) as unknown as { team: { id: string; name: string; is_own_team: boolean } | null }[]) {
+  for (const r of (rosterData ?? []) as { team: { id: string; name: string; is_own_team: boolean } | null }[]) {
     if (r.team?.is_own_team) teams.set(r.team.id, { id: r.team.id, name: r.team.name });
   }
   if (teams.size === 0) return [];

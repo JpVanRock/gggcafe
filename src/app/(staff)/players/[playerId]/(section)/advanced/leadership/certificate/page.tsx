@@ -36,7 +36,7 @@ async function Certificate({ params }: Pick<PageProps<"/players/[playerId]/advan
         .eq("team_id", certificate.team.id)
     : { data: [] };
   const number =
-    ((spot ?? []) as unknown as { jersey_number: string | null; season: { start_date: string | null } | null }[])
+    ((spot ?? []) as { jersey_number: string | null; season: { start_date: string | null } | null }[])
       .sort((a, b) => (b.season?.start_date ?? "").localeCompare(a.season?.start_date ?? ""))
       .find((r) => r.jersey_number)?.jersey_number ?? null;
 

@@ -48,15 +48,14 @@ export type RosterPlayer = {
 export async function loadPracticePlan(supabase: Supabase, planId: string): Promise<PracticePlan | null> {
   const { data } = await supabase
     .from("practice_plans")
+    // one literal string, so the client can type the result
     .select(
-      "id, practice_date, start_time, setting, total_minutes, location, focus, status, finalized_at, shared_at, created_by, team:teams(id, name), " +
-        "blocks:practice_plan_drills(drill_id, name, description, tags, minutes, coaches, equipment, video_url, position), " +
-        "spots:practice_plan_positions(position, player_id, sort)",
+      "id, practice_date, start_time, setting, total_minutes, location, focus, status, finalized_at, shared_at, created_by, team:teams(id, name), blocks:practice_plan_drills(drill_id, name, description, tags, minutes, coaches, equipment, video_url, position), spots:practice_plan_positions(position, player_id, sort)",
     )
     .eq("id", planId)
     .maybeSingle();
   if (!data) return null;
-  const row = data as unknown as PracticePlan & {
+  const row = data as PracticePlan & {
     blocks: (PlanBlock & { position: number })[];
     spots: (PlanSpot & { sort: number })[];
   };
@@ -97,7 +96,7 @@ export async function loadPlanRoster(supabase: Supabase, teamId: string, placedI
     .select("jersey_number, player:players(id, first_name, last_name, preferred_name, primary_position), season:seasons(start_date)")
     .eq("team_id", teamId)
     .eq("active", true);
-  const rows = ((data ?? []) as unknown as RosterRow[]).filter((r) => r.player);
+  const rows = ((data ?? []) as RosterRow[]).filter((r) => r.player);
   const latest = rows.reduce<string>((max, r) => ((r.season?.start_date ?? "") > max ? (r.season?.start_date ?? "") : max), "");
   const current = rows.filter((r) => (r.season?.start_date ?? "") === latest);
 

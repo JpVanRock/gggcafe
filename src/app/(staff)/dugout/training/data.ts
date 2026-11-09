@@ -34,7 +34,7 @@ export async function loadTeamRoster(supabase: Supabase, teamId: string): Promis
     .eq("team_id", teamId)
     .eq("season_id", season)
     .eq("active", true);
-  return ((data ?? []) as unknown as { jersey_number: string | null; player: { id: string; first_name: string; preferred_name: string | null; last_name: string } | null }[])
+  return ((data ?? []) as { jersey_number: string | null; player: { id: string; first_name: string; preferred_name: string | null; last_name: string } | null }[])
     .filter((r) => r.player)
     .map((r) => ({ id: r.player!.id, name: playerName(r.player!), jersey: r.jersey_number }))
     .sort((a, b) => a.name.localeCompare(b.name));
@@ -58,7 +58,7 @@ export async function loadRoadmap(supabase: Supabase, teamId: string) {
   ]);
   return {
     phases: (phases.data ?? []) as PhaseRow[],
-    routines: (routines.data ?? []) as unknown as TeamRoutineRow[],
+    routines: (routines.data ?? []) as TeamRoutineRow[],
     library: (library.data ?? []) as LibraryDrill[],
     scripts: (scripts.data ?? []) as { id: string; name: string }[],
   };

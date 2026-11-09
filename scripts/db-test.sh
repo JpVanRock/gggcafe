@@ -3,34 +3,21 @@
 # needed), then runs tests/db/*.test.sql. The temporary database is deleted after.
 # Requires Homebrew Postgres:  brew install postgresql@16
 set -euo pipefail
-export LC_ALL=C  # macOS: postgres refuses to start without a valid locale
+source "$(dirname "$0")/lib/local-db.sh"
 
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-PGBIN="$(dirname "$(command -v pg_ctl)")"
-PORT="${DB_TEST_PORT:-54329}"
-WORK="$(mktemp -d)"
-
-cleanup() {
-  "$PGBIN/pg_ctl" -D "$WORK/data" -m immediate stop >/dev/null 2>&1 || true
-  rm -rf "$WORK"
-}
-trap cleanup EXIT
-
-"$PGBIN/initdb" -D "$WORK/data" -U postgres --auth=trust >/dev/null
-"$PGBIN/pg_ctl" -D "$WORK/data" -l "$WORK/postgres.log" -w \
-  -o "-p $PORT -c listen_addresses=localhost -c unix_socket_directories=''" start >/dev/null
-
-run() { psql -h localhost -p "$PORT" -U postgres -d postgres -X -q -v ON_ERROR_STOP=1 -o /dev/null "$@"; }
-
-run -f "$ROOT/tests/db/00_supabase_stub.sql"
-for f in "$ROOT"/supabase/migrations/*.sql; do
-  echo "migrate  $(basename "$f")"
-  run -f "$f"
-done
+local_db_start
+# The app's database types must match the migrations (npm run db:types writes them).
+run -t -A -f "$ROOT/scripts/sql/introspect.sql" > "$WORK/schema.json"
+python3 "$ROOT/scripts/gen-types.py" "$WORK/schema.json" > "$WORK/database.types.ts"
+if ! cmp -s "$WORK/database.types.ts" "$ROOT/src/lib/supabase/database.types.ts"; then
+  echo "src/lib/supabase/database.types.ts is out of date with the migrations: run npm run db:types" >&2
+  exit 1
+fi
+echo "types    database.types.ts matches the migrations"
 echo "seed     seed.sql"
-run -f "$ROOT/supabase/seed.sql"
+run -o /dev/null -f "$ROOT/supabase/seed.sql"
 for f in "$ROOT"/tests/db/*.test.sql; do
   echo "test     $(basename "$f")"
-  run -f "$f"
+  run -o /dev/null -f "$f"
 done
 echo "All database checks passed."

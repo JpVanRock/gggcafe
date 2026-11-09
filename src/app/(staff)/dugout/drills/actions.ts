@@ -15,14 +15,15 @@ export async function saveDrill(_prev: FormState, fd: FormData): Promise<FormSta
   if (denied) return { error: denied };
 
   const id = text(fd, "id");
-  const drill = {
+  const fields = {
     name: text(fd, "name"),
     description: text(fd, "description"),
     tags: allOf(fd, "tags", DRILL_TAGS),
     equipment: text(fd, "equipment"),
     video_url: text(fd, "video_url"),
   };
-  if (!drill.name) return { error: "Give the drill a name." };
+  if (!fields.name) return { error: "Give the drill a name." };
+  const drill = { ...fields, name: fields.name };
   if (drill.name.length > 120) return { error: "Keep the name to 120 characters." };
   if ((drill.description ?? "").length > 2000) return { error: "Keep the description to 2,000 characters." };
   if ((drill.equipment ?? "").length > 500) return { error: "Keep the equipment list to 500 characters." };

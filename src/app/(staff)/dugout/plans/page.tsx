@@ -111,7 +111,7 @@ async function Plans({ searchParams }: Pick<PageProps<"/dugout/plans">, "searchP
     .eq("team_id", team.id)
     .order("practice_date", { ascending: false })
     .order("start_time", { ascending: false, nullsFirst: false });
-  const plans = (data ?? []) as unknown as PlanRow[];
+  const plans = (data ?? []) as PlanRow[];
   const upcoming = plans.filter((p) => p.practice_date >= today).reverse();
   const past = plans.filter((p) => p.practice_date < today);
   // Assistant coaches see every plan but change only their own.

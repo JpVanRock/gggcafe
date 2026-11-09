@@ -50,7 +50,7 @@ export async function loadGamedayRoster(supabase: Supabase, teamId: string, seas
   const stats = new Map(((statsResult.data ?? []) as { player_id: string; pa: number; avg: number | null; obp: number | null; k_pct: number | null }[]).map((s) => [s.player_id, s]));
   const num = (v: unknown) => (v === null || v === undefined ? null : Number(v));
 
-  return ((rosterResult.data ?? []) as unknown as RosterRow[])
+  return ((rosterResult.data ?? []) as RosterRow[])
     .filter((r) => r.player)
     .sort((a, b) => compareJersey(a.jersey_number, b.jersey_number) || a.player!.last_name.localeCompare(b.player!.last_name))
     .map((r) => {
@@ -105,7 +105,7 @@ export async function loadLineup(supabase: Supabase, id: string): Promise<Lineup
     )
     .eq("id", id)
     .maybeSingle();
-  return (data as unknown as Lineup | null) ?? null;
+  return (data as Lineup | null) ?? null;
 }
 
 /** The season a lineup uses: its own, else the team's latest season with a roster. */
@@ -115,7 +115,7 @@ export async function lineupSeason(supabase: Supabase, teamId: string, seasonId:
     .from("roster_entries")
     .select("season_id, season:seasons(start_date, created_at)")
     .eq("team_id", teamId);
-  const rows = (data ?? []) as unknown as { season_id: string; season: { start_date: string | null; created_at: string } | null }[];
+  const rows = (data ?? []) as { season_id: string; season: { start_date: string | null; created_at: string } | null }[];
   rows.sort((a, b) => (b.season?.start_date ?? "").localeCompare(a.season?.start_date ?? "") || (b.season?.created_at ?? "").localeCompare(a.season?.created_at ?? ""));
   return rows[0]?.season_id ?? null;
 }

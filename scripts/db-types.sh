@@ -1,17 +1,14 @@
 #!/usr/bin/env bash
-# Regenerates src/lib/supabase/database.types.ts from the live schema.
-# Needs a one-time `supabase login` (opens your browser).
+# Regenerates src/lib/supabase/database.types.ts from the migrations: applies them to a
+# throwaway local Postgres (the same one db:test uses; no Docker, no `supabase login`),
+# reads the public schema and writes the Supabase client's Database type.
+# Run it after every new migration (db:push runs it for you).
 set -euo pipefail
-source "$(dirname "$0")/lib/env.sh"
-# Generate into a temp file and only replace the real one on success, so a failed
-# run (e.g. no `supabase login` yet) can't overwrite the types with an error message.
-tmp="$(mktemp)"
-trap 'rm -f "$tmp"' EXIT
-supabase gen types typescript --project-id "$SUPABASE_PROJECT_REF" --schema public > "$tmp"
-if ! grep -q "export type" "$tmp"; then
-  echo "Type generation failed (run 'supabase login' first?):" >&2
-  head -c 400 "$tmp" >&2; echo >&2
-  exit 1
-fi
-mv "$tmp" "$ROOT/src/lib/supabase/database.types.ts"
+source "$(dirname "$0")/lib/local-db.sh"
+
+local_db_start quiet
+out="$WORK/schema.json"
+run -t -A -f "$ROOT/scripts/sql/introspect.sql" > "$out"
+python3 "$ROOT/scripts/gen-types.py" "$out" > "$WORK/database.types.ts"
+mv "$WORK/database.types.ts" "$ROOT/src/lib/supabase/database.types.ts"
 echo "Wrote src/lib/supabase/database.types.ts"

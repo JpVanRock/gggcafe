@@ -226,7 +226,7 @@ async function currentOwnTeam(supabase: Supabase, playerId: string): Promise<str
     .from("roster_entries")
     .select("team_id, active, team:teams(is_own_team), season:seasons(start_date)")
     .eq("player_id", playerId);
-  const rows = ((data ?? []) as unknown as { team_id: string; active: boolean; team: { is_own_team: boolean } | null; season: { start_date: string | null } | null }[])
+  const rows = ((data ?? []) as { team_id: string; active: boolean; team: { is_own_team: boolean } | null; season: { start_date: string | null } | null }[])
     .filter((r) => r.team?.is_own_team)
     .sort((a, b) => Number(b.active) - Number(a.active) || (b.season?.start_date ?? "").localeCompare(a.season?.start_date ?? ""));
   return rows[0]?.team_id ?? null;

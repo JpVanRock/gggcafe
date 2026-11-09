@@ -46,7 +46,7 @@ async function Mentors() {
   const pending = (pendingResult.data ?? []) as Pending[];
   // players on our teams (active spots), for assigning
   const players = new Map<string, { id: string; name: string; label: string }>();
-  for (const s of (spotRows ?? []) as unknown as Spot[]) {
+  for (const s of (spotRows ?? []) as Spot[]) {
     if (!s.player || !s.team?.is_own_team || players.has(s.player.id)) continue;
     const name = playerName(s.player as Parameters<typeof playerName>[0]);
     players.set(s.player.id, { id: s.player.id, name, label: [name, s.jersey_number && `#${s.jersey_number}`, s.team.name].filter(Boolean).join(" · ") });

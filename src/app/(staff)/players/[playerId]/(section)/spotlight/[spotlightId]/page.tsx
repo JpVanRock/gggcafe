@@ -34,7 +34,7 @@ async function Spotlight({ params }: Pick<PageProps<"/players/[playerId]/spotlig
     .eq("id", spotlightId)
     .maybeSingle();
   if (!data) notFound();
-  const s = data as unknown as { player_name: string; jersey: string | null; headline: string; body: string; published_on: string; team: { name: string } | null };
+  const s = data as { player_name: string; jersey: string | null; headline: string; body: string; published_on: string; team: { name: string } | null };
   const [first, ...rest] = s.player_name.split(" ");
 
   return (

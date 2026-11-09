@@ -42,7 +42,7 @@ async function Quizzes({ searchParams }: Pick<PageProps<"/dugout/playbook/quizze
     .select("id, title, published_at, created_at, questions:team_quiz_questions(id, answers:team_quiz_answers(player_id))")
     .eq("team_id", team.id)
     .order("created_at", { ascending: false });
-  const quizzes = (data ?? []) as unknown as QuizRow[];
+  const quizzes = (data ?? []) as QuizRow[];
 
   return (
     <div className="flex flex-col gap-8">

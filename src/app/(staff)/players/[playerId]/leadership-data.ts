@@ -53,6 +53,6 @@ export async function loadLeaderCertificate(supabase: Supabase, playerId: string
     .eq("player_id", playerId)
     .maybeSingle();
   if (!data) return null;
-  const row = data as unknown as { awarded_at: string; coach_name: string | null; team: LeaderCertificate["team"] };
+  const row = data as { awarded_at: string; coach_name: string | null; team: LeaderCertificate["team"] };
   return { awardedAt: row.awarded_at, coachName: row.coach_name, team: row.team };
 }

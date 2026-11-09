@@ -48,7 +48,7 @@ async function BoxScores({ searchParams }: Pick<PageProps<"/dugout/gameday/box">
     .lte("game_date", today)
     .order("game_date", { ascending: false })
     .limit(60);
-  const games = (data ?? []) as unknown as GameRow[];
+  const games = (data ?? []) as GameRow[];
 
   return (
     <div className="flex flex-col gap-8">

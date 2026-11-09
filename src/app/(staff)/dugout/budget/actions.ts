@@ -59,7 +59,7 @@ export async function recordPayment(_prev: FormState, fd: FormData): Promise<For
     kind: "payment",
     player_id,
     entry_date,
-    amount: centsToDollars(cents),
+    amount: Number(centsToDollars(cents)),
     method: oneOf(fd, "method", PAYMENT_METHODS),
     description: text(fd, "description"),
   });
@@ -87,7 +87,7 @@ export async function saveAdjustment(_prev: FormState, fd: FormData): Promise<Fo
     const signed = fd.get("direction") === "charge" ? cents : -cents;
     const { error } = await supabase
       .from("budget_adjustments")
-      .upsert({ ...where, player_id, amount: centsToDollars(signed), note: text(fd, "note") });
+      .upsert({ ...where, player_id, amount: Number(centsToDollars(signed)), note: text(fd, "note") });
     if (error) return { error: friendlyDbError(error) };
   }
   refresh();
@@ -112,7 +112,7 @@ export async function addEntry(_prev: FormState, fd: FormData): Promise<FormStat
   const supabase = await createClient();
   const { error } = await supabase
     .from("budget_entries")
-    .insert({ ...where, kind, entry_date, amount: centsToDollars(cents), category: category ?? "Other", description });
+    .insert({ ...where, kind, entry_date, amount: Number(centsToDollars(cents)), category: category ?? "Other", description });
   if (error) return { error: friendlyDbError(error) };
   refresh();
   return { error: null, saved: true };

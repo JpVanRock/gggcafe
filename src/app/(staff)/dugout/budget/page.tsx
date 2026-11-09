@@ -78,7 +78,7 @@ async function Budget({ searchParams }: Pick<PageProps<"/dugout/budget">, "searc
       .eq("active", true),
   ]);
   const seasons = (seasonsResult.data ?? []) as Season[];
-  const roster = ((rosterResult.data ?? []) as unknown as RosterRow[]).filter((r) => r.player);
+  const roster = ((rosterResult.data ?? []) as RosterRow[]).filter((r) => r.player);
   const withRoster = seasons.filter((s) => roster.some((r) => r.season_id === s.id));
   const season = seasons.find((s) => s.id === seasonParam) ?? withRoster[0] ?? seasons[0] ?? null;
   if (!season) {

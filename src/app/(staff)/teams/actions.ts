@@ -31,8 +31,9 @@ export async function createTeam(_prev: FormState, fd: FormData): Promise<FormSt
   const denied = await editorCheck();
   if (denied) return { error: denied };
 
-  const team = teamFields(fd);
-  if (!team.name) return { error: "Give the team a name." };
+  const fields = teamFields(fd);
+  if (!fields.name) return { error: "Give the team a name." };
+  const team = { ...fields, name: fields.name };
   if ((team.welcome_message ?? "").length > 1000) return { error: "Keep the welcome message to 1,000 characters." };
 
   const supabase = await createClient();
@@ -49,8 +50,9 @@ export async function updateTeam(_prev: FormState, fd: FormData): Promise<FormSt
 
   const id = text(fd, "id");
   if (!isUuid(id)) return { error: "Unknown team." };
-  const team = teamFields(fd);
-  if (!team.name) return { error: "Give the team a name." };
+  const fields = teamFields(fd);
+  if (!fields.name) return { error: "Give the team a name." };
+  const team = { ...fields, name: fields.name };
   if ((team.welcome_message ?? "").length > 1000) return { error: "Keep the welcome message to 1,000 characters." };
 
   const supabase = await createClient();

@@ -118,7 +118,7 @@ async function Calendar({ searchParams }: Pick<PageProps<"/dugout/calendar">, "s
       planId: e.kind === "practice" ? (planByDate.get(e.event_date) ?? null) : null,
     };
   });
-  const games: CalGame[] = ((gamesResult.data ?? []) as unknown as GameRow[]).map((g) => {
+  const games: CalGame[] = ((gamesResult.data ?? []) as GameRow[]).map((g) => {
     const home = g.home_team_id === team.id;
     const opp = home ? g.away : g.home;
     return {

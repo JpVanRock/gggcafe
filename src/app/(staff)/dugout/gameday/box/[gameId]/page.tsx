@@ -45,7 +45,7 @@ async function Box({ params, searchParams }: Pick<PageProps<"/dugout/gameday/box
     .eq("id", gameId)
     .maybeSingle();
   if (!data) notFound();
-  const game = data as unknown as GameRow;
+  const game = data as GameRow;
   const ours = [game.home, game.away].filter((t): t is NonNullable<typeof t> => Boolean(t?.is_own_team));
   const team = ours.find((t) => t.id === teamParam) ?? ours[0];
   if (!team) notFound();

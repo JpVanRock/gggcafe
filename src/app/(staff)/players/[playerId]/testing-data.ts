@@ -22,7 +22,7 @@ export async function loadMyTesting(supabase: Supabase, playerId: string): Promi
     supabase.from("test_bands").select("metric_key, age_group, cutoffs"),
   ]);
   const ageGroup =
-    ((roster.data ?? []) as unknown as { team: { age_group: string | null; is_own_team: boolean } | null }[]).find((r) => r.team?.is_own_team)?.team?.age_group ?? null;
+    ((roster.data ?? []) as { team: { age_group: string | null; is_own_team: boolean } | null }[]).find((r) => r.team?.is_own_team)?.team?.age_group ?? null;
   const overrides = ((bands.data ?? []) as { metric_key: string; age_group: string; cutoffs: number[] }[]).map((b) => ({ ...b, cutoffs: b.cutoffs.map(Number) }));
   const rows = ((results.data ?? []) as { metric_key: string; value: number; measured_on: string }[]).map((r) => ({ ...r, value: Number(r.value) }));
   const out: MyTestResult[] = [];

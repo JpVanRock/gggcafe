@@ -76,7 +76,7 @@ function cleanPlan(body: string) {
   if (start && parseClock(start) === null) return "Check the start time.";
   const total = Number(raw.total_minutes);
   if (!Number.isInteger(total) || total < 15 || total > 480) return "Total practice time must be 15 to 480 minutes.";
-  const setting = (PRACTICE_SETTINGS as readonly string[]).includes(raw.setting as string) ? raw.setting : "outdoor";
+  const setting = (PRACTICE_SETTINGS as readonly string[]).includes(raw.setting as string) ? (raw.setting as string) : "outdoor";
 
   const drills = Array.isArray(raw.drills) ? raw.drills : [];
   if (drills.length > 60) return "That's more than 60 drills. Split it into two plans.";
@@ -335,13 +335,17 @@ export async function savePlanExtras(planId: string, _prev: FormState, fd: FormD
   const denied = await planEditCheck(planId);
   if (denied) return { error: denied };
 
-  const fields = {
+  const notes = {
     objective: cleanNote(fd.get("objective") as string | null, NOTE_LIMITS.objective, "The objective"),
     rule_of_day: cleanNote(fd.get("rule_of_day") as string | null, NOTE_LIMITS.rule_of_day, "The rule of the day"),
     announcements: cleanNote(fd.get("announcements") as string | null, NOTE_LIMITS.announcements, "Announcements"),
     coach_notes: cleanNote(fd.get("coach_notes") as string | null, NOTE_LIMITS.coach_notes, "Coach notes"),
   };
-  for (const v of Object.values(fields)) if (v && typeof v === "object") return { error: v.error };
+  const fields: Record<keyof typeof notes, string | null> = { objective: null, rule_of_day: null, announcements: null, coach_notes: null };
+  for (const [key, v] of Object.entries(notes) as [keyof typeof notes, (typeof notes)[keyof typeof notes]][]) {
+    if (v && typeof v === "object") return { error: v.error };
+    fields[key] = v;
+  }
 
   const cues: { plan_id: string; player_id: string; cue: string }[] = [];
   for (const [key, value] of fd.entries()) {

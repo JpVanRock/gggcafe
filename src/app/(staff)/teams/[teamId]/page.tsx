@@ -83,7 +83,7 @@ async function TeamContent({
         ? supabase.from("players").select("id, first_name, last_name, preferred_name").order("last_name").order("first_name")
         : Promise.resolve({ data: [] }),
     ]);
-    roster = ((rosterResult.data ?? []) as unknown as RosterRow[]).sort(
+    roster = ((rosterResult.data ?? []) as RosterRow[]).sort(
       (a, b) => compareJersey(a.jersey_number, b.jersey_number) || a.player.last_name.localeCompare(b.player.last_name),
     );
     const onRoster = new Set(roster.map((r) => r.player.id));
@@ -129,7 +129,7 @@ async function TeamContent({
       where: e.location,
       eventId: e.id,
     })),
-    ...((gamesResult.data ?? []) as unknown as { id: string; game_date: string; start_time: string | null; venue: string | null; event_name: string | null; status: string; home_team_id: string; home: { name: string } | null; away: { name: string } | null }[]).map((g) => ({
+    ...((gamesResult.data ?? []) as { id: string; game_date: string; start_time: string | null; venue: string | null; event_name: string | null; status: string; home_team_id: string; home: { name: string } | null; away: { name: string } | null }[]).map((g) => ({
       key: `g${g.id}`,
       date: g.game_date,
       time: formatTime(g.start_time),

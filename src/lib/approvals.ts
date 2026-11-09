@@ -89,7 +89,7 @@ export async function loadTeamApprovals(supabase: Supabase, teamId: string) {
       .select("id, season_id, jersey_number, active, season:seasons(start_date), player:players(id, first_name, last_name, preferred_name)")
       .eq("team_id", teamId),
   ]);
-  const rows = ((spotsResult.data ?? []) as unknown as SpotRow[]).filter((r) => r.player);
+  const rows = ((spotsResult.data ?? []) as SpotRow[]).filter((r) => r.player);
   const label = (r: SpotRow) => `${r.jersey_number ? `#${r.jersey_number} ` : ""}${playerName(r.player!)}`;
   const spots: SpotOption[] = rows
     .map((r) => ({ id: r.id, season_id: r.season_id, player_id: r.player!.id, label: label(r) }))

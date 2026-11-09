@@ -25,7 +25,7 @@ src/lib/roles.ts         staff roles (Head Coach / Assistant Coach / Admin / Vie
 src/lib/form.ts          FormData readers + friendlyDbError for server actions
 src/lib/softball.ts      positions, bats/throws, formats, row types (must match DB enums)
 src/lib/supabase/        server.ts (Server Components/Actions), client.ts (browser),
-                         env.ts, database.types.ts (generated: npm run db:types)
+                         env.ts, database.types.ts (generated from the migrations: npm run db:types)
 src/components/main-nav.tsx  top menu: staff get Dashboard/Coaches Dugout (opens Roster)/Teams/Players on every page,
                          including /me and /family; players get "My profile"
 src/proxy.ts             refreshes the Supabase auth session each request (Next 16 "proxy", formerly middleware)
@@ -56,6 +56,11 @@ tests/unit/              node --test unit tests (npm run test:unit)
 - Run `npm run db:test` before `npm run db:push`. It checks stat math, RLS on every table,
   security_invoker on every view, and the viewer/coach/admin access rules.
 - Never edit an applied migration; add a new one (`npm run db:new <name>`).
+- The app is typed from the schema: `src/lib/supabase/database.types.ts` is generated from the migrations by
+  `npm run db:types` (`scripts/gen-types.py` over a throwaway local Postgres; no Docker or `supabase login`). Run it
+  after adding a migration: `db:test` fails while the types are out of date. Typed JSON columns are listed in
+  `scripts/json-types.json`. Keep `.select()` strings literal (one string, not built) so results are typed, and
+  don't use `as unknown as`: a plain `as` is checked against the inferred type.
 - Never print or commit `.env.local`. The database password lives only there.
 
 ## Player dashboard (`/players/[playerId]`, cafe-menu design)

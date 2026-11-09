@@ -59,7 +59,7 @@ export async function loadGamePlans(supabase: Supabase, playerId: string, from: 
       .order("plan_date", { ascending: false })
       .limit(30),
   ]);
-  const rows = (games.data ?? []) as unknown as { id: string; game_date: string; home_team_id: string; home: { name: string } | null; away: { name: string } | null }[];
+  const rows = (games.data ?? []) as { id: string; game_date: string; home_team_id: string; home: { name: string } | null; away: { name: string } | null }[];
   return {
     games: rows.map((g) => ({ id: g.id, game_date: g.game_date, opponent: (teams.includes(g.home_team_id) ? g.away?.name : g.home?.name) ?? "Opponent" })) as PlanGame[],
     plans: (plans.data ?? []) as GamePlan[],

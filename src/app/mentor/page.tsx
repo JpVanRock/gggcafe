@@ -50,7 +50,7 @@ async function Home() {
       .limit(8),
   ]);
   const players = ((playerRows ?? []) as Player[]).sort((a, b) => a.last_name.localeCompare(b.last_name));
-  const spots = (rosterRows ?? []) as unknown as { player_id: string; jersey_number: string | null; team: { name: string } | null }[];
+  const spots = (rosterRows ?? []) as { player_id: string; jersey_number: string | null; team: { name: string } | null }[];
   const photos = await signedPhotoUrls(supabase, players.map((p) => p.photo_path));
   const nameOf = (id: string) => {
     const p = players.find((x) => x.id === id);

@@ -211,7 +211,7 @@ async function CheckIns() {
     .gte("starts_on", today)
     .lte("starts_on", addDays(today, 14))
     .order("starts_on");
-  const checkIns = (data ?? []) as unknown as {
+  const checkIns = (data ?? []) as {
     id: string;
     starts_on: string;
     player: { id: string; first_name: string; preferred_name: string | null; last_name: string } | null;
@@ -262,9 +262,12 @@ function DugoutCard({ role }: { role: StaffRole }) {
 
 async function HeadCoachHome({ role }: { role: StaffRole }) {
   const supabase = await createClient();
-  const [teams, players, games, metrics] = await Promise.all(
-    ["teams", "players", "games", "metrics"].map((table) => supabase.from(table).select("*", { count: "exact", head: true })),
-  );
+  const [teams, players, games, metrics] = await Promise.all([
+    supabase.from("teams").select("*", { count: "exact", head: true }),
+    supabase.from("players").select("*", { count: "exact", head: true }),
+    supabase.from("games").select("*", { count: "exact", head: true }),
+    supabase.from("metrics").select("*", { count: "exact", head: true }),
+  ]);
   const rows: { label: string; count: number | null; href?: string }[] = [
     { label: "Teams", count: teams.count, href: "/teams" },
     { label: "Players", count: players.count, href: "/players" },
@@ -355,9 +358,9 @@ async function AssistantHome({ user }: { user: StaffUser }) {
       .order("practice_date", { ascending: false })
       .limit(5),
   ]);
-  const week = ((events ?? []) as unknown as EventRow[]).filter((e) => e.team?.is_own_team);
-  const upcoming = (plans ?? []) as unknown as PlanRow[];
-  const mine = (drafts ?? []) as unknown as PlanRow[];
+  const week = ((events ?? []) as EventRow[]).filter((e) => e.team?.is_own_team);
+  const upcoming = (plans ?? []) as PlanRow[];
+  const mine = (drafts ?? []) as PlanRow[];
   const when = (date: string, time: string | null) =>
     `${date === today ? "Today" : date === addDays(today, 1) ? "Tomorrow" : formatDay(date)}${time ? ` · ${formatTime(time)}` : ""}`;
 

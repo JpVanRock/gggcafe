@@ -29,7 +29,7 @@ export async function loadMentalTools(supabase: Supabase, playerId: string, toda
       .or(`ends_on.is.null,ends_on.gte.${today}`),
   ]);
   const guides = new Set(
-    ((routines.data ?? []) as unknown as { drill: { guide: string | null } | null }[]).map((r) => r.drill?.guide).filter((g): g is string => Boolean(g)),
+    ((routines.data ?? []) as { drill: { guide: string | null } | null }[]).map((r) => r.drill?.guide).filter((g): g is string => Boolean(g)),
   );
   return {
     checks: (checks.data ?? []) as IntensityCheck[],

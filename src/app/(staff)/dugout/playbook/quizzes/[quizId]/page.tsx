@@ -41,14 +41,14 @@ async function Quiz({ params }: Pick<PageProps<"/dugout/playbook/quizzes/[quizId
   const supabase = await createClient();
   const { data: quizData } = await supabase.from("team_quizzes").select("id, title, published_at, team_id, team:teams(name)").eq("id", quizId).maybeSingle();
   if (!quizData) notFound();
-  const quiz = quizData as unknown as { id: string; title: string; published_at: string | null; team_id: string; team: { name: string } | null };
+  const quiz = quizData as { id: string; title: string; published_at: string | null; team_id: string; team: { name: string } | null };
 
   const [questionsResult, playsResult, roster] = await Promise.all([
     supabase.from("team_quiz_questions").select("id, position, question, choices, correct_index, explanation, play:playbook_plays(name)").eq("quiz_id", quizId).order("position"),
     supabase.from("playbook_plays").select("id, name").or(`team_id.eq.${quiz.team_id},team_id.is.null`).eq("active", true).order("name"),
     loadTeamRoster(supabase, quiz.team_id),
   ]);
-  const questions = (questionsResult.data ?? []) as unknown as QuestionRow[];
+  const questions = (questionsResult.data ?? []) as QuestionRow[];
   const { data: answerData } = questions.length
     ? await supabase.from("team_quiz_answers").select("player_id, question_id, is_correct, first_correct").in("question_id", questions.map((q) => q.id))
     : { data: [] };
