@@ -57,7 +57,7 @@ async function Medical({ searchParams }: Pick<PageProps<"/dugout/roster/medical"
             <li key={p.id} className={`rounded-2xl border p-4 ${ok ? "border-navy-600" : "border-pink/60 bg-pink/5"}`}>
               <p className="flex items-baseline justify-between gap-2">
                 <span className="font-semibold">
-                  {p.jersey && <span className="mr-1.5 font-display text-muted tabular-nums">#{p.jersey}</span>}
+                  {p.number && <span className="mr-1.5 font-display text-muted tabular-nums">#{p.number}</span>}
                   {p.name}
                 </span>
                 <span className={`font-mono text-[10px] font-bold tracking-wider uppercase ${ok ? "text-highlight" : "text-pink-soft"}`}>{ok ? "On file" : "Missing"}</span>

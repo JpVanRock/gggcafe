@@ -2,7 +2,7 @@ import "server-only";
 // Phase 5 on her Team page: season goals, her pledge for each team's current season,
 // and the team's spotlights.
 import type { createClient } from "@/lib/supabase/server";
-import { lineupSeason } from "@/lib/gameday-data";
+import { seasonOrCurrent } from "@/lib/roster";
 import type { TeamGoal } from "@/lib/culture";
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
@@ -15,7 +15,7 @@ export async function loadTeamExtras(supabase: Supabase, playerId: string, teamI
   const pledges = new Map<string, PledgeRow>();
   const spotlights = new Map<string, SpotlightRow[]>();
   if (teamIds.length === 0) return { goals, pledges, spotlights };
-  const seasons = await Promise.all(teamIds.map((t) => lineupSeason(supabase, t, null)));
+  const seasons = await Promise.all(teamIds.map((t) => seasonOrCurrent(supabase, t, null)));
   const [goalRows, pledgeRows, spotRows] = await Promise.all([
     supabase.from("team_goals").select("id, team_id, phase, title, target, current, unit, achieved_at, position").in("team_id", teamIds),
     supabase.from("team_pledges").select("team_id, season_id, lines, signed_name, signed_at").eq("player_id", playerId).in("team_id", teamIds),

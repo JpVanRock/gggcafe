@@ -72,7 +72,7 @@ export function GoalForm({ teamId, goal }: { teamId: string; goal?: TeamGoal }) 
   );
 }
 
-export function SpotlightForm({ teamId, roster }: { teamId: string; roster: { id: string; name: string; jersey: string | null }[] }) {
+export function SpotlightForm({ teamId, roster }: { teamId: string; roster: { id: string; name: string; number: string | null }[] }) {
   const [state, action, pending] = useActionState(saveSpotlight, initialFormState);
   return (
     <form action={action} className="grid gap-3">
@@ -85,7 +85,7 @@ export function SpotlightForm({ teamId, roster }: { teamId: string; roster: { id
             </option>
             {roster.map((p) => (
               <option key={p.id} value={p.id}>
-                {p.jersey ? `#${p.jersey} ` : ""}
+                {p.number ? `#${p.number} ` : ""}
                 {p.name}
               </option>
             ))}

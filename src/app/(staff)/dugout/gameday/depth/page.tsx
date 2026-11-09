@@ -3,7 +3,8 @@ import { Suspense } from "react";
 import { canEdit, requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { EmptyState, Loading, buttonClass, inputClass } from "@/components/ui";
-import { lineupSeason, loadGamedayRoster } from "@/lib/gameday-data";
+import { loadGamedayRoster } from "@/lib/gameday-data";
+import { seasonOrCurrent } from "@/lib/roster";
 import { DEPTH_POSITIONS } from "@/lib/playbook";
 import { loadOwnTeams } from "../../data";
 import { TeamPicker, pickTeam } from "../../team-picker";
@@ -30,7 +31,7 @@ async function DepthChart({ searchParams }: Pick<PageProps<"/dugout/gameday/dept
   const teams = await loadOwnTeams(supabase);
   if (teams.length === 0) return <EmptyState>Add your team on the Teams page first.</EmptyState>;
   const team = pickTeam(teams, teamParam);
-  const seasonId = await lineupSeason(supabase, team.id, null);
+  const seasonId = await seasonOrCurrent(supabase, team.id, null);
   const [roster, depthResult] = await Promise.all([
     seasonId ? loadGamedayRoster(supabase, team.id, seasonId) : Promise.resolve([]),
     supabase.from("depth_chart").select("position, player_id, rank").eq("team_id", team.id).order("rank"),

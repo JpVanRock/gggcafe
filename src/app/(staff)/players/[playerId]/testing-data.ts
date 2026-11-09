@@ -3,6 +3,7 @@ import "server-only";
 // against her team's age-group bands, and her composite score.
 import type { createClient } from "@/lib/supabase/server";
 import { TESTS, composite, cutoffsFor, rate, type TestDef } from "@/lib/training-plan";
+import { activeTeams } from "@/lib/roster";
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
@@ -10,8 +11,8 @@ export type MyTestResult = { test: TestDef; value: number; measured_on: string; 
 export type MyTesting = { results: MyTestResult[]; composite: number | null; ageGroup: string | null };
 
 export async function loadMyTesting(supabase: Supabase, playerId: string): Promise<MyTesting> {
-  const [roster, results, bands] = await Promise.all([
-    supabase.from("roster_entries").select("team:teams(age_group, is_own_team)").eq("player_id", playerId).eq("active", true),
+  const [teams, results, bands] = await Promise.all([
+    activeTeams(supabase, playerId),
     supabase
       .from("measurements")
       .select("metric_key, value, measured_on")
@@ -21,8 +22,7 @@ export async function loadMyTesting(supabase: Supabase, playerId: string): Promi
       .order("created_at", { ascending: false }),
     supabase.from("test_bands").select("metric_key, age_group, cutoffs"),
   ]);
-  const ageGroup =
-    ((roster.data ?? []) as { team: { age_group: string | null; is_own_team: boolean } | null }[]).find((r) => r.team?.is_own_team)?.team?.age_group ?? null;
+  const ageGroup = teams.find((t) => t.is_own_team)?.age_group ?? null;
   const overrides = ((bands.data ?? []) as { metric_key: string; age_group: string; cutoffs: number[] }[]).map((b) => ({ ...b, cutoffs: b.cutoffs.map(Number) }));
   const rows = ((results.data ?? []) as { metric_key: string; value: number; measured_on: string }[]).map((r) => ({ ...r, value: Number(r.value) }));
   const out: MyTestResult[] = [];

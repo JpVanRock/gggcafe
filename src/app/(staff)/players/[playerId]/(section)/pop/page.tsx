@@ -10,7 +10,7 @@ import { PopDetail } from "../../pop-report";
 import { firstName, loadPlayer } from "../../section-data";
 import { SectionShell } from "../section-shell";
 import type { Questionnaire } from "@/lib/family";
-import { lineupSeason } from "@/lib/gameday-data";
+import { seasonOrCurrent } from "@/lib/roster";
 import { saveQuestionnaire } from "../../family-actions";
 import { QuestionnaireForm } from "@/components/family-forms";
 import { Disclosure } from "@/components/ui";
@@ -47,7 +47,7 @@ async function Pop({ params }: Pick<PageProps<"/players/[playerId]/pop">, "param
   const movementAccess = g3 ? "open" : access.user.staff?.role === "admin" ? "locked" : "hidden";
   // Phase 6: her preseason questionnaire (her current own team and season; she and coaches)
   const ownTeam = (await loadTeamDugout(supabase, player.id))[0]?.team ?? null;
-  const season = ownTeam ? await lineupSeason(supabase, ownTeam.id, null) : null;
+  const season = ownTeam ? await seasonOrCurrent(supabase, ownTeam.id, null) : null;
   const [stats, seasonName] = await Promise.all([
     loadPlayerStats(supabase, player.id, season),
     season ? supabase.from("seasons").select("name").eq("id", season).maybeSingle().then((r) => (r.data as { name: string } | null)?.name ?? null) : Promise.resolve(null),

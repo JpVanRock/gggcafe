@@ -151,7 +151,7 @@ async function Quiz({ params }: Pick<PageProps<"/dugout/playbook/quizzes/[quizId
                 {results.map((r) => (
                   <tr key={r.id}>
                     <td className={tdClass}>
-                      {r.jersey ? `#${r.jersey} ` : ""}
+                      {r.number ? `#${r.number} ` : ""}
                       {r.name}
                     </td>
                     <td className={`${tdClass} tabular-nums`}>

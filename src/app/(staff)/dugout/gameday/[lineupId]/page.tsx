@@ -10,7 +10,8 @@ import { Card, Loading, pillButtonClass, pillOutlineClass, pillQuietClass } from
 import { formatLongDate } from "@/lib/dates";
 import { emailConfigured } from "@/lib/email";
 import { BASE_RUNNING_LABEL, HITTING_TYPE_LABEL, percent, pitcherOf, rate } from "@/lib/gameday";
-import { lineupSeason, loadGamedayRoster, loadLineup } from "@/lib/gameday-data";
+import { loadGamedayRoster, loadLineup } from "@/lib/gameday-data";
+import { seasonOrCurrent } from "@/lib/roster";
 import { loadCoachingStaff } from "@/lib/practice-plans";
 import { ShareButton } from "../../plans/[planId]/share-button";
 import { deleteLineup, reopenLineup, shareLineup } from "../actions";
@@ -38,7 +39,7 @@ async function LineupView({ params, searchParams }: Pick<PageProps<"/dugout/game
   const supabase = await createClient();
   const lineup = await loadLineup(supabase, lineupId);
   if (!lineup) notFound();
-  const seasonId = await lineupSeason(supabase, lineup.team.id, lineup.season_id);
+  const seasonId = await seasonOrCurrent(supabase, lineup.team.id, lineup.season_id);
   const [roster, staff, depthResult, dutiesResult] = await Promise.all([
     seasonId ? loadGamedayRoster(supabase, lineup.team.id, seasonId) : Promise.resolve([]),
     editor ? loadCoachingStaff(supabase) : Promise.resolve([]),

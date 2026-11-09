@@ -12,7 +12,8 @@ import {
   BASE_RUNNING, BASE_RUNNING_LABEL, HITTING_TYPES, HITTING_TYPE_LABEL, MAX_ROTATIONS, PITCHES, ROTATION_SPOTS, dpFlexProblems,
   type PitchPlan, type Rotation, type SubEntry,
 } from "@/lib/gameday";
-import { lineupSeason, loadGamedayRoster, loadLineup } from "@/lib/gameday-data";
+import { loadGamedayRoster, loadLineup } from "@/lib/gameday-data";
+import { seasonOrCurrent } from "@/lib/roster";
 import { DEPTH_POSITIONS, type DepthPosition } from "@/lib/playbook";
 import {
   BATTING_COLUMNS, FIELDING_COLUMNS, PITCHING_COLUMNS, battingIsEmpty, boxProblems, fieldingIsEmpty,
@@ -258,7 +259,7 @@ export async function shareLineup(lineupId: string, recipientIds: string[], note
   const from = user?.staff?.displayName ?? "A coach";
   const vs = lineup.opponent ? ` vs ${lineup.opponent}` : "";
   const subject = `Lineup: ${lineup.team.name}${vs} · ${formatDay(lineup.game_date)}`;
-  const seasonId = await lineupSeason(supabase, lineup.team.id, lineup.season_id);
+  const seasonId = await seasonOrCurrent(supabase, lineup.team.id, lineup.season_id);
   const roster = seasonId ? await loadGamedayRoster(supabase, lineup.team.id, seasonId) : [];
   const byId = new Map(roster.map((p) => [p.id, p]));
   const orderLines = lineup.batting_order.map((id, i) => {
@@ -363,7 +364,7 @@ export async function fillDepthFromPositions(fd: FormData) {
   const teamId = text(fd, "team_id");
   if ((await headCoachCheck()) || !isUuid(teamId)) return;
   const supabase = await createClient();
-  const seasonId = await lineupSeason(supabase, teamId, null);
+  const seasonId = await seasonOrCurrent(supabase, teamId, null);
   if (!seasonId) return;
   const [roster, existing] = await Promise.all([loadGamedayRoster(supabase, teamId, seasonId), depthRows(supabase, teamId)]);
   const have = new Set(existing.map((r) => `${r.position}|${r.player_id}`));

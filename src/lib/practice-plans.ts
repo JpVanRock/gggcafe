@@ -1,7 +1,7 @@
 import "server-only";
 import type { createClient } from "@/lib/supabase/server";
-import { compareJersey } from "@/lib/softball";
 import type { DrillTag, PlanPosition, PracticeSetting } from "@/lib/dugout";
+import { loadPlayersById, loadRoster, type RosterPlayer } from "@/lib/roster";
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
@@ -36,14 +36,7 @@ export type PracticePlan = {
   spots: PlanSpot[];
 };
 
-export type RosterPlayer = {
-  id: string;
-  name: string;
-  /** "#7 Avery L." for chips on the field */
-  short: string;
-  number: string | null;
-  primary: string | null;
-};
+export type { RosterPlayer } from "@/lib/roster";
 
 export async function loadPracticePlan(supabase: Supabase, planId: string): Promise<PracticePlan | null> {
   const { data } = await supabase
@@ -69,56 +62,15 @@ export async function loadPracticePlan(supabase: Supabase, planId: string): Prom
   };
 }
 
-type RosterRow = {
-  jersey_number: string | null;
-  player: { id: string; first_name: string; last_name: string; preferred_name: string | null; primary_position: string | null } | null;
-  season: { start_date: string | null } | null;
-};
-
-function toRosterPlayer(p: NonNullable<RosterRow["player"]>, number: string | null): RosterPlayer {
-  const first = p.preferred_name || p.first_name;
-  return {
-    id: p.id,
-    name: `${first} ${p.last_name}`,
-    short: `${number ? `#${number} ` : ""}${first} ${p.last_name.charAt(0)}.`,
-    number,
-    primary: p.primary_position,
-  };
-}
-
 /**
- * The team's active roster for its latest season, by jersey number, plus anyone
+ * The team's active roster for its current season, by jersey number, plus anyone
  * already placed in the plan who isn't on it (so names never go missing).
  */
 export async function loadPlanRoster(supabase: Supabase, teamId: string, placedIds: string[] = []): Promise<RosterPlayer[]> {
-  const { data } = await supabase
-    .from("roster_entries")
-    .select("jersey_number, player:players(id, first_name, last_name, preferred_name, primary_position), season:seasons(start_date)")
-    .eq("team_id", teamId)
-    .eq("active", true);
-  const rows = ((data ?? []) as RosterRow[]).filter((r) => r.player);
-  const latest = rows.reduce<string>((max, r) => ((r.season?.start_date ?? "") > max ? (r.season?.start_date ?? "") : max), "");
-  const current = rows.filter((r) => (r.season?.start_date ?? "") === latest);
-
-  const byId = new Map<string, RosterPlayer>();
-  for (const r of current.sort(
-    (a, b) => compareJersey(a.jersey_number, b.jersey_number) || a.player!.last_name.localeCompare(b.player!.last_name),
-  )) {
-    if (!byId.has(r.player!.id)) byId.set(r.player!.id, toRosterPlayer(r.player!, r.jersey_number));
-  }
-
-  const missing = placedIds.filter((id) => !byId.has(id));
-  if (missing.length) {
-    const fromOther = rows.filter((r) => missing.includes(r.player!.id));
-    const { data: players } = await supabase
-      .from("players")
-      .select("id, first_name, last_name, preferred_name, primary_position")
-      .in("id", missing);
-    for (const p of (players ?? []) as NonNullable<RosterRow["player"]>[]) {
-      byId.set(p.id, toRosterPlayer(p, fromOther.find((r) => r.player!.id === p.id)?.jersey_number ?? null));
-    }
-  }
-  return [...byId.values()];
+  const roster = await loadRoster(supabase, teamId);
+  const onRoster = new Set(roster.map((p) => p.id));
+  const missing = placedIds.filter((id) => !onRoster.has(id));
+  return [...roster, ...(await loadPlayersById(supabase, [...new Set(missing)]))];
 }
 
 /** Coach names to assign drills to: coaches and admins on the staff list. */

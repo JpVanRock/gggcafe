@@ -47,7 +47,7 @@ async function Bp({ searchParams }: Pick<PageProps<"/dugout/training/bp">, "sear
   const rounds = (data ?? []) as Round[];
   const short = (id: string) => {
     const p = roster.find((r) => r.id === id);
-    return p ? `${p.jersey ? `#${p.jersey} ` : ""}${p.name}` : "Player";
+    return p ? `${p.number ? `#${p.number} ` : ""}${p.name}` : "Player";
   };
   const totals = roster
     .map((p) => {

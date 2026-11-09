@@ -1,14 +1,13 @@
 import "server-only";
 // Coaches Dugout → Training: the team's roadmap, team routines, testing and draft.
 import type { createClient } from "@/lib/supabase/server";
-import { lineupSeason } from "@/lib/gameday-data";
 import type { TrainingCategory } from "@/lib/achievements";
 import type { PhaseKind, SquadRow } from "@/lib/training-plan";
-import { playerName } from "@/lib/softball";
+import { loadRoster, type RosterPlayer } from "@/lib/roster";
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
-export type RosterPlayer = { id: string; name: string; jersey: string | null };
+export type { RosterPlayer } from "@/lib/roster";
 export type PhaseRow = { id: string; kind: PhaseKind; name: string; starts_on: string; ends_on: string; focus: string | null };
 export type TeamRoutineRow = {
   id: string;
@@ -24,20 +23,9 @@ export type TeamRoutineRow = {
 };
 export type LibraryDrill = { id: string; name: string; category: TrainingCategory; focus: string | null };
 
-/** The team's current roster (latest season, active), by number then name. */
-export async function loadTeamRoster(supabase: Supabase, teamId: string): Promise<RosterPlayer[]> {
-  const season = await lineupSeason(supabase, teamId, null);
-  if (!season) return [];
-  const { data } = await supabase
-    .from("roster_entries")
-    .select("jersey_number, player:players(id, first_name, preferred_name, last_name)")
-    .eq("team_id", teamId)
-    .eq("season_id", season)
-    .eq("active", true);
-  return ((data ?? []) as { jersey_number: string | null; player: { id: string; first_name: string; preferred_name: string | null; last_name: string } | null }[])
-    .filter((r) => r.player)
-    .map((r) => ({ id: r.player!.id, name: playerName(r.player!), jersey: r.jersey_number }))
-    .sort((a, b) => a.name.localeCompare(b.name));
+/** The team's current roster (current season, active), by name. */
+export function loadTeamRoster(supabase: Supabase, teamId: string): Promise<RosterPlayer[]> {
+  return loadRoster(supabase, teamId, { order: "name" });
 }
 
 export async function loadTeamAge(supabase: Supabase, teamId: string): Promise<string | null> {

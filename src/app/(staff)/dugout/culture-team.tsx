@@ -75,7 +75,7 @@ export function CultureTeamSections({
 }: {
   teamId: string;
   goals: TeamGoal[];
-  roster: { id: string; name: string; jersey: string | null }[];
+  roster: { id: string; name: string; number: string | null }[];
   pledges: Pledge[];
   standardTitles: string[];
   spotlights: Spotlight[];

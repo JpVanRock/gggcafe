@@ -7,7 +7,8 @@ import { createClient } from "@/lib/supabase/server";
 import { EmptyState, Loading } from "@/components/ui";
 import { formatLongDate } from "@/lib/dates";
 import { isUuid } from "@/lib/softball";
-import { lineupSeason, loadGamedayRoster } from "@/lib/gameday-data";
+import { loadGamedayRoster } from "@/lib/gameday-data";
+import { seasonOrCurrent } from "@/lib/roster";
 import type { BoxScore } from "@/lib/box-score";
 import { BoxScoreForm } from "./box-form";
 
@@ -52,7 +53,7 @@ async function Box({ params, searchParams }: Pick<PageProps<"/dugout/gameday/box
   const home = team.id === game.home_team_id;
   const opponent = (home ? game.away?.name : game.home?.name) ?? "TBD";
 
-  const seasonId = await lineupSeason(supabase, team.id, game.season_id);
+  const seasonId = await seasonOrCurrent(supabase, team.id, game.season_id);
   const [roster, lineupResult, batting, pitching, fielding, grades] = await Promise.all([
     seasonId ? loadGamedayRoster(supabase, team.id, seasonId) : Promise.resolve([]),
     supabase.from("gameday_lineups").select("batting_order").eq("game_id", gameId).eq("team_id", team.id).order("updated_at", { ascending: false }).limit(1),

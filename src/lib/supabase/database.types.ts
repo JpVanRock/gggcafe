@@ -5531,6 +5531,7 @@ export type Database = {
       sync_team_routine: { Args: { p_routine_id: string | null }; Returns: number }
       team_bp_leaders: { Args: { p_team_id: string | null }; Returns: { player_id: string; first_name: string; last_name: string; jersey_number: string; swings: number; production: number }[] }
       team_budget_summary: { Args: { p_team_id: string | null; p_season_id?: string | null }; Returns: Json }
+      team_current_season: { Args: { p_team_id: string | null }; Returns: string }
       team_leaderboard: { Args: { p_team_id: string | null }; Returns: Json }
       team_parent_links: { Args: { p_team_id: string | null }; Returns: { link_id: string; parent_name: string; email: string; child_name: string; player_id: string; status: Database["public"]["Enums"]["parent_link_status"]; requested_at: string }[] }
       team_player_claims: { Args: { p_team_id: string | null }; Returns: { claim_id: string; email: string; typed_name: string; typed_jersey: string; roster_entry_id: string; status: Database["public"]["Enums"]["player_claim_status"]; season_id: string; season_name: string; requested_at: string }[] }

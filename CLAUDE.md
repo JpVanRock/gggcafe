@@ -43,6 +43,10 @@ tests/unit/              node --test unit tests (npm run test:unit)
   `<PillNav items={teamPages(PAGES, teamId)}>` (`components/pill-nav.tsx`).
 - Server actions that append to an ordered list: `nextPosition(supabase, table, column, value)` (`src/lib/db.ts`).
 - Names: `playerName()` in `src/lib/softball.ts`.
+- Rosters: `src/lib/roster.ts`. A team's players: `loadRoster(supabase, teamId, { seasonId?, order? })` (active, current
+  season by default); the season: `currentSeason()` / `seasonOrCurrent()` (the database's `team_current_season`, the
+  same rule as claims and RLS); a player's teams: `activeTeams()` / `activeTeamIds()`. GameDay, practice plans and
+  Training extend it. Only management views (Roster tab, team page, intake, budget) query every season themselves.
 - The approvals count (top menu + Dugout tabs): `getWaitingCount()` in `src/lib/approvals.ts` (React `cache()`, one
   fetch per request).
 - Load independent queries together (`Promise.all`); only what needs an earlier result waits for it (see the player

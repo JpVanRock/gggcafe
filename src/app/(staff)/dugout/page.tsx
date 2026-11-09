@@ -13,7 +13,7 @@ import { CultureTeamSections, type Spotlight } from "./culture-team";
 import { MottoForm } from "./culture-forms";
 import { loadTeamRoster } from "./training/data";
 import type { TeamGoal } from "@/lib/culture";
-import { lineupSeason } from "@/lib/gameday-data";
+import { seasonOrCurrent } from "@/lib/roster";
 
 export const metadata: Metadata = { title: "Coaches Dugout · GGG.Cafe" };
 
@@ -45,7 +45,7 @@ async function StandardsAndCulture({ searchParams }: Pick<PageProps<"/dugout">, 
   }
   const team = pickTeam(teams, teamParam);
 
-  const season = await lineupSeason(supabase, team.id, null);
+  const season = await seasonOrCurrent(supabase, team.id, null);
   const [cultureResult, standardsResult, goalsResult, roster, pledgesResult, spotlightsResult] = await Promise.all([
     supabase.from("team_culture").select("headline, statement, motto").eq("team_id", team.id).maybeSingle(),
     supabase.from("team_standards").select("title, detail").eq("team_id", team.id).order("position"),

@@ -2,6 +2,7 @@ import "server-only";
 // Her team's call sheet (plays a coach put on it) and published team quizzes.
 import type { createClient } from "@/lib/supabase/server";
 import { PLAY_CATEGORY_LABEL, type PlayCategory } from "@/lib/playbook";
+import { activeTeamIds } from "@/lib/roster";
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
@@ -15,12 +16,6 @@ export type TeamQuizSummary = {
   first_try: number;
   to_fix: number;
 };
-
-/** Her active teams (any season), for the call sheet. */
-async function activeTeamIds(supabase: Supabase, playerId: string): Promise<string[]> {
-  const { data } = await supabase.from("roster_entries").select("team_id").eq("player_id", playerId).eq("active", true);
-  return [...new Set(((data ?? []) as { team_id: string }[]).map((r) => r.team_id))];
-}
 
 export async function loadTeamPlaybook(supabase: Supabase, playerId: string): Promise<{ cards: CallCard[]; quizzes: TeamQuizSummary[] }> {
   const teamIds = await activeTeamIds(supabase, playerId);

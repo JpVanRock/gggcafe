@@ -6,7 +6,7 @@ import { actForCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { friendlyDbError, text, type FormState } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
-import { lineupSeason } from "@/lib/gameday-data";
+import { seasonOrCurrent } from "@/lib/roster";
 import { cleanQuestionnaire } from "@/lib/family";
 
 export async function saveQuestionnaire(_prev: FormState, fd: FormData): Promise<FormState> {
@@ -18,7 +18,7 @@ export async function saveQuestionnaire(_prev: FormState, fd: FormData): Promise
   const q = cleanQuestionnaire({ ...Object.fromEntries(fd.entries()), numbers: fd.getAll("numbers"), positions: fd.getAll("positions") });
   if (typeof q === "string") return { error: q };
   const supabase = await createClient();
-  const season = await lineupSeason(supabase, teamId, null);
+  const season = await seasonOrCurrent(supabase, teamId, null);
   if (!season) return { error: "The team has no roster this season yet." };
   const { error } = await supabase
     .from("player_questionnaires")

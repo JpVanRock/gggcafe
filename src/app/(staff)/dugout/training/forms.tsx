@@ -254,7 +254,7 @@ export function ResultsForm({ roster, today }: { roster: RosterPlayer[]; today: 
               {roster.map((p) => (
                 <tr key={p.id} className="border-t border-navy-800">
                   <td className="py-1.5 pr-3 whitespace-nowrap">
-                    {p.jersey && <span className="mr-1.5 font-display font-bold text-muted tabular-nums">#{p.jersey}</span>}
+                    {p.number && <span className="mr-1.5 font-display font-bold text-muted tabular-nums">#{p.number}</span>}
                     {p.name}
                   </td>
                   {tests.map((t) => (
@@ -354,7 +354,7 @@ export function SquadsForm({ teamId, roster }: { teamId: string; roster: RosterP
               </option>
               {roster.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.jersey ? `#${p.jersey} ` : ""}
+                  {p.number ? `#${p.number} ` : ""}
                   {p.name}
                 </option>
               ))}

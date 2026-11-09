@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Card, Disclosure, EmptyState, Loading, pillButtonClass, tableClass, tdClass, thClass } from "@/components/ui";
 import { batsThrows, compareJersey, playerName, type Player, type Season } from "@/lib/softball";
 import { loadStaffRequests, loadTeamApprovals } from "@/lib/approvals";
-import { lineupSeason } from "@/lib/gameday-data";
+import { seasonOrCurrent } from "@/lib/roster";
 import { loadOwnTeams } from "../data";
 import { TeamPicker, pickTeam } from "../team-picker";
 import { ApprovedClaimList, PendingClaimList, PendingParentList } from "../approvals";
@@ -53,7 +53,7 @@ async function Roster({ searchParams }: Pick<PageProps<"/dugout/roster">, "searc
   const team = pickTeam(teams, teamParam);
   const [seasonsResult, currentSeason, approvals, staffRequests, staffResult] = await Promise.all([
     supabase.from("seasons").select("*").order("start_date", { ascending: false, nullsFirst: false }).order("created_at", { ascending: false }),
-    lineupSeason(supabase, team.id, null),
+    seasonOrCurrent(supabase, team.id, null),
     editor ? loadTeamApprovals(supabase, team.id) : Promise.resolve(null),
     head ? loadStaffRequests(supabase) : Promise.resolve([]),
     supabase.from("staff").select("user_id, display_name, role"),

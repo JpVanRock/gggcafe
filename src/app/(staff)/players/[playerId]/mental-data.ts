@@ -4,6 +4,7 @@ import "server-only";
 import type { createClient } from "@/lib/supabase/server";
 import { addDays } from "@/lib/dates";
 import type { IntensityContext } from "@/lib/mental";
+import { activeTeamIds } from "@/lib/roster";
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
@@ -41,8 +42,7 @@ export async function loadMentalTools(supabase: Supabase, playerId: string, toda
 /** Her journal for one week (Monday..Sunday), the week's look-back and which days have a team practice. */
 export async function loadJournalWeek(supabase: Supabase, playerId: string, monday: string) {
   const sunday = addDays(monday, 6);
-  const { data: rosterData } = await supabase.from("roster_entries").select("team_id").eq("player_id", playerId).eq("active", true);
-  const teamIds = [...new Set(((rosterData ?? []) as { team_id: string }[]).map((r) => r.team_id))];
+  const teamIds = await activeTeamIds(supabase, playerId);
   const [entries, week, practices] = await Promise.all([
     supabase.from("journal_entries").select("entry_date, purpose, worked, fix").eq("player_id", playerId).gte("entry_date", monday).lte("entry_date", sunday),
     supabase.from("journal_weeks").select("look_back").eq("player_id", playerId).eq("week_start", monday).maybeSingle(),

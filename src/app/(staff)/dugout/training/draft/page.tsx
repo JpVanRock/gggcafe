@@ -56,7 +56,7 @@ async function Draft({ searchParams }: Pick<PageProps<"/dugout/training/draft">,
     points: Number(p.points),
     week_points: Number(p.week_points),
   }));
-  const nameOf = new Map(roster.map((p) => [p.id, `${p.jersey ? `#${p.jersey} ` : ""}${p.name}`]));
+  const nameOf = new Map(roster.map((p) => [p.id, `${p.number ? `#${p.number} ` : ""}${p.name}`]));
   const drafted = new Set(squads.flatMap((s) => s.members));
   const remaining = roster.filter((p) => !drafted.has(p.id));
   const picks = squads.reduce((n, s) => n + s.members.length - 1, 0);
@@ -93,7 +93,7 @@ async function Draft({ searchParams }: Pick<PageProps<"/dugout/training/draft">,
                       <input type="hidden" name="team_id" value={team.id} />
                       <input type="hidden" name="player_id" value={p.id} />
                       <button type="submit" className="rounded-full border border-navy-600 px-3 py-1.5 text-sm font-semibold transition hover:border-pink hover:bg-pink hover:text-on-accent">
-                        {p.jersey && <span className="mr-1 font-display tabular-nums">#{p.jersey}</span>}
+                        {p.number && <span className="mr-1 font-display tabular-nums">#{p.number}</span>}
                         {p.name}
                       </button>
                     </form>

@@ -7,7 +7,7 @@ import { actForCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { friendlyDbError, text, type FormState } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
-import { lineupSeason } from "@/lib/gameday-data";
+import { seasonOrCurrent } from "@/lib/roster";
 import { cleanLines } from "@/lib/culture";
 
 export async function savePledge(_prev: FormState, fd: FormData): Promise<FormState> {
@@ -19,7 +19,7 @@ export async function savePledge(_prev: FormState, fd: FormData): Promise<FormSt
   const supabase = await createClient();
   const [{ data: standards }, season] = await Promise.all([
     supabase.from("team_standards").select("title").eq("team_id", teamId).order("position"),
-    lineupSeason(supabase, teamId, null),
+    seasonOrCurrent(supabase, teamId, null),
   ]);
   if (!season) return { error: "The team has no roster this season yet." };
   const titles = ((standards ?? []) as { title: string }[]).map((s) => s.title);

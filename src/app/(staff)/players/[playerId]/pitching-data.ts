@@ -2,6 +2,7 @@ import "server-only";
 // Pitching (Phase 4): her team's bullpen scripts, her bullpen sessions and her game plans.
 import type { createClient } from "@/lib/supabase/server";
 import type { ResultPitch, ScriptPitch } from "@/lib/bullpen";
+import { activeTeamIds as teamIds } from "@/lib/roster";
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
@@ -20,11 +21,6 @@ export type GamePlan = {
   fix: string | null;
   strike_pct: number | null;
 };
-
-async function teamIds(supabase: Supabase, playerId: string) {
-  const { data } = await supabase.from("roster_entries").select("team_id").eq("player_id", playerId).eq("active", true);
-  return [...new Set(((data ?? []) as { team_id: string }[]).map((r) => r.team_id))];
-}
 
 export async function loadBullpens(supabase: Supabase, playerId: string) {
   const teams = await teamIds(supabase, playerId);

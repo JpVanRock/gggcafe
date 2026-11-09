@@ -9,6 +9,7 @@ import { MENTAL_FIELDS, type MentalPlan } from "./shared";
 import { TRAINING_CATEGORY_LABEL, type Check, type Routine, type TrainingCategory } from "@/lib/achievements";
 import { phaseOn, phaseWeek } from "@/lib/training-plan";
 import type { HittingZones } from "@/lib/my-zone";
+import { activeTeamIds, activeTeams } from "@/lib/roster";
 
 export { MENTAL_FIELDS, type MentalField, type MentalPlan } from "./shared";
 
@@ -107,12 +108,7 @@ export type ActivityRow = {
 export async function loadTwisWeek(supabase: Supabase, playerId: string, monday: string): Promise<TwisWeek> {
   const sunday = addDays(monday, 6);
 
-  const { data: rosterData } = await supabase
-    .from("roster_entries")
-    .select("team_id")
-    .eq("player_id", playerId)
-    .eq("active", true);
-  const teamIds = [...new Set(((rosterData ?? []) as { team_id: string }[]).map((r) => r.team_id))];
+  const teamIds = await activeTeamIds(supabase, playerId);
   const teamList = teamIds.join(",");
 
   const phasesPromise = teamIds.length
@@ -614,15 +610,7 @@ export type TeamDugout = {
 };
 
 export async function loadTeamDugout(supabase: Supabase, playerId: string): Promise<TeamDugout[]> {
-  const { data: rosterData } = await supabase
-    .from("roster_entries")
-    .select("team:teams(id, name, is_own_team)")
-    .eq("player_id", playerId)
-    .eq("active", true);
-  const teams = new Map<string, { id: string; name: string }>();
-  for (const r of (rosterData ?? []) as { team: { id: string; name: string; is_own_team: boolean } | null }[]) {
-    if (r.team?.is_own_team) teams.set(r.team.id, { id: r.team.id, name: r.team.name });
-  }
+  const teams = new Map((await activeTeams(supabase, playerId)).filter((t) => t.is_own_team).map((t) => [t.id, { id: t.id, name: t.name }]));
   if (teams.size === 0) return [];
 
   const ids = [...teams.keys()];

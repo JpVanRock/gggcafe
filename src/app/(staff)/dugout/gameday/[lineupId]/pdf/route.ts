@@ -2,7 +2,8 @@ import type { NextRequest } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { isUuid } from "@/lib/softball";
-import { lineupSeason, loadGamedayRoster, loadLineup } from "@/lib/gameday-data";
+import { loadGamedayRoster, loadLineup } from "@/lib/gameday-data";
+import { seasonOrCurrent } from "@/lib/roster";
 import { lineupFilename, renderLineupPdf, renderUmpireCardPdf } from "@/lib/pdf/lineup-pdf";
 
 /** The lineup card (or, with ?card=umpire, the umpire exchange card) as a PDF to print or save. Head coaches. */
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest, ctx: RouteContext<"/dugout/gamed
   const supabase = await createClient();
   const lineup = await loadLineup(supabase, lineupId);
   if (!lineup) return new Response("Not found", { status: 404 });
-  const seasonId = await lineupSeason(supabase, lineup.team.id, lineup.season_id);
+  const seasonId = await seasonOrCurrent(supabase, lineup.team.id, lineup.season_id);
   const roster = seasonId ? await loadGamedayRoster(supabase, lineup.team.id, seasonId) : [];
 
   const umpire = request.nextUrl.searchParams.get("card") === "umpire";
