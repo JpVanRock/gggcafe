@@ -89,11 +89,11 @@ try {
   }
   if (BASELINE) console.log(changes.length ? `\nChanged since ${BASELINE}:\n${changes.join("\n")}` : `\nNo visible changes since ${BASELINE}.`);
   console.log(`\n${PAGES.length * VIEWS.length * THEMES.length} screenshots in screens/.`);
-  browser.close();
+  await browser.close();
   site.stop();
 } catch (e) {
   console.error(e instanceof Error ? e.message : e);
-  browser?.close();
+  await browser?.close();
   site?.stop();
   process.exit(1);
 }

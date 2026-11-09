@@ -75,12 +75,12 @@ try {
   }
   const failing = rules.filter((r) => FAILS.has(r.impact));
   console.log(`\n${pages.length} pages checked in Night Game (WCAG 2.2 A/AA) and Day Game (contrast): ${failing.length} failing rule${failing.length === 1 ? "" : "s"}, ${rules.length - failing.length} note${rules.length - failing.length === 1 ? "" : "s"}.`);
-  browser.close();
+  await browser.close();
   site.stop();
   process.exit(failing.length ? 1 : 0);
 } catch (e) {
   console.error(e instanceof Error ? e.message : e);
-  browser?.close();
+  await browser?.close();
   site?.stop();
   process.exit(1);
 }

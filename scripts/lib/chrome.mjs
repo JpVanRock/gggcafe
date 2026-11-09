@@ -141,10 +141,17 @@ export async function launchChrome() {
 
   return {
     newPage,
-    close() {
+    /** Stops Chrome, waits for it to exit, then removes its throwaway profile (cleanup never fails a check). */
+    async close() {
       cdp.close();
-      proc.kill();
-      rmSync(profile, { recursive: true, force: true });
+      if (proc.exitCode === null) {
+        const exited = new Promise((resolve) => proc.once("exit", resolve));
+        proc.kill();
+        await Promise.race([exited, new Promise((r) => setTimeout(r, 5000))]);
+      }
+      try {
+        rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+      } catch {}
     },
   };
 }
