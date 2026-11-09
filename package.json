@@ -12,7 +12,7 @@
     "db:new": "sh -c 'supabase migration new \"$0\" < /dev/null'",
     "db:types": "bash scripts/db-types.sh",
     "db:check": "bash scripts/db-check.sh",
-    "test:unit": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/unit/",
+    "test:unit": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test 'tests/unit/*.test.ts'",
     "test:pages": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-pages.mjs"
   },
   "dependencies": {
