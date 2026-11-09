@@ -91,6 +91,8 @@ try {
   console.log(`\n${PAGES.length * VIEWS.length * THEMES.length} screenshots in screens/.`);
   await browser.close();
   site.stop();
+  // the server's child processes would keep Node running; end here like the other checks do
+  process.exit(0);
 } catch (e) {
   console.error(e instanceof Error ? e.message : e);
   await browser?.close();
