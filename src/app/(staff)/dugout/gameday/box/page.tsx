@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { EmptyState } from "@/components/ui";
+import { EmptyState, RECENT_LIMIT, ShowAllLink } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import { loadDugoutTeam } from "../../data";
 import { NoOwnTeam, TeamPicker } from "../../team-picker";
@@ -25,20 +25,20 @@ type GameRow = {
 
 export default async function BoxScoresPage({ searchParams }: PageProps<"/dugout/gameday/box">) {
   await requireHeadCoachPage();
-  const { team: teamParam } = await searchParams;
+  const { team: teamParam, games: gamesParam } = await searchParams;
   const supabase = await createClient();
   const dugout = await loadDugoutTeam(supabase, teamParam);
   if (!dugout) return <NoOwnTeam />;
   const { teams, team } = dugout;
   const today = todayISO();
-  const { data } = await supabase
+  const { data, count } = await supabase
     .from("games")
-    .select("id, game_date, home_team_id, home_score, away_score, status, event_name, home:teams!home_team_id(name), away:teams!away_team_id(name), lines:batting_lines(team_id)")
+    .select("id, game_date, home_team_id, home_score, away_score, status, event_name, home:teams!home_team_id(name), away:teams!away_team_id(name), lines:batting_lines(team_id)", { count: "exact" })
     .or(`home_team_id.eq.${team.id},away_team_id.eq.${team.id}`)
     .neq("status", "cancelled")
     .lte("game_date", today)
     .order("game_date", { ascending: false })
-    .limit(60);
+    .limit(gamesParam === "all" ? 2000 : RECENT_LIMIT);
   const games = (data ?? []) as GameRow[];
 
   return (
@@ -94,6 +94,7 @@ export default async function BoxScoresPage({ searchParams }: PageProps<"/dugout
           })}
         </ul>
       )}
+      <ShowAllLink shown={games.length} total={count ?? games.length} href={`/dugout/gameday/box?team=${team.id}&games=all`} noun="games" />
     </div>
   );
 }

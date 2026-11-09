@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { canEdit, requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Card, Disclosure, EmptyState, tableClass, tdClass, thClass } from "@/components/ui";
+import { Card, Disclosure, EmptyState, RECENT_LIMIT, ShowAllLink, tableClass, tdClass, thClass } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import { BASE_RUNNING_LABEL, HITTING_TYPE_LABEL, percent, rate } from "@/lib/gameday";
 import { loadGamedayRoster } from "@/lib/gameday-data";
@@ -20,7 +20,7 @@ type LineupRow = { id: string; game_date: string; opponent: string | null; title
 export default async function GamedayPage({ searchParams }: PageProps<"/dugout/gameday">) {
   const user = await requireHeadCoachPage();
   const editor = canEdit(user.staff.role);
-  const { team: teamParam } = await searchParams;
+  const { team: teamParam, lineups: lineupsParam } = await searchParams;
   const supabase = await createClient();
   const dugout = await loadDugoutTeam(supabase, teamParam);
   if (!dugout) return <NoOwnTeam />;
@@ -31,9 +31,10 @@ export default async function GamedayPage({ searchParams }: PageProps<"/dugout/g
     seasonId ? loadGamedayRoster(supabase, team.id, seasonId) : Promise.resolve([]),
     supabase
       .from("gameday_lineups")
-      .select("id, game_date, opponent, title, status, shared_at, batting_order")
+      .select("id, game_date, opponent, title, status, shared_at, batting_order", { count: "exact" })
       .eq("team_id", team.id)
-      .order("game_date", { ascending: false }),
+      .order("game_date", { ascending: false })
+      .limit(lineupsParam === "all" ? 2000 : RECENT_LIMIT),
     supabase
       .from("games")
       .select("game_date, home_team_id, home:teams!home_team_id(name), away:teams!away_team_id(name)")
@@ -44,6 +45,7 @@ export default async function GamedayPage({ searchParams }: PageProps<"/dugout/g
     seasonId ? supabase.from("seasons").select("name").eq("id", seasonId).maybeSingle() : Promise.resolve({ data: null }),
   ]);
   const lineups = (lineupsResult.data ?? []) as LineupRow[];
+  const lineupTotal = lineupsResult.count ?? lineups.length;
   const games = ((gamesResult.data ?? []) as { game_date: string; home_team_id: string; home: { name: string } | null; away: { name: string } | null }[]).map(
     (g) => ({ date: g.game_date, opponent: (g.home_team_id === team.id ? g.away?.name : g.home?.name) ?? "" }),
   );
@@ -98,6 +100,7 @@ export default async function GamedayPage({ searchParams }: PageProps<"/dugout/g
             })}
           </ul>
         )}
+        <ShowAllLink shown={lineups.length} total={lineupTotal} href={`/dugout/gameday?team=${team.id}&lineups=all`} noun="lineups" />
       </section>
 
       <Card title={`Player cards${seasonResult.data?.name ? ` · ${seasonResult.data.name}` : ""}`}>

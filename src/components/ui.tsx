@@ -112,3 +112,19 @@ export function FormMessage({ error, saved }: { error: string | null; saved?: bo
 export const tableClass = "w-full text-left text-sm";
 export const thClass = "border-b border-navy-700 py-2 pr-4 text-[0.75rem] leading-4 font-semibold uppercase tracking-wider text-muted";
 export const tdClass = "border-b border-navy-800 py-2 pr-4";
+
+/** How many past items a list shows before "Show all" (plans, lineups, games). */
+export const RECENT_LIMIT = 30;
+
+/** "Showing 30 of 84 · Show all" under a list that was cut to RECENT_LIMIT. */
+export function ShowAllLink({ shown, total, href, noun }: { shown: number; total: number; href: string; noun: string }) {
+  if (total <= shown) return null;
+  return (
+    <p className="mt-3 text-sm text-muted">
+      Showing the latest {shown} of {total} {noun}.{" "}
+      <Link href={href} className="font-semibold text-pink hover:underline">
+        Show all
+      </Link>
+    </p>
+  );
+}

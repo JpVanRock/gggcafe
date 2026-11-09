@@ -62,6 +62,9 @@ tests/unit/              node --test unit tests (npm run test:unit)
   Training extend it. Only management views (Roster tab, team page, intake, budget) query every season themselves.
 - The approvals count (top menu + Dugout tabs): `getWaitingCount()` in `src/lib/approvals.ts` (React `cache()`, one
   fetch per request).
+- Lists that grow every season (past plans, lineups, games) show the latest `RECENT_LIMIT` (30) with
+  `<ShowAllLink>` (`?past=all`, `?lineups=all`, `?games=all`). New lists of that kind do the same.
+- Index a foreign key the app filters or joins on (Postgres doesn't index them; see migration 20261109120000).
 - Load independent queries together (`Promise.all`); only what needs an earlier result waits for it (see the player
   dashboard, `players/[playerId]/page.tsx`: two rounds).
 
@@ -421,8 +424,9 @@ tests/unit/              node --test unit tests (npm run test:unit)
   at the very top (subtitle); no links to change them on this page.
 - Notifications (`notifications`, migration 20261108150000): each user sees and marks read only their own;
   only the database writes them. A new Player of the Week notifies every coach and admin. Coaches/admins
-  get a bell with the unread count in the top menu (`unread_notifications()`, which first decides finished
-  weeks for every team in its offseason) and the list at `/notifications` (opening it marks them read).
+  get a bell with the unread count in the top menu (`unread_notifications()`, a plain count) and the list at
+  `/notifications` (opening it marks them read). Finished weeks are decided by a daily pg_cron job at 09:00 UTC
+  (`private.decide_all_players_of_week`, migration 20261109120000) and whenever a Leaderboard opens.
 
 ## G3 Advanced (Level 2, `/players/[id]/advanced`)
 - The advanced tier (user, 2026-11-07): admin-approved per player now, a paid subscription later

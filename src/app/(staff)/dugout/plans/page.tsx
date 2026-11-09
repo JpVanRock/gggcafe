@@ -3,7 +3,7 @@ import Link from "next/link";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { canEditPlanRole } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
-import { Disclosure, EmptyState } from "@/components/ui";
+import { Disclosure, EmptyState, RECENT_LIMIT, ShowAllLink } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import { PRACTICE_SETTING_LABEL, durationLabel, practiceRange, type PracticeSetting } from "@/lib/dugout";
 import { loadDugoutTeam } from "../data";
@@ -79,22 +79,35 @@ function PlanCard({ plan, viewOnly = false }: { plan: PlanRow; viewOnly?: boolea
 export default async function PracticePlansPage({ searchParams }: PageProps<"/dugout/plans">) {
   const user = await requireStaffPage();
   const editor = canEdit(user.staff.role);
-  const { team: teamParam } = await searchParams;
+  const { team: teamParam, past: pastParam } = await searchParams;
   const supabase = await createClient();
   const dugout = await loadDugoutTeam(supabase, teamParam);
   if (!dugout) return <NoOwnTeam />;
   const { teams, team } = dugout;
   const today = todayISO();
 
-  const { data } = await supabase
-    .from("practice_plans")
-    .select("id, practice_date, start_time, setting, total_minutes, focus, location, status, shared_at, created_by, drills:practice_plan_drills(count)")
-    .eq("team_id", team.id)
-    .order("practice_date", { ascending: false })
-    .order("start_time", { ascending: false, nullsFirst: false });
-  const plans = (data ?? []) as PlanRow[];
-  const upcoming = plans.filter((p) => p.practice_date >= today).reverse();
-  const past = plans.filter((p) => p.practice_date < today);
+  // Every upcoming plan; past ones newest first, the latest RECENT_LIMIT unless ?past=all.
+  const columns = "id, practice_date, start_time, setting, total_minutes, focus, location, status, shared_at, created_by, drills:practice_plan_drills(count)";
+  const [upcomingResult, pastResult] = await Promise.all([
+    supabase
+      .from("practice_plans")
+      .select(columns)
+      .eq("team_id", team.id)
+      .gte("practice_date", today)
+      .order("practice_date")
+      .order("start_time", { nullsFirst: true }),
+    supabase
+      .from("practice_plans")
+      .select(columns, { count: "exact" })
+      .eq("team_id", team.id)
+      .lt("practice_date", today)
+      .order("practice_date", { ascending: false })
+      .order("start_time", { ascending: false, nullsFirst: false })
+      .limit(pastParam === "all" ? 2000 : RECENT_LIMIT),
+  ]);
+  const upcoming = (upcomingResult.data ?? []) as PlanRow[];
+  const past = (pastResult.data ?? []) as PlanRow[];
+  const pastTotal = pastResult.count ?? past.length;
   // Assistant coaches see every plan but change only their own.
   const viewOnly = (p: PlanRow) => editor && !canEditPlanRole(user.staff.role, user.id, p.created_by);
 
@@ -104,7 +117,7 @@ export default async function PracticePlansPage({ searchParams }: PageProps<"/du
       <PlansNav current="plans" teamId={team.id} />
 
       {editor && (
-        <Disclosure summary={`New practice plan for ${team.name}`} open={plans.length === 0}>
+        <Disclosure summary={`New practice plan for ${team.name}`} open={upcoming.length === 0 && pastTotal === 0}>
           <NewPlanForm teamId={team.id} today={today} />
         </Disclosure>
       )}
@@ -130,6 +143,7 @@ export default async function PracticePlansPage({ searchParams }: PageProps<"/du
               <PlanCard key={p.id} plan={p} viewOnly={viewOnly(p)} />
             ))}
           </ul>
+          <ShowAllLink shown={past.length} total={pastTotal} href={`/dugout/plans?team=${team.id}&past=all`} noun="past plans" />
         </section>
       )}
     </div>

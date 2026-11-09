@@ -112,6 +112,9 @@ select pg_temp.expect('opens again', jsonb_typeof(public.team_leaderboard('00000
 select pg_temp.expect('seven weeks decided once', (select count(*) from public.team_player_of_week), 0::bigint); -- players can't read the table
 reset role;
 select pg_temp.expect('seven weeks decided once (staff view)', (select count(*) from public.team_player_of_week), 7::bigint);
+-- the daily scheduled job (decide_all_players_of_week) finds nothing new to decide
+select private.decide_all_players_of_week();
+select pg_temp.expect('the daily job decides nothing twice', (select count(*) from public.team_player_of_week), 7::bigint);
 
 -- Each new Player of the Week notified every coach and admin (five winners), not view-only staff
 select pg_temp.expect('coach notified of five Players of the Week',
