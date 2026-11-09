@@ -1,22 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { canEdit, requireHeadCoachPage } from "@/lib/auth";
 import { formatDay } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
 import { playerName } from "@/lib/softball";
-import { Card, EmptyState, Loading } from "@/components/ui";
+import { Card, EmptyState } from "@/components/ui";
 import { ApproveMentor, AssignPlayer, CalendarToggle, RemoveMentor, RemoveMessage, UnassignPlayer } from "./mentors-client";
 
 export const metadata: Metadata = { title: "Mentors · Coaches Dugout · GGG.Cafe" };
-
-export default function MentorsPage() {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Mentors />
-    </Suspense>
-  );
-}
 
 type Mentor = { user_id: string; display_name: string; specialty: string | null; can_schedule: boolean };
 type Pending = { user_id: string; email: string; display_name: string; specialty: string | null; created_at: string };
@@ -25,7 +16,7 @@ type Spot = { jersey_number: string | null; player: { id: string; first_name: st
 
 const heading = "mb-3 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
 
-async function Mentors() {
+export default async function MentorsPage() {
   const user = await requireHeadCoachPage();
   const editor = canEdit(user.staff.role);
   const admin = user.staff.role === "admin";

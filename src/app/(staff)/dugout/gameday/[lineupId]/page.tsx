@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { canEdit, requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { isUuid } from "@/lib/softball";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Card, Loading, pillButtonClass, pillOutlineClass, pillQuietClass } from "@/components/ui";
+import { Card, pillButtonClass, pillOutlineClass, pillQuietClass } from "@/components/ui";
 import { formatLongDate } from "@/lib/dates";
 import { emailConfigured } from "@/lib/email";
 import { BASE_RUNNING_LABEL, HITTING_TYPE_LABEL, percent, pitcherOf, rate } from "@/lib/gameday";
@@ -22,15 +21,7 @@ import type { DepthChart, DepthPosition } from "@/lib/playbook";
 
 export const metadata: Metadata = { title: "Lineup · GameDay · GGG.Cafe" };
 
-export default function LineupPage({ params, searchParams }: PageProps<"/dugout/gameday/[lineupId]">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <LineupView params={params} searchParams={searchParams} />
-    </Suspense>
-  );
-}
-
-async function LineupView({ params, searchParams }: Pick<PageProps<"/dugout/gameday/[lineupId]">, "params" | "searchParams">) {
+export default async function LineupPage({ params, searchParams }: PageProps<"/dugout/gameday/[lineupId]">) {
   const user = await requireHeadCoachPage();
   const editor = canEdit(user.staff.role);
   const { lineupId } = await params;

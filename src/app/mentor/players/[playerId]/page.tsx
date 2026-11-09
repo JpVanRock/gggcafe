@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { Suspense } from "react";
 import { getCurrentUser, getMenteeIds, getMentor } from "@/lib/auth";
 import { formatDay } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
 import { signedPhotoUrls } from "@/lib/player-photos";
 import { MESSAGE_COLUMNS, signedMessagePhotoUrls, type MentorMessage } from "@/lib/message-photos";
 import { GOAL_METHOD_LABEL, isUuid, playerName, type Player } from "@/lib/softball";
-import { Loading } from "@/components/ui";
+
 import {
   currentRostering, loadHarada, loadMentalPlan, loadMetricOptions, loadMovementAndHitting, loadPopReport, loadSmartGoals,
 } from "@/app/(staff)/players/[playerId]/data";
@@ -20,14 +19,6 @@ import { DateForm, MessageForm, RemoveDate, RemoveMessage, type LibraryDrill } f
 
 export const metadata: Metadata = { title: "Player · Mentor · GGG.Cafe" };
 
-export default function MentorPlayerPage({ params }: PageProps<"/mentor/players/[playerId]">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <MentorPlayer params={params} />
-    </Suspense>
-  );
-}
-
 function Panel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="flex flex-col gap-4 rounded-2xl border border-navy-700 bg-navy-900/70 p-5 sm:p-6">
@@ -37,7 +28,7 @@ function Panel({ title, children }: { title: string; children: React.ReactNode }
   );
 }
 
-async function MentorPlayer({ params }: Pick<PageProps<"/mentor/players/[playerId]">, "params">) {
+export default async function MentorPlayerPage({ params }: PageProps<"/mentor/players/[playerId]">) {
   const { playerId } = await params;
   if (!isUuid(playerId)) notFound();
   const user = await getCurrentUser();

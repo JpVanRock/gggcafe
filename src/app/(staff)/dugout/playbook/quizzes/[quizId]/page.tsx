@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Card, EmptyState, Loading, buttonClass, secondaryButtonClass, tableClass, tdClass, thClass } from "@/components/ui";
+import { Card, EmptyState, buttonClass, secondaryButtonClass, tableClass, tdClass, thClass } from "@/components/ui";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { isUuid } from "@/lib/softball";
 import { quizScore } from "@/lib/playbook";
@@ -13,14 +12,6 @@ import { deleteQuiz, publishQuiz, removeQuizQuestion } from "../../actions";
 import { QuizQuestionForm } from "../../forms";
 
 export const metadata: Metadata = { title: "Team Quiz · Coaches Dugout · GGG.Cafe" };
-
-export default function QuizPage({ params }: PageProps<"/dugout/playbook/quizzes/[quizId]">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Quiz params={params} />
-    </Suspense>
-  );
-}
 
 type QuestionRow = {
   id: string;
@@ -33,7 +24,7 @@ type QuestionRow = {
 };
 type AnswerRow = { player_id: string; question_id: string; is_correct: boolean; first_correct: boolean };
 
-async function Quiz({ params }: Pick<PageProps<"/dugout/playbook/quizzes/[quizId]">, "params">) {
+export default async function QuizPage({ params }: PageProps<"/dugout/playbook/quizzes/[quizId]">) {
   const user = await requireStaffPage();
   const editor = canEdit(user.staff.role);
   const { quizId } = await params;

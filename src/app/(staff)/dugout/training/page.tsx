@@ -1,15 +1,13 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Suspense } from "react";
 import { canEdit, isHeadCoach, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Disclosure, EmptyState, Loading } from "@/components/ui";
+import { Disclosure, EmptyState } from "@/components/ui";
 import { WEEKDAYS, formatDay, todayISO } from "@/lib/dates";
 import { TRAINING_CATEGORY_LABEL } from "@/lib/achievements";
 import { PHASE_INFO, overlaps, phaseOn, phaseWeek } from "@/lib/training-plan";
-import { loadOwnTeams } from "../data";
-import { TeamPicker, pickTeam } from "../team-picker";
+import { loadDugoutTeam } from "../data";
+import { NoOwnTeam, TeamPicker } from "../team-picker";
 import { TrainingNav } from "./nav";
 import { loadRoadmap } from "./data";
 import { deletePhase, deleteTeamRoutine, endTeamRoutine } from "./actions";
@@ -19,14 +17,6 @@ export const metadata: Metadata = { title: "Training · Coaches Dugout · GGG.Ca
 
 // Coaches Dugout → Training (SB Blueprint Phase 2): the season roadmap, planned
 // backward from the championship, and team routines pushed to every player.
-export default function TrainingPage({ searchParams }: PageProps<"/dugout/training">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Training searchParams={searchParams} />
-    </Suspense>
-  );
-}
-
 const heading = "font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
 const KIND_COLOR: Record<string, string> = {
   testing: "bg-pink",
@@ -37,24 +27,14 @@ const KIND_COLOR: Record<string, string> = {
   recovery: "bg-muted",
 };
 
-async function Training({ searchParams }: Pick<PageProps<"/dugout/training">, "searchParams">) {
+export default async function TrainingPage({ searchParams }: PageProps<"/dugout/training">) {
   const user = await requireStaffPage();
   const editor = canEdit(user.staff.role);
   const { team: teamParam } = await searchParams;
   const supabase = await createClient();
-  const teams = await loadOwnTeams(supabase);
-  if (teams.length === 0) {
-    return (
-      <EmptyState>
-        Add your team on the{" "}
-        <Link href="/teams" className="text-pink hover:underline">
-          Teams
-        </Link>{" "}
-        page first.
-      </EmptyState>
-    );
-  }
-  const team = pickTeam(teams, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam);
+  if (!dugout) return <NoOwnTeam />;
+  const { teams, team } = dugout;
   const today = todayISO();
   const [{ phases, routines, library, scripts }, offseason, nextGame] = await Promise.all([
     loadRoadmap(supabase, team.id),

@@ -1,24 +1,15 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { requireStaffPage } from "@/lib/auth";
 import { ACCOUNT_TYPES, QUESTIONS, SECTIONS, type Level } from "@/lib/account-types";
 import { Softball } from "@/components/softball-icon";
-import { Disclosure, Loading, PageHeader } from "@/components/ui";
+import { Disclosure, PageHeader } from "@/components/ui";
 import { FaqNav } from "../faq-nav";
 
 export const metadata: Metadata = { title: "Account types · FAQ · GGG.Cafe" };
 
 // Admin-only (user, 2026-11-08): the five registration types and what each
 // one's dashboard can use, side by side. Content: src/lib/account-types.ts.
-export default function AccountTypesPage() {
-  return (
-    <Suspense fallback={<Loading />}>
-      <AccountTypes />
-    </Suspense>
-  );
-}
-
 const heading = "font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
 const TAG: Partial<Record<Level, string>> = { part: "Part", own: "Own", view: "View" };
 const SAYS: Record<Level, string> = { yes: "Yes", part: "Part of it", own: "Only their own", view: "View only", no: "No" };
@@ -33,7 +24,7 @@ function Mark({ level, who }: { level: Level; who: string }) {
   );
 }
 
-async function AccountTypes() {
+export default async function AccountTypesPage() {
   const user = await requireStaffPage();
   // admins only: everyone else gets a 404
   if (user.staff.role !== "admin") notFound();

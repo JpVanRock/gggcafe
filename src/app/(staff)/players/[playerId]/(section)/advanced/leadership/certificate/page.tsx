@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
-import { Loading } from "@/components/ui";
+
 import { LeadershipCertificate } from "@/components/leadership-certificate";
 import { formatLongDateAt } from "@/lib/dates";
 import { playerName } from "@/lib/softball";
@@ -14,15 +13,7 @@ import { SectionShell } from "../../../section-shell";
 
 export const metadata: Metadata = { title: "Certificate of Leadership · GGG.Cafe" };
 
-export default function CertificatePage({ params }: PageProps<"/players/[playerId]/advanced/leadership/certificate">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Certificate params={params} />
-    </Suspense>
-  );
-}
-
-async function Certificate({ params }: Pick<PageProps<"/players/[playerId]/advanced/leadership/certificate">, "params">) {
+export default async function CertificatePage({ params }: PageProps<"/players/[playerId]/advanced/leadership/certificate">) {
   const { playerId } = await params;
   const { player, certificate, lead, name } = await leadershipContext(playerId);
   // only coaches/admins and the player herself can read it (RLS); everyone else gets a 404

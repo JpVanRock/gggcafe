@@ -1,25 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { EmptyState, Loading, pillQuietClass } from "@/components/ui";
+import { pillQuietClass } from "@/components/ui";
 import { formatLongDate, todayISO } from "@/lib/dates";
 import { monthGrid, monthLabel, monthOf, shiftMonth, type EventKind } from "@/lib/dugout";
-import { loadOwnTeams } from "../data";
-import { TeamPicker, pickTeam } from "../team-picker";
+import { loadDugoutTeam } from "../data";
+import { NoOwnTeam, TeamPicker } from "../team-picker";
 import { CalendarView, type CalEvent, type CalGame } from "./calendar";
 import { OffseasonForm, OffseasonPanel } from "./offseason";
 
 export const metadata: Metadata = { title: "Calendar · Coaches Dugout · GGG.Cafe" };
-
-export default function CalendarPage({ searchParams }: PageProps<"/dugout/calendar">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Calendar searchParams={searchParams} />
-    </Suspense>
-  );
-}
 
 type EventRow = {
   id: string;
@@ -45,24 +36,14 @@ type GameRow = {
   away: { name: string; short_name: string | null } | null;
 };
 
-async function Calendar({ searchParams }: Pick<PageProps<"/dugout/calendar">, "searchParams">) {
+export default async function CalendarPage({ searchParams }: PageProps<"/dugout/calendar">) {
   const user = await requireStaffPage();
   const editor = canEdit(user.staff.role);
   const { team: teamParam, month: monthParam } = await searchParams;
   const supabase = await createClient();
-  const teams = await loadOwnTeams(supabase);
-  if (teams.length === 0) {
-    return (
-      <EmptyState>
-        Add your team on the{" "}
-        <Link href="/teams" className="text-pink hover:underline">
-          Teams
-        </Link>{" "}
-        page first (mark it as one of our teams).
-      </EmptyState>
-    );
-  }
-  const team = pickTeam(teams, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam);
+  if (!dugout) return <NoOwnTeam />;
+  const { teams, team } = dugout;
   const today = todayISO();
   const month = monthOf(monthParam, today);
   const days = monthGrid(month);

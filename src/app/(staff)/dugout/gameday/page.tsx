@@ -1,49 +1,30 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { canEdit, requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Card, Disclosure, EmptyState, Loading, tableClass, tdClass, thClass } from "@/components/ui";
+import { Card, Disclosure, EmptyState, tableClass, tdClass, thClass } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import { BASE_RUNNING_LABEL, HITTING_TYPE_LABEL, percent, rate } from "@/lib/gameday";
 import { loadGamedayRoster } from "@/lib/gameday-data";
 import { seasonOrCurrent } from "@/lib/roster";
-import { loadOwnTeams } from "../data";
-import { TeamPicker, pickTeam } from "../team-picker";
+import { loadDugoutTeam } from "../data";
+import { NoOwnTeam, TeamPicker } from "../team-picker";
 import { CardsForm, NewLineupForm } from "./forms";
 import { GamedayNav } from "./nav";
 import { StatTerm } from "@/components/stat-term";
 
 export const metadata: Metadata = { title: "GameDay · Coaches Dugout · GGG.Cafe" };
 
-export default function GamedayPage({ searchParams }: PageProps<"/dugout/gameday">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Gameday searchParams={searchParams} />
-    </Suspense>
-  );
-}
-
 type LineupRow = { id: string; game_date: string; opponent: string | null; title: string | null; status: "draft" | "final"; shared_at: string | null; batting_order: string[] };
 
-async function Gameday({ searchParams }: Pick<PageProps<"/dugout/gameday">, "searchParams">) {
+export default async function GamedayPage({ searchParams }: PageProps<"/dugout/gameday">) {
   const user = await requireHeadCoachPage();
   const editor = canEdit(user.staff.role);
   const { team: teamParam } = await searchParams;
   const supabase = await createClient();
-  const teams = await loadOwnTeams(supabase);
-  if (teams.length === 0) {
-    return (
-      <EmptyState>
-        Add your team on the{" "}
-        <Link href="/teams" className="text-pink hover:underline">
-          Teams
-        </Link>{" "}
-        page first.
-      </EmptyState>
-    );
-  }
-  const team = pickTeam(teams, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam);
+  if (!dugout) return <NoOwnTeam />;
+  const { teams, team } = dugout;
   const today = todayISO();
   const seasonId = await seasonOrCurrent(supabase, team.id, null);
   const [roster, lineupsResult, gamesResult, seasonResult] = await Promise.all([

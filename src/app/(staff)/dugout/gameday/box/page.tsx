@@ -1,23 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { EmptyState, Loading } from "@/components/ui";
+import { EmptyState } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
-import { loadOwnTeams } from "../../data";
-import { TeamPicker, pickTeam } from "../../team-picker";
+import { loadDugoutTeam } from "../../data";
+import { NoOwnTeam, TeamPicker } from "../../team-picker";
 import { GamedayNav } from "../nav";
 
 export const metadata: Metadata = { title: "Box Scores · GameDay · GGG.Cafe" };
-
-export default function BoxScoresPage({ searchParams }: PageProps<"/dugout/gameday/box">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <BoxScores searchParams={searchParams} />
-    </Suspense>
-  );
-}
 
 type GameRow = {
   id: string;
@@ -32,13 +23,13 @@ type GameRow = {
   lines: { team_id: string }[];
 };
 
-async function BoxScores({ searchParams }: Pick<PageProps<"/dugout/gameday/box">, "searchParams">) {
+export default async function BoxScoresPage({ searchParams }: PageProps<"/dugout/gameday/box">) {
   await requireHeadCoachPage();
   const { team: teamParam } = await searchParams;
   const supabase = await createClient();
-  const teams = await loadOwnTeams(supabase);
-  if (teams.length === 0) return <EmptyState>Add your team on the Teams page first.</EmptyState>;
-  const team = pickTeam(teams, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam);
+  if (!dugout) return <NoOwnTeam />;
+  const { teams, team } = dugout;
   const today = todayISO();
   const { data } = await supabase
     .from("games")

@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Loading } from "@/components/ui";
+
 import { todayISO } from "@/lib/dates";
 import { loadMentalPlan } from "../../data";
 import { MentalDetail } from "../../mental";
@@ -13,15 +12,7 @@ import { SectionShell } from "../section-shell";
 
 export const metadata: Metadata = { title: "Mental GP · GGG.Cafe" };
 
-export default function MentalPage({ params }: PageProps<"/players/[playerId]/mental">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Mental params={params} />
-    </Suspense>
-  );
-}
-
-async function Mental({ params }: Pick<PageProps<"/players/[playerId]/mental">, "params">) {
+export default async function MentalPage({ params }: PageProps<"/players/[playerId]/mental">) {
   const { playerId } = await params;
   const supabase = await createClient();
   const access = await requirePlayerPage(playerId);

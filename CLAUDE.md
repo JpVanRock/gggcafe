@@ -39,7 +39,8 @@ tests/unit/              node --test unit tests (npm run test:unit)
 ## Shared building blocks (use these, don't copy them)
 - Form fields: `inputClass` is full width. An input that sets its own width uses `fieldClass` + `w-*` (never
   `${inputClass} w-20`: both widths apply and full width wins).
-- Dugout pages: `pickTeam(teams, ?team)` and `<TeamPicker>` (`dugout/team-picker.tsx`); a tab's sub-menu is
+- Dugout pages: `const dugout = await loadDugoutTeam(supabase, teamParam); if (!dugout) return <NoOwnTeam />;` then
+  `const { teams, team } = dugout` (`dugout/data.ts`, `dugout/team-picker.tsx`); `<TeamPicker>`; a tab's sub-menu is
   `<PillNav items={teamPages(PAGES, teamId)}>` (`components/pill-nav.tsx`).
 - Server actions that append to an ordered list: `nextPosition(supabase, table, column, value)` (`src/lib/db.ts`).
 - Names: `playerName()` in `src/lib/softball.ts`.
@@ -650,7 +651,11 @@ like a sports brand or media-day graphics. Never childish or preschool.
 
 ## Next.js 16 notes
 - `middleware.ts` is now `proxy.ts` (export `proxy`).
-- `cacheComponents` is on: anything reading cookies (any Supabase server query) must sit inside `<Suspense>`.
+- `cacheComponents` is on: anything reading cookies (any Supabase server query) must sit inside `<Suspense>`. Pages
+  get it from `loading.tsx` files (one line: `export { Loading as default } from "@/components/ui"`), one in every
+  folder that has a layout or child pages, so pages are plain `export default async function XPage(props: PageProps<…>)`.
+  A new folder with pages under it gets its own `loading.tsx` (else navigating inside it shows no "Loading…"). Pages
+  with a static header (login, /me, /family, Players, Teams) keep their own inner `<Suspense>`.
 - Server-side Supabase `createClient()` calls `connection()` first, because Supabase's token-expiry
   check uses `Date.now()`, which Cache Components rejects during prerender/prefetch. Keep it.
 - Password reset: /forgot-password emails a link (`resetPasswordForEmail`, redirect to

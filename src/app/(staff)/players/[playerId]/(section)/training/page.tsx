@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Loading } from "@/components/ui";
+
 import { todayISO } from "@/lib/dates";
 import { loadPerformance } from "../../data";
 import { loadMyTesting } from "../../testing-data";
@@ -14,15 +13,7 @@ import { SectionShell } from "../section-shell";
 
 export const metadata: Metadata = { title: "Performance Training · GGG.Cafe" };
 
-export default function TrainingPage({ params }: PageProps<"/players/[playerId]/training">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Training params={params} />
-    </Suspense>
-  );
-}
-
-async function Training({ params }: Pick<PageProps<"/players/[playerId]/training">, "params">) {
+export default async function TrainingPage({ params }: PageProps<"/players/[playerId]/training">) {
   const { playerId } = await params;
   const supabase = await createClient();
   const access = await requirePlayerPage(playerId);

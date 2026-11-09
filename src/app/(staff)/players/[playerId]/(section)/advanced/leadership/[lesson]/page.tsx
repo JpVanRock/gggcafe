@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
-import { Loading, buttonClass, secondaryButtonClass } from "@/components/ui";
+import { buttonClass, secondaryButtonClass } from "@/components/ui";
 import {
   ANSWER_MAX, BONUS, BONUS_TITLE, ENGAGEMENT_ASK, ENGAGEMENT_LEVELS, GUIDE_TITLE, HABITS, LEADER_ROLES, LESSONS, RUBRIC, RUBRIC_LEVELS,
   SCENARIOS, SCENARIO_GROUPS, STARTER_GROUPS, findLesson, lessonLabel,
@@ -13,19 +12,11 @@ import { SectionShell } from "../../../section-shell";
 
 export const metadata: Metadata = { title: "G3 Leadership Guide · GGG.Cafe" };
 
-export default function LeadershipLessonPage({ params }: PageProps<"/players/[playerId]/advanced/leadership/[lesson]">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Lesson params={params} />
-    </Suspense>
-  );
-}
-
 function Heading({ children }: { children: React.ReactNode }) {
   return <h2 className="mb-4 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">{children}</h2>;
 }
 
-async function Lesson({ params }: Pick<PageProps<"/players/[playerId]/advanced/leadership/[lesson]">, "params">) {
+export default async function LeadershipLessonPage({ params }: PageProps<"/players/[playerId]/advanced/leadership/[lesson]">) {
   const { playerId, lesson: slug } = await params;
   const lesson = findLesson(slug);
   if (!lesson) notFound();

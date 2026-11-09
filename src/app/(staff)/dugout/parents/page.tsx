@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { headers } from "next/headers";
-import { Suspense } from "react";
 import { canEdit, requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Card, EmptyState, Loading, buttonClass, pillQuietClass, Disclosure } from "@/components/ui";
-import { loadOwnTeams } from "../data";
-import { TeamPicker, pickTeam } from "../team-picker";
+import { Card, EmptyState, buttonClass, pillQuietClass, Disclosure } from "@/components/ui";
+import { loadDugoutTeam } from "../data";
+import { NoOwnTeam, TeamPicker } from "../team-picker";
 import { removeParentLink, setParentCode } from "./actions";
 import { PendingParentList } from "../approvals";
 import { loadTeamApprovals } from "@/lib/approvals";
@@ -17,33 +15,14 @@ import { PacketItemForm } from "./packet-forms";
 
 export const metadata: Metadata = { title: "Parents · Coaches Dugout · GGG.Cafe" };
 
-export default function ParentsPage({ searchParams }: PageProps<"/dugout/parents">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Parents searchParams={searchParams} />
-    </Suspense>
-  );
-}
-
-
-async function Parents({ searchParams }: Pick<PageProps<"/dugout/parents">, "searchParams">) {
+export default async function ParentsPage({ searchParams }: PageProps<"/dugout/parents">) {
   const user = await requireHeadCoachPage();
   const editor = canEdit(user.staff.role);
   const { team: teamParam } = await searchParams;
   const supabase = await createClient();
-  const teams = await loadOwnTeams(supabase);
-  if (teams.length === 0) {
-    return (
-      <EmptyState>
-        Add your team on the{" "}
-        <Link href="/teams" className="text-pink hover:underline">
-          Teams
-        </Link>{" "}
-        page first.
-      </EmptyState>
-    );
-  }
-  const team = pickTeam(teams, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam);
+  if (!dugout) return <NoOwnTeam />;
+  const { teams, team } = dugout;
   if (!editor) {
     return (
       <div className="flex flex-col gap-6">
@@ -174,7 +153,6 @@ async function Parents({ searchParams }: Pick<PageProps<"/dugout/parents">, "sea
     </div>
   );
 }
-
 
 // The parent welcome packet (Phase 6): the coach's letter, team policies and "how to
 // help her" tips that approved parents read (and mark read) on /family.

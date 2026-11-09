@@ -1,16 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import {
   FORMAT_LABEL, POSITION_LABEL, batsThrows, compareJersey, isUuid, playerName,
   type Player, type Season, type Team,
 } from "@/lib/softball";
-import {
-  Card, Disclosure, EmptyState, Loading, PageHeader, pillButtonClass, secondaryButtonClass, tableClass, tdClass, thClass,
-} from "@/components/ui";
+import { Card, Disclosure, EmptyState, PageHeader, pillButtonClass, secondaryButtonClass, tableClass, tdClass, thClass } from "@/components/ui";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { addDays, formatDay, formatTime, todayISO } from "@/lib/dates";
 import { deleteTeamEvent, removeFromRoster } from "../actions";
@@ -31,14 +28,6 @@ const EVENT_LABEL: Record<string, string> = {
   other: "Event",
 };
 
-export default function TeamPage({ params, searchParams }: PageProps<"/teams/[teamId]">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <TeamContent params={params} searchParams={searchParams} />
-    </Suspense>
-  );
-}
-
 type RosterRow = {
   id: string;
   jersey_number: string | null;
@@ -46,10 +35,10 @@ type RosterRow = {
   player: Player;
 };
 
-async function TeamContent({
+export default async function TeamPage({
   params,
   searchParams,
-}: Pick<PageProps<"/teams/[teamId]">, "params" | "searchParams">) {
+}: PageProps<"/teams/[teamId]">) {
   const user = await requireStaffPage();
   const editor = canEdit(user.staff.role);
   const { teamId } = await params;

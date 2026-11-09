@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Loading } from "@/components/ui";
+
 import { GOAL_METHOD_LABEL } from "@/lib/softball";
 import { loadHarada, loadMetricOptions, loadPopReport, loadSmartGoals, possessive } from "../../data";
 import { GoalsDetail } from "../../goals";
@@ -13,15 +12,7 @@ import { SectionShell } from "../section-shell";
 
 export const metadata: Metadata = { title: "Goals · GGG.Cafe" };
 
-export default function GoalsPage({ params }: PageProps<"/players/[playerId]/goals">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Goals params={params} />
-    </Suspense>
-  );
-}
-
-async function Goals({ params }: Pick<PageProps<"/players/[playerId]/goals">, "params">) {
+export default async function GoalsPage({ params }: PageProps<"/players/[playerId]/goals">) {
   const { playerId } = await params;
   const supabase = await createClient();
   const access = await requirePlayerPage(playerId);

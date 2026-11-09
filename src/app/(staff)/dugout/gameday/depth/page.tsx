@@ -1,36 +1,27 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { canEdit, requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { EmptyState, Loading, buttonClass, inputClass } from "@/components/ui";
+import { EmptyState, buttonClass, inputClass } from "@/components/ui";
 import { loadGamedayRoster } from "@/lib/gameday-data";
 import { seasonOrCurrent } from "@/lib/roster";
 import { DEPTH_POSITIONS } from "@/lib/playbook";
-import { loadOwnTeams } from "../../data";
-import { TeamPicker, pickTeam } from "../../team-picker";
+import { loadDugoutTeam } from "../../data";
+import { NoOwnTeam, TeamPicker } from "../../team-picker";
 import { GamedayNav } from "../nav";
 import { addToDepth, fillDepthFromPositions, moveInDepth, removeFromDepth } from "../actions";
 
 export const metadata: Metadata = { title: "Depth Chart · GameDay · GGG.Cafe" };
 
-export default function DepthChartPage({ searchParams }: PageProps<"/dugout/gameday/depth">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <DepthChart searchParams={searchParams} />
-    </Suspense>
-  );
-}
-
 const iconButton = "rounded px-1.5 text-muted hover:text-ink disabled:opacity-30";
 
-async function DepthChart({ searchParams }: Pick<PageProps<"/dugout/gameday/depth">, "searchParams">) {
+export default async function DepthChartPage({ searchParams }: PageProps<"/dugout/gameday/depth">) {
   const user = await requireHeadCoachPage();
   const editor = canEdit(user.staff.role);
   const { team: teamParam } = await searchParams;
   const supabase = await createClient();
-  const teams = await loadOwnTeams(supabase);
-  if (teams.length === 0) return <EmptyState>Add your team on the Teams page first.</EmptyState>;
-  const team = pickTeam(teams, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam);
+  if (!dugout) return <NoOwnTeam />;
+  const { teams, team } = dugout;
   const seasonId = await seasonOrCurrent(supabase, team.id, null);
   const [roster, depthResult] = await Promise.all([
     seasonId ? loadGamedayRoster(supabase, team.id, seasonId) : Promise.resolve([]),

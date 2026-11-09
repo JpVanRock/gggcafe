@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { MESSAGE_COLUMNS, signedMessagePhotoUrls, type MentorMessage } from "@/lib/message-photos";
-import { EmptyState, Loading } from "@/components/ui";
+import { EmptyState } from "@/components/ui";
 import { MessageCard } from "../../mentor-messages";
 import { GotIt } from "../../messages-client";
 import { firstName, loadPlayer } from "../../section-data";
@@ -11,15 +10,7 @@ import { SectionShell } from "../section-shell";
 
 export const metadata: Metadata = { title: "Messages · GGG.Cafe" };
 
-export default function MessagesPage({ params }: PageProps<"/players/[playerId]/messages">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Messages params={params} />
-    </Suspense>
-  );
-}
-
-async function Messages({ params }: Pick<PageProps<"/players/[playerId]/messages">, "params">) {
+export default async function MessagesPage({ params }: PageProps<"/players/[playerId]/messages">) {
   const { playerId } = await params;
   const supabase = await createClient();
   const access = await requirePlayerPage(playerId);

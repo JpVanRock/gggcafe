@@ -1,14 +1,12 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Suspense } from "react";
 import { canEdit, requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Card, EmptyState, Loading } from "@/components/ui";
+import { Card, EmptyState } from "@/components/ui";
 import { DugoutStrip } from "@/components/dugout-strip";
 import { CultureStatement, StandardsList, hasCulture, type TeamCulture, type TeamStandard } from "@/components/team-standards";
-import { loadOwnTeams } from "./data";
+import { loadDugoutTeam } from "./data";
 import { StandardsForm } from "./standards-form";
-import { TeamPicker, pickTeam } from "./team-picker";
+import { NoOwnTeam, TeamPicker } from "./team-picker";
 import { CultureTeamSections, type Spotlight } from "./culture-team";
 import { MottoForm } from "./culture-forms";
 import { loadTeamRoster } from "./training/data";
@@ -17,33 +15,15 @@ import { seasonOrCurrent } from "@/lib/roster";
 
 export const metadata: Metadata = { title: "Coaches Dugout · GGG.Cafe" };
 
-export default function DugoutPage({ searchParams }: PageProps<"/dugout">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <StandardsAndCulture searchParams={searchParams} />
-    </Suspense>
-  );
-}
-
-async function StandardsAndCulture({ searchParams }: Pick<PageProps<"/dugout">, "searchParams">) {
+export default async function DugoutPage({ searchParams }: PageProps<"/dugout">) {
   const user = await requireHeadCoachPage();
   const editor = canEdit(user.staff.role);
   const { team: teamParam } = await searchParams;
 
   const supabase = await createClient();
-  const teams = await loadOwnTeams(supabase);
-  if (teams.length === 0) {
-    return (
-      <EmptyState>
-        Add your team on the{" "}
-        <Link href="/teams" className="text-pink hover:underline">
-          Teams
-        </Link>{" "}
-        page first (mark it as one of our teams).
-      </EmptyState>
-    );
-  }
-  const team = pickTeam(teams, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam);
+  if (!dugout) return <NoOwnTeam />;
+  const { teams, team } = dugout;
 
   const season = await seasonOrCurrent(supabase, team.id, null);
   const [cultureResult, standardsResult, goalsResult, roster, pledgesResult, spotlightsResult] = await Promise.all([

@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { loadYearbook } from "@/lib/yearbook-data";
 import { YearbookView } from "@/components/yearbook-view";
-import { EmptyState, Loading } from "@/components/ui";
+import { EmptyState } from "@/components/ui";
 import { loadTeamDugout } from "../../data";
 import { loadPlayer } from "../../section-data";
 import { SectionShell } from "../section-shell";
@@ -14,15 +13,7 @@ import { pickTeam } from "../../../../dugout/team-picker";
 
 export const metadata: Metadata = { title: "Yearbook · GGG.Cafe" };
 
-export default function YearbookPage({ params, searchParams }: PageProps<"/players/[playerId]/yearbook">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Yearbook params={params} searchParams={searchParams} />
-    </Suspense>
-  );
-}
-
-async function Yearbook({ params, searchParams }: Pick<PageProps<"/players/[playerId]/yearbook">, "params" | "searchParams">) {
+export default async function YearbookPage({ params, searchParams }: PageProps<"/players/[playerId]/yearbook">) {
   const { playerId } = await params;
   const { team: teamParam, season } = await searchParams;
   const supabase = await createClient();

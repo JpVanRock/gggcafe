@@ -1,30 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Disclosure, EmptyState, Loading, buttonClass, sectionLabelClass } from "@/components/ui";
+import { Disclosure, EmptyState, buttonClass, sectionLabelClass } from "@/components/ui";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { formatDay, todayISO } from "@/lib/dates";
 import {
   INSTALL_CATEGORIES, INSTALL_CATEGORY_LABEL, INSTALL_STATUSES, INSTALL_STATUS_LABEL, STARTER_ITEMS,
   groupInstallItems, installPace, installProgress, type InstallCategory, type InstallIqTrack, type InstallStatus,
 } from "@/lib/install";
-import { loadOwnTeams } from "../../data";
-import { TeamPicker, pickTeam } from "../../team-picker";
+import { loadDugoutTeam } from "../../data";
+import { NoOwnTeam, TeamPicker } from "../../team-picker";
 import { PlansNav } from "../plans-nav";
 import { loadStarterInstall, removeInstallItem, setInstallStatus } from "./actions";
 import { AddInstallItemForm } from "./forms";
 
 export const metadata: Metadata = { title: "Install Checklist · Coaches Dugout · GGG.Cafe" };
-
-export default function InstallPage({ searchParams }: PageProps<"/dugout/plans/install">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Install searchParams={searchParams} />
-    </Suspense>
-  );
-}
 
 const IQ_LABEL: Record<InstallIqTrack, string> = {
   defense: "Defensive IQ",
@@ -86,16 +77,14 @@ function StatusControl({ item, editor }: { item: ItemRow; editor: boolean }) {
   );
 }
 
-async function Install({ searchParams }: Pick<PageProps<"/dugout/plans/install">, "searchParams">) {
+export default async function InstallPage({ searchParams }: PageProps<"/dugout/plans/install">) {
   const user = await requireStaffPage();
   const editor = canEdit(user.staff.role);
   const { team: teamParam } = await searchParams;
   const supabase = await createClient();
-  const teams = await loadOwnTeams(supabase);
-  if (teams.length === 0) {
-    return <EmptyState>Add your team on the Teams page first (mark it as one of our teams).</EmptyState>;
-  }
-  const team = pickTeam(teams, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam);
+  if (!dugout) return <NoOwnTeam />;
+  const { teams, team } = dugout;
   const today = todayISO();
 
   const [itemsResult, gameResult, phaseResult] = await Promise.all([

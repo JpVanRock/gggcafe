@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Loading } from "@/components/ui";
+
 import { todayISO } from "@/lib/dates";
 import { loadIq, loadPerformance, loadPopReport, possessive } from "../../data";
 import { buildPositions } from "../../iq";
@@ -13,15 +12,7 @@ import { SectionShell } from "../section-shell";
 
 export const metadata: Metadata = { title: "Trophy Room · GGG.Cafe" };
 
-export default function TrophiesPage({ params }: PageProps<"/players/[playerId]/trophies">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Trophies params={params} />
-    </Suspense>
-  );
-}
-
-async function Trophies({ params }: Pick<PageProps<"/players/[playerId]/trophies">, "params">) {
+export default async function TrophiesPage({ params }: PageProps<"/players/[playerId]/trophies">) {
   const { playerId } = await params;
   const supabase = await createClient();
   await requirePlayerPage(playerId);

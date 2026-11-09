@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { EmptyState, Loading } from "@/components/ui";
+import { EmptyState } from "@/components/ui";
 import { CHAPTERS } from "@/lib/scorebook";
 import { loadIq, loadPopReport } from "../../../../data";
 import { loadPlayer, plateFor } from "../../../../section-data";
@@ -13,15 +12,7 @@ import { ChapterRunner } from "../../../../scorebook-client";
 
 export const metadata: Metadata = { title: "How to Keep the Book · Softball IQ · GGG.Cafe" };
 
-export default function ScorebookChapterPage({ params }: PageProps<"/players/[playerId]/iq/scorebook/[chapter]">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Chapter params={params} />
-    </Suspense>
-  );
-}
-
-async function Chapter({ params }: Pick<PageProps<"/players/[playerId]/iq/scorebook/[chapter]">, "params">) {
+export default async function ScorebookChapterPage({ params }: PageProps<"/players/[playerId]/iq/scorebook/[chapter]">) {
   const { playerId, chapter: raw } = await params;
   const n = Number(raw);
   if (!CHAPTERS.some((c) => c.n === n)) notFound();

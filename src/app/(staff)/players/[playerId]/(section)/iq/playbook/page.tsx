@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { EmptyState, Loading, sectionLabelClass } from "@/components/ui";
+import { EmptyState, sectionLabelClass } from "@/components/ui";
 import { loadPlayer } from "../../../section-data";
 import { loadTeamPlaybook } from "../../../playbook-data";
 import { Flashcards } from "../../../playbook-client";
@@ -11,15 +10,7 @@ import { SectionShell } from "../../section-shell";
 
 export const metadata: Metadata = { title: "Team Playbook · Softball IQ · GGG.Cafe" };
 
-export default function TeamPlaybookPage({ params }: PageProps<"/players/[playerId]/iq/playbook">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <TeamPlaybook params={params} />
-    </Suspense>
-  );
-}
-
-async function TeamPlaybook({ params }: Pick<PageProps<"/players/[playerId]/iq/playbook">, "params">) {
+export default async function TeamPlaybookPage({ params }: PageProps<"/players/[playerId]/iq/playbook">) {
   const { playerId } = await params;
   const supabase = await createClient();
   await requirePlayerPage(playerId);

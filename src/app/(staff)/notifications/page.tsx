@@ -1,26 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { EmptyState, Loading, PageHeader } from "@/components/ui";
+import { EmptyState, PageHeader } from "@/components/ui";
 import { MarkRead } from "./mark-read";
 
 export const metadata: Metadata = { title: "Notifications · GGG.Cafe" };
-
-export default function NotificationsPage() {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Notifications />
-    </Suspense>
-  );
-}
 
 type Note = { id: string; kind: string; title: string; body: string | null; href: string | null; created_at: string; read_at: string | null };
 
 const KIND_LABEL: Record<string, string> = { "player-of-the-week": "Player of the Week" };
 
-async function Notifications() {
+export default async function NotificationsPage() {
   const user = await requireStaffPage();
   const supabase = await createClient();
   // decides any finished Player of the Week first (coaches and admins), like the bell

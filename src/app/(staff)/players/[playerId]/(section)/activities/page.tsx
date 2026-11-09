@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Loading } from "@/components/ui";
+
 import { isISODate, todayISO, weekStart } from "@/lib/dates";
 import { loadActivities, loadHarada, possessive } from "../../data";
 import { ActivitiesManager } from "../../twis";
@@ -11,15 +10,7 @@ import { SectionShell } from "../section-shell";
 
 export const metadata: Metadata = { title: "Activities · GGG.Cafe" };
 
-export default function ActivitiesPage({ params, searchParams }: PageProps<"/players/[playerId]/activities">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Activities params={params} searchParams={searchParams} />
-    </Suspense>
-  );
-}
-
-async function Activities({ params, searchParams }: Pick<PageProps<"/players/[playerId]/activities">, "params" | "searchParams">) {
+export default async function ActivitiesPage({ params, searchParams }: PageProps<"/players/[playerId]/activities">) {
   const { playerId } = await params;
   const { week } = await searchParams;
   const supabase = await createClient();

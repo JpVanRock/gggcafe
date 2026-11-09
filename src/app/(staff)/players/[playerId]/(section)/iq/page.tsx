@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
-import { Loading } from "@/components/ui";
+
 import { loadTeamPlaybook } from "../../playbook-data";
 import { loadIq, loadPopReport } from "../../data";
 import { IqDetail, buildBadgeTracks, buildLibrary, buildPositions, buildQuizzes, buildTracks } from "../../iq";
@@ -12,15 +11,7 @@ import { SectionShell } from "../section-shell";
 
 export const metadata: Metadata = { title: "Softball IQ · GGG.Cafe" };
 
-export default function IqPage({ params }: PageProps<"/players/[playerId]/iq">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Iq params={params} />
-    </Suspense>
-  );
-}
-
-async function Iq({ params }: Pick<PageProps<"/players/[playerId]/iq">, "params">) {
+export default async function IqPage({ params }: PageProps<"/players/[playerId]/iq">) {
   const { playerId } = await params;
   const supabase = await createClient();
   const access = await requirePlayerPage(playerId);

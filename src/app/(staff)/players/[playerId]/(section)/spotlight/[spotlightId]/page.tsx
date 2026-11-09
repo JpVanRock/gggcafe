@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Loading } from "@/components/ui";
+
 import { Logo } from "@/components/brand";
 import { OutlineText, SpeedStripes } from "@/components/athletic";
 import { formatLongDate } from "@/lib/dates";
@@ -15,15 +14,7 @@ export const metadata: Metadata = { title: "Player Spotlight · GGG.Cafe" };
 
 // Player Spotlight (Phase 5): the media-day graphic for a spotlight her coach wrote.
 // Readable by staff and players on the team (RLS); screenshot or print to share.
-export default function SpotlightPage({ params }: PageProps<"/players/[playerId]/spotlight/[spotlightId]">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Spotlight params={params} />
-    </Suspense>
-  );
-}
-
-async function Spotlight({ params }: Pick<PageProps<"/players/[playerId]/spotlight/[spotlightId]">, "params">) {
+export default async function SpotlightPage({ params }: PageProps<"/players/[playerId]/spotlight/[spotlightId]">) {
   const { playerId, spotlightId } = await params;
   if (!isUuid(spotlightId)) notFound();
   const supabase = await createClient();

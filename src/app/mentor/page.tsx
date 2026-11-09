@@ -1,24 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Suspense } from "react";
 import { getCurrentUser, getMenteeIds, getMentor } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { signedPhotoUrls } from "@/lib/player-photos";
-import { EmptyState, Loading, PageHeader } from "@/components/ui";
+import { EmptyState, PageHeader } from "@/components/ui";
 import { playerName, type Player } from "@/lib/softball";
 
 export const metadata: Metadata = { title: "My players · Mentor · GGG.Cafe" };
 
-export default function MentorHome() {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Home />
-    </Suspense>
-  );
-}
-
-async function Home() {
+export default async function MentorHome() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
   const mentor = await getMentor();

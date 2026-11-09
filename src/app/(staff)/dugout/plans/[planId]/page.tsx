@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { isUuid } from "@/lib/softball";
 import { canEditPlanRole } from "@/lib/roles";
-import { Card, Loading, sectionLabelClass } from "@/components/ui";
+import { Card, sectionLabelClass } from "@/components/ui";
 import { emailConfigured } from "@/lib/email";
 import type { LibraryDrill } from "@/lib/dugout";
 import { loadCoachNames, loadCoachingStaff, loadPlanRoster, loadPracticePlan } from "@/lib/practice-plans";
@@ -15,14 +14,6 @@ import { PlanSheet } from "./sheet";
 import { PlanExtrasForm, type PlanNotes } from "./notes";
 
 export const metadata: Metadata = { title: "Practice Plan · Coaches Dugout · GGG.Cafe" };
-
-export default function PracticePlanPage({ params, searchParams }: PageProps<"/dugout/plans/[planId]">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Plan params={params} searchParams={searchParams} />
-    </Suspense>
-  );
-}
 
 function SharedBanner({ shared }: { shared: string }) {
   const n = Number(shared);
@@ -37,7 +28,7 @@ function SharedBanner({ shared }: { shared: string }) {
   );
 }
 
-async function Plan({ params, searchParams }: Pick<PageProps<"/dugout/plans/[planId]">, "params" | "searchParams">) {
+export default async function PracticePlanPage({ params, searchParams }: PageProps<"/dugout/plans/[planId]">) {
   const user = await requireStaffPage();
   const editor = canEdit(user.staff.role);
   const { planId } = await params;

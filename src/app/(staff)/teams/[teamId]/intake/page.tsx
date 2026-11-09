@@ -1,27 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { Suspense } from "react";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { compareJersey, isUuid, playerName, type Player, type Season, type Team } from "@/lib/softball";
-import { Card, Disclosure, EmptyState, Loading, PageHeader } from "@/components/ui";
+import { Card, Disclosure, EmptyState, PageHeader } from "@/components/ui";
 import { IntakeForm } from "../../../players/intake-form";
 import { ExistingRosterPlayerForm, SeasonForm } from "../../forms";
 
 export const metadata: Metadata = { title: "Player intake · GGG.Cafe" };
 
-export default function IntakePage({ params, searchParams }: PageProps<"/teams/[teamId]/intake">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Intake params={params} searchParams={searchParams} />
-    </Suspense>
-  );
-}
-
 type RosterRow = { id: string; jersey_number: string | null; player: Player };
 
-async function Intake({ params, searchParams }: Pick<PageProps<"/teams/[teamId]/intake">, "params" | "searchParams">) {
+export default async function IntakePage({ params, searchParams }: PageProps<"/teams/[teamId]/intake">) {
   const user = await requireStaffPage();
   const { teamId } = await params;
   const { season: seasonParam } = await searchParams;

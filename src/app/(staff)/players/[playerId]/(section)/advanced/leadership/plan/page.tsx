@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
-import { Loading } from "@/components/ui";
+
 import { COMMITMENT, GUIDE_TITLE, PLAN_LIMITS, RUBRIC, RUBRIC_LEVELS, RUBRIC_MAX, courseReady, guideProgress, lessonNumber, rubricTotal } from "@/lib/leadership-guide";
 import { LeaderBadge } from "@/components/leader-badge";
 import { CoachSignOff, PlanForm } from "../../../../leadership-client";
@@ -10,15 +9,7 @@ import { SectionShell } from "../../../section-shell";
 
 export const metadata: Metadata = { title: "My Leadership Plan · G3 Leadership Guide · GGG.Cafe" };
 
-export default function LeadershipPlanPage({ params }: PageProps<"/players/[playerId]/advanced/leadership/plan">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Plan params={params} />
-    </Suspense>
-  );
-}
-
-async function Plan({ params }: Pick<PageProps<"/players/[playerId]/advanced/leadership/plan">, "params">) {
+export default async function LeadershipPlanPage({ params }: PageProps<"/players/[playerId]/advanced/leadership/plan">) {
   const { playerId } = await params;
   const { access, player, book, lead, certificate, name } = await leadershipContext(playerId);
   if (!lead.open) {

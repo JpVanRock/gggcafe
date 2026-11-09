@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { canEdit, isHeadCoach, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Card, EmptyState, Loading, tableClass, tdClass, thClass } from "@/components/ui";
+import { Card, EmptyState, tableClass, tdClass, thClass } from "@/components/ui";
 import { StatTerm } from "@/components/stat-term";
 import { formatDay, todayISO } from "@/lib/dates";
 import { qabSummary } from "@/lib/box-score";
-import { loadOwnTeams } from "../../data";
-import { TeamPicker, pickTeam } from "../../team-picker";
+import { loadDugoutTeam } from "../../data";
+import { NoOwnTeam, TeamPicker } from "../../team-picker";
 import { TrainingNav } from "../nav";
 import { loadTeamRoster } from "../data";
 import { removeBpRound } from "../actions";
@@ -16,24 +15,16 @@ import { BpRoundForm } from "./bp-form";
 
 export const metadata: Metadata = { title: "BP Rounds · Training · Coaches Dugout · GGG.Cafe" };
 
-export default function BpPage({ searchParams }: PageProps<"/dugout/training/bp">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Bp searchParams={searchParams} />
-    </Suspense>
-  );
-}
-
 type Round = { id: string; player_id: string; round_date: string; grades: number[]; note: string | null };
 
-async function Bp({ searchParams }: Pick<PageProps<"/dugout/training/bp">, "searchParams">) {
+export default async function BpPage({ searchParams }: PageProps<"/dugout/training/bp">) {
   const user = await requireStaffPage();
   const editor = canEdit(user.staff.role);
   const { team: teamParam } = await searchParams;
   const supabase = await createClient();
-  const teams = await loadOwnTeams(supabase);
-  if (teams.length === 0) return <EmptyState>Add your team on the Teams page first.</EmptyState>;
-  const team = pickTeam(teams, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam);
+  if (!dugout) return <NoOwnTeam />;
+  const { teams, team } = dugout;
   const roster = await loadTeamRoster(supabase, team.id);
   const { data } = roster.length
     ? await supabase

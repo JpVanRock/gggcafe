@@ -1,28 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Card, Disclosure, EmptyState, Loading, sectionLabelClass } from "@/components/ui";
+import { Card, Disclosure, EmptyState, sectionLabelClass } from "@/components/ui";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { formatDay, todayISO } from "@/lib/dates";
 import { isUuid } from "@/lib/softball";
 import { CONFIDENCE_LABEL, SCOUT_CATEGORY_LABEL } from "@/lib/playbook";
-import { loadOwnTeams } from "../../data";
-import { TeamPicker, pickTeam } from "../../team-picker";
+import { loadDugoutTeam } from "../../data";
+import { NoOwnTeam, TeamPicker } from "../../team-picker";
 import { PlaybookNav } from "../nav";
 import { removeScoutReport } from "../actions";
 import { ScoutNoteForm, ScoutingForm } from "../forms";
 
 export const metadata: Metadata = { title: "Scouting · Coaches Dugout · GGG.Cafe" };
-
-export default function ScoutingPage({ searchParams }: PageProps<"/dugout/playbook/scouting">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Scouting searchParams={searchParams} />
-    </Suspense>
-  );
-}
 
 type ReportRow = {
   id: string;
@@ -37,14 +28,14 @@ type ReportRow = {
 
 const CATEGORY_ORDER = ["team_overview", "hitter_tendencies", "pitcher_tendencies", "defense", "baserunning", "coaching_tendencies", "signs_and_signals", "other"] as const;
 
-async function Scouting({ searchParams }: Pick<PageProps<"/dugout/playbook/scouting">, "searchParams">) {
+export default async function ScoutingPage({ searchParams }: PageProps<"/dugout/playbook/scouting">) {
   const user = await requireStaffPage();
   const editor = canEdit(user.staff.role);
   const { team: teamParam, opp } = await searchParams;
   const supabase = await createClient();
-  const teams = await loadOwnTeams(supabase);
-  if (teams.length === 0) return <EmptyState>Add your team on the Teams page first (mark it as one of our teams).</EmptyState>;
-  const team = pickTeam(teams, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam);
+  if (!dugout) return <NoOwnTeam />;
+  const { teams, team } = dugout;
   const today = todayISO();
 
   // Every opponent's note count (one small column), but full notes only for the one picked.

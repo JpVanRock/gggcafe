@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Loading, buttonClass, secondaryButtonClass } from "@/components/ui";
+import { buttonClass, secondaryButtonClass } from "@/components/ui";
 import { CHAPTERS, MY_HABITS_MAX, MY_HABIT_LENGTH, NOTES_MAX, chapterLabel, courseLessons, visibleChapters } from "@/lib/advanced-book";
 import { loadAdvanced } from "../../../advanced-data";
 import { AdvancedNotFoundForAdmin, LEVEL_LABEL, advancedHref } from "../../../advanced";
@@ -17,19 +16,11 @@ import { SectionShell } from "../../section-shell";
 
 export const metadata: Metadata = { title: "G3 Advanced · GGG.Cafe" };
 
-export default function AdvancedChapterPage({ params }: PageProps<"/players/[playerId]/advanced/[chapter]">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Chapter params={params} />
-    </Suspense>
-  );
-}
-
 function Heading({ children }: { children: React.ReactNode }) {
   return <h2 className="mb-4 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">{children}</h2>;
 }
 
-async function Chapter({ params }: Pick<PageProps<"/players/[playerId]/advanced/[chapter]">, "params">) {
+export default async function AdvancedChapterPage({ params }: PageProps<"/players/[playerId]/advanced/[chapter]">) {
   const { playerId, chapter: slug } = await params;
   if (!CHAPTERS.some((c) => c.slug === slug)) notFound();
   const supabase = await createClient();

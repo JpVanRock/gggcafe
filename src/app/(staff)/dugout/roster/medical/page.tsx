@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Disclosure, EmptyState, Loading } from "@/components/ui";
+import { Disclosure } from "@/components/ui";
 import { MedicalForm } from "@/components/family-forms";
 import { medicalOnFile } from "@/lib/family";
-import { loadOwnTeams } from "../../data";
-import { TeamPicker, pickTeam } from "../../team-picker";
+import { loadDugoutTeam } from "../../data";
+import { NoOwnTeam, TeamPicker } from "../../team-picker";
 import { loadTeamRoster } from "../../training/data";
 import { saveMedicalCard } from "../actions";
 
@@ -15,23 +14,15 @@ export const metadata: Metadata = { title: "Medical cards · Roster · Coaches D
 
 // Medical & emergency cards (Phase 6): head coaches and admins only (user, 2026-11-08);
 // parents fill them in on /family. A quick view for game days.
-export default function MedicalPage({ searchParams }: PageProps<"/dugout/roster/medical">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Medical searchParams={searchParams} />
-    </Suspense>
-  );
-}
-
 type Card = Record<string, string | null> & { player_id: string; updated_at: string };
 
-async function Medical({ searchParams }: Pick<PageProps<"/dugout/roster/medical">, "searchParams">) {
+export default async function MedicalPage({ searchParams }: PageProps<"/dugout/roster/medical">) {
   await requireHeadCoachPage();
   const { team: teamParam } = await searchParams;
   const supabase = await createClient();
-  const teams = await loadOwnTeams(supabase);
-  if (teams.length === 0) return <EmptyState>Add your team first.</EmptyState>;
-  const team = pickTeam(teams, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam);
+  if (!dugout) return <NoOwnTeam />;
+  const { teams, team } = dugout;
   const roster = await loadTeamRoster(supabase, team.id);
   const { data } = roster.length ? await supabase.from("medical_cards").select("*").in("player_id", roster.map((p) => p.id)) : { data: [] };
   const cards = new Map(((data ?? []) as Card[]).map((c) => [c.player_id, c]));

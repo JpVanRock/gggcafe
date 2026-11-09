@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
-import { Disclosure, Loading, buttonClass } from "@/components/ui";
+import { Disclosure, buttonClass } from "@/components/ui";
 import { ProgressBar } from "@/components/progress-bar";
 import { SpeedStripes } from "@/components/athletic";
 import { LeaderBadge } from "@/components/leader-badge";
@@ -16,14 +15,6 @@ import { advancedHref } from "../../../advanced";
 import { SectionShell } from "../../section-shell";
 
 export const metadata: Metadata = { title: "G3 Leadership Guide · GGG.Cafe" };
-
-export default function LeadershipPage({ params }: PageProps<"/players/[playerId]/advanced/leadership">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Guide params={params} />
-    </Suspense>
-  );
-}
 
 function LessonList({ playerId, lessons, work, prefix }: { playerId: string; lessons: Lesson[]; work: LessonWork[]; prefix: string }) {
   return (
@@ -60,7 +51,7 @@ function LessonList({ playerId, lessons, work, prefix }: { playerId: string; les
 
 const heading = "mb-3 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
 
-async function Guide({ params }: Pick<PageProps<"/players/[playerId]/advanced/leadership">, "params">) {
+export default async function LeadershipPage({ params }: PageProps<"/players/[playerId]/advanced/leadership">) {
   const { playerId } = await params;
   const { access, player, book, lead, certificate, name } = await leadershipContext(playerId);
   if (!lead.open) {

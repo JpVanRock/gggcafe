@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { requirePlayerPage } from "@/lib/auth";
 import { addDays, formatDay, formatLongDate } from "@/lib/dates";
 import {
@@ -10,7 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 import { SpeedStripes } from "@/components/athletic";
 import { squadStandings, type SquadRow } from "@/lib/training-plan";
 import { StatTerm } from "@/components/stat-term";
-import { EmptyState, Loading, buttonClass, tableClass, tdClass, thClass } from "@/components/ui";
+import { EmptyState, buttonClass, tableClass, tdClass, thClass } from "@/components/ui";
 import { loadTeamDugout } from "../../data";
 import { loadLeaderboard, loadTeamSessions } from "../../leaderboard-data";
 import { RemoveTeamSession } from "../../leaderboard-client";
@@ -19,14 +18,6 @@ import { SectionShell } from "../section-shell";
 import { pickTeam } from "../../../../dugout/team-picker";
 
 export const metadata: Metadata = { title: "Leaderboard · GGG.Cafe" };
-
-export default function LeaderboardPage({ params, searchParams }: PageProps<"/players/[playerId]/leaderboard">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Leaderboard params={params} searchParams={searchParams} />
-    </Suspense>
-  );
-}
 
 const heading = "mb-3 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
 
@@ -47,7 +38,7 @@ function BestVersion() {
 }
 const STATUS_LABEL = { eligible: "In the running", "named-this-round": "Named this round" } as const;
 
-async function Leaderboard({ params, searchParams }: Pick<PageProps<"/players/[playerId]/leaderboard">, "params" | "searchParams">) {
+export default async function LeaderboardPage({ params, searchParams }: PageProps<"/players/[playerId]/leaderboard">) {
   const { playerId } = await params;
   const { team: teamParam } = await searchParams;
   const supabase = await createClient();

@@ -1,38 +1,29 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Disclosure, EmptyState, Loading } from "@/components/ui";
+import { Disclosure, EmptyState } from "@/components/ui";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { INSTALL_STATUS_LABEL, type InstallStatus } from "@/lib/install";
 import { PLAY_CATEGORIES, PLAY_CATEGORY_LABEL } from "@/lib/playbook";
-import { loadOwnTeams } from "../data";
-import { TeamPicker, pickTeam } from "../team-picker";
+import { loadDugoutTeam } from "../data";
+import { NoOwnTeam, TeamPicker } from "../team-picker";
 import { PlaybookNav } from "./nav";
 import { addPlayToInstall, removePlay } from "./actions";
 import { PlayForm, type PlayRow } from "./forms";
 
 export const metadata: Metadata = { title: "Playbook · Coaches Dugout · GGG.Cafe" };
 
-export default function PlaybookPage({ searchParams }: PageProps<"/dugout/playbook">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Playbook searchParams={searchParams} />
-    </Suspense>
-  );
-}
-
 type Effectiveness = { play_id: string; times_called: number; successes: number };
 
-async function Playbook({ searchParams }: Pick<PageProps<"/dugout/playbook">, "searchParams">) {
+export default async function PlaybookPage({ searchParams }: PageProps<"/dugout/playbook">) {
   const user = await requireStaffPage();
   const editor = canEdit(user.staff.role);
   const { team: teamParam } = await searchParams;
   const supabase = await createClient();
-  const teams = await loadOwnTeams(supabase);
-  if (teams.length === 0) return <EmptyState>Add your team on the Teams page first (mark it as one of our teams).</EmptyState>;
-  const team = pickTeam(teams, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam);
+  if (!dugout) return <NoOwnTeam />;
+  const { teams, team } = dugout;
 
   const [playsResult, installResult, effectResult] = await Promise.all([
     supabase

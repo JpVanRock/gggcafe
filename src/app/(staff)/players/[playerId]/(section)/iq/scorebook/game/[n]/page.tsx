@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { EmptyState, Loading } from "@/components/ui";
+import { EmptyState } from "@/components/ui";
 import { CHAPTER_COUNT, type BoxMarks } from "@/lib/scorebook";
 import { GAME_COUNT, gameStatuses } from "@/lib/scorebook-game";
 import { loadIq } from "../../../../../data";
@@ -13,15 +12,7 @@ import { GameRunner } from "../../../../../scorebook-game-client";
 
 export const metadata: Metadata = { title: "Keep the Book: Game · Softball IQ · GGG.Cafe" };
 
-export default function ScorebookGamePage({ params }: PageProps<"/players/[playerId]/iq/scorebook/game/[n]">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Game params={params} />
-    </Suspense>
-  );
-}
-
-async function Game({ params }: Pick<PageProps<"/players/[playerId]/iq/scorebook/game/[n]">, "params">) {
+export default async function ScorebookGamePage({ params }: PageProps<"/players/[playerId]/iq/scorebook/game/[n]">) {
   const { playerId, n: raw } = await params;
   const n = Number(raw);
   if (!Number.isInteger(n) || n < 1 || n > GAME_COUNT) notFound();

@@ -1,28 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { canEdit, isHeadCoach, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Card, Disclosure, EmptyState, Loading, pillButtonClass, tableClass, tdClass, thClass } from "@/components/ui";
+import { Card, Disclosure, EmptyState, pillButtonClass, tableClass, tdClass, thClass } from "@/components/ui";
 import { batsThrows, compareJersey, playerName, type Player, type Season } from "@/lib/softball";
 import { loadStaffRequests, loadTeamApprovals } from "@/lib/approvals";
 import { seasonOrCurrent } from "@/lib/roster";
-import { loadOwnTeams } from "../data";
-import { TeamPicker, pickTeam } from "../team-picker";
+import { loadDugoutTeam } from "../data";
+import { NoOwnTeam, TeamPicker } from "../team-picker";
 import { ApprovedClaimList, PendingClaimList, PendingParentList } from "../approvals";
 import { LeaderBadge } from "@/components/leader-badge";
 import { loadLeaderBadges } from "@/lib/leader-badges";
 import { PendingStaffList, StaffList, type StaffMember } from "./staff";
 
 export const metadata: Metadata = { title: "Roster · Coaches Dugout · GGG.Cafe" };
-
-export default function RosterPage({ searchParams }: PageProps<"/dugout/roster">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Roster searchParams={searchParams} />
-    </Suspense>
-  );
-}
 
 type RosterRow = { id: string; jersey_number: string | null; active: boolean; player: Player };
 
@@ -31,26 +22,16 @@ function Pill({ tone, children }: { tone: "on" | "wait" | "off"; children: React
   return <span className={`rounded px-1.5 py-px font-mono text-[10px] font-bold tracking-wider uppercase ${cls}`}>{children}</span>;
 }
 
-async function Roster({ searchParams }: Pick<PageProps<"/dugout/roster">, "searchParams">) {
+export default async function RosterPage({ searchParams }: PageProps<"/dugout/roster">) {
   const user = await requireStaffPage();
   const editor = canEdit(user.staff.role);
   // Head coaches and admins also handle parents and coach sign-ups; assistants don't.
   const head = isHeadCoach(user.staff.role);
   const { team: teamParam, season: seasonParam } = await searchParams;
   const supabase = await createClient();
-  const teams = await loadOwnTeams(supabase);
-  if (teams.length === 0) {
-    return (
-      <EmptyState>
-        Add your team on the{" "}
-        <Link href="/teams" className="text-pink hover:underline">
-          Teams
-        </Link>{" "}
-        page first.
-      </EmptyState>
-    );
-  }
-  const team = pickTeam(teams, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam);
+  if (!dugout) return <NoOwnTeam />;
+  const { teams, team } = dugout;
   const [seasonsResult, currentSeason, approvals, staffRequests, staffResult] = await Promise.all([
     supabase.from("seasons").select("*").order("start_date", { ascending: false, nullsFirst: false }).order("created_at", { ascending: false }),
     seasonOrCurrent(supabase, team.id, null),
@@ -242,7 +223,6 @@ async function Roster({ searchParams }: Pick<PageProps<"/dugout/roster">, "searc
     </div>
   );
 }
-
 
 // Preseason questionnaires (Phase 6): sizes, number choices and the positions she wants, for coaches.
 async function QuestionnaireTable({ teamId, seasonId }: { teamId: string; seasonId: string | null }) {

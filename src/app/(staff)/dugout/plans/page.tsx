@@ -1,26 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { canEditPlanRole } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
-import { Disclosure, EmptyState, Loading } from "@/components/ui";
+import { Disclosure, EmptyState } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import { PRACTICE_SETTING_LABEL, durationLabel, practiceRange, type PracticeSetting } from "@/lib/dugout";
-import { loadOwnTeams } from "../data";
-import { TeamPicker, pickTeam } from "../team-picker";
+import { loadDugoutTeam } from "../data";
+import { NoOwnTeam, TeamPicker } from "../team-picker";
 import { NewPlanForm } from "./new-plan-form";
 import { PlansNav } from "./plans-nav";
 
 export const metadata: Metadata = { title: "Practice Plans · Coaches Dugout · GGG.Cafe" };
-
-export default function PracticePlansPage({ searchParams }: PageProps<"/dugout/plans">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Plans searchParams={searchParams} />
-    </Suspense>
-  );
-}
 
 type PlanRow = {
   id: string;
@@ -85,24 +76,14 @@ function PlanCard({ plan, viewOnly = false }: { plan: PlanRow; viewOnly?: boolea
   );
 }
 
-async function Plans({ searchParams }: Pick<PageProps<"/dugout/plans">, "searchParams">) {
+export default async function PracticePlansPage({ searchParams }: PageProps<"/dugout/plans">) {
   const user = await requireStaffPage();
   const editor = canEdit(user.staff.role);
   const { team: teamParam } = await searchParams;
   const supabase = await createClient();
-  const teams = await loadOwnTeams(supabase);
-  if (teams.length === 0) {
-    return (
-      <EmptyState>
-        Add your team on the{" "}
-        <Link href="/teams" className="text-pink hover:underline">
-          Teams
-        </Link>{" "}
-        page first (mark it as one of our teams).
-      </EmptyState>
-    );
-  }
-  const team = pickTeam(teams, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam);
+  if (!dugout) return <NoOwnTeam />;
+  const { teams, team } = dugout;
   const today = todayISO();
 
   const { data } = await supabase

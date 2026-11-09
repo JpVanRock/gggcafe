@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Suspense } from "react";
 import { canEdit, isHeadCoach, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Disclosure, EmptyState, Loading } from "@/components/ui";
+import { Disclosure, EmptyState } from "@/components/ui";
 import { INTENT_LABEL, type ScriptPitch } from "@/lib/bullpen";
-import { loadOwnTeams } from "../../data";
-import { TeamPicker, pickTeam } from "../../team-picker";
+import { loadDugoutTeam } from "../../data";
+import { NoOwnTeam, TeamPicker } from "../../team-picker";
 import { TrainingNav } from "../nav";
 import { deleteBullpenScript } from "../actions";
 import { BullpenBuilder } from "../bullpen-builder";
@@ -16,34 +14,16 @@ export const metadata: Metadata = { title: "Bullpens · Training · Coaches Dugo
 
 // Scripted bullpens (Phase 4): the team's scripts. Pitchers throw them from their
 // Performance Training page (or a team routine in TWIS) and tap hit or miss.
-export default function BullpensPage({ searchParams }: PageProps<"/dugout/training/bullpens">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Bullpens searchParams={searchParams} />
-    </Suspense>
-  );
-}
-
 type Script = { id: string; name: string; notes: string | null; pitches: ScriptPitch[] };
 
-async function Bullpens({ searchParams }: Pick<PageProps<"/dugout/training/bullpens">, "searchParams">) {
+export default async function BullpensPage({ searchParams }: PageProps<"/dugout/training/bullpens">) {
   const user = await requireStaffPage();
   const editor = canEdit(user.staff.role);
   const { team: teamParam } = await searchParams;
   const supabase = await createClient();
-  const teams = await loadOwnTeams(supabase);
-  if (teams.length === 0) {
-    return (
-      <EmptyState>
-        Add your team on the{" "}
-        <Link href="/teams" className="text-pink hover:underline">
-          Teams
-        </Link>{" "}
-        page first.
-      </EmptyState>
-    );
-  }
-  const team = pickTeam(teams, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam);
+  if (!dugout) return <NoOwnTeam />;
+  const { teams, team } = dugout;
   const { data } = await supabase.from("bullpen_scripts").select("id, name, notes, pitches").eq("team_id", team.id).order("name");
   const scripts = (data ?? []) as Script[];
 

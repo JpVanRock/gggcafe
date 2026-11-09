@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { requirePlayerPage } from "@/lib/auth";
 import { formatDay, todayISO } from "@/lib/dates";
 import { LOG_DAYS_BACK, POINTS, rankRows, sessionLabel } from "@/lib/leaderboard";
 import { createClient } from "@/lib/supabase/server";
-import { EmptyState, Loading } from "@/components/ui";
+import { EmptyState } from "@/components/ui";
 import { loadTeamDugout } from "../../data";
 import { loadLeaderboard, loadMySessions } from "../../leaderboard-data";
 import { LogSessionForm, RemoveSession } from "../../leaderboard-client";
@@ -14,17 +13,9 @@ import { SectionShell } from "../section-shell";
 
 export const metadata: Metadata = { title: "+ Activity · GGG.Cafe" };
 
-export default function LogPage({ params }: PageProps<"/players/[playerId]/log">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Log params={params} />
-    </Suspense>
-  );
-}
-
 const heading = "mb-3 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
 
-async function Log({ params }: Pick<PageProps<"/players/[playerId]/log">, "params">) {
+export default async function LogPage({ params }: PageProps<"/players/[playerId]/log">) {
   const { playerId } = await params;
   const supabase = await createClient();
   const access = await requirePlayerPage(playerId);

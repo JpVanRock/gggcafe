@@ -1,24 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Card, EmptyState, Loading } from "@/components/ui";
+import { Card, EmptyState } from "@/components/ui";
 import { formatDay } from "@/lib/dates";
-import { loadOwnTeams } from "../../data";
-import { TeamPicker, pickTeam } from "../../team-picker";
+import { loadDugoutTeam } from "../../data";
+import { NoOwnTeam, TeamPicker } from "../../team-picker";
 import { PlaybookNav } from "../nav";
 import { NewQuizForm } from "../forms";
 
 export const metadata: Metadata = { title: "Team Quizzes · Coaches Dugout · GGG.Cafe" };
-
-export default function QuizzesPage({ searchParams }: PageProps<"/dugout/playbook/quizzes">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Quizzes searchParams={searchParams} />
-    </Suspense>
-  );
-}
 
 type QuizRow = {
   id: string;
@@ -28,14 +19,14 @@ type QuizRow = {
   questions: { id: string; answers: { player_id: string }[] }[];
 };
 
-async function Quizzes({ searchParams }: Pick<PageProps<"/dugout/playbook/quizzes">, "searchParams">) {
+export default async function QuizzesPage({ searchParams }: PageProps<"/dugout/playbook/quizzes">) {
   const user = await requireStaffPage();
   const editor = canEdit(user.staff.role);
   const { team: teamParam } = await searchParams;
   const supabase = await createClient();
-  const teams = await loadOwnTeams(supabase);
-  if (teams.length === 0) return <EmptyState>Add your team on the Teams page first (mark it as one of our teams).</EmptyState>;
-  const team = pickTeam(teams, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam);
+  if (!dugout) return <NoOwnTeam />;
+  const { teams, team } = dugout;
 
   const { data } = await supabase
     .from("team_quizzes")

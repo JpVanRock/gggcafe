@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Disclosure, Loading, secondaryButtonClass } from "@/components/ui";
+import { Disclosure, secondaryButtonClass } from "@/components/ui";
 import { addDays, formatDay, formatWeekRange, isISODate, todayISO, weekDates, weekStart } from "@/lib/dates";
 import { JOURNAL_PROMPTS } from "@/lib/mental";
 import { loadJournalWeek } from "../../../mental-data";
@@ -17,15 +16,7 @@ export const metadata: Metadata = { title: "Practice journal · Mental GP · GGG
 // The practice journal (Phase 1, user 2026-11-08): a purpose before practice, what
 // worked and what to fix after, and a look back at the week. Team practice days
 // are marked; she can write on any day.
-export default function JournalPage({ params, searchParams }: PageProps<"/players/[playerId]/mental/journal">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Journal params={params} searchParams={searchParams} />
-    </Suspense>
-  );
-}
-
-async function Journal({ params, searchParams }: Pick<PageProps<"/players/[playerId]/mental/journal">, "params" | "searchParams">) {
+export default async function JournalPage({ params, searchParams }: PageProps<"/players/[playerId]/mental/journal">) {
   const { playerId } = await params;
   const { week } = await searchParams;
   const supabase = await createClient();

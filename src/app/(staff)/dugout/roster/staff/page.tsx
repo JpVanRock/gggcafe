@@ -1,33 +1,24 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { isHeadCoach, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Card, Disclosure, EmptyState, Loading, buttonClass, sectionLabelClass } from "@/components/ui";
+import { Card, Disclosure, EmptyState, buttonClass, sectionLabelClass } from "@/components/ui";
 import { DUTY_PHASES, DUTY_PHASE_LABEL, STARTER_DUTIES } from "@/lib/staff-duties";
-import { loadOwnTeams } from "../../data";
-import { TeamPicker, pickTeam } from "../../team-picker";
+import { loadDugoutTeam } from "../../data";
+import { NoOwnTeam, TeamPicker } from "../../team-picker";
 import { loadStarterDuties } from "./actions";
 import { AddDutyForm, DutyMatrixForm, StaffStandardsForm, type DutyRow } from "./forms";
 
 export const metadata: Metadata = { title: "Staff Duties · Coaches Dugout · GGG.Cafe" };
 
-export default function StaffDutiesPage({ searchParams }: PageProps<"/dugout/roster/staff">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <StaffDuties searchParams={searchParams} />
-    </Suspense>
-  );
-}
-
-async function StaffDuties({ searchParams }: Pick<PageProps<"/dugout/roster/staff">, "searchParams">) {
+export default async function StaffDutiesPage({ searchParams }: PageProps<"/dugout/roster/staff">) {
   const user = await requireStaffPage();
   const head = isHeadCoach(user.staff.role);
   const { team: teamParam } = await searchParams;
   const supabase = await createClient();
-  const teams = await loadOwnTeams(supabase);
-  if (teams.length === 0) return <EmptyState>Add your team on the Teams page first.</EmptyState>;
-  const team = pickTeam(teams, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam);
+  if (!dugout) return <NoOwnTeam />;
+  const { teams, team } = dugout;
 
   const [dutiesResult, standardsResult, staffResult] = await Promise.all([
     supabase.from("staff_duties").select("id, phase, duty, owner").eq("team_id", team.id).order("position"),

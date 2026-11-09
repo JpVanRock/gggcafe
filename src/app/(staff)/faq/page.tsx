@@ -1,21 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { requireStaffPage } from "@/lib/auth";
 import { FAQ, FEATURE_SECTIONS, TIERS, type Access } from "@/lib/access-faq";
 import { Softball } from "@/components/softball-icon";
-import { Disclosure, Loading, PageHeader } from "@/components/ui";
+import { Disclosure, PageHeader } from "@/components/ui";
 import { FaqNav } from "./faq-nav";
 
 export const metadata: Metadata = { title: "Access FAQ · GGG.Cafe" };
-
-export default function FaqPage() {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Faq />
-    </Suspense>
-  );
-}
 
 const heading = "font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
 
@@ -29,7 +20,7 @@ function Mark({ access, tier }: { access: Access; tier: string }) {
   );
 }
 
-async function Faq() {
+export default async function FaqPage() {
   const user = await requireStaffPage();
   // admins only: everyone else gets a 404
   if (user.staff.role !== "admin") notFound();

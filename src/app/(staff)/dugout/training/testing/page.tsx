@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { canEdit, isHeadCoach, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Disclosure, EmptyState, Loading } from "@/components/ui";
+import { Disclosure, EmptyState } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import { TESTS, composite, cutoffsFor, rate, tierFor } from "@/lib/training-plan";
 import { RatingChip } from "@/components/rating-chip";
-import { loadOwnTeams } from "../../data";
-import { TeamPicker, pickTeam } from "../../team-picker";
+import { loadDugoutTeam } from "../../data";
+import { NoOwnTeam, TeamPicker } from "../../team-picker";
 import { TrainingNav } from "../nav";
 import { loadTeamAge, loadTeamRoster, loadTesting } from "../data";
 import { BandsForm, ResultsForm } from "../forms";
@@ -18,35 +17,17 @@ export const metadata: Metadata = { title: "Testing · Training · Coaches Dugou
 // The athletic testing pack (Phase 2): results save as measurements; each is rated
 // 1-5 against the team's age-group bands, with a composite score. Coaches only:
 // players see their own results in Performance Training (no public rankings).
-export default function TestingPage({ searchParams }: PageProps<"/dugout/training/testing">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Testing searchParams={searchParams} />
-    </Suspense>
-  );
-}
-
 const heading = "font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
 const TIER_LABEL = { youth: "8U-10U", u12: "11U-12U", u14: "13U-14U", u16: "15U-16U", u18: "17U-18U" } as const;
 
-async function Testing({ searchParams }: Pick<PageProps<"/dugout/training/testing">, "searchParams">) {
+export default async function TestingPage({ searchParams }: PageProps<"/dugout/training/testing">) {
   const user = await requireStaffPage();
   const editor = canEdit(user.staff.role);
   const { team: teamParam } = await searchParams;
   const supabase = await createClient();
-  const teams = await loadOwnTeams(supabase);
-  if (teams.length === 0) {
-    return (
-      <EmptyState>
-        Add your team on the{" "}
-        <Link href="/teams" className="text-pink hover:underline">
-          Teams
-        </Link>{" "}
-        page first.
-      </EmptyState>
-    );
-  }
-  const team = pickTeam(teams, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam);
+  if (!dugout) return <NoOwnTeam />;
+  const { teams, team } = dugout;
   const [roster, ageGroup] = await Promise.all([loadTeamRoster(supabase, team.id), loadTeamAge(supabase, team.id)]);
   const { results, bands } = await loadTesting(supabase, roster.map((p) => p.id), TESTS.map((t) => t.key));
   const latest = (playerId: string, key: string) => results.find((r) => r.player_id === playerId && r.metric_key === key) ?? null;

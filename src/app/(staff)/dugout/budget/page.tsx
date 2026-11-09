@@ -1,29 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { isHeadCoach, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { Modal } from "@/components/modal";
 import { BudgetSummary, type BudgetSummaryData } from "@/components/budget-summary";
-import { Card, Disclosure, EmptyState, Loading, pillQuietClass, tableClass, tdClass, thClass } from "@/components/ui";
+import { Card, Disclosure, EmptyState, pillQuietClass, tableClass, tdClass, thClass } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import { money, playerBalances, runningLedger, toCents, type EntryKind, type PlayerStatus } from "@/lib/budget";
 import { compareJersey, type Season, playerName } from "@/lib/softball";
-import { loadOwnTeams } from "../data";
-import { TeamPicker, pickTeam } from "../team-picker";
+import { loadDugoutTeam } from "../data";
+import { NoOwnTeam, TeamPicker } from "../team-picker";
 import { deleteEntry } from "./actions";
 import { AdjustmentForm, EntryForm, FeesForm, PaymentForm, type BudgetPlayer } from "./forms";
 
 export const metadata: Metadata = { title: "Team Budget · Coaches Dugout · GGG.Cafe" };
-
-export default function BudgetPage({ searchParams }: PageProps<"/dugout/budget">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Budget searchParams={searchParams} />
-    </Suspense>
-  );
-}
 
 type RosterRow = {
   season_id: string;
@@ -49,25 +40,15 @@ const STATUS: Record<PlayerStatus, { label: string; className: string }> = {
   none: { label: "—", className: "text-muted" },
 };
 
-async function Budget({ searchParams }: Pick<PageProps<"/dugout/budget">, "searchParams">) {
+export default async function BudgetPage({ searchParams }: PageProps<"/dugout/budget">) {
   const user = await requireStaffPage();
   // Head coaches and admins change the budget; assistant coaches and viewers read it (user, 2026-11-08).
   const editor = isHeadCoach(user.staff.role);
   const { team: teamParam, season: seasonParam } = await searchParams;
   const supabase = await createClient();
-  const teams = await loadOwnTeams(supabase);
-  if (teams.length === 0) {
-    return (
-      <EmptyState>
-        Add your team on the{" "}
-        <Link href="/teams" className="text-pink hover:underline">
-          Teams
-        </Link>{" "}
-        page first (mark it as one of our teams).
-      </EmptyState>
-    );
-  }
-  const team = pickTeam(teams, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam);
+  if (!dugout) return <NoOwnTeam />;
+  const { teams, team } = dugout;
 
   const [seasonsResult, rosterResult] = await Promise.all([
     supabase.from("seasons").select("*").order("start_date", { ascending: false, nullsFirst: false }).order("created_at", { ascending: false }),

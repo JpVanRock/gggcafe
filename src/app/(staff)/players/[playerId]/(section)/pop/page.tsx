@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Loading } from "@/components/ui";
+
 import { signedPhotoUrls } from "@/lib/player-photos";
 import type { MoveSeason, MoveTeam } from "../../../move-form";
 import { loadMovementAndHitting, loadPopReport, loadTeamDugout, possessive } from "../../data";
@@ -18,15 +17,7 @@ import { StatsCard, loadPlayerStats } from "../../stats-card";
 
 export const metadata: Metadata = { title: "Pop Report · GGG.Cafe" };
 
-export default function PopPage({ params }: PageProps<"/players/[playerId]/pop">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Pop params={params} />
-    </Suspense>
-  );
-}
-
-async function Pop({ params }: Pick<PageProps<"/players/[playerId]/pop">, "params">) {
+export default async function PopPage({ params }: PageProps<"/players/[playerId]/pop">) {
   const { playerId } = await params;
   const supabase = await createClient();
   const access = await requirePlayerPage(playerId);

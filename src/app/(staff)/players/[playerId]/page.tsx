@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { requirePlayerPage, isHeadCoach } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { isISODate, todayISO, weekStart } from "@/lib/dates";
 import { isUuid, type Player } from "@/lib/softball";
-import { Loading } from "@/components/ui";
+
 import {
   loadHarada, loadIq, loadMentalPlan, loadPerformance, loadPopReport, loadSmartGoals,
   loadMovementAndHitting, loadTeamDugout, loadTwisWeek,
@@ -18,15 +17,7 @@ import { MESSAGE_COLUMNS, signedMessagePhotoUrls, type MentorMessage } from "@/l
 
 export const metadata: Metadata = { title: "Player · GGG.Cafe" };
 
-export default function PlayerDashboardPage({ params, searchParams }: PageProps<"/players/[playerId]">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <PlayerDashboard params={params} searchParams={searchParams} />
-    </Suspense>
-  );
-}
-
-async function PlayerDashboard({ params, searchParams }: Pick<PageProps<"/players/[playerId]">, "params" | "searchParams">) {
+export default async function PlayerDashboardPage({ params, searchParams }: PageProps<"/players/[playerId]">) {
   const { playerId } = await params;
   const { week } = await searchParams;
   if (!isUuid(playerId)) notFound();

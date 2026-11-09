@@ -1,31 +1,22 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { loadYearbook } from "@/lib/yearbook-data";
 import { YearbookView } from "@/components/yearbook-view";
-import { EmptyState, Loading } from "@/components/ui";
-import { loadOwnTeams } from "../data";
-import { TeamPicker, pickTeam } from "../team-picker";
+import { EmptyState } from "@/components/ui";
+import { loadDugoutTeam } from "../data";
+import { NoOwnTeam, TeamPicker } from "../team-picker";
 
 export const metadata: Metadata = { title: "Yearbook · Coaches Dugout · GGG.Cafe" };
 
-export default function DugoutYearbookPage({ searchParams }: PageProps<"/dugout/yearbook">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <DugoutYearbook searchParams={searchParams} />
-    </Suspense>
-  );
-}
-
-async function DugoutYearbook({ searchParams }: Pick<PageProps<"/dugout/yearbook">, "searchParams">) {
+export default async function DugoutYearbookPage({ searchParams }: PageProps<"/dugout/yearbook">) {
   await requireStaffPage();
   const { team: teamParam, season } = await searchParams;
   const supabase = await createClient();
-  const teams = await loadOwnTeams(supabase);
-  if (teams.length === 0) return <EmptyState>Add your team on the Teams page first.</EmptyState>;
-  const team = pickTeam(teams, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam);
+  if (!dugout) return <NoOwnTeam />;
+  const { teams, team } = dugout;
   const loaded = await loadYearbook(supabase, team.id, typeof season === "string" ? season : null);
   return (
     <div className="flex flex-col gap-6">

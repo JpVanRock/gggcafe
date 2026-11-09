@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { EmptyState, Loading } from "@/components/ui";
+import { EmptyState } from "@/components/ui";
 import { ProgressBar } from "@/components/progress-bar";
 import { CHAPTER_COUNT } from "@/lib/scorebook";
 import { GAMES, GAME_COUNT, GAME_PLAYS, LEAGUE, gameStatuses, type GameStatus } from "@/lib/scorebook-game";
@@ -12,14 +11,6 @@ import { loadPlayer } from "../../../../section-data";
 import { chapterHref } from "../../../../scorebook";
 
 export const metadata: Metadata = { title: "Keep the Book: Games · Softball IQ · GGG.Cafe" };
-
-export default function ScorebookGamesPage({ params }: PageProps<"/players/[playerId]/iq/scorebook/game">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Games params={params} />
-    </Suspense>
-  );
-}
 
 function statusLine(g: GameStatus) {
   switch (g.status) {
@@ -34,7 +25,7 @@ function statusLine(g: GameStatus) {
   }
 }
 
-async function Games({ params }: Pick<PageProps<"/players/[playerId]/iq/scorebook/game">, "params">) {
+export default async function ScorebookGamesPage({ params }: PageProps<"/players/[playerId]/iq/scorebook/game">) {
   const { playerId } = await params;
   const supabase = await createClient();
   await requirePlayerPage(playerId);

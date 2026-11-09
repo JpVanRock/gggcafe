@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Loading } from "@/components/ui";
+
 import { isUuid } from "@/lib/softball";
 import type { ScriptPitch } from "@/lib/bullpen";
 import { BullpenRunner } from "../../../../bullpen-client";
@@ -12,15 +11,7 @@ import { SectionShell } from "../../../section-shell";
 
 export const metadata: Metadata = { title: "Bullpen · Performance Training · GGG.Cafe" };
 
-export default function BullpenPage({ params }: PageProps<"/players/[playerId]/training/bullpen/[scriptId]">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Bullpen params={params} />
-    </Suspense>
-  );
-}
-
-async function Bullpen({ params }: Pick<PageProps<"/players/[playerId]/training/bullpen/[scriptId]">, "params">) {
+export default async function BullpenPage({ params }: PageProps<"/players/[playerId]/training/bullpen/[scriptId]">) {
   const { playerId, scriptId } = await params;
   if (!isUuid(scriptId)) notFound();
   const supabase = await createClient();

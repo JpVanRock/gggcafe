@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Suspense } from "react";
 import { requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { EmptyState, Loading, secondaryButtonClass } from "@/components/ui";
+import { EmptyState, secondaryButtonClass } from "@/components/ui";
 import { onTheClock, squadStandings } from "@/lib/training-plan";
-import { loadOwnTeams } from "../../data";
-import { TeamPicker, pickTeam } from "../../team-picker";
+import { loadDugoutTeam } from "../../data";
+import { NoOwnTeam, TeamPicker } from "../../team-picker";
 import { TrainingNav } from "../nav";
 import { loadSquads, loadTeamRoster } from "../data";
 import { draftPick, resetDraft, undoPick } from "../actions";
@@ -19,33 +17,15 @@ export const metadata: Metadata = { title: "Offseason draft · Training · Coach
 // with a captain each, then a snake draft the head coach records here as the
 // captains pick. Squads score the Leaderboard's points; players see the squads
 // and their totals on the Leaderboard.
-export default function DraftPage({ searchParams }: PageProps<"/dugout/training/draft">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Draft searchParams={searchParams} />
-    </Suspense>
-  );
-}
-
 const heading = "font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
 
-async function Draft({ searchParams }: Pick<PageProps<"/dugout/training/draft">, "searchParams">) {
+export default async function DraftPage({ searchParams }: PageProps<"/dugout/training/draft">) {
   await requireHeadCoachPage();
   const { team: teamParam } = await searchParams;
   const supabase = await createClient();
-  const teams = await loadOwnTeams(supabase);
-  if (teams.length === 0) {
-    return (
-      <EmptyState>
-        Add your team on the{" "}
-        <Link href="/teams" className="text-pink hover:underline">
-          Teams
-        </Link>{" "}
-        page first.
-      </EmptyState>
-    );
-  }
-  const team = pickTeam(teams, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam);
+  if (!dugout) return <NoOwnTeam />;
+  const { teams, team } = dugout;
   const [roster, squads, board] = await Promise.all([
     loadTeamRoster(supabase, team.id),
     loadSquads(supabase, team.id),

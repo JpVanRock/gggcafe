@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { PillNav } from "@/components/pill-nav";
+import { EmptyState } from "@/components/ui";
 
 export type OwnTeam = { id: string; name: string };
 
@@ -11,4 +13,17 @@ export function TeamPicker({ teams, current, basePath }: { teams: OwnTeam[]; cur
 /** The team a Dugout page shows: the one in `?team=`, else the first (callers check the list isn't empty). */
 export function pickTeam<T extends { id: string }>(teams: T[], param: string | string[] | undefined): T {
   return teams.find((t) => t.id === param) ?? teams[0];
+}
+
+/** What a Dugout page shows before we have a team of our own. */
+export function NoOwnTeam() {
+  return (
+    <EmptyState>
+      Add your team on the{" "}
+      <Link href="/teams" className="text-pink hover:underline">
+        Teams
+      </Link>{" "}
+      page first (mark it as one of our teams).
+    </EmptyState>
+  );
 }

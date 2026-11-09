@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Disclosure, EmptyState, Loading } from "@/components/ui";
+import { Disclosure, EmptyState } from "@/components/ui";
 import { addDays, formatDay, todayISO } from "@/lib/dates";
 import { GamePlanForm } from "../../../bullpen-client";
 import { loadGamePlans } from "../../../pitching-data";
@@ -13,17 +12,9 @@ import { SectionShell } from "../../section-shell";
 export const metadata: Metadata = { title: "Game plans · Performance Training · GGG.Cafe" };
 
 // The pitcher's game plan (Phase 4): before a game her plan, after it a look-back.
-export default function GamePlanPage({ params }: PageProps<"/players/[playerId]/training/game-plan">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <GamePlans params={params} />
-    </Suspense>
-  );
-}
-
 const heading = "font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
 
-async function GamePlans({ params }: Pick<PageProps<"/players/[playerId]/training/game-plan">, "params">) {
+export default async function GamePlanPage({ params }: PageProps<"/players/[playerId]/training/game-plan">) {
   const { playerId } = await params;
   const supabase = await createClient();
   const access = await requirePlayerPage(playerId);

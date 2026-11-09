@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Loading } from "@/components/ui";
+
 import { isUuid } from "@/lib/softball";
 import { loadPlayer } from "../../../../section-data";
 import { loadTeamQuiz } from "../../../../playbook-data";
@@ -13,15 +12,7 @@ import { SectionShell } from "../../../section-shell";
 
 export const metadata: Metadata = { title: "Team Quiz · Softball IQ · GGG.Cafe" };
 
-export default function TeamQuizPage({ params }: PageProps<"/players/[playerId]/iq/playbook/[quizId]">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <TeamQuiz params={params} />
-    </Suspense>
-  );
-}
-
-async function TeamQuiz({ params }: Pick<PageProps<"/players/[playerId]/iq/playbook/[quizId]">, "params">) {
+export default async function TeamQuizPage({ params }: PageProps<"/players/[playerId]/iq/playbook/[quizId]">) {
   const { playerId, quizId } = await params;
   if (!isUuid(quizId)) notFound();
   const supabase = await createClient();

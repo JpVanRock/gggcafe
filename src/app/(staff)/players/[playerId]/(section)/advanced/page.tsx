@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Loading, buttonClass } from "@/components/ui";
+import { buttonClass } from "@/components/ui";
 import { OutlineText, SpeedStripes } from "@/components/athletic";
 import { ProgressBar } from "@/components/progress-bar";
 import { BOOK_THEME, BOOK_TITLE_MAX, bookProgress, chapterLabel, visibleChapters } from "@/lib/advanced-book";
@@ -21,15 +20,7 @@ import { SectionShell } from "../section-shell";
 
 export const metadata: Metadata = { title: "G3 Advanced · GGG.Cafe" };
 
-export default function AdvancedPage({ params }: PageProps<"/players/[playerId]/advanced">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Advanced params={params} />
-    </Suspense>
-  );
-}
-
-async function Advanced({ params }: Pick<PageProps<"/players/[playerId]/advanced">, "params">) {
+export default async function AdvancedPage({ params }: PageProps<"/players/[playerId]/advanced">) {
   const { playerId } = await params;
   const supabase = await createClient();
   const access = await requirePlayerPage(playerId);

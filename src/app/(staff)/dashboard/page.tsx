@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { canEdit, getCurrentUser, getMentor, isHeadCoach, type StaffUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Card, Loading, PageHeader } from "@/components/ui";
+import { Card, PageHeader } from "@/components/ui";
 import { addDays, formatDay, formatTime, todayISO } from "@/lib/dates";
 import { COACH_SIGNUP_ROLE, ROLE_NOTE, canEditPlanRole, dugoutTabsFor, isCoachSignup, type StaffRole } from "@/lib/roles";
 import { loadStaffRequests, type StaffRequestRow } from "@/lib/approvals";
@@ -16,14 +15,6 @@ export const metadata: Metadata = { title: "Dashboard · GGG.Cafe" };
 // get the full dashboard, assistant coaches their week and their plans, coaches
 // waiting for approval a holding page; players, parents and mentors are sent to
 // /me, /family and /mentor.
-export default function DashboardPage() {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Dashboard />
-    </Suspense>
-  );
-}
-
 const heading = "font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
 
 const TAB_NOTE: Record<string, string> = {
@@ -39,7 +30,7 @@ const TAB_NOTE: Record<string, string> = {
   "/dugout/mentors": "Mentors and skill coaches",
 };
 
-async function Dashboard() {
+export default async function DashboardPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
   if (!user.staff) return <NotStaff userId={user.id} email={user.email} />;

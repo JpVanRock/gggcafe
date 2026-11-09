@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { EmptyState, Loading } from "@/components/ui";
+import { EmptyState } from "@/components/ui";
 import { formatLongDate } from "@/lib/dates";
 import { isUuid } from "@/lib/softball";
 import { loadGamedayRoster } from "@/lib/gameday-data";
@@ -13,14 +12,6 @@ import type { BoxScore } from "@/lib/box-score";
 import { BoxScoreForm } from "./box-form";
 
 export const metadata: Metadata = { title: "Box Score · GameDay · GGG.Cafe" };
-
-export default function BoxScorePage({ params, searchParams }: PageProps<"/dugout/gameday/box/[gameId]">) {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Box params={params} searchParams={searchParams} />
-    </Suspense>
-  );
-}
 
 type GameRow = {
   id: string;
@@ -34,7 +25,7 @@ type GameRow = {
   away: { id: string; name: string; is_own_team: boolean } | null;
 };
 
-async function Box({ params, searchParams }: Pick<PageProps<"/dugout/gameday/box/[gameId]">, "params" | "searchParams">) {
+export default async function BoxScorePage({ params, searchParams }: PageProps<"/dugout/gameday/box/[gameId]">) {
   await requireHeadCoachPage();
   const { gameId } = await params;
   const { team: teamParam } = await searchParams;
