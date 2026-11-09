@@ -32,7 +32,7 @@ export default async function MedicalPage({ searchParams }: PageProps<"/dugout/r
     <div className="flex flex-col gap-6">
       <TeamPicker teams={teams} current={team.id} basePath="/dugout/roster/medical" />
       <div>
-        <Link href={`/dugout/roster?team=${team.id}`} className="text-sm text-pink hover:underline">
+        <Link href={`/dugout/roster?team=${team.id}`} className="text-sm text-link hover:underline">
           ← Roster
         </Link>
         <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-highlight uppercase">Medical cards</h2>
@@ -51,7 +51,7 @@ export default async function MedicalPage({ searchParams }: PageProps<"/dugout/r
                   {p.number && <span className="mr-1.5 font-display text-muted tabular-nums">#{p.number}</span>}
                   {p.name}
                 </span>
-                <span className={`font-mono text-[10px] font-bold tracking-wider uppercase ${ok ? "text-highlight" : "text-pink-soft"}`}>{ok ? "On file" : "Missing"}</span>
+                <span className={`font-mono text-2xs font-bold tracking-wider uppercase ${ok ? "text-highlight" : "text-pink-soft"}`}>{ok ? "On file" : "Missing"}</span>
               </p>
               {c && (
                 <dl className="mt-2 grid gap-1 text-sm">
@@ -60,7 +60,7 @@ export default async function MedicalPage({ searchParams }: PageProps<"/dugout/r
                       <dt className="inline text-muted">Contact: </dt>
                       <dd className="inline">
                         {c.contact1_name}
-                        {c.contact1_relation ? ` (${c.contact1_relation})` : ""} · <a href={`tel:${c.contact1_phone}`} className="text-pink hover:underline">{c.contact1_phone}</a>
+                        {c.contact1_relation ? ` (${c.contact1_relation})` : ""} · <a href={`tel:${c.contact1_phone}`} className="text-link hover:underline">{c.contact1_phone}</a>
                       </dd>
                     </div>
                   )}
@@ -69,7 +69,7 @@ export default async function MedicalPage({ searchParams }: PageProps<"/dugout/r
                       <dt className="inline text-muted">Contact 2: </dt>
                       <dd className="inline">
                         {c.contact2_name}
-                        {c.contact2_relation ? ` (${c.contact2_relation})` : ""} {c.contact2_phone && <>· <a href={`tel:${c.contact2_phone}`} className="text-pink hover:underline">{c.contact2_phone}</a></>}
+                        {c.contact2_relation ? ` (${c.contact2_relation})` : ""} {c.contact2_phone && <>· <a href={`tel:${c.contact2_phone}`} className="text-link hover:underline">{c.contact2_phone}</a></>}
                       </dd>
                     </div>
                   )}

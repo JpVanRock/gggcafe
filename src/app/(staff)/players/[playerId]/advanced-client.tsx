@@ -4,11 +4,12 @@
 // props from the server page; never import src/lib/advanced-book.ts here (paid
 // content stays on the server). Type-only imports are fine.
 import { useState, useTransition } from "react";
-import { buttonClass, inputClass, secondaryButtonClass } from "@/components/ui";
+import { buttonClass, inputClass, secondaryButtonClass, eyebrowClass } from "@/components/ui";
 import type { Habit } from "@/lib/advanced-book";
 import {
   renameAdvancedBook, saveAdvancedMine, saveAdvancedNotes, setAdvancedAccess, setAdvancedChapterDone, setAdvancedHabit, setConfirmedPosition,
 } from "./advanced-actions";
+import { confirmAction } from "@/components/confirm-submit";
 
 function ErrorLine({ error }: { error: string | null }) {
   return error ? (
@@ -32,7 +33,7 @@ export function BookTitle({ playerId, title, canEdit, maxLength }: { playerId: s
           setValue(title);
           setEditing(true);
         }}
-        className="text-sm text-pink hover:underline"
+        className="text-sm text-link hover:underline"
       >
         Rename your book
       </button>
@@ -102,7 +103,7 @@ export function FoundationHabits({
   }
   return (
     <div>
-      <p className="mb-3 font-mono text-[11px] tracking-wider text-muted uppercase">
+      <p className="mb-3 font-mono text-2xs tracking-wider text-muted uppercase">
         {owned.size} of {habits.length} owned
       </p>
       <ol className="grid gap-3">
@@ -173,7 +174,7 @@ export function MyHabits({
         <ul className="grid gap-2">
           {mine.map((h, i) => (
             <li key={`${i}-${h}`} className="flex items-start gap-3 rounded-lg border border-pink/40 bg-pink/5 px-3 py-2.5">
-              <span className="mt-0.5 font-mono text-[11px] tracking-wider text-pink-soft uppercase">Mine</span>
+              <span className={`${eyebrowClass} mt-0.5`}>Mine</span>
               <span className="min-w-0 flex-1 text-sm">{h}</span>
               {canEdit && (
                 <button type="button" onClick={() => save(mine.filter((_, k) => k !== i))} className="text-xs text-muted hover:text-danger" aria-label={`Remove: ${h}`}>
@@ -314,8 +315,8 @@ export function AdvancedAccessToggle({ playerId, name, on }: { playerId: string;
       <button
         type="button"
         disabled={pending}
-        onClick={() => {
-          if (on && !window.confirm(`Turn off G3 Advanced for ${name}? Her book is kept and comes back if you turn it on again.`)) return;
+        onClick={async () => {
+          if (on && !(await confirmAction(`Turn off G3 Advanced for ${name}? Her book is kept and comes back if you turn it on again.`))) return;
           setError(null);
           startTransition(async () => setError((await setAdvancedAccess({ playerId, on: !on })).error));
         }}
@@ -350,8 +351,8 @@ export function ConfirmPosition({
       <button
         type="button"
         disabled={pending}
-        onClick={() => {
-          if (confirmed && !window.confirm(`Remove ${name} as a confirmed ${label}? Her ${label} chapter leaves her book (her notes are kept).`)) return;
+        onClick={async () => {
+          if (confirmed && !(await confirmAction(`Remove ${name} as a confirmed ${label}? Her ${label} chapter leaves her book (her notes are kept).`))) return;
           setError(null);
           startTransition(async () => setError((await setConfirmedPosition({ playerId, position, on: !confirmed })).error));
         }}

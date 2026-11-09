@@ -53,7 +53,7 @@ export async function loadPlayerStats(supabase: Supabase, playerId: string, seas
 function Stat({ label, k, value }: { label?: string; k?: StatKey; value: ReactNode }) {
   return (
     <div className="min-w-14">
-      <dt className="font-mono text-[10px] font-bold tracking-wider text-muted uppercase">{k ? <StatTerm k={k} /> : label}</dt>
+      <dt className="font-mono text-2xs font-bold tracking-wider text-muted uppercase">{k ? <StatTerm k={k} /> : label}</dt>
       <dd className="font-display text-xl font-bold text-highlight tabular-nums">{value}</dd>
     </div>
   );
@@ -62,7 +62,7 @@ function Stat({ label, k, value }: { label?: string; k?: StatKey; value: ReactNo
 function Row({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="rounded-xl border border-navy-700 bg-navy-950/40 p-3">
-      <p className="mb-2 font-mono text-[11px] font-bold tracking-[0.18em] text-pink-soft uppercase">{title}</p>
+      <p className="mb-2 font-mono text-2xs font-bold tracking-[0.18em] text-pink-soft uppercase">{title}</p>
       <dl className="flex flex-wrap gap-x-5 gap-y-3">{children}</dl>
     </div>
   );
@@ -72,7 +72,7 @@ export function StatsCard({ stats, seasonLabel }: { stats: Awaited<ReturnType<ty
   const has = stats && (stats.batting || stats.pitching || stats.fielding || stats.qab || stats.bp);
   return (
     <section className="mt-10 flex flex-col gap-3">
-      <h2 className="font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">
+      <h2 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">
         Season stats{seasonLabel ? ` · ${seasonLabel}` : ""}
       </h2>
       {!has ? (

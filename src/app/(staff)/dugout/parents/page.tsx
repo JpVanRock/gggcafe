@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { canEdit, requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Card, EmptyState, buttonClass, pillQuietClass, Disclosure } from "@/components/ui";
+import { Card, EmptyState, pillQuietClass, Disclosure, eyebrowClass } from "@/components/ui";
 import { loadDugoutTeam } from "../data";
 import { NoOwnTeam, TeamPicker } from "../team-picker";
 import { removeParentLink, setParentCode } from "./actions";
@@ -13,6 +13,7 @@ import { PACKET_KIND_LABEL, type PacketKind } from "@/lib/family";
 import { addStarterTips, deletePacketItem } from "./actions";
 import { PacketItemForm } from "./packet-forms";
 import { ActionForm } from "@/components/action-form";
+import { SubmitButton } from "@/components/submit-button";
 
 export const metadata: Metadata = { title: "Parents · Coaches Dugout · GGG.Cafe" };
 
@@ -90,9 +91,9 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
             </p>
             <ActionForm action={setParentCode}>
               <input type="hidden" name="team_id" value={team.id} />
-              <button type="submit" className={buttonClass}>
+              <SubmitButton>
                 Turn on parent sign-up
-              </button>
+              </SubmitButton>
             </ActionForm>
           </div>
         )}
@@ -167,13 +168,13 @@ async function PacketSection({ teamId }: { teamId: string }) {
   const readCount = (id: string) => ((reads ?? []) as { item_id: string }[]).filter((r) => r.item_id === id).length;
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">Welcome packet</h2>
+      <h2 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Welcome packet</h2>
       <p className="text-sm text-muted">Approved parents read it on their family page and mark each item read.</p>
       {list.length > 0 && (
         <ul className="grid gap-3 md:grid-cols-2">
           {list.map((it) => (
             <li key={it.id} className="rounded-xl border border-navy-700 p-4">
-              <p className="font-mono text-[11px] tracking-widest text-pink-soft uppercase">
+              <p className={eyebrowClass}>
                 {PACKET_KIND_LABEL[it.kind]} · read by {readCount(it.id)}
               </p>
               <p className="mt-1 font-semibold">{it.title}</p>
@@ -200,7 +201,7 @@ async function PacketSection({ teamId }: { teamId: string }) {
       </Disclosure>
       <ActionForm action={addStarterTips}>
         <input type="hidden" name="team_id" value={teamId} />
-        <button type="submit" className="text-sm font-semibold text-pink hover:underline">
+        <button type="submit" className="text-sm font-semibold text-link hover:underline">
           + Add the starter &ldquo;how to help her&rdquo; tips
         </button>
       </ActionForm>

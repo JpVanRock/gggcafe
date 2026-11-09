@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { BudgetSummary, type BudgetSummaryData } from "@/components/budget-summary";
-import { Card, Disclosure, Loading, PageHeader, secondaryButtonClass } from "@/components/ui";
+import { Card, Disclosure, Loading, PageHeader, secondaryButtonClass, eyebrowClass, badgeClass } from "@/components/ui";
 import { JoinForm } from "./join-form";
 import { FamilyHeader } from "./header";
 import { yearbookTeams } from "@/lib/yearbook-data";
@@ -22,7 +22,7 @@ export default function FamilyPage({ searchParams }: PageProps<"/family">) {
   return (
     <div className="flex flex-1 flex-col">
       <FamilyHeader />
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
+      <main id="main" className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
         <Suspense fallback={<Loading />}>
           <Family searchParams={searchParams} />
         </Suspense>
@@ -107,9 +107,7 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
                   <p className="text-sm text-muted">Parent of {l.player_name ?? l.child_name}</p>
                 </div>
                 <span
-                  className={`rounded px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase ${
-                    l.status === "approved" ? "bg-neon text-on-accent" : l.status === "pending" ? "border border-pink text-pink-soft" : "border border-navy-600 text-muted"
-                  }`}
+                  className={badgeClass(l.status === "approved" ? "neon" : l.status === "pending" ? "pink" : "neutral")}
                 >
                   {l.status === "approved" ? "Approved" : l.status === "pending" ? "Waiting for coach" : "Not approved"}
                 </span>
@@ -172,7 +170,7 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
           <ul className="flex flex-col gap-3">
             {packet.map((it) => (
               <li key={it.id} className={`rounded-xl border p-4 ${readIds.has(it.id) ? "border-navy-700" : "border-pink/60 bg-pink/5"}`}>
-                <p className="font-mono text-[11px] tracking-widest text-pink-soft uppercase">{PACKET_KIND_LABEL[it.kind]}</p>
+                <p className={eyebrowClass}>{PACKET_KIND_LABEL[it.kind]}</p>
                 <p className="mt-1 font-semibold">{it.title}</p>
                 <p className="mt-1 text-sm whitespace-pre-wrap text-ink/90">{it.body}</p>
                 {readIds.has(it.id) ? (
@@ -180,7 +178,7 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
                 ) : (
                   <ActionForm action={markPacketRead} className="mt-2">
                     <input type="hidden" name="item_id" value={it.id} />
-                    <button type="submit" className="text-sm font-semibold text-pink hover:underline">
+                    <button type="submit" className="text-sm font-semibold text-link hover:underline">
                       Mark as read
                     </button>
                   </ActionForm>

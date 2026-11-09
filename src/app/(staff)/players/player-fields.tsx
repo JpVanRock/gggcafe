@@ -10,7 +10,7 @@ import { PhotoField } from "./photo-field";
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <fieldset className="grid gap-4 sm:col-span-6 sm:grid-cols-6">
-      <legend className="mb-1 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">{title}</legend>
+      <legend className="mb-1 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">{title}</legend>
       {children}
     </fieldset>
   );

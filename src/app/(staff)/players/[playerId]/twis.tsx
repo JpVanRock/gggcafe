@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { EmptyState, secondaryButtonClass } from "@/components/ui";
+import { EmptyState, secondaryButtonClass, badgeClass } from "@/components/ui";
 import { WEEKDAYS, addDays, formatDay, formatWeekRange, isoWeekday, weekStart } from "@/lib/dates";
 import { deleteActivity, endActivity } from "./twis-actions";
 import type { ActivityRow, TwisWeek } from "./data";
@@ -7,6 +7,7 @@ import { DetailHeading } from "./menu";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { ActivityForm, TwisChecklist, type TwisCellView } from "./twis-client";
 import { ActionForm } from "@/components/action-form";
+import { SubmitButton } from "@/components/submit-button";
 
 const monthDay = new Intl.DateTimeFormat("en-US", { timeZone: "UTC", month: "short", day: "numeric" });
 
@@ -53,7 +54,7 @@ export function TwisBoard({
           <p className="mt-2 font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">This Week in Softball</p>
           {week.phase && (
             <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1" title={week.phase.focus ?? undefined}>
-              <span className="rounded border border-neon px-2 py-0.5 font-mono text-[11px] font-bold tracking-wider text-highlight uppercase">
+              <span className={badgeClass("neonOutline")}>
                 {week.phase.name} · Week {week.phase.week} of {week.phase.of}
               </span>
               {week.phase.focus && <span className="text-xs text-muted">{week.phase.focus}</span>}
@@ -128,15 +129,15 @@ export function ActivitiesManager({
                   {a.details && <p className="mt-1 text-sm text-ink/80">{a.details}</p>}
                 </div>
                 {a.source === "coach" ? (
-                  <span className="rounded border border-pink px-1.5 py-px font-mono text-[10px] font-bold tracking-wider text-pink-soft uppercase">From your coach</span>
+                  <span className={badgeClass("pink")}>From your coach</span>
                 ) : (
                 <div className="flex items-center gap-2">
                   {(!a.ends_on || a.ends_on >= today) && (
                     <ActionForm action={endActivity}>
                       <input type="hidden" name="id" value={a.id} />
-                      <button type="submit" className={secondaryButtonClass}>
+                      <SubmitButton variant="secondary">
                         End
-                      </button>
+                      </SubmitButton>
                     </ActionForm>
                   )}
                   <ActionForm action={deleteActivity}>

@@ -5,7 +5,7 @@
 // end she logs it; if it's one of her routines today, it's checked off in TWIS.
 import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { buttonClass, secondaryButtonClass } from "@/components/ui";
+import { buttonClass, secondaryButtonClass, eyebrowClass } from "@/components/ui";
 import type { GuidedSession } from "@/lib/mental";
 import { finishGuidedSession } from "./mental-actions";
 
@@ -83,7 +83,7 @@ export function SessionRunner({ playerId, session, canEdit, backHref }: { player
   if (stage === "intro") {
     return (
       <div className="flex max-w-2xl flex-col gap-4">
-        <p className="font-mono text-[11px] tracking-widest text-pink-soft uppercase">{label}</p>
+        <p className={eyebrowClass}>{label}</p>
         {session.intro.map((p, i) => (
           <p key={i} className="text-lg text-ink/90">
             {p}
@@ -139,7 +139,7 @@ export function SessionRunner({ playerId, session, canEdit, backHref }: { player
 
   return (
     <div className="flex flex-col items-center gap-6">
-      <p className="font-mono text-[11px] tracking-widest text-pink-soft uppercase">
+      <p className={eyebrowClass}>
         {breathing ? `Round ${seg.round} of ${rounds}` : `${seg.round} of ${rounds}`}
       </p>
       {breathing ? (

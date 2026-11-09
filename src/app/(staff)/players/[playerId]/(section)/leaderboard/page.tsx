@@ -9,7 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 import { SpeedStripes } from "@/components/athletic";
 import { squadStandings, type SquadRow } from "@/lib/training-plan";
 import { StatTerm } from "@/components/stat-term";
-import { EmptyState, buttonClass, tableClass, tdClass, thClass } from "@/components/ui";
+import { EmptyState, buttonClass, tableClass, tdClass, thClass, TableScroll } from "@/components/ui";
 import { loadTeamDugout } from "../../data";
 import { loadLeaderboard, loadTeamSessions } from "../../leaderboard-data";
 import { RemoveTeamSession } from "../../leaderboard-client";
@@ -19,16 +19,16 @@ import { pickTeam } from "../../../../dugout/team-picker";
 
 export const metadata: Metadata = { title: "Leaderboard · GGG.Cafe" };
 
-const heading = "mb-3 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = "mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
 
 /** The board's rallying cry (user, 2026-11-08: "This is meant to be fun"). */
 function BestVersion() {
   return (
     <header className="text-center">
       <p className="flex items-center justify-center gap-3 font-mono text-xs tracking-[0.35em] text-pink-soft uppercase">
-        <SpeedStripes className="h-3 w-9 text-pink" />
+        <SpeedStripes className="h-3 w-9 text-link" />
         Offseason Training
-        <SpeedStripes className="h-3 w-9 -scale-x-100 text-pink" />
+        <SpeedStripes className="h-3 w-9 -scale-x-100 text-link" />
       </p>
       <h2 className="mt-3 bg-linear-to-r from-highlight via-highlight to-pink bg-clip-text pb-1 font-display text-4xl leading-none font-black tracking-tight text-transparent uppercase italic sm:text-6xl">
         Be the Best Version of You
@@ -129,7 +129,7 @@ export default async function LeaderboardPage({ params, searchParams }: PageProp
           {/* Player of the Week */}
           <section className="relative overflow-hidden rounded-2xl border-2 border-neon bg-linear-to-br from-navy-950 to-navy-900 p-5 sm:p-6">
             <p className="flex items-center gap-3 font-mono text-xs tracking-[0.3em] text-pink-soft uppercase">
-              <SpeedStripes className="h-3 w-9 text-pink" />
+              <SpeedStripes className="h-3 w-9 text-link" />
               Player of the Week
             </p>
             {winner && winnerRow ? (
@@ -148,7 +148,7 @@ export default async function LeaderboardPage({ params, searchParams }: PageProp
               </p>
             )}
             <div className="mt-5">
-              <p className="font-mono text-[11px] tracking-wider text-muted uppercase">
+              <p className="font-mono text-2xs tracking-wider text-muted uppercase">
                 Round {round} · {named.size} of {board.players.length} named
               </p>
               <ul className="mt-2 flex flex-wrap gap-1.5">
@@ -209,7 +209,7 @@ export default async function LeaderboardPage({ params, searchParams }: PageProp
                     <span className="font-display text-2xl font-bold tracking-wide uppercase">{sq.name}</span>
                     <span className="font-display text-3xl font-black text-highlight tabular-nums">{sq.points}</span>
                   </p>
-                  <p className="font-mono text-[11px] tracking-wider text-muted uppercase">
+                  <p className="font-mono text-2xs tracking-wider text-muted uppercase">
                     {i === 0 ? "Leading · " : ""}+{sq.weekPoints} this week{sq.id === mySquad?.id ? " · your squad" : ""}
                   </p>
                   <p className="mt-3 text-sm text-ink/90">
@@ -241,7 +241,7 @@ export default async function LeaderboardPage({ params, searchParams }: PageProp
                   <span className="block truncate font-semibold">
                     {r.first_name} {r.last_name}
                   </span>
-                  <span className="block font-mono text-[10px] tracking-wider text-muted uppercase">
+                  <span className="block font-mono text-2xs tracking-wider text-muted uppercase">
                     {r.status === "cooldown" ? `Back in the running ${formatDay(r.until!)}` : STATUS_LABEL[r.status]}
                   </span>
                 </span>
@@ -258,7 +258,7 @@ export default async function LeaderboardPage({ params, searchParams }: PageProp
         {/* standings */}
         <section>
           <h2 className={heading}>Standings</h2>
-          <div className="overflow-x-auto">
+          <TableScroll label="Standings">
             <table className={tableClass}>
               <thead>
                 <tr>
@@ -290,7 +290,7 @@ export default async function LeaderboardPage({ params, searchParams }: PageProp
                 ))}
               </tbody>
             </table>
-          </div>
+          </TableScroll>
         </section>
 
         {bpLeaders.length > 0 && (

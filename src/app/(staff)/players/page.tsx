@@ -4,9 +4,7 @@ import { Suspense } from "react";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { AGE_GROUPS, POSITION_LABEL, ageGroupOf, batsThrows, playerName, type AgeGroup, type Player } from "@/lib/softball";
-import {
-  Card, EmptyState, Loading, PageHeader, buttonClass, inputClass, tableClass, tdClass, thClass,
-} from "@/components/ui";
+import { Card, EmptyState, Loading, PageHeader, buttonClass, inputClass, tableClass, tdClass, thClass, TableScroll } from "@/components/ui";
 
 export const metadata: Metadata = { title: "Players · GGG.Cafe" };
 
@@ -104,7 +102,7 @@ async function PlayersContent({ searchParams }: Pick<PageProps<"/players">, "sea
     <div className="flex flex-col gap-6">
       {editor && (
         <p className="text-sm text-muted">
-          To add players, open a team on the <Link href="/teams" className="text-pink hover:underline">Teams</Link> page and use{" "}
+          To add players, open a team on the <Link href="/teams" className="text-link hover:underline">Teams</Link> page and use{" "}
           <span className="font-semibold text-ink">Player intake</span>.
         </p>
       )}
@@ -128,7 +126,7 @@ async function PlayersContent({ searchParams }: Pick<PageProps<"/players">, "sea
             {query ? "No players match that name." : ageTab !== "all" ? `No ${ageTab} players yet. A player's age group comes from her team's age group.` : "No players yet."}
           </EmptyState>
         ) : (
-          <div className="overflow-x-auto">
+          <TableScroll label="Players">
             <table className={tableClass}>
               <thead>
                 <tr>
@@ -172,7 +170,7 @@ async function PlayersContent({ searchParams }: Pick<PageProps<"/players">, "sea
                 })}
               </tbody>
             </table>
-          </div>
+          </TableScroll>
         )}
       </Card>
     </div>

@@ -62,7 +62,7 @@ export function AdvancedNotFoundForAdmin({ playerId, name }: { playerId: string;
     <div className="flex flex-col gap-4">
       <EmptyState>G3 Advanced isn&apos;t unlocked for {name} yet.</EmptyState>
       <AdvancedLocked playerId={playerId} name={name} />
-      <Link href={`/players/${playerId}`} className="text-sm text-pink hover:underline">
+      <Link href={`/players/${playerId}`} className="text-sm text-link hover:underline">
         ← Back to {name}&apos;s menu
       </Link>
     </div>

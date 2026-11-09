@@ -78,7 +78,7 @@ export default async function ScoutingPage({ searchParams }: PageProps<"/dugout/
       {opponents.length === 0 ? (
         <EmptyState>
           Add opponents on the{" "}
-          <Link href="/teams" className="text-pink hover:underline">
+          <Link href="/teams" className="text-link hover:underline">
             Teams
           </Link>{" "}
           page first.
@@ -137,7 +137,7 @@ export default async function ScoutingPage({ searchParams }: PageProps<"/dugout/
                                 )}
                               </div>
                               <p className="mt-1 whitespace-pre-line text-ink/90">{r.body}</p>
-                              <p className="mt-1 font-mono text-[11px] text-muted">
+                              <p className="mt-1 font-mono text-2xs text-muted">
                                 {[r.observed_on && formatDay(r.observed_on), r.confidence && CONFIDENCE_LABEL[r.confidence]].filter(Boolean).join(" · ")}
                               </p>
                             </li>

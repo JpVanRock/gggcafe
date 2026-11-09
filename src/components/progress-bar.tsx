@@ -14,7 +14,7 @@ export function ProgressBar({ value, max, label }: { value: number; max: number;
       >
         <div className="h-full rounded-full bg-linear-to-r from-pink to-neon transition-all" style={{ width: `${pct}%` }} />
       </div>
-      <p className="mt-1.5 flex justify-between font-mono text-[11px] tracking-wider text-muted uppercase">
+      <p className="mt-1.5 flex justify-between font-mono text-2xs tracking-wider text-muted uppercase">
         <span>{label}</span>
         <span className="tabular-nums">{pct}%</span>
       </p>

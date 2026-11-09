@@ -1,5 +1,5 @@
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Disclosure, EmptyState, secondaryButtonClass } from "@/components/ui";
+import { Disclosure, EmptyState, secondaryButtonClass, badgeClass } from "@/components/ui";
 import { formatLongDate } from "@/lib/dates";
 import { SKILL_AREA_LABEL, type SkillArea } from "@/lib/softball";
 import { deleteSmartGoal, setSmartGoalStatus } from "./goals-actions";
@@ -90,9 +90,7 @@ function SmartGoalCard({
           <p className="mt-0.5 font-mono text-xs tracking-wider text-muted uppercase">{SKILL_AREA_LABEL[goal.area as SkillArea]}</p>
         </div>
         <span
-          className={`rounded px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase ${
-            done ? "bg-neon text-on-accent" : "border border-pink text-pink-soft"
-          }`}
+          className={badgeClass(done ? "neon" : "pink")}
         >
           {done ? `Achieved${goal.achieved_on ? ` ${short(goal.achieved_on)}` : ""}` : "In progress"}
         </span>

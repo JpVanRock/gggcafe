@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { DM_Sans, Jost, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { SiteFooter } from "@/components/brand";
+import { SkipLink } from "@/components/ui";
 import { THEME_BOOT_SCRIPT } from "@/lib/theme";
 
 // Body and interface (brand kit): clear at small sizes; the opsz axis tunes letter shapes per size.
@@ -47,6 +48,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
       </head>
       <body className="flex min-h-full flex-col">
+        <SkipLink />
         {children}
         <SiteFooter />
       </body>

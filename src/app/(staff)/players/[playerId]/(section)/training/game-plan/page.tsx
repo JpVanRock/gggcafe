@@ -12,7 +12,7 @@ import { SectionShell } from "../../section-shell";
 export const metadata: Metadata = { title: "Game plans · Performance Training · GGG.Cafe" };
 
 // The pitcher's game plan (Phase 4): before a game her plan, after it a look-back.
-const heading = "font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
 
 export default async function GamePlanPage({ params }: PageProps<"/players/[playerId]/training/game-plan">) {
   const { playerId } = await params;
@@ -70,7 +70,7 @@ export default async function GamePlanPage({ params }: PageProps<"/players/[play
   return (
     <SectionShell title="Game plans" subtitle={`${firstName(player)} in the circle`}>
       <div className="flex flex-col gap-8">
-        <Link href={`/players/${player.id}/training`} className="-mt-2 self-start text-sm text-pink hover:underline">
+        <Link href={`/players/${player.id}/training`} className="-mt-2 self-start text-sm text-link hover:underline">
           ← Performance Training
         </Link>
         <section className="flex flex-col gap-3">

@@ -16,8 +16,9 @@ import {
   type YearbookData, type YearbookPhoto,
 } from "@/lib/yearbook";
 import { addYearbookPhotos, deleteYearbookPhoto, setYearbookCaption, setYearbookTags } from "@/app/yearbook/actions";
+import { confirmAction } from "@/components/confirm-submit";
 
-const label = "font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
+const label = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
 
 async function shrink(file: File, side: number): Promise<{ blob: Blob; width: number; height: number }> {
   const bitmap = await createImageBitmap(file);
@@ -292,14 +293,14 @@ function Lightbox({
                 <span>Added by {photo.uploader_name}</span>
                 {canEdit && (
                   <>
-                    <button type="button" onClick={() => setEditing(true)} className="text-pink underline">
+                    <button type="button" onClick={() => setEditing(true)} className="text-link underline">
                       Edit caption &amp; tags
                     </button>
                     <button
                       type="button"
                       disabled={pending}
-                      onClick={() => {
-                        if (!window.confirm("Remove this photo from the yearbook?")) return;
+                      onClick={async () => {
+                        if (!(await confirmAction("Remove this photo from the yearbook?"))) return;
                         startTransition(async () => {
                           const res = await deleteYearbookPhoto({ photoId: photo.id });
                           if (res.error) return setError(res.error);
@@ -342,7 +343,7 @@ function Tile({ photo, size, url, onOpen }: { photo: YearbookPhoto; size: Return
         <span className="absolute inset-x-0 bottom-0 bg-linear-to-t from-navy-950/95 via-navy-950/60 to-transparent px-3 pt-8 pb-2.5">
           {photo.caption && <span className={`block font-semibold text-white ${size === "feature" ? "text-lg" : "truncate text-sm"}`}>{photo.caption}</span>}
           {photo.tags.length > 0 && (
-            <span className="block truncate font-mono text-[10px] tracking-wider text-neon uppercase">{photo.tags.map((t) => t.name.split(" ")[0]).join(" · ")}</span>
+            <span className="block truncate font-mono text-2xs tracking-wider text-neon uppercase">{photo.tags.map((t) => t.name.split(" ")[0]).join(" · ")}</span>
           )}
         </span>
       )}
@@ -396,7 +397,7 @@ export function YearbookView({
         </div>
         <div className="relative max-w-xl">
           <p className="flex items-center gap-3 font-mono text-xs tracking-[0.35em] text-pink-soft uppercase">
-            <SpeedStripes className="h-3 w-9 text-pink" />
+            <SpeedStripes className="h-3 w-9 text-link" />
             {data.season?.name ?? "This season"}
           </p>
           <p className="mt-3 text-sm font-semibold tracking-[0.3em] text-ink uppercase">{data.team.name}</p>
@@ -512,7 +513,7 @@ export function YearbookView({
               <header className="relative mb-4 flex items-end gap-4">
                 <h3 className="font-display text-5xl leading-none font-black tracking-tight text-ink/90 uppercase sm:text-7xl">{s.month}</h3>
                 <span className="mb-1 flex items-center gap-2 font-mono text-xs tracking-[0.3em] text-pink-soft uppercase">
-                  <SpeedStripes className="h-3 w-8 text-pink" />
+                  <SpeedStripes className="h-3 w-8 text-link" />
                   {s.year} · {s.photos.length} photo{s.photos.length === 1 ? "" : "s"}
                 </span>
               </header>

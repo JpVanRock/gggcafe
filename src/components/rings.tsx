@@ -53,11 +53,11 @@ export function RingCase({
             {[1, 2, 3].map((level) => (
               <div key={level} className="flex flex-col items-center gap-1">
                 <Ring track={track} level={level} earned={has(track, level)} size={size} />
-                {showLabels && <span className="font-mono text-[10px] text-muted">L{level}</span>}
+                {showLabels && <span className="font-mono text-2xs text-muted">L{level}</span>}
               </div>
             ))}
           </div>
-          {showLabels && <p className="font-mono text-[10px] tracking-[0.2em] text-muted uppercase">{TRACK_LABEL[track]}</p>}
+          {showLabels && <p className="font-mono text-2xs tracking-[0.2em] text-muted uppercase">{TRACK_LABEL[track]}</p>}
         </div>
       ))}
     </div>

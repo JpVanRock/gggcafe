@@ -10,7 +10,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { useRouter } from "next/navigation";
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Card, fieldClass, inputClass, pillButtonClass, pillOutlineClass, sectionLabelClass } from "@/components/ui";
+import { Card, fieldClass, inputClass, pillButtonClass, pillOutlineClass, sectionLabelClass, TableScroll } from "@/components/ui";
 import { formatLongDate } from "@/lib/dates";
 import {
   BASE_RUNNING_LABEL, GAME_JOB_STARTERS, HITTING_TYPE_LABEL, MAX_ROTATIONS, PITCHES, ROTATION_SPOTS, dpFlexProblems, fieldingPlayers, percent,
@@ -24,7 +24,7 @@ import { ShareButton } from "../../plans/[planId]/share-button";
 import { deleteLineup, finalizeLineup, saveLineup, shareLineup } from "../actions";
 import { ActionForm } from "@/components/action-form";
 
-const labelClass = "font-mono text-[10px] font-bold tracking-wider text-muted uppercase";
+const labelClass = "font-mono text-2xs font-bold tracking-wider text-muted uppercase";
 const small = `${inputClass} px-2 py-1 text-sm`;
 
 function Grip() {
@@ -295,7 +295,7 @@ export function LineupBuilder({
           title={`Bench (${bench.length})`}
           actions={
             bench.length > 0 ? (
-              <button type="button" onClick={() => setOrder((list) => [...list, ...bench.map((p) => p.id)])} className="text-xs font-semibold text-pink hover:underline">
+              <button type="button" onClick={() => setOrder((list) => [...list, ...bench.map((p) => p.id)])} className="text-xs font-semibold text-link hover:underline">
                 Add everyone
               </button>
             ) : undefined
@@ -353,11 +353,11 @@ export function LineupBuilder({
 
       {/* Defensive rotations */}
       <Card title="Defensive rotations">
-        <div className="overflow-x-auto">
+        <TableScroll label="Defensive rotations">
           <table className="w-full min-w-[36rem] text-left text-sm">
             <thead>
               <tr className="border-b border-navy-700">
-                <th className="py-2 pr-3 text-[0.75rem] leading-4 font-semibold tracking-wider text-muted uppercase">Player</th>
+                <th className="py-2 pr-3 text-2xs font-semibold tracking-wider text-muted uppercase">Player</th>
                 {rotations.map((r, i) => {
                   const p = rotationProblems(defense[r]);
                   const ok = p.missing.length === 0 && p.doubled.length === 0;
@@ -366,18 +366,18 @@ export function LineupBuilder({
                       <div className="flex flex-col items-center gap-1">
                         <span className="font-display text-sm font-bold text-highlight">R{r}</span>
                         <span
-                          className={`text-[10px] font-semibold ${ok ? "text-highlight" : "text-pink-soft"}`}
+                          className={`text-2xs font-semibold ${ok ? "text-highlight" : "text-pink-soft"}`}
                           title={ok ? "Every position filled once" : [p.missing.length && `Missing ${p.missing.join(", ")}`, p.doubled.length && `Two at ${p.doubled.join(", ")}`].filter(Boolean).join(" · ")}
                         >
                           {ok ? "✓ Set" : p.doubled.length ? `2× ${p.doubled[0]}` : `${p.missing.length} open`}
                         </span>
                         {i > 0 && (
-                          <button type="button" onClick={() => copyRotation(rotations[i - 1], r)} className="text-[10px] text-muted hover:text-pink" title={`Copy R${rotations[i - 1]} into R${r}`}>
+                          <button type="button" onClick={() => copyRotation(rotations[i - 1], r)} className="text-2xs text-muted hover:text-link" title={`Copy R${rotations[i - 1]} into R${r}`}>
                             Copy R{rotations[i - 1]}
                           </button>
                         )}
                         {hasDepth && (
-                          <button type="button" onClick={() => fromDepth(r)} className="text-[10px] text-muted hover:text-pink" title={`Fill R${r} from the depth chart`}>
+                          <button type="button" onClick={() => fromDepth(r)} className="text-2xs text-muted hover:text-link" title={`Fill R${r} from the depth chart`}>
                             Depth chart
                           </button>
                         )}
@@ -394,7 +394,7 @@ export function LineupBuilder({
                   <tr key={id} className="border-b border-navy-800">
                     <td className="py-1.5 pr-3">
                       <span className="font-semibold">{p.short}</span>
-                      {p.positions.length > 0 && <span className="ml-1.5 font-mono text-[10px] text-muted">{p.positions.slice(0, 3).join(" ")}</span>}
+                      {p.positions.length > 0 && <span className="ml-1.5 font-mono text-2xs text-muted">{p.positions.slice(0, 3).join(" ")}</span>}
                     </td>
                     {rotations.map((r) => {
                       const spot = defense[r]?.[id] ?? "";
@@ -421,7 +421,7 @@ export function LineupBuilder({
               })}
             </tbody>
           </table>
-        </div>
+        </TableScroll>
         <p className="mt-3 text-xs text-muted">Each rotation needs one player at every position. Sub means she sits that rotation. The player at P pitches that rotation.</p>
       </Card>
 
@@ -471,7 +471,7 @@ export function LineupBuilder({
         title="Game-day jobs"
         actions={
           dutyJobs.length > 0 ? (
-            <button type="button" onClick={() => setJobs(dutyJobs.slice(0, 12))} className="text-xs font-semibold text-pink hover:underline">
+            <button type="button" onClick={() => setJobs(dutyJobs.slice(0, 12))} className="text-xs font-semibold text-link hover:underline">
               Fill from staff duties
             </button>
           ) : undefined

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Disclosure, EmptyState, buttonClass, sectionLabelClass } from "@/components/ui";
+import { Badge, Disclosure, EmptyState, badgeClass, buttonClass, sectionLabelClass, type BadgeTone } from "@/components/ui";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { formatDay, todayISO } from "@/lib/dates";
 import {
@@ -26,11 +26,12 @@ const IQ_LABEL: Record<InstallIqTrack, string> = {
   position: "Position IQ",
 };
 
-const STATUS_CLASS: Record<InstallStatus, string> = {
-  not_started: "border-navy-600 text-muted",
-  taught: "border-pink/70 text-pink-soft",
-  repped: "border-pink bg-pink/20 text-ink",
-  game_ready: "border-neon bg-neon text-on-accent",
+/** not started → taught → repped → game-ready, getting brighter */
+const STATUS_TONE: Record<InstallStatus, BadgeTone> = {
+  not_started: "neutral",
+  taught: "pink",
+  repped: "pinkSolid",
+  game_ready: "neon",
 };
 
 type ItemRow = {
@@ -48,14 +49,10 @@ type PlanRow = { id: string; practice_date: string; focus: string | null; instal
 
 function StatusControl({ item, editor }: { item: ItemRow; editor: boolean }) {
   if (!editor) {
-    return (
-      <span className={`rounded border px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase ${STATUS_CLASS[item.status]}`}>
-        {INSTALL_STATUS_LABEL[item.status]}
-      </span>
-    );
+    return <Badge tone={STATUS_TONE[item.status]}>{INSTALL_STATUS_LABEL[item.status]}</Badge>;
   }
   return (
-    <ActionForm action={setInstallStatus} className="flex flex-wrap gap-1" aria-label={`Status of ${item.title}`}>
+    <ActionForm action={setInstallStatus} className="flex flex-wrap gap-1.5" aria-label={`Status of ${item.title}`}>
       <input type="hidden" name="id" value={item.id} />
       {INSTALL_STATUSES.map((s) => {
         const on = s === item.status;
@@ -66,9 +63,7 @@ function StatusControl({ item, editor }: { item: ItemRow; editor: boolean }) {
             name="status"
             value={s}
             aria-pressed={on}
-            className={`rounded border px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase transition ${
-              on ? STATUS_CLASS[s] : "border-navy-700 text-muted/70 hover:border-pink hover:text-ink"
-            }`}
+            className={`${badgeClass(on ? STATUS_TONE[s] : "neutral", "md")} transition ${on ? "" : "opacity-75 hover:border-pink hover:text-ink hover:opacity-100"}`}
           >
             {INSTALL_STATUS_LABEL[s]}
           </button>

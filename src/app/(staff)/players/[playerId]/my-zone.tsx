@@ -1,6 +1,6 @@
 // My Zone (Phase 3) in her Pop Report, next to her Preferred Hitting Style: her
 // zones on the 1-9 grid and the count plan they give (0, 1, 2 strikes).
-import { Disclosure } from "@/components/ui";
+import { Disclosure, eyebrowClass } from "@/components/ui";
 import { ZoneGrid } from "@/components/zone-grid";
 import { countPlan, type HittingZones } from "@/lib/my-zone";
 import { DetailHeading } from "./menu";
@@ -33,7 +33,7 @@ export function MyZoneSection({ playerId, zones, canAct }: { playerId: string; z
             {zones?.notes && <p className="max-w-sm text-sm whitespace-pre-wrap text-ink/90">{zones.notes}</p>}
           </div>
           <div>
-            <p className="mb-2 font-mono text-[11px] tracking-widest text-pink-soft uppercase">Her count plan</p>
+            <p className={`${eyebrowClass} mb-2`}>Her count plan</p>
             <CountPlan zones={zones} />
           </div>
         </div>

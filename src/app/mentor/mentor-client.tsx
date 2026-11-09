@@ -7,6 +7,7 @@ import { buttonClass, inputClass, secondaryButtonClass } from "@/components/ui";
 import { createClient } from "@/lib/supabase/client";
 import { MESSAGE_MAX, MESSAGE_PHOTO_BUCKET } from "@/lib/mentors";
 import { addMentorDate, deleteMentorMessage, removeMentorDate, sendMentorMessage } from "./actions";
+import { confirmAction } from "@/components/confirm-submit";
 
 const MAX_SIDE = 1600; // px: sharp enough to show a grip or a swing frame
 
@@ -32,7 +33,7 @@ function ErrorLine({ error }: { error: string | null }) {
   ) : null;
 }
 
-const label = "font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
+const label = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
 
 export type LibraryDrill = { id: string; name: string; video_url: string | null };
 
@@ -260,8 +261,8 @@ export function RemoveMessage({ id }: { id: string }) {
     <button
       type="button"
       disabled={pending}
-      onClick={() => {
-        if (window.confirm("Take this message back? She won't see it any more.")) startTransition(async () => void (await deleteMentorMessage({ id })));
+      onClick={async () => {
+        if (await confirmAction("Take this message back? She won't see it any more.")) startTransition(async () => void (await deleteMentorMessage({ id })));
       }}
       className="text-xs text-muted underline hover:text-danger"
     >

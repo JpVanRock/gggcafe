@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { RatingChip } from "@/components/rating-chip";
-import { Disclosure, EmptyState, secondaryButtonClass } from "@/components/ui";
+import { Disclosure, EmptyState, eyebrowClass, badgeClass } from "@/components/ui";
 import {
   TRAINING_CATEGORY_LABEL, categoriesFor, evaluateAchievements, streaks, weeklyStats,
   type AchievementProgress, type TrainingCategory,
@@ -13,6 +13,7 @@ import type { MyTesting } from "./testing-data";
 import { DetailHeading, MenuItem } from "./menu";
 import { RoutineForm } from "./performance-client";
 import { ActionForm } from "@/components/action-form";
+import { SubmitButton } from "@/components/submit-button";
 
 const monthDay = new Intl.DateTimeFormat("en-US", { timeZone: "UTC", month: "short", day: "numeric" });
 const short = (iso: string) => monthDay.format(new Date(`${iso}T00:00:00Z`));
@@ -74,7 +75,7 @@ export function PerformanceSummary({ summary }: { summary: Summary }) {
           {summary.streak.current > 0 && ` · ${summary.streak.current}-week streak`}
         </span>
         {latest.map((a) => (
-          <span key={a.def.key} className="rounded-md border border-neon/60 px-2 py-0.5 font-mono text-[11px] font-bold tracking-wider text-highlight uppercase">
+          <span key={a.def.key} className={badgeClass("neonOutline")}>
             {a.def.title}
           </span>
         ))}
@@ -96,7 +97,7 @@ export function HexBadge({ unlocked, pct }: { unlocked: boolean; pct: number }) 
       {unlocked ? (
         <path d="m13 22.5 5 5 9-10" fill="none" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="stroke-on-accent" />
       ) : (
-        <text x="20" y="26" textAnchor="middle" className="fill-muted font-mono text-[10px] font-bold">
+        <text x="20" y="26" textAnchor="middle" className="fill-muted font-mono text-2xs font-bold">
           {pct}%
         </text>
       )}
@@ -119,13 +120,13 @@ function AchievementBadge({ a }: { a: AchievementProgress }) {
         </div>
       </div>
       {unlocked ? (
-        <p className="mt-2 font-mono text-[11px] tracking-wider text-pink-soft uppercase">Unlocked {short(a.unlockedOn!)}</p>
+        <p className={`${eyebrowClass} mt-2`}>Unlocked {short(a.unlockedOn!)}</p>
       ) : (
         <div className="mt-2.5 flex items-center gap-2">
           <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-navy-800" aria-hidden>
             <div className="h-full rounded-full bg-pink" style={{ width: `${(a.current / a.target) * 100}%` }} />
           </div>
-          <span className="font-mono text-[11px] text-muted tabular-nums">
+          <span className="font-mono text-2xs text-muted tabular-nums">
             {a.current}/{a.target}
           </span>
         </div>
@@ -144,7 +145,7 @@ function RoutineCard({ r, today, canEdit, playerId }: { r: RoutineRow; today: st
           <p className="font-semibold">{r.title}</p>
           <p className="mt-0.5 text-xs text-muted">
             {daysText(r.days)} · since {short(r.starts_on)}
-            {fromCoach && <span className="ml-1.5 rounded border border-pink px-1 py-px font-mono text-[10px] font-bold tracking-wider text-pink-soft uppercase">From your coach</span>}
+            {fromCoach && <span className={`${badgeClass("pink")} ml-1.5`}>From your coach</span>}
           </p>
         </div>
         {canEdit && !fromCoach && (
@@ -152,9 +153,9 @@ function RoutineCard({ r, today, canEdit, playerId }: { r: RoutineRow; today: st
             {(!r.ends_on || r.ends_on >= today) && (
               <ActionForm action={endActivity}>
                 <input type="hidden" name="id" value={r.id} />
-                <button type="submit" className={secondaryButtonClass}>
+                <SubmitButton variant="secondary">
                   End
-                </button>
+                </SubmitButton>
               </ActionForm>
             )}
             <ActionForm action={deleteActivity}>
@@ -217,7 +218,7 @@ export function PerformanceDetail({
       <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {stats.map(([label, value]) => (
           <div key={label} className="rounded-xl border border-navy-700 p-3">
-            <dt className="font-mono text-[11px] tracking-wider text-muted uppercase">{label}</dt>
+            <dt className="font-mono text-2xs tracking-wider text-muted uppercase">{label}</dt>
             <dd className="mt-1 text-2xl font-bold text-highlight tabular-nums">{value}</dd>
           </div>
         ))}

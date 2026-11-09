@@ -31,7 +31,7 @@ export default async function SpotlightPage({ params }: PageProps<"/players/[pla
   return (
     <SectionShell title="Player Spotlight" subtitle={s.team?.name}>
       <div className="flex flex-col gap-4">
-        <Link href={`/players/${playerId}/team#spotlight`} className="-mt-2 self-start text-sm text-pink hover:underline">
+        <Link href={`/players/${playerId}/team#spotlight`} className="-mt-2 self-start text-sm text-link hover:underline">
           ← Team page
         </Link>
         <article className="keep-night relative mx-auto w-full max-w-xl overflow-hidden rounded-2xl border-2 border-neon bg-linear-to-br from-navy-950 via-navy-900 to-navy-950 p-6 sm:p-8">
@@ -42,7 +42,7 @@ export default async function SpotlightPage({ params }: PageProps<"/players/[pla
             </span>
           )}
           <p className="relative flex items-center gap-3 font-mono text-xs tracking-[0.35em] text-pink-soft uppercase">
-            <SpeedStripes className="h-3 w-9 text-pink" />
+            <SpeedStripes className="h-3 w-9 text-link" />
             Player Spotlight
           </p>
           <h2 className="relative mt-6 font-display text-5xl leading-[0.9] font-black tracking-tight text-neon uppercase sm:text-6xl">
@@ -52,7 +52,7 @@ export default async function SpotlightPage({ params }: PageProps<"/players/[pla
           <p className="relative mt-5 font-display text-2xl font-bold tracking-wide text-ink uppercase">{s.headline}</p>
           <p className="relative mt-3 whitespace-pre-wrap text-ink/90">{s.body}</p>
           <div className="relative mt-8 flex items-end justify-between gap-4">
-            <p className="font-mono text-[11px] tracking-widest text-muted uppercase">
+            <p className="font-mono text-2xs tracking-widest text-muted uppercase">
               {s.team?.name}
               <br />
               {formatLongDate(s.published_on)}

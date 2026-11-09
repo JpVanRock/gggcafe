@@ -25,7 +25,7 @@ export function DutyMatrixForm({ duties, names }: { duties: DutyRow[]; names: st
           if (list.length === 0) return null;
           return (
             <fieldset key={phase} className="rounded-xl border border-navy-700 p-3">
-              <legend className="px-1 font-mono text-[11px] font-bold tracking-[0.18em] text-pink-soft uppercase">{DUTY_PHASE_LABEL[phase]}</legend>
+              <legend className="px-1 font-mono text-2xs font-bold tracking-[0.18em] text-pink-soft uppercase">{DUTY_PHASE_LABEL[phase]}</legend>
               <ul className="flex flex-col gap-2">
                 {list.map((d) => (
                   <li key={d.id} className="grid grid-cols-[1fr_1fr_auto] items-center gap-2 text-sm">

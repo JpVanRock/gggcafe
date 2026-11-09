@@ -19,7 +19,7 @@ export default async function TeamPlaybookPage({ params }: PageProps<"/players/[
   return (
     <SectionShell title="Team Playbook" subtitle="Our calls · flashcards · team quizzes">
       <div className="flex flex-col gap-8">
-        <Link href={`/players/${player.id}/iq`} className="text-sm text-pink hover:underline">
+        <Link href={`/players/${player.id}/iq`} className="text-sm text-link hover:underline">
           ← Softball IQ
         </Link>
         <section>

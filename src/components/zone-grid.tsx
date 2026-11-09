@@ -32,7 +32,7 @@ export function ZoneGrid({
       {ZONE_CELLS.map((cell) => {
         const state = only ? (only.includes(cell) ? (stateOf(zones, cell) === "none" ? "strong" : stateOf(zones, cell)) : "none") : stateOf(zones, cell);
         const fight = battle.includes(cell);
-        const cls = `grid place-items-center rounded border border-transparent text-center font-mono text-[9px] leading-tight font-bold tracking-wider uppercase transition ${FILL[fight ? "weak" : state]} ${
+        const cls = `grid place-items-center rounded border border-transparent text-center font-mono text-2xs leading-tight font-bold tracking-wider uppercase transition ${FILL[fight ? "weak" : state]} ${
           fight ? "border-dashed !border-pink" : ""
         }`;
         const label = `${cellName(cell)}: ${fight ? "battle" : MARK[state] || "not marked"}`;

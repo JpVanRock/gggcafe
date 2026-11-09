@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useOptimistic, useState, useTransition } from "react";
-import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, buttonClass, inputClass, badgeClass, type BadgeTone } from "@/components/ui";
 import { WEEKDAYS } from "@/lib/dates";
 import { initialFormState } from "@/lib/form";
 import { addActivity, setTwisCheck } from "./twis-actions";
@@ -24,7 +24,7 @@ function PracticeNotes({ notes, many }: { notes: PracticeNote[]; many: boolean }
     <div className="mt-3 space-y-2">
       {notes.map((n, i) => (
         <div key={i} className="rounded-lg border-l-2 border-pink bg-navy-900/60 px-2.5 py-2 text-xs leading-snug">
-          <p className="font-mono text-[10px] font-bold tracking-wider text-pink-soft uppercase">Practice plan{many ? ` · ${n.team}` : ""}</p>
+          <p className="font-mono text-2xs font-bold tracking-wider text-pink-soft uppercase">Practice plan{many ? ` · ${n.team}` : ""}</p>
           {n.objective && <p className="mt-1 text-ink">{n.objective}</p>}
           {n.rule && (
             <p className="mt-1 text-muted">
@@ -43,10 +43,10 @@ function PracticeNotes({ notes, many }: { notes: PracticeNote[]; many: boolean }
   );
 }
 
-const TAG_CLASS: Record<TwisItem["kind"], string> = {
-  game: "bg-neon text-on-accent",
-  event: "bg-pink text-on-accent",
-  activity: "border border-navy-600 text-muted",
+const TAG_TONE: Record<TwisItem["kind"], BadgeTone> = {
+  game: "neon",
+  event: "pinkSolid",
+  activity: "neutral",
 };
 
 export function TwisChecklist({ playerId, cells, canEdit }: { playerId: string; cells: TwisCellView[]; canEdit: boolean }) {
@@ -114,7 +114,7 @@ export function TwisChecklist({ playerId, cells, canEdit }: { playerId: string; 
                             {item.title}
                           </span>
                           <span className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted">
-                            <span className={`rounded px-1.5 py-px font-mono text-[10px] font-bold tracking-wider uppercase ${TAG_CLASS[item.kind]}`}>
+                            <span className={badgeClass(TAG_TONE[item.kind])}>
                               {item.tag}
                             </span>
                             {item.detail}

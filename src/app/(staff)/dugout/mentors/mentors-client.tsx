@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { buttonClass, inputClass, secondaryButtonClass } from "@/components/ui";
 import { approveMentor, assignMentorPlayer, removeMentor, removeMentorMessage, setMentorCalendar, unassignMentorPlayer } from "./actions";
+import { confirmAction } from "@/components/confirm-submit";
 
 function ErrorLine({ error }: { error: string | null }) {
   return error ? (
@@ -70,8 +71,8 @@ export function RemoveMentor({ userId, name }: { userId: string; name: string })
     <button
       type="button"
       disabled={pending}
-      onClick={() => {
-        if (window.confirm(`Remove ${name} as a mentor? She loses access to every player. Messages she sent stay.`))
+      onClick={async () => {
+        if (await confirmAction(`Remove ${name} as a mentor? She loses access to every player. Messages she sent stay.`))
           startTransition(async () => void (await removeMentor({ userId })));
       }}
       className="text-xs text-muted underline hover:text-danger"
@@ -142,8 +143,8 @@ export function RemoveMessage({ id }: { id: string }) {
     <button
       type="button"
       disabled={pending}
-      onClick={() => {
-        if (window.confirm("Remove this message? The player won't see it any more.")) startTransition(async () => void (await removeMentorMessage({ id })));
+      onClick={async () => {
+        if (await confirmAction("Remove this message? The player won't see it any more.")) startTransition(async () => void (await removeMentorMessage({ id })));
       }}
       className="text-xs text-muted underline hover:text-danger"
     >

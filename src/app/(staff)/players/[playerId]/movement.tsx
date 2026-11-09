@@ -1,4 +1,4 @@
-import { Disclosure, EmptyState } from "@/components/ui";
+import { Disclosure, EmptyState, eyebrowClass } from "@/components/ui";
 import { MoveDial } from "@/components/move-dial";
 import { SpeedStripes } from "@/components/athletic";
 import { FOCUS_TIP, HITTING, MOVEMENT, changes, choiceOf, moveDial, type Category, type Values } from "@/lib/movement";
@@ -19,7 +19,7 @@ function History({ categories, versions }: { categories: Category[]; versions: S
           const lines = changes(categories, versions[i + 1]?.values ?? null, v.values);
           return (
             <li key={v.id} className="border-l-2 border-navy-600 pl-3 text-sm">
-              <p className="font-mono text-[0.75rem] leading-4 tracking-wider text-pink-soft uppercase">
+              <p className={eyebrowClass}>
                 {stamp.format(new Date(v.recorded_at))} · {v.by}
               </p>
               {lines.length ? (
@@ -47,7 +47,7 @@ function Cards({ categories, values }: { categories: Category[]; values: Values 
         const o = choiceOf(categories, c.key, values[c.key])!;
         return (
           <li key={c.key} className="rounded-xl border border-navy-700 bg-navy-950/40 p-3">
-            <p className="font-mono text-[0.75rem] leading-4 font-bold tracking-[0.15em] text-pink-soft uppercase">{c.title}</p>
+            <p className="font-mono text-2xs font-bold tracking-[0.15em] text-pink-soft uppercase">{c.title}</p>
             <p className="mt-1 text-lg leading-snug font-semibold text-highlight">{o.label}</p>
             {o.about && <p className="mt-1 text-sm text-muted">{o.about}</p>}
           </li>
@@ -85,8 +85,8 @@ export function MovementSection({ playerId, versions, canManage }: { playerId: s
               <div className="flex gap-3 rounded-xl border border-navy-700 bg-navy-950/40 p-3">
                 <span aria-hidden className="mt-1 size-4 shrink-0 rounded-full" style={{ backgroundColor: focus.color }} />
                 <div>
-                  <p className="flex items-center gap-2 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.15em] text-pink-soft uppercase">
-                    <SpeedStripes className="h-3 w-7 text-pink" /> At-bat focus · {focus.colorName}
+                  <p className="flex items-center gap-2 font-mono text-2xs font-bold tracking-[0.15em] text-pink-soft uppercase">
+                    <SpeedStripes className="h-3 w-7 text-link" /> At-bat focus · {focus.colorName}
                   </p>
                   <p className="mt-1 font-semibold">{focus.title}</p>
                   <p className="text-sm text-muted">{focus.tip}</p>

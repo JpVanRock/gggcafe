@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { buttonClass } from "@/components/ui";
+import { buttonClass, eyebrowClass } from "@/components/ui";
 import { OutlineText, SpeedStripes } from "@/components/athletic";
 import { ProgressBar } from "@/components/progress-bar";
 import { BOOK_THEME, BOOK_TITLE_MAX, bookProgress, chapterLabel, visibleChapters } from "@/lib/advanced-book";
@@ -46,7 +46,7 @@ export default async function AdvancedPage({ params }: PageProps<"/players/[play
           G3
         </OutlineText>
         <p className="relative flex items-center gap-3 font-mono text-xs tracking-[0.3em] text-pink-soft uppercase">
-          <SpeedStripes className="h-3 w-9 text-pink" />
+          <SpeedStripes className="h-3 w-9 text-link" />
           {possessive(name)} book
         </p>
         <h2 className="relative mt-3 text-4xl leading-none font-bold tracking-wide text-highlight uppercase sm:text-6xl">{book.title}</h2>
@@ -68,7 +68,7 @@ export default async function AdvancedPage({ params }: PageProps<"/players/[play
           className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-neon bg-neon/5 p-5 transition hover:bg-neon/10"
         >
           <span>
-            <span className="block font-mono text-[11px] tracking-[0.2em] text-pink-soft uppercase">Picked by your coach</span>
+            <span className="block font-mono text-2xs tracking-[0.2em] text-pink-soft uppercase">Picked by your coach</span>
             <span className="block font-display text-2xl font-bold tracking-wide text-highlight uppercase">{GUIDE_TITLE}</span>
           </span>
           <span className="font-mono text-xs tracking-wider text-ink uppercase">
@@ -78,7 +78,7 @@ export default async function AdvancedPage({ params }: PageProps<"/players/[play
       )}
 
       {/* table of contents */}
-      <h2 className="mt-8 mb-3 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">Contents</h2>
+      <h2 className="mt-8 mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Contents</h2>
       <ol className="divide-y divide-navy-700 border-y border-navy-700">
         {chapters.map((c) => {
           const work = book.work.find((w) => w.chapter === c.slug);
@@ -96,18 +96,18 @@ export default async function AdvancedPage({ params }: PageProps<"/players/[play
                 href={advancedHref(player.id, c.slug)}
                 className={`flex items-center gap-4 px-1 py-4 transition hover:bg-navy-800 ${c.status === "coming" ? "opacity-60" : ""}`}
               >
-                <span className="w-24 shrink-0 font-mono text-[11px] tracking-wider text-muted uppercase">{chapterLabel(c, chapters)}</span>
+                <span className="w-24 shrink-0 font-mono text-2xs tracking-wider text-muted uppercase">{chapterLabel(c, chapters)}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block font-semibold text-ink">
                     {c.title}
-                    {c.kicker && <span className="ml-2 font-mono text-[10px] tracking-wider text-pink-soft uppercase">{c.kicker}</span>}
+                    {c.kicker && <span className={`${eyebrowClass} ml-2`}>{c.kicker}</span>}
                   </span>
                   <span className="block text-sm text-muted">{c.summary}</span>
                 </span>
-                <span className={`hidden shrink-0 font-mono text-[11px] tracking-wider uppercase sm:block ${work?.completedAt ? "text-highlight" : "text-muted"}`}>
+                <span className={`hidden shrink-0 font-mono text-2xs tracking-wider uppercase sm:block ${work?.completedAt ? "text-highlight" : "text-muted"}`}>
                   {status}
                 </span>
-                <span className="text-pink">→</span>
+                <span className="text-link">→</span>
               </Link>
             </li>
           );
@@ -116,12 +116,12 @@ export default async function AdvancedPage({ params }: PageProps<"/players/[play
 
       {access.canManage && (
         <div className="mt-8 flex flex-col gap-2 rounded-xl border border-navy-700 p-4">
-          <p className="font-mono text-[11px] tracking-wider text-pink-soft uppercase">Coaches · position chapters</p>
+          <p className={eyebrowClass}>Coaches · position chapters</p>
           <p className="text-sm text-muted">
             The Pitching chapter is only in the book of a player you&apos;ve confirmed as a pitcher.
           </p>
           <ConfirmPosition playerId={player.id} name={name} position="P" label="pitcher" confirmed={book.confirmed.includes("P")} />
-          <p className="mt-3 font-mono text-[11px] tracking-wider text-pink-soft uppercase">Coaches · leadership</p>
+          <p className={`${eyebrowClass} mt-3`}>Coaches · leadership</p>
           <p className="text-sm text-muted">The G3 Leadership Guide is for the players you pick to train as leaders.</p>
           <LeaderToggle playerId={player.id} name={name} on={lead.picked} />
         </div>

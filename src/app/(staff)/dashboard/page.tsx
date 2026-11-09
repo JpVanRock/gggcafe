@@ -15,7 +15,7 @@ export const metadata: Metadata = { title: "Dashboard · GGG.Cafe" };
 // get the full dashboard, assistant coaches their week and their plans, coaches
 // waiting for approval a holding page; players, parents and mentors are sent to
 // /me, /family and /mentor.
-const heading = "font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
 
 const TAB_NOTE: Record<string, string> = {
   "/dugout/roster": "Your roster, player accounts, approvals",
@@ -112,11 +112,11 @@ async function NotStaff({ userId, email }: { userId: string; email: string | nul
       </p>
       <p className="mt-4 text-sm text-muted">
         A player?{" "}
-        <Link href="/me" className="text-pink hover:underline">
+        <Link href="/me" className="text-link hover:underline">
           Claim your profile →
         </Link>{" "}
         A parent?{" "}
-        <Link href="/family" className="text-pink hover:underline">
+        <Link href="/family" className="text-link hover:underline">
           Set up your family account →
         </Link>
       </p>
@@ -147,7 +147,7 @@ function Approvals({
           <li className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
             <span className="font-semibold">Head coaches</span>
             <span className="text-muted">{heads.map((r) => r.display_name).join(", ")}</span>
-            <Link href="/dugout/roster#waiting" className="text-pink hover:underline">
+            <Link href="/dugout/roster#waiting" className="text-link hover:underline">
               Review in Roster →
             </Link>
           </li>
@@ -166,7 +166,7 @@ function Approvals({
                   .filter(Boolean)
                   .join(" · ")}
               </span>
-              <Link href={`/dugout/roster?team=${w.team_id}#waiting`} className="text-pink hover:underline">
+              <Link href={`/dugout/roster?team=${w.team_id}#waiting`} className="text-link hover:underline">
                 Review in Roster →
               </Link>
             </li>
@@ -181,7 +181,7 @@ function Approvals({
           <li key={r.team_id ?? "none"} className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
             <span className="font-semibold">{r.team_name ?? "Assistant coaches"}</span>
             <span className="text-muted">{plural(assistants.filter((a) => a.team_id === r.team_id).length, "assistant coach")}</span>
-            <Link href={`/dugout/roster${r.team_id ? `?team=${r.team_id}` : ""}#waiting`} className="text-pink hover:underline">
+            <Link href={`/dugout/roster${r.team_id ? `?team=${r.team_id}` : ""}#waiting`} className="text-link hover:underline">
               Review in Roster →
             </Link>
           </li>
@@ -219,7 +219,7 @@ async function CheckIns() {
             </span>
             <span className="font-semibold">{c.player ? playerName(c.player) : "A player"}</span>
             {c.player && (
-              <Link href={`/players/${c.player.id}/advanced/leadership/plan`} className="text-pink hover:underline">
+              <Link href={`/players/${c.player.id}/advanced/leadership/plan`} className="text-link hover:underline">
                 Her Leadership Plan →
               </Link>
             )}
@@ -372,7 +372,7 @@ async function AssistantHome({ user }: { user: StaffUser }) {
               ))}
             </ul>
           )}
-          <Link href="/dugout/calendar" className="mt-3 inline-block text-sm text-pink hover:underline">
+          <Link href="/dugout/calendar" className="mt-3 inline-block text-sm text-link hover:underline">
             Calendar →
           </Link>
         </Card>
@@ -387,14 +387,14 @@ async function AssistantHome({ user }: { user: StaffUser }) {
                   <Link href={`/dugout/plans/${p.id}`} className="font-semibold hover:underline">
                     {when(p.practice_date, p.start_time)} · {p.focus ?? "Practice"}
                   </Link>
-                  <span className="font-mono text-[10px] tracking-wider text-muted uppercase">
+                  <span className="font-mono text-2xs tracking-wider text-muted uppercase">
                     {canEditPlanRole(user.staff.role, user.id, p.created_by) ? "Yours" : "View only"} · {p.status}
                   </span>
                 </li>
               ))}
             </ul>
           )}
-          <Link href="/dugout/plans" className="mt-3 inline-block text-sm text-pink hover:underline">
+          <Link href="/dugout/plans" className="mt-3 inline-block text-sm text-link hover:underline">
             All practice plans →
           </Link>
         </Card>

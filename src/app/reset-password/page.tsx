@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Set a new password · GGG.Cafe" };
 
 export default function ResetPasswordPage() {
   return (
-    <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-8 px-4 py-16">
+    <main id="main" className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-8 px-4 py-16">
       <CornerThemeToggle />
       <header className="flex flex-col items-center text-center">
         <Logo size={128} priority className="h-28 w-28 shadow-[0_0_40px_rgba(254,31,124,0.3)]" />

@@ -61,7 +61,7 @@ export function StaffList({ staff, isAdmin, meId }: { staff: StaffMember[]; isAd
                   <option value="assistant">Assistant Coach</option>
                   <option value="viewer">Viewer</option>
                 </select>
-                <button type="submit" className="text-xs text-pink hover:underline">
+                <button type="submit" className="text-xs text-link hover:underline">
                   Save
                 </button>
               </ActionForm>

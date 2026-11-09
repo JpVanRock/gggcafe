@@ -79,7 +79,7 @@ export function PlanExtrasForm({
                           <input type="checkbox" name="install" value={i.id} defaultChecked={picked.includes(i.id)} className="mt-1 accent-pink" />
                           <span>
                             {i.title}
-                            {i.status === "game_ready" && <span className="ml-1 font-mono text-[10px] tracking-wider text-highlight uppercase">Game-ready</span>}
+                            {i.status === "game_ready" && <span className="ml-1 font-mono text-2xs tracking-wider text-highlight uppercase">Game-ready</span>}
                           </span>
                         </label>
                       </li>

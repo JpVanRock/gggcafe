@@ -67,7 +67,7 @@ export function PhotoField({ folder, path, previewUrl }: { folder?: string; path
           // eslint-disable-next-line @next/next/no-img-element -- signed Storage URL or local preview
           <img src={preview} alt="Profile picture" className="size-full object-cover" />
         ) : (
-          <span className="font-mono text-[10px] tracking-wider text-muted uppercase">No photo</span>
+          <span className="font-mono text-2xs tracking-wider text-muted uppercase">No photo</span>
         )}
       </div>
       <div className="flex flex-col gap-1.5">

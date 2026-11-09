@@ -89,7 +89,7 @@ export default async function MentorHome() {
       )}
       {(sent ?? []).length > 0 && (
         <section>
-          <h2 className="mb-3 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">What you sent lately</h2>
+          <h2 className="mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">What you sent lately</h2>
           <ul className="divide-y divide-navy-700 rounded-xl border border-navy-700">
             {((sent ?? []) as { id: string; player_id: string; body: string | null; photo_path: string | null; drill_name: string | null; created_at: string; read_at: string | null }[]).map((m) => (
               <li key={m.id} className="flex flex-wrap items-baseline gap-x-4 gap-y-1 px-4 py-2.5 text-sm">
@@ -97,7 +97,7 @@ export default async function MentorHome() {
                 <span className="min-w-0 flex-1 truncate text-muted">
                   {[m.body, m.drill_name && `Drill: ${m.drill_name}`, m.photo_path && "Photo"].filter(Boolean).join(" · ")}
                 </span>
-                <span className="font-mono text-[10px] tracking-wider text-muted uppercase">{m.read_at ? "Seen" : "Not seen yet"}</span>
+                <span className="font-mono text-2xs tracking-wider text-muted uppercase">{m.read_at ? "Seen" : "Not seen yet"}</span>
               </li>
             ))}
           </ul>

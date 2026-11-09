@@ -4,7 +4,7 @@
 // final score, and an optional 0-5 grade on each plate appearance (quality at-bats).
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Card, buttonClass, fieldClass } from "@/components/ui";
+import { Card, buttonClass, fieldClass, TableScroll } from "@/components/ui";
 import {
   BATTING_COLUMNS, BATTING_LABEL, FIELDING_COLUMNS, FIELDING_LABEL, PITCHING_COLUMNS, PITCHING_LABEL, QAB_SCALE,
   boxProblems, emptyBatting, emptyFielding, ipLabel, parseIp,
@@ -15,7 +15,7 @@ import { saveBoxScore } from "../../actions";
 // these small inputs set their own width (fieldClass has none)
 const base = fieldClass;
 const cell = `${base} w-11 px-1 py-1 text-center text-sm tabular-nums`;
-const th = "px-0.5 pb-1 text-center font-mono text-[10px] font-bold tracking-wider text-muted uppercase";
+const th = "px-0.5 pb-1 text-center font-mono text-2xs font-bold tracking-wider text-muted uppercase";
 
 function Num({ value, onChange, label, max = 99 }: { value: number; onChange: (n: number) => void; label: string; max?: number }) {
   return (
@@ -112,11 +112,11 @@ export function BoxScoreForm({
       </Card>
 
       <Card title="Batting">
-        <div className="overflow-x-auto">
+        <TableScroll label="Batting">
           <table className="text-sm">
             <thead>
               <tr>
-                <th className="pr-2 pb-1 text-left font-mono text-[10px] font-bold tracking-wider text-muted uppercase">Player</th>
+                <th className="pr-2 pb-1 text-left font-mono text-2xs font-bold tracking-wider text-muted uppercase">Player</th>
                 {BATTING_COLUMNS.map((k) => (
                   <th key={k} className={th}>
                     {BATTING_LABEL[k]}
@@ -137,7 +137,7 @@ export function BoxScoreForm({
               ))}
             </tbody>
           </table>
-        </div>
+        </TableScroll>
       </Card>
 
       <Card title="Quality at-bats (optional)">
@@ -192,7 +192,7 @@ export function BoxScoreForm({
             <table className="text-sm">
               <thead>
                 <tr>
-                  <th className="pr-2 pb-1 text-left font-mono text-[10px] font-bold tracking-wider text-muted uppercase">Pitcher</th>
+                  <th className="pr-2 pb-1 text-left font-mono text-2xs font-bold tracking-wider text-muted uppercase">Pitcher</th>
                   <th className={th}>IP</th>
                   {PITCHING_COLUMNS.map((k) => (
                     <th key={k} className={th}>
@@ -270,11 +270,11 @@ export function BoxScoreForm({
       </Card>
 
       <Card title="Fielding">
-        <div className="overflow-x-auto">
+        <TableScroll label="Fielding">
           <table className="text-sm">
             <thead>
               <tr>
-                <th className="pr-2 pb-1 text-left font-mono text-[10px] font-bold tracking-wider text-muted uppercase">Player</th>
+                <th className="pr-2 pb-1 text-left font-mono text-2xs font-bold tracking-wider text-muted uppercase">Player</th>
                 {FIELDING_COLUMNS.map((k) => (
                   <th key={k} className={th}>
                     {FIELDING_LABEL[k]}
@@ -295,7 +295,7 @@ export function BoxScoreForm({
               ))}
             </tbody>
           </table>
-        </div>
+        </TableScroll>
         <p className="mt-2 text-xs text-muted">PB, SBA (steals allowed) and CS (caught stealing) are for catchers.</p>
       </Card>
 

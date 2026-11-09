@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 import { Modal } from "@/components/modal";
 import { formatDay } from "@/lib/dates";
 import { money, runningLedger, toCents, type EntryKind } from "@/lib/budget";
+import { TableScroll } from "@/components/ui";
 
 export type BudgetSummaryData = {
   team: string;
@@ -38,7 +39,7 @@ function Stat({
   return (
     <div className="relative rounded-xl border border-navy-700 bg-navy-900/70 p-4">
       {action && <div className="absolute top-3 right-3">{action}</div>}
-      <p className="font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">{label}</p>
+      <p className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">{label}</p>
       <p
         className={`mt-1 font-display text-2xl font-bold tabular-nums ${
           tone === "highlight" ? "text-highlight" : tone === "danger" ? "text-danger" : "text-ink"
@@ -77,7 +78,7 @@ function LineItems({ title, kind, entries, team }: { title: string; kind: "expen
           .map(([category, rows]) => (
             <section key={category}>
               <div className="mb-2 flex items-baseline justify-between gap-3 border-b border-navy-700 pb-1.5">
-                <h3 className="font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">{category}</h3>
+                <h3 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">{category}</h3>
                 <span className="font-display text-sm font-bold tabular-nums">{money(rows.reduce((sum, e) => sum + toCents(e.amount), 0))}</span>
               </div>
               <ul className="flex flex-col">
@@ -124,7 +125,7 @@ export function BudgetSummary({ summary, showLedger = true }: { summary: BudgetS
           note={summary.fees.length ? summary.fees.map((f) => `${f.name} ${money(toCents(f.amount))}`).join(" · ") : "Not set yet"}
         />
         <div className="rounded-xl border border-navy-700 bg-navy-900/70 p-4">
-          <p className="font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">Collected</p>
+          <p className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Collected</p>
           <p className="mt-1 font-display text-2xl font-bold text-highlight tabular-nums">{money(t.collected)}</p>
           <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-navy-800" aria-hidden>
             <div className="h-full rounded-full bg-neon" style={{ width: `${pct}%` }} />
@@ -151,14 +152,14 @@ export function BudgetSummary({ summary, showLedger = true }: { summary: BudgetS
 
       {showLedger && (
         <section aria-label="Ledger">
-          <h3 className="mb-3 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">Ledger</h3>
+          <h3 className="mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Ledger</h3>
           {ledger.length === 0 ? (
             <p className="rounded-md border border-dashed border-navy-600 p-6 text-center text-sm text-muted">Nothing recorded yet.</p>
           ) : (
-            <div className="overflow-x-auto">
+            <TableScroll label="Ledger">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-navy-700 text-[0.75rem] leading-4 font-semibold tracking-wider text-muted uppercase">
+                  <tr className="border-b border-navy-700 text-2xs font-semibold tracking-wider text-muted uppercase">
                     <th className="py-2 pr-4">Date</th>
                     <th className="py-2 pr-4">Item</th>
                     <th className="py-2 pr-4 text-right">In</th>
@@ -181,7 +182,7 @@ export function BudgetSummary({ summary, showLedger = true }: { summary: BudgetS
                   ))}
                 </tbody>
               </table>
-            </div>
+            </TableScroll>
           )}
         </section>
       )}

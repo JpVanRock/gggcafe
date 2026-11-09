@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { EmptyState, RECENT_LIMIT, ShowAllLink } from "@/components/ui";
+import { EmptyState, RECENT_LIMIT, ShowAllLink, badgeClass } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import { loadDugoutTeam } from "../../data";
 import { NoOwnTeam, TeamPicker } from "../../team-picker";
@@ -81,9 +81,7 @@ export default async function BoxScoresPage({ searchParams }: PageProps<"/dugout
                       </span>
                     )}
                     <span
-                      className={`rounded px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase ${
-                        entered ? "bg-neon text-on-accent" : "border border-pink text-pink-soft"
-                      }`}
+                      className={badgeClass(entered ? "neon" : "pink")}
                     >
                       {entered ? "Entered" : "Enter box score"}
                     </span>

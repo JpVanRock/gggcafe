@@ -3,7 +3,7 @@
 // Forms for Coaches Dugout → Training: phases, the backward-planned roadmap, team
 // routines, testing results, rating bands and the draft setup.
 import { useActionState, useMemo, useState } from "react";
-import { Field, FormMessage, buttonClass, fieldClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, buttonClass, fieldClass, inputClass, eyebrowClass, TableScroll } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import { WEEKDAYS } from "@/lib/dates";
 import { TRAINING_CATEGORIES, TRAINING_CATEGORY_LABEL, type TrainingCategory } from "@/lib/achievements";
@@ -237,13 +237,13 @@ export function ResultsForm({ roster, today }: { roster: RosterPlayer[]; today: 
         </div>
       </fieldset>
       {tests.length > 0 && (
-        <div className="overflow-x-auto">
+        <TableScroll label="Test results">
           <table className="w-full min-w-max text-sm">
             <thead>
               <tr>
-                <th className="py-2 pr-3 text-left text-[0.75rem] leading-4 font-semibold tracking-wider text-muted uppercase">Player</th>
+                <th className="py-2 pr-3 text-left text-2xs font-semibold tracking-wider text-muted uppercase">Player</th>
                 {tests.map((t) => (
-                  <th key={t.key} className="px-1 py-2 text-left text-[0.75rem] leading-4 font-semibold tracking-wider text-muted uppercase">
+                  <th key={t.key} className="px-1 py-2 text-left text-2xs font-semibold tracking-wider text-muted uppercase">
                     {t.name.replace(/ \(.*\)/, "")}
                     <span className="block font-normal normal-case">{t.unit}</span>
                   </th>
@@ -266,7 +266,7 @@ export function ResultsForm({ roster, today }: { roster: RosterPlayer[]; today: 
               ))}
             </tbody>
           </table>
-        </div>
+        </TableScroll>
       )}
       <div className="flex items-center gap-4">
         <button type="submit" disabled={pending || tests.length === 0} className={buttonClass}>
@@ -286,7 +286,7 @@ export function BandsForm({ ageGroup, bands }: { ageGroup: string; bands: { key:
       <p className="text-xs text-muted">
         Four cutoffs split the five ratings (Building, Developing, Solid, Strong, Elite). A result at or past a cutoff earns the next rating.
       </p>
-      <div className="overflow-x-auto">
+      <TableScroll label="Rating cutoffs">
         <table className="w-full min-w-max text-sm">
           <tbody>
             {TESTS.map((t) => {
@@ -317,7 +317,7 @@ export function BandsForm({ ageGroup, bands }: { ageGroup: string; bands: { key:
             })}
           </tbody>
         </table>
-      </div>
+      </TableScroll>
       <div className="flex items-center gap-4">
         <button type="submit" disabled={pending} className={buttonClass}>
           {pending ? "Saving…" : `Save ${ageGroup} bands`}
@@ -346,7 +346,7 @@ export function SquadsForm({ teamId, roster }: { teamId: string; roster: RosterP
       <ol className="grid gap-3 sm:grid-cols-2">
         {Array.from({ length: count }, (_, i) => (
           <li key={i} className="grid gap-2 rounded-xl border border-navy-700 p-3">
-            <p className="font-mono text-[11px] tracking-widest text-pink-soft uppercase">Picks {i === 0 ? "first" : `#${i + 1}`}</p>
+            <p className={eyebrowClass}>Picks {i === 0 ? "first" : `#${i + 1}`}</p>
             <input name={`name:${i}`} required maxLength={40} placeholder={`Squad ${i + 1} name`} aria-label={`Squad ${i + 1} name`} className={inputClass} />
             <select name={`captain:${i}`} required defaultValue="" aria-label={`Squad ${i + 1} captain`} className={inputClass}>
               <option value="" disabled>

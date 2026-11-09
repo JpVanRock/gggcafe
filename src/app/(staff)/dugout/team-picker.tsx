@@ -20,7 +20,7 @@ export function NoOwnTeam() {
   return (
     <EmptyState>
       Add your team on the{" "}
-      <Link href="/teams" className="text-pink hover:underline">
+      <Link href="/teams" className="text-link hover:underline">
         Teams
       </Link>{" "}
       page first (mark it as one of our teams).

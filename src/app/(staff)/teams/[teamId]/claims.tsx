@@ -13,7 +13,7 @@ export function ClaimsCard({ teamId, claims, spots }: { teamId: string; claims: 
       <Card
         title={`Player claims${pending.length ? ` · ${pending.length} waiting` : ""}`}
         actions={
-          <Link href={`/dugout/roster?team=${teamId}`} className="text-xs font-semibold text-pink hover:underline">
+          <Link href={`/dugout/roster?team=${teamId}`} className="text-xs font-semibold text-link hover:underline">
             Dugout roster →
           </Link>
         }

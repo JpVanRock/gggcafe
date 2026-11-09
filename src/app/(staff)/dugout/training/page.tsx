@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { canEdit, isHeadCoach, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Disclosure, EmptyState } from "@/components/ui";
+import { Disclosure, EmptyState, eyebrowClass } from "@/components/ui";
 import { WEEKDAYS, formatDay, todayISO } from "@/lib/dates";
 import { TRAINING_CATEGORY_LABEL } from "@/lib/achievements";
 import { PHASE_INFO, overlaps, phaseOn, phaseWeek } from "@/lib/training-plan";
@@ -18,7 +18,7 @@ export const metadata: Metadata = { title: "Training · Coaches Dugout · GGG.Ca
 
 // Coaches Dugout → Training (SB Blueprint Phase 2): the season roadmap, planned
 // backward from the championship, and team routines pushed to every player.
-const heading = "font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
 const KIND_COLOR: Record<string, string> = {
   testing: "bg-pink",
   build: "bg-navy-600",
@@ -69,7 +69,7 @@ export default async function TrainingPage({ searchParams }: PageProps<"/dugout/
           {r.phase_id && phaseName.get(r.phase_id) ? ` · ${phaseName.get(r.phase_id)}` : ""}
         </p>
         {r.details && <p className="mt-1 text-sm text-ink/90">{r.details}</p>}
-        <p className="mt-1 font-mono text-[11px] tracking-wider text-pink-soft uppercase">On {r.copies[0]?.count ?? 0} players</p>
+        <p className={`${eyebrowClass} mt-1`}>On {r.copies[0]?.count ?? 0} players</p>
       </div>
       {editor && (
         <div className="flex items-center gap-3">

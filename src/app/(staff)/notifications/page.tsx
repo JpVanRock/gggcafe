@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { EmptyState, PageHeader } from "@/components/ui";
+import { EmptyState, PageHeader, eyebrowClass } from "@/components/ui";
 import { MarkRead } from "./mark-read";
 
 export const metadata: Metadata = { title: "Notifications · GGG.Cafe" };
@@ -37,7 +37,7 @@ export default async function NotificationsPage() {
           {notes.map((n) => {
             const inner = (
               <>
-                <span className="font-mono text-[10px] tracking-wider text-pink-soft uppercase">
+                <span className={eyebrowClass}>
                   {KIND_LABEL[n.kind] ?? n.kind} · {when(n.created_at)}
                   {!n.read_at && <span className="ml-2 rounded bg-neon px-1.5 py-px font-bold text-on-accent">New</span>}
                 </span>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Disclosure, buttonClass } from "@/components/ui";
+import { Disclosure, buttonClass, eyebrowClass } from "@/components/ui";
 import { ProgressBar } from "@/components/progress-bar";
 import { SpeedStripes } from "@/components/athletic";
 import { LeaderBadge } from "@/components/leader-badge";
@@ -36,11 +36,11 @@ function LessonList({ playerId, lessons, work, prefix }: { playerId: string; les
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-sm font-semibold text-ink">{l.title}</span>
-                <span className={`block font-mono text-[11px] tracking-wider uppercase ${w?.completedAt ? "text-highlight" : "text-muted"}`}>
+                <span className={`block font-mono text-2xs tracking-wider uppercase ${w?.completedAt ? "text-highlight" : "text-muted"}`}>
                   {w?.completedAt ? "Complete ✓" : `${answered} of ${l.questions.length} answered`}
                 </span>
               </span>
-              <span className="text-sm text-pink">→</span>
+              <span className="text-sm text-link">→</span>
             </Link>
           </li>
         );
@@ -49,7 +49,7 @@ function LessonList({ playerId, lessons, work, prefix }: { playerId: string; les
   );
 }
 
-const heading = "mb-3 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = "mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
 
 export default async function LeadershipPage({ params }: PageProps<"/players/[playerId]/advanced/leadership">) {
   const { playerId } = await params;
@@ -84,7 +84,7 @@ export default async function LeadershipPage({ params }: PageProps<"/players/[pl
   return (
     <SectionShell title={GUIDE_TITLE} subtitle={`G3 Advanced · ${name}'s leadership`}>
       <div className="flex flex-col gap-8">
-        <Link href={advancedHref(player.id)} className="-mt-2 self-start text-sm text-pink hover:underline">
+        <Link href={advancedHref(player.id)} className="-mt-2 self-start text-sm text-link hover:underline">
           ← {book.title}
         </Link>
 
@@ -105,7 +105,7 @@ export default async function LeadershipPage({ params }: PageProps<"/players/[pl
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
           <div>
             <p className="flex items-center gap-3 font-mono text-xs tracking-[0.3em] text-pink-soft uppercase">
-              <SpeedStripes className="h-3 w-9 text-pink" />
+              <SpeedStripes className="h-3 w-9 text-link" />
               Read this first
             </p>
             <div className="mt-3 flex flex-col gap-3 text-ink/90">
@@ -125,14 +125,14 @@ export default async function LeadershipPage({ params }: PageProps<"/players/[pl
 
           {/* the ladder: top rung first */}
           <div className="rounded-2xl border-2 border-pink bg-linear-to-b from-navy-950 to-navy-900 p-5">
-            <p className="font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">The leadership ladder</p>
+            <p className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">The leadership ladder</p>
             <ol className="mt-4 flex flex-col-reverse gap-2">
               {LADDER.map((rung, i) => (
                 <li key={rung} className="flex items-center gap-3 border-b border-navy-700 pb-2 last:border-0">
                   <span className="w-7 font-display text-xl font-bold text-highlight tabular-nums">{i + 1}</span>
                   <span className="text-sm">{rung}</span>
-                  {i === 3 && <span className="ml-auto font-mono text-[10px] tracking-wider text-muted uppercase">Lead yourself ↓</span>}
-                  {i === 6 && <span className="ml-auto font-mono text-[10px] tracking-wider text-muted uppercase">Lead others ↓</span>}
+                  {i === 3 && <span className="ml-auto font-mono text-2xs tracking-wider text-muted uppercase">Lead yourself ↓</span>}
+                  {i === 6 && <span className="ml-auto font-mono text-2xs tracking-wider text-muted uppercase">Lead others ↓</span>}
                 </li>
               ))}
             </ol>
@@ -179,7 +179,7 @@ export default async function LeadershipPage({ params }: PageProps<"/players/[pl
 
         {access.canManage && (
           <div className="flex flex-col gap-3 rounded-xl border border-navy-700 p-4">
-            <p className="font-mono text-[11px] tracking-wider text-pink-soft uppercase">Coaches</p>
+            <p className={eyebrowClass}>Coaches</p>
             <p className="text-sm text-muted">
               {ready
                 ? lead.review.signedAt
@@ -191,7 +191,7 @@ export default async function LeadershipPage({ params }: PageProps<"/players/[pl
               <ul className="grid gap-1.5 text-sm sm:grid-cols-2">
                 {COACH_NOTES.map((n) => (
                   <li key={n} className="flex gap-2">
-                    <span className="text-pink">·</span>
+                    <span className="text-link">·</span>
                     {n}
                   </li>
                 ))}

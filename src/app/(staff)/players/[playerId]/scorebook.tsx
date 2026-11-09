@@ -132,11 +132,11 @@ export function CourseCard({ playerId, course, plate }: { playerId: string; cour
               </OutlineText>
               <span className="min-w-0 flex-1">
                 <span className="block text-sm font-semibold text-ink">{c.title}</span>
-                <span className={`block font-mono text-[11px] tracking-wider uppercase ${c.status === "complete" ? "text-highlight" : "text-muted"}`}>
+                <span className={`block font-mono text-2xs tracking-wider uppercase ${c.status === "complete" ? "text-highlight" : "text-muted"}`}>
                   {statusLine(c)}
                 </span>
               </span>
-              {!locked && <span className="text-sm text-pink">→</span>}
+              {!locked && <span className="text-sm text-link">→</span>}
             </>
           );
           return (
@@ -165,11 +165,11 @@ export function CourseCard({ playerId, course, plate }: { playerId: string; cour
                 </OutlineText>
                 <span className="min-w-0 flex-1">
                   <span className="block text-sm font-semibold text-ink">Extra credit: keep the book for real games</span>
-                  <span className={`block font-mono text-[11px] tracking-wider uppercase ${course.game.clean ? "text-highlight" : "text-pink-soft"}`}>
+                  <span className={`block font-mono text-2xs tracking-wider uppercase ${course.game.clean ? "text-highlight" : "text-pink-soft"}`}>
                     {gameLine(course.game)}
                   </span>
                 </span>
-                {course.game.unlocked && <span className="text-sm text-pink">→</span>}
+                {course.game.unlocked && <span className="text-sm text-link">→</span>}
               </>
             );
             return course.game.unlocked ? (

@@ -27,6 +27,7 @@ import { PlayerName } from "./player-name";
 import { MentorAlerts } from "./mentor-messages";
 import type { MentorMessage } from "@/lib/message-photos";
 import { leadershipHref } from "./leadership";
+import { eyebrowClass } from "@/components/ui";
 
 /** The cafe-menu player dashboard: header, TWIS, then the menu boards. */
 export function PlayerMenu({
@@ -194,19 +195,19 @@ export function PlayerMenu({
             />
           )}
           <p className="flex items-center justify-center gap-3 font-mono text-xs tracking-[0.35em] text-pink-soft uppercase">
-            <SpeedStripes className="h-3 w-9 text-pink" />
+            <SpeedStripes className="h-3 w-9 text-link" />
             Player menu
-            <SpeedStripes className="h-3 w-9 text-pink" />
+            <SpeedStripes className="h-3 w-9 text-link" />
           </p>
           <PlayerName first={name} last={player.last_name} leaderHref={leader ? leadershipHref(player.id, "certificate") : null} />
           {tagline && <p className="mx-auto mt-4 max-w-2xl font-mono text-sm text-muted">{tagline}</p>}
           {player.walk_up_songs.length > 0 && (
             <p className="mx-auto mt-3 flex max-w-2xl flex-wrap items-baseline justify-center gap-x-4 gap-y-1 text-sm">
-              <span className="font-mono text-[0.75rem] leading-4 tracking-[0.25em] text-pink-soft uppercase">Walk-up</span>
+              <span className={eyebrowClass}>Walk-up</span>
               {player.walk_up_songs.map((song, i) => {
                 const label = `${song.title}${song.artist ? ` · ${song.artist}` : ""}`;
                 return song.link ? (
-                  <a key={i} href={song.link} target="_blank" rel="noopener noreferrer" className="font-semibold text-ink hover:text-pink">
+                  <a key={i} href={song.link} target="_blank" rel="noopener noreferrer" className="font-semibold text-ink hover:text-link">
                     {label} ↗
                   </a>
                 ) : (

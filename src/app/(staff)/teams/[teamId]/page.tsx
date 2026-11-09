@@ -7,7 +7,7 @@ import {
   FORMAT_LABEL, POSITION_LABEL, batsThrows, compareJersey, isUuid, playerName,
   type Player, type Season, type Team,
 } from "@/lib/softball";
-import { Card, Disclosure, EmptyState, PageHeader, pillButtonClass, secondaryButtonClass, tableClass, tdClass, thClass } from "@/components/ui";
+import { Card, Disclosure, EmptyState, PageHeader, pillButtonClass, secondaryButtonClass, tableClass, tdClass, thClass, badgeClass, TableScroll } from "@/components/ui";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { addDays, formatDay, formatTime, todayISO } from "@/lib/dates";
 import { deleteTeamEvent, removeFromRoster } from "../actions";
@@ -189,7 +189,7 @@ export default async function TeamPage({
               {editor && (team.is_own_team ? " Use Player intake to build it." : " Add them below.")}
             </EmptyState>
           ) : (
-            <div className="overflow-x-auto">
+            <TableScroll label="Roster">
               <table className={tableClass}>
                 <thead>
                   <tr>
@@ -212,9 +212,7 @@ export default async function TeamPage({
                         {r.player.is_slapper && <span className="ml-2 text-xs text-muted">slapper</span>}
                         {claimOf.get(r.id) && (
                           <span
-                            className={`ml-2 rounded px-1.5 py-px font-mono text-[10px] font-bold tracking-wider uppercase ${
-                              claimOf.get(r.id) === "approved" ? "bg-neon text-on-accent" : "border border-pink text-pink-soft"
-                            }`}
+                            className={`${badgeClass(claimOf.get(r.id) === "approved" ? "neon" : "pink")} ml-2`}
                           >
                             {claimOf.get(r.id) === "approved" ? "Claimed" : "Claim waiting"}
                           </span>
@@ -246,7 +244,7 @@ export default async function TeamPage({
                   ))}
                 </tbody>
               </table>
-            </div>
+            </TableScroll>
           )}
 
           {editor && (
@@ -279,9 +277,7 @@ export default async function TeamPage({
                 <li key={row.key} className="flex flex-wrap items-center gap-x-4 gap-y-1 py-2.5 text-sm">
                   <span className="w-28 shrink-0 font-mono text-xs text-highlight uppercase">{formatDay(row.date)}</span>
                   <span
-                    className={`rounded px-1.5 py-px font-mono text-[10px] font-bold tracking-wider uppercase ${
-                      row.tag === "Game" ? "bg-neon text-on-accent" : row.tag === "Cancelled" ? "bg-navy-700 text-muted" : "bg-pink text-on-accent"
-                    }`}
+                    className={badgeClass(row.tag === "Game" ? "neon" : row.tag === "Cancelled" ? "neutral" : "pinkSolid")}
                   >
                     {row.tag}
                   </span>

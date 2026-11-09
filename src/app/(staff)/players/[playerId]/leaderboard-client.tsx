@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { buttonClass, inputClass } from "@/components/ui";
 import { LOG_NOTE_MAX, SESSION_KINDS, sessionLabel, type SessionKind } from "@/lib/leaderboard";
 import { deleteSession, logSession, removeTeamSession } from "./leaderboard-actions";
+import { confirmAction } from "@/components/confirm-submit";
 
 function ErrorLine({ error }: { error: string | null }) {
   return error ? (
@@ -53,7 +54,7 @@ export function LogSessionForm({ playerId, today, daysBack }: { playerId: string
       }}
     >
       <fieldset>
-        <legend className="mb-3 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">What did you do?</legend>
+        <legend className="mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">What did you do?</legend>
         <div className="grid gap-3 sm:grid-cols-3">
           {SESSION_KINDS.map((k) => {
             const on = kind === k.kind;
@@ -79,7 +80,7 @@ export function LogSessionForm({ playerId, today, daysBack }: { playerId: string
       </fieldset>
 
       <fieldset className="flex flex-wrap items-end gap-3">
-        <legend className="mb-3 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">When?</legend>
+        <legend className="mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">When?</legend>
         {[
           { label: "Today", value: today },
           { label: "Yesterday", value: yesterday },
@@ -111,7 +112,7 @@ export function LogSessionForm({ playerId, today, daysBack }: { playerId: string
       </fieldset>
 
       <label className="flex max-w-2xl flex-col gap-2">
-        <span className="font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">Note (optional)</span>
+        <span className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Note (optional)</span>
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
@@ -142,8 +143,8 @@ export function RemoveSession({ playerId, id }: { playerId: string; id: string }
       <button
         type="button"
         disabled={pending}
-        onClick={() => {
-          if (!window.confirm("Remove this session? Its points come off the leaderboard.")) return;
+        onClick={async () => {
+          if (!(await confirmAction("Remove this session? Its points come off the leaderboard."))) return;
           startTransition(async () => setError((await deleteSession({ playerId, id })).error));
         }}
         className="text-xs text-muted underline hover:text-danger"
@@ -164,8 +165,8 @@ export function RemoveTeamSession({ id, who }: { id: string; who: string }) {
       <button
         type="button"
         disabled={pending}
-        onClick={() => {
-          if (!window.confirm(`Remove this session of ${who}'s? Its points come off the leaderboard.`)) return;
+        onClick={async () => {
+          if (!(await confirmAction(`Remove this session of ${who}'s? Its points come off the leaderboard.`))) return;
           startTransition(async () => setError((await removeTeamSession({ id })).error));
         }}
         className="text-xs text-muted underline hover:text-danger"

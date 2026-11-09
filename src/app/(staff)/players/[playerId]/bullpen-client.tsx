@@ -63,7 +63,7 @@ export function BullpenRunner({ playerId, scriptId, pitches, canEdit, backHref }
           </p>
         )}
         {error && <p role="alert" className="text-sm text-danger">{error}</p>}
-        <Link href={backHref} className="text-sm text-pink hover:underline">
+        <Link href={backHref} className="text-sm text-link hover:underline">
           ← Performance Training
         </Link>
       </div>

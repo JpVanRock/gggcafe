@@ -32,7 +32,7 @@ export default async function ScorebookChapterPage({ params }: PageProps<"/playe
           <h2 className="font-display text-3xl font-bold tracking-wide text-highlight uppercase">{c.title}</h2>
           <EmptyState>
             Chapter {n} opens once Chapter {n - 1} is complete.{" "}
-            <Link href={chapterHref(player.id, n - 1)} className="text-pink hover:underline">
+            <Link href={chapterHref(player.id, n - 1)} className="text-link hover:underline">
               Go to Chapter {n - 1} →
             </Link>
           </EmptyState>

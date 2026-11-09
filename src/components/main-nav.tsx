@@ -2,21 +2,21 @@
 // Coaches Dugout) on every page, including the player (/me) and family (/family)
 // homes; everyone else gets `fallback`. Head coaches and admins also get the
 // notifications bell (new Player of the Week...); admins get the FAQ.
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { canEdit, getCurrentUser, isHeadCoach } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getWaitingCount } from "@/lib/approvals";
+import { CountBadge } from "@/components/ui";
+import { NavLink } from "@/components/nav-link";
 
 const NAV = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/dugout/roster", label: "Coaches Dugout" }, // opens the first tab, Roster
-  { href: "/teams", label: "Teams" },
-  { href: "/players", label: "Players" },
+  { href: "/dashboard", section: "/dashboard", label: "Dashboard" },
+  { href: "/dugout/roster", section: "/dugout", label: "Coaches Dugout" }, // opens the first tab, Roster
+  { href: "/teams", section: "/teams", label: "Teams" },
+  { href: "/players", section: "/players", label: "Players" },
 ] as const;
 
 const navClass = "flex flex-wrap gap-x-4 gap-y-1 text-sm font-medium uppercase tracking-wider";
-const linkClass = "text-muted hover:text-highlight";
 
 export async function MainNav({ fallback = null }: { fallback?: ReactNode }) {
   const user = await getCurrentUser();
@@ -31,30 +31,21 @@ export async function MainNav({ fallback = null }: { fallback?: ReactNode }) {
     unread = Number(notes ?? 0);
   }
   return (
-    <nav className={navClass}>
+    <nav aria-label="Main" className={navClass}>
       {NAV.map((item) => (
-        <Link key={item.href} href={item.href} className={`${linkClass} inline-flex items-center gap-1.5`}>
+        <NavLink key={item.href} href={item.href} section={item.section} className="inline-flex items-center gap-1.5">
           {item.label}
-          {item.href === "/dugout/roster" && waiting > 0 && (
-            <span
-              className="grid h-5 min-w-5 place-items-center rounded-full bg-pink px-1 font-mono text-[10px] font-bold text-on-accent"
-              title={`${waiting} approval${waiting === 1 ? "" : "s"} waiting`}
-            >
-              {waiting}
-            </span>
-          )}
-        </Link>
+          {item.href === "/dugout/roster" && <CountBadge count={waiting} label={`${waiting} approval${waiting === 1 ? "" : "s"} waiting`} />}
+        </NavLink>
       ))}
       {user.staff.role === "admin" && (
-        <Link href="/faq" className={linkClass}>
-          FAQ
-        </Link>
+        <NavLink href="/faq">FAQ</NavLink>
       )}
       {/* Player of the Week notices go to head coaches and admins */}
       {isHeadCoach(user.staff.role) && (
-        <Link
+        <NavLink
           href="/notifications"
-          className={`${linkClass} inline-flex items-center gap-1`}
+          className="inline-flex items-center gap-1"
           aria-label={unread ? `Notifications: ${unread} new` : "Notifications"}
           title="Notifications"
         >
@@ -62,10 +53,8 @@ export async function MainNav({ fallback = null }: { fallback?: ReactNode }) {
             <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
             <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
           </svg>
-          {unread > 0 && (
-            <span className="grid h-5 min-w-5 place-items-center rounded-full bg-neon px-1 font-mono text-[10px] font-bold text-on-accent">{unread}</span>
-          )}
-        </Link>
+          <CountBadge count={unread} label={`${unread} new`} tone="neon" />
+        </NavLink>
       )}
     </nav>
   );
@@ -74,10 +63,8 @@ export async function MainNav({ fallback = null }: { fallback?: ReactNode }) {
 /** What players see in the staff area's menu. */
 export function PlayerNav() {
   return (
-    <nav className={navClass}>
-      <Link href="/me" className={linkClass}>
-        My profile
-      </Link>
+    <nav aria-label="Main" className={navClass}>
+      <NavLink href="/me">My profile</NavLink>
     </nav>
   );
 }

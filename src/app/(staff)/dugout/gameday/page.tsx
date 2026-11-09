@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { canEdit, requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Card, Disclosure, EmptyState, RECENT_LIMIT, ShowAllLink, tableClass, tdClass, thClass } from "@/components/ui";
+import { Card, Disclosure, EmptyState, RECENT_LIMIT, ShowAllLink, tableClass, tdClass, thClass, badgeClass, TableScroll } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import { BASE_RUNNING_LABEL, HITTING_TYPE_LABEL, percent, rate } from "@/lib/gameday";
 import { loadGamedayRoster } from "@/lib/gameday-data";
@@ -88,9 +88,7 @@ export default async function GamedayPage({ searchParams }: PageProps<"/dugout/g
                       </p>
                     </div>
                     <span
-                      className={`rounded px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase ${
-                        l.status === "final" ? "bg-neon text-on-accent" : "border border-pink text-pink-soft"
-                      }`}
+                      className={badgeClass(l.status === "final" ? "neon" : "pink")}
                     >
                       {l.status === "draft" ? "Draft" : l.shared_at ? "Final · Shared" : "Final"}
                     </span>
@@ -107,7 +105,7 @@ export default async function GamedayPage({ searchParams }: PageProps<"/dugout/g
         {!seasonId || roster.length === 0 ? (
           <EmptyState>
             No roster yet. Build it with{" "}
-            <Link href={`/teams/${team.id}/intake`} className="text-pink hover:underline">
+            <Link href={`/teams/${team.id}/intake`} className="text-link hover:underline">
               Player intake
             </Link>
             .
@@ -115,7 +113,7 @@ export default async function GamedayPage({ searchParams }: PageProps<"/dugout/g
         ) : editor ? (
           <CardsForm teamId={team.id} seasonId={seasonId} players={roster} />
         ) : (
-          <div className="overflow-x-auto">
+          <TableScroll label="Player cards">
             <table className={tableClass}>
               <thead>
                 <tr>
@@ -146,7 +144,7 @@ export default async function GamedayPage({ searchParams }: PageProps<"/dugout/g
                 ))}
               </tbody>
             </table>
-          </div>
+          </TableScroll>
         )}
       </Card>
     </div>

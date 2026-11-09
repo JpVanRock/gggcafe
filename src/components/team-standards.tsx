@@ -34,7 +34,7 @@ export function CultureStatement({ culture }: { culture: TeamCulture }) {
     <div className="mx-auto max-w-3xl">
       {culture.headline && (
         <div className="mb-6">
-          <SpeedStripes className="h-4 w-12 text-pink" />
+          <SpeedStripes className="h-4 w-12 text-link" />
           <p className="mt-3 font-display text-3xl leading-tight font-bold tracking-tight text-highlight uppercase sm:text-4xl">
             {culture.headline}
           </p>

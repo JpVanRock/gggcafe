@@ -3,19 +3,19 @@ import { notFound } from "next/navigation";
 import { requireStaffPage } from "@/lib/auth";
 import { FAQ, FEATURE_SECTIONS, TIERS, type Access } from "@/lib/access-faq";
 import { Softball } from "@/components/softball-icon";
-import { Disclosure, PageHeader } from "@/components/ui";
+import { Disclosure, PageHeader, eyebrowClass } from "@/components/ui";
 import { FaqNav } from "./faq-nav";
 
 export const metadata: Metadata = { title: "Access FAQ · GGG.Cafe" };
 
-const heading = "font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
 
 function Mark({ access, tier }: { access: Access; tier: string }) {
   if (access === "no") return <Softball off size={22} label={`Not in ${tier}`} />;
   return (
     <span className="inline-flex flex-col items-center gap-0.5">
       <Softball size={24} label={access === "coach" ? `In ${tier}, with a coach's OK` : `In ${tier}`} />
-      {access === "coach" && <span className="font-mono text-[9px] leading-none tracking-wider text-pink-soft uppercase">Coach&apos;s OK</span>}
+      {access === "coach" && <span className="font-mono text-2xs leading-none tracking-wider text-pink-soft uppercase">Coach&apos;s OK</span>}
     </span>
   );
 }
@@ -51,7 +51,7 @@ export default async function FaqPage() {
         </span>
         <span className="inline-flex items-center gap-1.5">
           <Softball size={18} label="Included with a coach's OK" />
-          <span className="font-mono text-[10px] tracking-wider text-pink-soft uppercase">Coach&apos;s OK</span> Included once a coach or admin says so
+          <span className={eyebrowClass}>Coach&apos;s OK</span> Included once a coach or admin says so
         </span>
       </p>
 
@@ -59,11 +59,11 @@ export default async function FaqPage() {
         <table className="w-full text-sm">
           <thead className="bg-navy-900">
             <tr>
-              <th className="px-4 py-3 text-left font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-muted uppercase">Feature</th>
+              <th className="px-4 py-3 text-left font-mono text-2xs font-bold tracking-[0.2em] text-muted uppercase">Feature</th>
               {TIERS.map((t) => (
-                <th key={t.key} className="w-28 px-2 py-3 text-center font-mono text-[0.75rem] leading-4 font-bold tracking-[0.15em] text-highlight uppercase sm:w-36">
+                <th key={t.key} className="w-28 px-2 py-3 text-center font-mono text-2xs font-bold tracking-[0.15em] text-highlight uppercase sm:w-36">
                   {t.label.replace(" Access", "")}
-                  <span className="block text-[10px] font-normal tracking-wider text-muted">Access</span>
+                  <span className="block text-2xs font-normal tracking-wider text-muted">Access</span>
                 </th>
               ))}
             </tr>

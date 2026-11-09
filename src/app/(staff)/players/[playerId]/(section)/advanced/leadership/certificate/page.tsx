@@ -35,7 +35,7 @@ export default async function CertificatePage({ params }: PageProps<"/players/[p
     <SectionShell title={CERTIFICATE.title} subtitle={`${name} · ${GUIDE_TITLE}`}>
       <div className="flex flex-col gap-6">
         {lead.open && (
-          <Link href={leadershipHref(player.id)} className="-mt-2 self-start text-sm text-pink hover:underline">
+          <Link href={leadershipHref(player.id)} className="-mt-2 self-start text-sm text-link hover:underline">
             ← Leadership Guide
           </Link>
         )}

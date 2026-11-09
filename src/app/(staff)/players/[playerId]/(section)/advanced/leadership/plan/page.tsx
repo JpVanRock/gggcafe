@@ -29,16 +29,16 @@ export default async function LeadershipPlanPage({ params }: PageProps<"/players
   return (
     <SectionShell title="My Leadership Plan" subtitle={`${name} · ${GUIDE_TITLE}`}>
       <div className="flex flex-col gap-10">
-        <Link href={leadershipHref(player.id)} className="-mt-2 self-start text-sm text-pink hover:underline">
+        <Link href={leadershipHref(player.id)} className="-mt-2 self-start text-sm text-link hover:underline">
           ← Leadership Guide
         </Link>
 
         <section>
-          <h2 className="mb-3 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">Where I stand</h2>
+          <h2 className="mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Where I stand</h2>
           <div className="overflow-x-auto rounded-xl border border-navy-700">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left font-mono text-[11px] tracking-wider text-muted uppercase">
+                <tr className="text-left font-mono text-2xs tracking-wider text-muted uppercase">
                   <th className="px-4 py-2 font-normal">Area</th>
                   <th className="px-4 py-2 font-normal">Me</th>
                   <th className="px-4 py-2 font-normal">My coach</th>
@@ -64,7 +64,7 @@ export default async function LeadershipPlanPage({ params }: PageProps<"/players
           </div>
           <p className="mt-2 text-xs text-muted">
             From{" "}
-            <Link href={leadershipHref(player.id, "rate-yourself")} className="text-pink hover:underline">
+            <Link href={leadershipHref(player.id, "rate-yourself")} className="text-link hover:underline">
               Lesson {lessonNumber("rate-yourself")}: Rate Your Leadership
             </Link>
             .
@@ -74,7 +74,7 @@ export default async function LeadershipPlanPage({ params }: PageProps<"/players
         <PlanForm playerId={player.id} plan={lead.plan} committedAt={lead.committedAt} commitment={COMMITMENT} canEdit={access.canAct} limits={PLAN_LIMITS} />
 
         <section className="border-t border-navy-700 pt-5">
-          <h2 className="mb-3 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">Coach sign-off</h2>
+          <h2 className="mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Coach sign-off</h2>
           <p className="mb-3 text-sm text-muted">
             {progress.done} of {progress.total} lessons complete · plan {lead.committedAt ? "committed" : "not committed yet"}. The sign-off awards the
             Certificate of Leadership and the Leader Badge.

@@ -68,7 +68,7 @@ export default async function DugoutPage({ searchParams }: PageProps<"/dugout">)
       />
 
       <section className="flex flex-col gap-3">
-        <h2 className="font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">
+        <h2 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">
           What players see above TWIS
         </h2>
         <DugoutStrip teams={[{ team, culture, standards }]} canEdit={false} yearbookHref={`/dugout/yearbook?team=${team.id}`} />

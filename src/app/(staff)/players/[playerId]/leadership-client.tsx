@@ -4,12 +4,13 @@
 // the server pages; never import src/lib/leadership-guide.ts values here (paid
 // content stays on the server). Type-only imports are fine.
 import { useState, useTransition } from "react";
-import { buttonClass, inputClass, secondaryButtonClass } from "@/components/ui";
+import { buttonClass, inputClass, secondaryButtonClass, eyebrowClass } from "@/components/ui";
 import type { HabitItem, LeadershipPlan, RubricArea } from "@/lib/leadership-guide";
 import {
   commitLeadershipPlan, saveCoachRating, saveLeadershipAnswer, saveLeadershipPlan, setLeadershipAccess, setLeadershipLessonDone,
   setLeadershipStep, signLeadershipPlan,
 } from "./leadership-actions";
+import { confirmAction } from "@/components/confirm-submit";
 
 function ErrorLine({ error }: { error: string | null }) {
   return error ? (
@@ -217,7 +218,7 @@ export function HabitsTool({
   const groups = [...new Set(habits.map((h) => h.group))];
   return (
     <div>
-      <p className="mb-3 font-mono text-[11px] tracking-wider text-muted uppercase">
+      <p className="mb-3 font-mono text-2xs tracking-wider text-muted uppercase">
         {strengths} strengths · {growth} working on it · {habits.length - strengths - growth} to go
       </p>
       <div className="grid gap-5">
@@ -316,7 +317,7 @@ export function RubricTool({
   const total = (ratings: Record<string, string>) => areas.reduce((sum, a) => sum + Number(ratings[a.key] || 0), 0);
   return (
     <div>
-      <p className="mb-3 font-mono text-[11px] tracking-wider text-muted uppercase">
+      <p className="mb-3 font-mono text-2xs tracking-wider text-muted uppercase">
         {levels.map((l, i) => `${i + 1} ${l}`).join(" · ")}
       </p>
       <div className="grid gap-6">
@@ -332,12 +333,12 @@ export function RubricTool({
                     <p className="text-sm text-muted">{a.looks}</p>
                     <div className="mt-3 flex flex-wrap gap-x-8 gap-y-3">
                       <div>
-                        {showCoach && <p className="mb-1.5 font-mono text-[10px] tracking-wider text-pink-soft uppercase">Me</p>}
+                        {showCoach && <p className={`${eyebrowClass} mb-1.5`}>Me</p>}
                         {scale("self", a.key, canEdit)}
                       </div>
                       {showCoach && (
                         <div>
-                          <p className="mb-1.5 font-mono text-[10px] tracking-wider text-pink-soft uppercase">My coach</p>
+                          <p className={`${eyebrowClass} mb-1.5`}>My coach</p>
                           {canRate || coach[a.key] ? scale("coach", a.key, canRate) : <span className="text-xs text-muted">Not rated yet</span>}
                         </div>
                       )}
@@ -389,7 +390,7 @@ export function PlanForm({
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const field = inputClass;
-  const heading = "mb-2 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
+  const heading = "mb-2 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
 
   function save(commit = false) {
     setError(null);
@@ -518,7 +519,7 @@ export function PlanForm({
         <ul className="grid gap-1.5">
           {commitment.map((c) => (
             <li key={c} className="flex gap-2 text-sm">
-              <span className="text-pink">·</span>
+              <span className="text-link">·</span>
               {c}
             </li>
           ))}
@@ -573,8 +574,8 @@ export function CoachSignOff({
         <button
           type="button"
           disabled={pending}
-          onClick={() => {
-            if (signed && !window.confirm(`Take back the sign-off? ${name} loses her certificate and Leader Badge until you sign again.`)) return;
+          onClick={async () => {
+            if (signed && !(await confirmAction(`Take back the sign-off? ${name} loses her certificate and Leader Badge until you sign again.`))) return;
             setError(null);
             startTransition(async () => setError((await signLeadershipPlan({ playerId, signed: !signed })).error));
           }}
@@ -598,8 +599,8 @@ export function LeaderToggle({ playerId, name, on }: { playerId: string; name: s
       <button
         type="button"
         disabled={pending}
-        onClick={() => {
-          if (on && !window.confirm(`Stop training ${name} as a leader? The Leadership Guide leaves her book (her work is kept).`)) return;
+        onClick={async () => {
+          if (on && !(await confirmAction(`Stop training ${name} as a leader? The Leadership Guide leaves her book (her work is kept).`))) return;
           setError(null);
           startTransition(async () => setError((await setLeadershipAccess({ playerId, on: !on })).error));
         }}

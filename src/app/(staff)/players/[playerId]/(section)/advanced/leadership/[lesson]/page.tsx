@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { buttonClass, secondaryButtonClass } from "@/components/ui";
+import { buttonClass, secondaryButtonClass, eyebrowClass } from "@/components/ui";
 import {
   ANSWER_MAX, BONUS, BONUS_TITLE, ENGAGEMENT_ASK, ENGAGEMENT_LEVELS, GUIDE_TITLE, HABITS, LEADER_ROLES, LESSONS, RUBRIC, RUBRIC_LEVELS,
   SCENARIOS, SCENARIO_GROUPS, STARTER_GROUPS, findLesson, lessonLabel,
@@ -13,7 +13,7 @@ import { SectionShell } from "../../../section-shell";
 export const metadata: Metadata = { title: "G3 Leadership Guide · GGG.Cafe" };
 
 function Heading({ children }: { children: React.ReactNode }) {
-  return <h2 className="mb-4 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">{children}</h2>;
+  return <h2 className="mb-4 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">{children}</h2>;
 }
 
 export default async function LeadershipLessonPage({ params }: PageProps<"/players/[playerId]/advanced/leadership/[lesson]">) {
@@ -44,7 +44,7 @@ export default async function LeadershipLessonPage({ params }: PageProps<"/playe
   return (
     <SectionShell title={lesson.title} subtitle={`${lessonLabel(lesson)} ${of} · ${lesson.part} · ${GUIDE_TITLE}`}>
       <div className="flex flex-col gap-10">
-        <Link href={leadershipHref(player.id)} className="-mt-2 self-start text-sm text-pink hover:underline">
+        <Link href={leadershipHref(player.id)} className="-mt-2 self-start text-sm text-link hover:underline">
           ← Leadership Guide
         </Link>
 
@@ -79,7 +79,7 @@ export default async function LeadershipLessonPage({ params }: PageProps<"/playe
                   <div>
                     <p className="font-display text-xl font-bold tracking-wide text-highlight uppercase">{r.title}</p>
                     <p className="mt-1 text-sm">{r.does}</p>
-                    <p className="mt-1 font-mono text-[11px] tracking-wider text-pink-soft uppercase">Brings: {r.brings}</p>
+                    <p className={`${eyebrowClass} mt-1`}>Brings: {r.brings}</p>
                   </div>
                   {answerBox(r.key, "Who fits this on our team?", 1)}
                 </li>
@@ -136,7 +136,7 @@ export default async function LeadershipLessonPage({ params }: PageProps<"/playe
         {lesson.tool === "scenarios" && (
           <section>
             <Heading>What would you do?</Heading>
-            <p className="mb-4 font-mono text-[11px] tracking-wider text-muted uppercase">
+            <p className="mb-4 font-mono text-2xs tracking-wider text-muted uppercase">
               {SCENARIOS.filter((s) => answers[s.key]).length} of {SCENARIOS.length} answered
             </p>
             <div className="grid gap-3">
@@ -147,7 +147,7 @@ export default async function LeadershipLessonPage({ params }: PageProps<"/playe
                   <details key={g} className="group rounded-xl border border-navy-700 open:border-pink/60">
                     <summary className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 font-semibold">
                       <span>{g}</span>
-                      <span className="font-mono text-[11px] tracking-wider text-muted uppercase">
+                      <span className="font-mono text-2xs tracking-wider text-muted uppercase">
                         {answered} / {group.length} <span className="ml-1 inline-block transition group-open:rotate-90">›</span>
                       </span>
                     </summary>
@@ -155,7 +155,7 @@ export default async function LeadershipLessonPage({ params }: PageProps<"/playe
                       {group.map((s) => (
                         <div key={s.key} className="flex flex-col gap-3 rounded-xl border border-navy-700 p-4">
                           <div>
-                            <p className="font-mono text-[11px] tracking-wider text-pink-soft uppercase">{s.title}</p>
+                            <p className={eyebrowClass}>{s.title}</p>
                             <p className="mt-1 text-sm">{s.situation}</p>
                           </div>
                           {answerBox(s.key, "What I'd do")}

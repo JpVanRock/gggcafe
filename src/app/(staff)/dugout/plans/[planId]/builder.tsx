@@ -9,7 +9,7 @@ import { DndContext, DragOverlay, KeyboardSensor, MouseSensor, TouchSensor, clos
 import { SortableContext, arrayMove, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useRouter } from "next/navigation";
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
-import { Card, inputClass, pillButtonClass, pillOutlineClass, sectionLabelClass } from "@/components/ui";
+import { Card, inputClass, pillButtonClass, pillOutlineClass, sectionLabelClass, badgeClass } from "@/components/ui";
 import { TOTAL_TIME_OPTIONS, durationLabel, finalizeProblems, planTimeline, type LibraryDrill, type PracticeSetting } from "@/lib/dugout";
 import type { PlanBlock, PlanSpot, PracticePlan, RosterPlayer, StaffContact } from "@/lib/practice-plans";
 import { SettingPills } from "../new-plan-form";
@@ -260,7 +260,7 @@ export function PlanBuilder({
             {formatLongDate(setup.practice_date)}
           </h2>
         </div>
-        <span className="rounded border border-pink px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider text-pink-soft uppercase">
+        <span className={badgeClass("pink")}>
           Draft
         </span>
       </header>

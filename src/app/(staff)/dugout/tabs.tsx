@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { dugoutTabsFor, type StaffRole } from "@/lib/roles";
+import { CountBadge } from "@/components/ui";
 
 /** A tab is current on its own page and below it (Culture only on /dugout itself). */
 const isCurrent = (href: string, path: string) => (href === "/dugout" ? path === "/dugout" : path.startsWith(href));
@@ -30,11 +31,8 @@ export function TabList({ path = "", badges = {}, role }: { path?: string; badge
               >
                 {tab.label}
                 {(badges[tab.href] ?? 0) > 0 && (
-                  <span
-                    className="ml-1.5 inline-grid h-5 min-w-5 place-items-center rounded-full bg-pink px-1 align-text-bottom font-mono text-[10px] font-bold text-on-accent"
-                    title={`${badges[tab.href]} waiting for approval`}
-                  >
-                    {badges[tab.href]}
+                  <span className="ml-1.5 align-text-bottom">
+                    <CountBadge count={badges[tab.href]} label={`${badges[tab.href]} waiting for approval`} />
                   </span>
                 )}
               </Link>

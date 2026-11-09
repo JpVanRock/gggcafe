@@ -4,9 +4,7 @@ import { Suspense } from "react";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { FORMAT_LABEL, type Team } from "@/lib/softball";
-import {
-  Card, Disclosure, EmptyState, Loading, PageHeader, tableClass, tdClass, thClass,
-} from "@/components/ui";
+import { Card, Disclosure, EmptyState, Loading, PageHeader, tableClass, tdClass, thClass, TableScroll } from "@/components/ui";
 import { TeamForm } from "./forms";
 
 export const metadata: Metadata = { title: "Teams · GGG.Cafe" };
@@ -57,7 +55,7 @@ async function TeamsContent() {
 function TeamTable({ teams, empty }: { teams: TeamRow[]; empty: string }) {
   if (teams.length === 0) return <EmptyState>{empty}</EmptyState>;
   return (
-    <div className="overflow-x-auto">
+    <TableScroll label="Opponents">
       <table className={tableClass}>
         <thead>
           <tr>
@@ -83,6 +81,6 @@ function TeamTable({ teams, empty }: { teams: TeamRow[]; empty: string }) {
           ))}
         </tbody>
       </table>
-    </div>
+    </TableScroll>
   );
 }

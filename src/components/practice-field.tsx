@@ -47,7 +47,7 @@ export function FieldFrame({ children, className = "", label }: { children: Reac
 export function PositionBadge({ position, active = false }: { position: PlanPosition; active?: boolean }) {
   return (
     <span
-      className={`grid h-7 w-7 place-items-center rounded-full border font-mono text-[10px] font-bold ${
+      className={`grid h-7 w-7 place-items-center rounded-full border font-mono text-2xs font-bold ${
         active ? "border-white bg-pink text-white" : "border-navy-600 bg-navy-700 text-ink"
       }`}
     >
@@ -68,7 +68,7 @@ export function FieldLineup({ players }: { players: Partial<Record<PlanPosition,
             {names.map((n, i) => (
               <span
                 key={i}
-                className="max-w-full truncate rounded bg-navy-950/85 px-1.5 text-[11px] leading-4 font-semibold text-ink sm:text-xs"
+                className="max-w-full truncate rounded bg-navy-950/85 px-1.5 text-2xs leading-4 font-semibold text-ink sm:text-xs"
               >
                 {n}
               </span>

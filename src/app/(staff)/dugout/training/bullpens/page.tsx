@@ -33,7 +33,7 @@ export default async function BullpensPage({ searchParams }: PageProps<"/dugout/
       <TeamPicker teams={teams} current={team.id} basePath="/dugout/training/bullpens" />
       <TrainingNav current="bullpens" teamId={team.id} head={isHeadCoach(user.staff.role)} />
       <section className="flex flex-col gap-3">
-        <h2 className="font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">Bullpen scripts</h2>
+        <h2 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Bullpen scripts</h2>
         <p className="text-sm text-muted">
           Pitch by pitch: type, target zone (catcher&apos;s view), intent and count. Pitchers throw them from Performance Training and tap hit or
           miss on each pitch; command % by pitch type builds over the weeks. Push one as a pitching team routine to put it in TWIS.

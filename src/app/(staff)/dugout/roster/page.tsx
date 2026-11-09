@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { canEdit, isHeadCoach, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Card, Disclosure, EmptyState, pillButtonClass, tableClass, tdClass, thClass } from "@/components/ui";
+import { Card, Disclosure, EmptyState, pillButtonClass, tableClass, tdClass, thClass, Badge, TableScroll } from "@/components/ui";
 import { batsThrows, compareJersey, playerName, type Player, type Season } from "@/lib/softball";
 import { loadStaffRequests, loadTeamApprovals } from "@/lib/approvals";
 import { seasonOrCurrent } from "@/lib/roster";
@@ -18,8 +18,9 @@ export const metadata: Metadata = { title: "Roster · Coaches Dugout · GGG.Cafe
 type RosterRow = { id: string; jersey_number: string | null; active: boolean; player: Player };
 
 function Pill({ tone, children }: { tone: "on" | "wait" | "off"; children: React.ReactNode }) {
-  const cls = tone === "on" ? "bg-neon text-on-accent" : tone === "wait" ? "border border-pink text-pink-soft" : "text-muted";
-  return <span className={`rounded px-1.5 py-px font-mono text-[10px] font-bold tracking-wider uppercase ${cls}`}>{children}</span>;
+  // no account yet: plain grey text, not a chip
+  if (tone === "off") return <span className="text-muted">{children}</span>;
+  return <Badge tone={tone === "on" ? "neon" : "pink"}>{children}</Badge>;
 }
 
 export default async function RosterPage({ searchParams }: PageProps<"/dugout/roster">) {
@@ -100,7 +101,7 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
 
       {editor && (
         <section id="waiting" aria-label="Waiting for approval" className={`rounded-2xl border p-4 sm:p-5 ${waiting ? "border-pink/60 bg-pink/5" : "border-navy-700 bg-navy-900/60"}`}>
-          <h2 className="font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">Waiting for approval ({waiting})</h2>
+          <h2 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Waiting for approval ({waiting})</h2>
           {waiting === 0 ? (
             <p className="mt-3 text-sm text-muted">
               Nothing waiting. Players claiming their profile{head ? ", parents asking to join and coaches signing up" : ""} show up here.
@@ -137,7 +138,7 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
             {editor && " Use Player intake to build it."}
           </EmptyState>
         ) : (
-          <div className="overflow-x-auto">
+          <TableScroll label="Roster">
             <table className={tableClass}>
               <thead>
                 <tr>
@@ -186,7 +187,7 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
                 })}
               </tbody>
             </table>
-          </div>
+          </TableScroll>
         )}
       </Card>
 
@@ -214,7 +215,7 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
       {head && (
         <p className="text-xs text-muted">
           Parent sign-up codes and approved parents are on the{" "}
-          <Link href={`/dugout/parents?team=${team.id}`} className="text-pink hover:underline">
+          <Link href={`/dugout/parents?team=${team.id}`} className="text-link hover:underline">
             Parents
           </Link>{" "}
           tab.
@@ -237,7 +238,7 @@ async function QuestionnaireTable({ teamId, seasonId }: { teamId: string; season
   if (rows.length === 0) return null;
   return (
     <Disclosure summary={`Preseason questionnaires (${rows.length})`}>
-      <div className="overflow-x-auto">
+      <TableScroll label="Preseason questionnaires">
         <table className={tableClass}>
           <thead>
             <tr>
@@ -267,7 +268,7 @@ async function QuestionnaireTable({ teamId, seasonId }: { teamId: string; season
               ))}
           </tbody>
         </table>
-      </div>
+      </TableScroll>
     </Disclosure>
   );
 }

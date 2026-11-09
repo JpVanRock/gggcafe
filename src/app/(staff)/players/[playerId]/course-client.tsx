@@ -5,7 +5,7 @@
 // (paid content stays out of every other page); her furthest step is saved as she
 // goes, and finishing the course unlocks "Mark chapter complete".
 import { useState, useTransition } from "react";
-import { buttonClass, secondaryButtonClass } from "@/components/ui";
+import { buttonClass, secondaryButtonClass, eyebrowClass } from "@/components/ui";
 import { ProgressBar } from "@/components/progress-bar";
 import type { CourseStep } from "@/lib/advanced-book";
 import { finishCourse, saveCourseStep } from "./advanced-actions";
@@ -16,7 +16,7 @@ function QuickCheck({ check }: { check: NonNullable<CourseStep["check"]> }) {
   const [chosen, setChosen] = useState<number | null>(null);
   return (
     <div className="mt-5 rounded-xl border border-navy-600 p-4">
-      <p className="font-mono text-[11px] tracking-widest text-pink-soft uppercase">Quick check</p>
+      <p className={eyebrowClass}>Quick check</p>
       <p className="mt-1 font-semibold">{check.question}</p>
       <ol className="mt-3 grid gap-2">
         {check.choices.map((c, i) => {
@@ -128,7 +128,7 @@ export function CourseRunner({
       </nav>
 
       <article className="mt-6">
-        <p className="font-mono text-[11px] tracking-widest text-pink-soft uppercase">
+        <p className={eyebrowClass}>
           {step.lesson} · {index + 1} / {steps.length}
         </p>
         <h3 className="mt-1 font-display text-2xl font-bold tracking-wide text-highlight uppercase">{step.title}</h3>
@@ -139,7 +139,7 @@ export function CourseRunner({
         ))}
         {step.tryIt && (
           <p className="mt-5 max-w-3xl rounded-xl border border-neon/60 bg-neon/5 p-4 text-sm">
-            <span className="mr-2 font-mono text-[11px] font-bold tracking-widest text-highlight uppercase">Try it</span>
+            <span className="mr-2 font-mono text-2xs font-bold tracking-widest text-highlight uppercase">Try it</span>
             {step.tryIt}
           </p>
         )}

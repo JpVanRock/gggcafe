@@ -157,7 +157,7 @@ export function TrophyRoomDetail({ room }: { room: TrophyRoom }) {
           {room.plaques.map((p) => (
             <li key={p.level} className="flex flex-col items-center gap-2">
               <StolenBasePlaque name={room.plate.name} number={room.plate.number} level={p.level} earned={Boolean(p.earnedOn)} size={150} />
-              <span className="font-mono text-[11px] tracking-wider text-muted uppercase">
+              <span className="font-mono text-2xs tracking-wider text-muted uppercase">
                 Level {p.level} · {p.earnedOn ?? "not earned yet"}
               </span>
             </li>
@@ -182,7 +182,7 @@ export function TrophyRoomDetail({ room }: { room: TrophyRoom }) {
             {room.mvps.map((m) => (
               <li key={m.key} className="flex flex-col items-center gap-1.5">
                 <MvpBadge label={m.label} size={92} />
-                <span className="font-mono text-[10px] tracking-wider text-muted uppercase">{m.earnedOn}</span>
+                <span className="font-mono text-2xs tracking-wider text-muted uppercase">{m.earnedOn}</span>
               </li>
             ))}
           </ul>
@@ -209,7 +209,7 @@ export function TrophyRoomDetail({ room }: { room: TrophyRoom }) {
                 earned={Boolean(m.earnedOn)}
                 size={140}
               />
-              <span className="text-center font-mono text-[10px] tracking-wider text-muted uppercase">
+              <span className="text-center font-mono text-2xs tracking-wider text-muted uppercase">
                 {m.label}
                 <br />
                 {m.earnedOn ?? "not earned yet"}

@@ -8,7 +8,7 @@ import { CornerThemeToggle } from "@/components/theme-toggle";
 
 export default function Home() {
   return (
-    <main className="relative flex flex-1 flex-col items-center overflow-hidden px-4 pt-14 pb-4 sm:pt-16">
+    <main id="main" className="relative flex flex-1 flex-col items-center overflow-hidden px-4 pt-14 pb-4 sm:pt-16">
       <CornerThemeToggle />
       {/* soft pink glow behind the badge */}
       <div

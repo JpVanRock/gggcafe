@@ -14,7 +14,7 @@ type Pending = { user_id: string; email: string; display_name: string; specialty
 type Msg = { id: string; player_id: string; sender_name: string; body: string | null; photo_path: string | null; drill_name: string | null; created_at: string; read_at: string | null };
 type Spot = { jersey_number: string | null; player: { id: string; first_name: string; preferred_name: string | null; last_name: string } | null; team: { name: string; is_own_team: boolean } | null };
 
-const heading = "mb-3 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = "mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
 
 export default async function MentorsPage() {
   const user = await requireHeadCoachPage();
@@ -131,7 +131,7 @@ export default async function MentorsPage() {
                 <span className="min-w-0 flex-1 truncate text-muted">
                   {[msg.body, msg.drill_name && `Drill: ${msg.drill_name}`, msg.photo_path && "Photo"].filter(Boolean).join(" · ")}
                 </span>
-                <span className="font-mono text-[10px] tracking-wider text-muted uppercase">{msg.read_at ? "Seen" : "New"}</span>
+                <span className="font-mono text-2xs tracking-wider text-muted uppercase">{msg.read_at ? "Seen" : "New"}</span>
                 {editor && <RemoveMessage id={msg.id} />}
               </li>
             ))}

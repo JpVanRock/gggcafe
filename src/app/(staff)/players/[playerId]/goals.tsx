@@ -45,7 +45,7 @@ const RING = [0, 1, 2, 3, 5, 6, 7, 8];
 
 function Cell({ children, className = "" }: { children?: React.ReactNode; className?: string }) {
   return (
-    <div className={`flex min-h-16 items-center justify-center rounded p-1.5 text-center text-[11px] leading-tight break-words ${className}`}>
+    <div className={`flex min-h-16 items-center justify-center rounded p-1.5 text-center text-2xs leading-tight break-words ${className}`}>
       {children}
     </div>
   );

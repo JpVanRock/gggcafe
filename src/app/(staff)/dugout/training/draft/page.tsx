@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { EmptyState, secondaryButtonClass } from "@/components/ui";
+import { EmptyState } from "@/components/ui";
 import { onTheClock, squadStandings } from "@/lib/training-plan";
 import { loadDugoutTeam } from "../../data";
 import { NoOwnTeam, TeamPicker } from "../../team-picker";
@@ -11,6 +11,7 @@ import { loadSquads, loadTeamRoster } from "../data";
 import { draftPick, resetDraft, undoPick } from "../actions";
 import { SquadsForm } from "../forms";
 import { ActionForm } from "@/components/action-form";
+import { SubmitButton } from "@/components/submit-button";
 
 export const metadata: Metadata = { title: "Offseason draft · Training · Coaches Dugout · GGG.Cafe" };
 
@@ -18,7 +19,7 @@ export const metadata: Metadata = { title: "Offseason draft · Training · Coach
 // with a captain each, then a snake draft the head coach records here as the
 // captains pick. Squads score the Leaderboard's points; players see the squads
 // and their totals on the Leaderboard.
-const heading = "font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
 
 export default async function DraftPage({ searchParams }: PageProps<"/dugout/training/draft">) {
   await requireHeadCoachPage();
@@ -112,9 +113,9 @@ export default async function DraftPage({ searchParams }: PageProps<"/dugout/tra
             {picks > 0 && (
               <ActionForm action={undoPick}>
                 <input type="hidden" name="team_id" value={team.id} />
-                <button type="submit" className={secondaryButtonClass}>
+                <SubmitButton variant="secondary">
                   Undo last pick
-                </button>
+                </SubmitButton>
               </ActionForm>
             )}
             <ActionForm action={resetDraft} className="ml-auto">

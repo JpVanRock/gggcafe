@@ -105,7 +105,7 @@ export default async function IntakePage({ params, searchParams }: PageProps<"/t
                   <Link href={`/players/${r.player.id}`} className="flex-1 font-medium hover:underline">
                     {playerName(r.player)}
                   </Link>
-                  <span className="font-mono text-[10px] text-muted">{r.player.primary_position ?? ""}</span>
+                  <span className="font-mono text-2xs text-muted">{r.player.primary_position ?? ""}</span>
                 </li>
               ))}
             </ul>

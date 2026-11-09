@@ -37,7 +37,7 @@ async function FamilyNav() {
 
 export function FamilyHeader() {
   return (
-    <header className="sticky top-0 z-10 border-b border-pink/40 bg-navy-950/90 backdrop-blur">
+    <header className="z-10 border-b border-pink/40 bg-navy-950/90 backdrop-blur sm:sticky sm:top-0">
       <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-2.5">
         <Link href="/family" aria-label="GGG.Cafe family home" className="shrink-0">
           <Logo size={44} className="h-11 w-11" />

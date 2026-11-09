@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { Modal } from "@/components/modal";
 import { BudgetSummary, type BudgetSummaryData } from "@/components/budget-summary";
-import { Card, Disclosure, EmptyState, pillQuietClass, tableClass, tdClass, thClass } from "@/components/ui";
+import { Card, Disclosure, EmptyState, pillQuietClass, tableClass, tdClass, thClass, badgeClass, type BadgeTone, TableScroll } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import { money, playerBalances, runningLedger, toCents, type EntryKind, type PlayerStatus } from "@/lib/budget";
 import { compareJersey, type Season, playerName } from "@/lib/softball";
@@ -33,12 +33,12 @@ type EntryRow = {
   description: string | null;
 };
 
-const STATUS: Record<PlayerStatus, { label: string; className: string }> = {
-  paid: { label: "Paid", className: "bg-neon text-on-accent" },
-  partial: { label: "Partial", className: "border border-pink text-pink-soft" },
-  unpaid: { label: "Unpaid", className: "border border-navy-600 text-muted" },
-  over: { label: "Overpaid", className: "border border-neon text-highlight" },
-  none: { label: "—", className: "text-muted" },
+const STATUS: Record<PlayerStatus, { label: string; tone: BadgeTone }> = {
+  paid: { label: "Paid", tone: "neon" },
+  partial: { label: "Partial", tone: "pink" },
+  unpaid: { label: "Unpaid", tone: "neutral" },
+  over: { label: "Overpaid", tone: "neonOutline" },
+  none: { label: "—", tone: "neutral" },
 };
 
 export default async function BudgetPage({ searchParams }: PageProps<"/dugout/budget">) {
@@ -67,7 +67,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
     return (
       <EmptyState>
         Add a season and roster on the{" "}
-        <Link href={`/teams/${team.id}`} className="text-pink hover:underline">
+        <Link href={`/teams/${team.id}`} className="text-link hover:underline">
           team page
         </Link>{" "}
         first.
@@ -188,7 +188,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
         {players.length === 0 ? (
           <EmptyState>No active players on this season&apos;s roster.</EmptyState>
         ) : (
-          <div className="overflow-x-auto">
+          <TableScroll label="Player payments">
             <table className={tableClass}>
               <thead>
                 <tr>
@@ -218,7 +218,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
                       <td className={`${tdClass} text-right tabular-nums`}>{money(b.paid)}</td>
                       <td className={`${tdClass} text-right font-semibold tabular-nums ${b.owed > 0 ? "text-pink-soft" : ""}`}>{money(b.owed)}</td>
                       <td className={tdClass}>
-                        <span className={`rounded px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase ${STATUS[b.status].className}`}>
+                        <span className={badgeClass(STATUS[b.status].tone)}>
                           {STATUS[b.status].label}
                         </span>
                       </td>
@@ -227,7 +227,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
                 })}
               </tbody>
             </table>
-          </div>
+          </TableScroll>
         )}
       </Card>
 
@@ -235,7 +235,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
         {ledger.length === 0 ? (
           <EmptyState>Nothing recorded yet. Payments, income and expenses show here with a running balance.</EmptyState>
         ) : (
-          <div className="overflow-x-auto">
+          <TableScroll label="Ledger">
             <table className={tableClass}>
               <thead>
                 <tr>
@@ -283,7 +283,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
                 })}
               </tbody>
             </table>
-          </div>
+          </TableScroll>
         )}
       </Card>
     </div>

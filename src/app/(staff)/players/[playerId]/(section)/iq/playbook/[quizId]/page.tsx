@@ -23,7 +23,7 @@ export default async function TeamQuizPage({ params }: PageProps<"/players/[play
   return (
     <SectionShell title={quiz.title} subtitle={`Team quiz · ${quiz.team}`}>
       <div className="flex flex-col gap-6">
-        <Link href={`/players/${player.id}/iq/playbook`} className="text-sm text-pink hover:underline">
+        <Link href={`/players/${player.id}/iq/playbook`} className="text-sm text-link hover:underline">
           ← Team Playbook
         </Link>
         <TeamQuizRunner playerId={player.id} quizId={quiz.id} questions={quiz.questions} canAct={access.canAct} />

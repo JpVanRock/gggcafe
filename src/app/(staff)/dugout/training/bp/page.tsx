@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { canEdit, isHeadCoach, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Card, EmptyState, tableClass, tdClass, thClass } from "@/components/ui";
+import { Card, EmptyState, tableClass, tdClass, thClass, TableScroll } from "@/components/ui";
 import { StatTerm } from "@/components/stat-term";
 import { formatDay, todayISO } from "@/lib/dates";
 import { qabSummary } from "@/lib/box-score";
@@ -63,7 +63,7 @@ export default async function BpPage({ searchParams }: PageProps<"/dugout/traini
       )}
       {totals.length > 0 && (
         <Card title="Production by hitter (last 200 rounds)">
-          <div className="overflow-x-auto">
+          <TableScroll label="Production by hitter">
             <table className={tableClass}>
               <thead>
                 <tr>
@@ -88,7 +88,7 @@ export default async function BpPage({ searchParams }: PageProps<"/dugout/traini
                 ))}
               </tbody>
             </table>
-          </div>
+          </TableScroll>
         </Card>
       )}
       {rounds.length > 0 && (

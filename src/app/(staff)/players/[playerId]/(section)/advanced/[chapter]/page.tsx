@@ -17,7 +17,7 @@ import { SectionShell } from "../../section-shell";
 export const metadata: Metadata = { title: "G3 Advanced · GGG.Cafe" };
 
 function Heading({ children }: { children: React.ReactNode }) {
-  return <h2 className="mb-4 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">{children}</h2>;
+  return <h2 className="mb-4 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">{children}</h2>;
 }
 
 export default async function AdvancedChapterPage({ params }: PageProps<"/players/[playerId]/advanced/[chapter]">) {
@@ -51,7 +51,7 @@ export default async function AdvancedChapterPage({ params }: PageProps<"/player
   return (
     <SectionShell title={chapter.title} subtitle={`${chapterLabel(chapter, chapters)}${chapter.kicker ? ` · ${chapter.kicker}` : ""} · ${book.title} · ${LEVEL_LABEL}`}>
       <div className="flex flex-col gap-10">
-        <Link href={advancedHref(player.id)} className="-mt-2 self-start text-sm text-pink hover:underline">
+        <Link href={advancedHref(player.id)} className="-mt-2 self-start text-sm text-link hover:underline">
           ← Contents
         </Link>
 
@@ -93,7 +93,7 @@ export default async function AdvancedChapterPage({ params }: PageProps<"/player
         {chapter.tools?.includes("game-plans") && (
           <section className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-pink/50 bg-pink/5 p-4">
             <p className="text-sm">Put this chapter to work: a plan before every game you pitch, and a look-back after it.</p>
-            <Link href={`/players/${player.id}/training/game-plan`} className="font-semibold text-pink hover:underline">
+            <Link href={`/players/${player.id}/training/game-plan`} className="font-semibold text-link hover:underline">
               Your game plans →
             </Link>
           </section>
@@ -105,7 +105,7 @@ export default async function AdvancedChapterPage({ params }: PageProps<"/player
             <CountPlan zones={zones} />
             <p className="mt-3 text-sm text-muted">
               Built from My Zone.{" "}
-              <Link href={`/players/${player.id}/pop`} className="text-pink hover:underline">
+              <Link href={`/players/${player.id}/pop`} className="text-link hover:underline">
                 {zones && zones.hot.length + zones.strong.length + zones.weak.length ? "Change My Zone in your Pop Report →" : "Mark My Zone in your Pop Report →"}
               </Link>
             </p>

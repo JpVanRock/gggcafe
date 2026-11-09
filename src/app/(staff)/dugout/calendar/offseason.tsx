@@ -5,6 +5,7 @@
 import { useEffect, useState, useTransition, type ReactNode } from "react";
 import { inputClass, secondaryButtonClass } from "@/components/ui";
 import { setOffseason } from "./actions";
+import { confirmAction } from "@/components/confirm-submit";
 
 const HIDDEN_KEY = "ggg-offseason-panel-hidden";
 
@@ -35,7 +36,7 @@ export function OffseasonPanel({ status, children }: { status: string; children:
       className={`flex flex-col gap-3 rounded-2xl border border-neon/50 bg-neon/5 ${hidden ? "px-4 py-2.5 sm:px-5" : "p-4 sm:p-5"}`}
     >
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
-        <h3 className="font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">Offseason Training</h3>
+        <h3 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Offseason Training</h3>
         {hidden && <span className="min-w-0 flex-1 truncate text-sm text-muted">{status}</span>}
         <button
           type="button"
@@ -103,8 +104,8 @@ export function OffseasonForm({ teamId, startsOn, endsOn }: { teamId: string; st
         <button
           type="button"
           disabled={pending}
-          onClick={() => {
-            if (window.confirm("Turn off the offseason leaderboard for this team? Points and Players of the Week are kept.")) save("", "");
+          onClick={async () => {
+            if (await confirmAction("Turn off the offseason leaderboard for this team? Points and Players of the Week are kept.")) save("", "");
           }}
           className="text-xs text-muted underline hover:text-danger"
         >

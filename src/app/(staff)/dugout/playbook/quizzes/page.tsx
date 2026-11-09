@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Card, EmptyState } from "@/components/ui";
+import { Card, EmptyState, badgeClass } from "@/components/ui";
 import { formatDay } from "@/lib/dates";
 import { loadDugoutTeam } from "../../data";
 import { NoOwnTeam, TeamPicker } from "../../team-picker";
@@ -68,9 +68,7 @@ export default async function QuizzesPage({ searchParams }: PageProps<"/dugout/p
                     </span>
                   </span>
                   <span
-                    className={`rounded px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase ${
-                      q.published_at ? "bg-neon text-on-accent" : "border border-pink text-pink-soft"
-                    }`}
+                    className={badgeClass(q.published_at ? "neon" : "pink")}
                   >
                     {q.published_at ? "Published" : "Draft"}
                   </span>

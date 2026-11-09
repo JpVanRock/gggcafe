@@ -1,14 +1,14 @@
 // Coaches Dugout → Culture (Phase 5): Team Season Goals, the pledge tracker and
 // Player Spotlights, under Team Standards and Culture.
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Disclosure, EmptyState } from "@/components/ui";
+import { Disclosure, EmptyState, eyebrowClass } from "@/components/ui";
 import { formatDay } from "@/lib/dates";
 import { GOAL_PHASE_LABEL, goalProgress, pledgeStatus, sortGoals, type TeamGoal } from "@/lib/culture";
 import { deleteGoal, deleteSpotlight, setGoalAchieved } from "./actions";
 import { GoalForm, SpotlightForm } from "./culture-forms";
 import { ActionForm } from "@/components/action-form";
 
-const heading = "font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
 
 export type Spotlight = { id: string; player_name: string; jersey: string | null; headline: string; body: string; published_on: string };
 type Pledge = { player_id: string; lines: Record<string, string>; signed_at: string | null };
@@ -21,7 +21,7 @@ export function GoalsBoard({ goals, teamId, editor }: { goals: TeamGoal[]; teamI
         const pct = goalProgress(g);
         return (
           <li key={g.id} className={`rounded-xl border p-4 ${g.achieved_at ? "border-neon bg-neon/5" : "border-navy-700"}`}>
-            <p className="font-mono text-[11px] tracking-widest text-pink-soft uppercase">
+            <p className={eyebrowClass}>
               {GOAL_PHASE_LABEL[g.phase]}
               {g.achieved_at && " · Achieved ✓"}
             </p>
@@ -41,7 +41,7 @@ export function GoalsBoard({ goals, teamId, editor }: { goals: TeamGoal[]; teamI
                 <ActionForm action={setGoalAchieved}>
                   <input type="hidden" name="id" value={g.id} />
                   {!g.achieved_at && <input type="hidden" name="achieved" value="on" />}
-                  <button type="submit" className="text-xs font-semibold text-pink hover:underline">
+                  <button type="submit" className="text-xs font-semibold text-link hover:underline">
                     {g.achieved_at ? "Mark not achieved" : "Mark achieved"}
                   </button>
                 </ActionForm>
@@ -107,7 +107,7 @@ export function CultureTeamSections({
               return (
                 <li key={p.id} className="flex items-center justify-between gap-2 border-b border-navy-800 py-1">
                   <span>{p.name}</span>
-                  <span className={`font-mono text-[11px] ${st.complete ? "text-highlight" : "text-muted"}`}>
+                  <span className={`font-mono text-2xs ${st.complete ? "text-highlight" : "text-muted"}`}>
                     {st.signed ? "Signed" : "Not signed"} · {st.written}/{st.total}
                   </span>
                 </li>
@@ -131,7 +131,7 @@ export function CultureTeamSections({
           <ul className="grid gap-3 md:grid-cols-2">
             {spotlights.map((s) => (
               <li key={s.id} className="rounded-xl border border-navy-700 p-4">
-                <p className="font-mono text-[11px] tracking-widest text-pink-soft uppercase">
+                <p className={eyebrowClass}>
                   {formatDay(s.published_on)} · {s.jersey ? `#${s.jersey} ` : ""}
                   {s.player_name}
                 </p>

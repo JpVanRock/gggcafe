@@ -39,7 +39,7 @@ export default async function ScorebookGamesPage({ params }: PageProps<"/players
           <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">How to Keep the Book · Extra credit</p>
           <h2 className="mt-1 font-display text-3xl font-bold tracking-wide text-highlight uppercase">Keep the book for real games</h2>
         </div>
-        <Link href={`/players/${player.id}/iq`} className="text-sm text-pink hover:underline">
+        <Link href={`/players/${player.id}/iq`} className="text-sm text-link hover:underline">
           ← Softball IQ
         </Link>
       </div>
@@ -52,7 +52,7 @@ export default async function ScorebookGamesPage({ params }: PageProps<"/players
         {header}
         <EmptyState>
           Finish all six chapters to unlock the games ({done} of {CHAPTER_COUNT} done).{" "}
-          <Link href={chapterHref(player.id, Math.min(done + 1, CHAPTER_COUNT))} className="text-pink hover:underline">
+          <Link href={chapterHref(player.id, Math.min(done + 1, CHAPTER_COUNT))} className="text-link hover:underline">
             Go to Chapter {Math.min(done + 1, CHAPTER_COUNT)} →
           </Link>
         </EmptyState>
@@ -88,11 +88,11 @@ export default async function ScorebookGamesPage({ params }: PageProps<"/players
                 <span className="block text-sm font-semibold text-ink">
                   {LEAGUE[game.visitors].name} at {LEAGUE[game.home].name}
                 </span>
-                <span className={`block font-mono text-[11px] tracking-wider uppercase ${g.status === "clean" ? "text-highlight" : "text-muted"}`}>
+                <span className={`block font-mono text-2xs tracking-wider uppercase ${g.status === "clean" ? "text-highlight" : "text-muted"}`}>
                   {statusLine(g)}
                 </span>
               </span>
-              {g.status !== "locked" && <span className="text-sm text-pink">→</span>}
+              {g.status !== "locked" && <span className="text-sm text-link">→</span>}
             </>
           );
           return (

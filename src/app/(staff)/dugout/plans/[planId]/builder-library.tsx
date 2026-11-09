@@ -71,7 +71,7 @@ export function LibraryPanel({
       {library.length === 0 ? (
         <p className="mt-4 text-sm text-muted">
           The library is empty.{" "}
-          <a href="/dugout/drills" className="text-pink hover:underline">
+          <a href="/dugout/drills" className="text-link hover:underline">
             Add drills →
           </a>
         </p>

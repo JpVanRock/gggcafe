@@ -48,7 +48,7 @@ export function LeadershipClosed({
           : `${name} isn't being trained as a leader yet.`}
       </EmptyState>
       {canManage && hasAdvanced && !picked && <LeaderToggle playerId={playerId} name={name} on={false} />}
-      <Link href={`/players/${playerId}`} className="text-sm text-pink hover:underline">
+      <Link href={`/players/${playerId}`} className="text-sm text-link hover:underline">
         ← Back to {name}&apos;s menu
       </Link>
     </div>

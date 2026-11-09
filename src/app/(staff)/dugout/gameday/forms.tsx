@@ -2,7 +2,7 @@
 
 import { StatTerm } from "@/components/stat-term";
 import { useActionState } from "react";
-import { Field, FormMessage, buttonClass, fieldClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, buttonClass, fieldClass, inputClass, TableScroll } from "@/components/ui";
 import { BASE_RUNNING, BASE_RUNNING_LABEL, HITTING_TYPES, HITTING_TYPE_LABEL, MAX_ROTATIONS, percent, rate } from "@/lib/gameday";
 import { initialFormState } from "@/lib/form";
 import { createLineup, saveGamedayCards } from "./actions";
@@ -30,10 +30,10 @@ export function CardsForm({ teamId, seasonId, players }: { teamId: string; seaso
     <form action={action} className="flex flex-col gap-4">
       <input type="hidden" name="team_id" value={teamId} />
       <input type="hidden" name="season_id" value={seasonId} />
-      <div className="overflow-x-auto">
+      <TableScroll label="Player cards">
         <table className="w-full min-w-[46rem] text-left text-sm">
           <thead>
-            <tr className="border-b border-navy-700 text-[0.75rem] leading-4 font-semibold tracking-wider text-muted uppercase">
+            <tr className="border-b border-navy-700 text-2xs font-semibold tracking-wider text-muted uppercase">
               <th className="py-2 pr-3">Player</th>
               <th className="py-2 pr-3">Hitting type</th>
               <th className="py-2 pr-3">Base running</th>
@@ -54,7 +54,7 @@ export function CardsForm({ teamId, seasonId, players }: { teamId: string; seaso
                 <td className="py-2 pr-3">
                   <input type="hidden" name="player_id" value={p.id} />
                   <span className="font-semibold">{p.short}</span>
-                  {p.positions.length > 0 && <span className="ml-2 font-mono text-[10px] text-muted">{p.positions.join(" ")}</span>}
+                  {p.positions.length > 0 && <span className="ml-2 font-mono text-2xs text-muted">{p.positions.join(" ")}</span>}
                 </td>
                 <td className="py-2 pr-3">
                   <select name="hitting_type" defaultValue={p.hitting_type ?? ""} aria-label={`Hitting type for ${p.short}`} className={small}>
@@ -108,7 +108,7 @@ export function CardsForm({ teamId, seasonId, players }: { teamId: string; seaso
             ))}
           </tbody>
         </table>
-      </div>
+      </TableScroll>
       <p className="text-xs text-muted">Stats fill in from box scores once games are entered. Until then, type them in (AVG and OBP like .312, K% like 18.5).</p>
       <div className="flex flex-wrap items-center gap-3">
         <button type="submit" disabled={pending} className={buttonClass}>

@@ -15,7 +15,7 @@ export function PitchingSection({ playerId, scripts, sessions, canEdit }: { play
       <DetailHeading>Bullpens and game plans</DetailHeading>
       {command.length > 0 && (
         <div>
-          <p className="mb-2 font-mono text-[11px] tracking-widest text-muted uppercase">Command by pitch · last {sessions.length} bullpens</p>
+          <p className="mb-2 font-mono text-2xs tracking-widest text-muted uppercase">Command by pitch · last {sessions.length} bullpens</p>
           <ul className="grid gap-2 sm:grid-cols-3 lg:grid-cols-4">
             {command.map((c) => (
               <li key={c.pitch} className="rounded-xl border border-navy-700 p-3">
@@ -58,7 +58,7 @@ export function PitchingSection({ playerId, scripts, sessions, canEdit }: { play
           ))}
         </ul>
       )}
-      <Link href={`/players/${playerId}/training/game-plan`} className="self-start text-sm font-semibold text-pink hover:underline">
+      <Link href={`/players/${playerId}/training/game-plan`} className="self-start text-sm font-semibold text-link hover:underline">
         Game plans: before and after each game →
       </Link>
     </section>

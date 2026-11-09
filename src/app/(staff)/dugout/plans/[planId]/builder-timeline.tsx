@@ -143,7 +143,7 @@ export function BlockCard({
             <DrillTags tags={block.tags} className="mt-1" />
             {block.description && <p className="mt-1.5 line-clamp-2 text-sm text-muted" title={block.description}>{block.description}</p>}
             {block.video_url && (
-              <a href={block.video_url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block text-xs font-semibold text-pink hover:underline">
+              <a href={block.video_url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block text-xs font-semibold text-link hover:underline">
                 ▶ Watch the drill
               </a>
             )}

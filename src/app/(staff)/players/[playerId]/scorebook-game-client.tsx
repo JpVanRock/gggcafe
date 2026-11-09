@@ -6,7 +6,7 @@
 // src/lib/scorebook-game.ts); nothing here names it until it's earned.
 import Link from "next/link";
 import { useState, useTransition } from "react";
-import { buttonClass, fieldClass, inputClass, secondaryButtonClass } from "@/components/ui";
+import { buttonClass, fieldClass, inputClass, secondaryButtonClass, eyebrowClass } from "@/components/ui";
 import { ProgressBar } from "@/components/progress-bar";
 import { ScoreBox, ScoreSheet } from "@/components/scorebook";
 import { WorldSeriesTrophy } from "@/components/world-series-trophy";
@@ -17,6 +17,7 @@ import {
   type Club, type Team,
 } from "@/lib/scorebook-game";
 import { finishScorebookGame, scoreGamePlay, startScorebookGame, type GameRun } from "./scorebook-actions";
+import { confirmAction } from "@/components/confirm-submit";
 
 type Draft = { marks: BoxMarks; tokens: string[] };
 type View = "intro" | "play" | "line" | "result";
@@ -81,7 +82,7 @@ function BoxEditor({
   const bad = (f: string) => flagged.has(f);
   const row = (label: string, field: string, children: React.ReactNode) => (
     <div className="flex flex-wrap items-center gap-2">
-      <span className={`w-16 shrink-0 font-mono text-[11px] tracking-wider uppercase ${bad(field) ? "text-pink-soft" : "text-muted"}`}>
+      <span className={`w-16 shrink-0 font-mono text-2xs tracking-wider uppercase ${bad(field) ? "text-pink-soft" : "text-muted"}`}>
         {label}
         {bad(field) && " ●"}
       </span>
@@ -95,7 +96,7 @@ function BoxEditor({
           <p className="font-semibold">
             #{who.no} {who.name}
           </p>
-          <p className="font-mono text-[11px] tracking-wider text-pink-soft uppercase">{role}</p>
+          <p className={eyebrowClass}>{role}</p>
         </div>
         <ScoreBox marks={canonicalMarks(m)} className="w-24 shrink-0 p-1.5" />
       </div>
@@ -324,7 +325,7 @@ export function GameRunner({
           {TEAMS.V.short} at {TEAMS.H.short}
         </h2>
       </div>
-      <Link href={gamesHref} className="text-sm text-pink hover:underline">
+      <Link href={gamesHref} className="text-sm text-link hover:underline">
         ← All games
       </Link>
     </div>
@@ -365,7 +366,7 @@ export function GameRunner({
             {run && (
               <button
                 type="button"
-                onClick={() => window.confirm("Start a new game? This book will be cleared.") && start(true)}
+                onClick={async () => (await confirmAction("Start a new game? This book will be cleared.")) && start(true)}
                 disabled={!canEdit || pending}
                 className="text-xs text-muted underline hover:text-ink"
               >
@@ -505,7 +506,7 @@ export function GameRunner({
             <p className="mt-1 text-sm text-muted">Count the shaded diamonds in each inning column, on each team&apos;s page.</p>
             <table className="mt-4 w-full text-sm">
               <thead>
-                <tr className="text-left font-mono text-[11px] tracking-wider text-muted uppercase">
+                <tr className="text-left font-mono text-2xs tracking-wider text-muted uppercase">
                   <th className="py-1 font-normal">Team</th>
                   <th className="w-16 py-1 text-center font-normal">1</th>
                   <th className="w-16 py-1 text-center font-normal">2</th>

@@ -44,7 +44,7 @@ export function GoalMethodSwitch({ playerId, method, canEdit }: { playerId: stri
             >
               <span className={`block text-sm font-bold tracking-wider uppercase ${selected ? "text-highlight" : "text-ink"}`}>
                 {GOAL_METHOD_LABEL[m]}
-                {selected && <span className="ml-2 font-mono text-[10px] text-pink-soft">In use</span>}
+                {selected && <span className="ml-2 font-mono text-2xs text-pink-soft">In use</span>}
               </span>
               <span className="mt-1 block text-xs text-muted">{METHOD_BLURB[m]}</span>
             </button>

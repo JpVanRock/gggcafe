@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requirePlayerPage, isHeadCoach } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { EmptyState } from "@/components/ui";
+import { EmptyState, eyebrowClass } from "@/components/ui";
 import { ScrollToHash } from "@/components/scroll-to-hash";
 import { CultureStatement, StandardsList, hasCulture } from "@/components/team-standards";
 import { loadTeamDugout } from "../../data";
@@ -19,7 +19,7 @@ export const metadata: Metadata = { title: "Team Standards & Culture · GGG.Cafe
 
 function Heading({ id, children }: { id: string; children: React.ReactNode }) {
   return (
-    <h2 id={id} className="mb-5 scroll-mt-40 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">
+    <h2 id={id} className="mb-5 scroll-mt-40 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">
       {children}
     </h2>
   );
@@ -35,7 +35,7 @@ export default async function TeamPage({ params }: PageProps<"/players/[playerId
     access.user.staff && isHeadCoach(access.user.staff.role) && (
       <>
         {" "}
-        <Link href={`/dugout?team=${teamId}`} className="text-pink hover:underline">
+        <Link href={`/dugout?team=${teamId}`} className="text-link hover:underline">
           Write it in the Coaches Dugout →
         </Link>
       </>
@@ -110,13 +110,13 @@ export default async function TeamPage({ params }: PageProps<"/players/[playerId
                   <ul className="grid gap-3 md:grid-cols-2">
                     {extras.spotlights.get(team.id)!.map((sp) => (
                       <li key={sp.id} className="rounded-2xl border border-pink/50 bg-pink/5 p-4">
-                        <p className="font-mono text-[11px] tracking-widest text-pink-soft uppercase">
+                        <p className={eyebrowClass}>
                           {sp.jersey ? `#${sp.jersey} · ` : ""}
                           {sp.player_name}
                         </p>
                         <p className="mt-1 font-display text-xl font-bold tracking-wide uppercase">{sp.headline}</p>
                         <p className="mt-1 line-clamp-3 text-sm text-ink/90">{sp.body}</p>
-                        <Link href={`/players/${player.id}/spotlight/${sp.id}`} className="mt-2 inline-block text-sm font-semibold text-pink hover:underline">
+                        <Link href={`/players/${player.id}/spotlight/${sp.id}`} className="mt-2 inline-block text-sm font-semibold text-link hover:underline">
                           The media-day graphic →
                         </Link>
                       </li>

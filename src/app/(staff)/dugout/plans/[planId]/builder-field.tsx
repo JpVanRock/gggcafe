@@ -4,7 +4,7 @@
 import { DndContext, DragOverlay, MouseSensor, TouchSensor, pointerWithin, useDraggable, useDroppable, useSensor, useSensors, type DragEndEvent, type DragStartEvent } from "@dnd-kit/core";
 import { useMemo, useState, type ReactNode } from "react";
 import { FieldFrame, PositionBadge, spotStyle } from "@/components/practice-field";
-import { EmptyState, sectionLabelClass } from "@/components/ui";
+import { CountBadge, EmptyState, sectionLabelClass } from "@/components/ui";
 import { PLAN_POSITIONS, type PlanPosition } from "@/lib/dugout";
 import type { PlanSpot, RosterPlayer } from "@/lib/practice-plans";
 
@@ -28,12 +28,8 @@ export function RosterChip({ player, count, selected, onTap }: { player: RosterP
       >
         <span className="w-8 shrink-0 font-display font-bold text-highlight tabular-nums">{player.number ? `#${player.number}` : "–"}</span>
         <span className="min-w-0 flex-1 truncate">{player.name}</span>
-        {player.primary && <span className="font-mono text-[10px] text-muted">{player.primary}</span>}
-        {count > 0 && (
-          <span className="grid h-5 min-w-5 place-items-center rounded-full bg-neon px-1 font-mono text-[10px] font-bold text-on-accent" title="Placed on the field">
-            {count}
-          </span>
-        )}
+        {player.primary && <span className="font-mono text-2xs text-muted">{player.primary}</span>}
+        <CountBadge count={count} label={`On the field ${count} time${count === 1 ? "" : "s"}`} tone="neon" />
       </button>
     </li>
   );
@@ -48,7 +44,7 @@ export function PlacedChip({ position, player, onRemove }: { position: PlanPosit
     <span
       ref={setNodeRef}
       {...listeners}
-      className={`flex max-w-full cursor-grab items-center gap-0.5 rounded bg-navy-950/90 pl-1.5 text-[11px] leading-5 font-semibold text-ink touch-manipulation sm:text-xs ${
+      className={`flex max-w-full cursor-grab items-center gap-0.5 rounded bg-navy-950/90 pl-1.5 text-2xs leading-5 font-semibold text-ink touch-manipulation sm:text-xs ${
         isDragging ? "opacity-40" : ""
       }`}
     >
@@ -61,7 +57,7 @@ export function PlacedChip({ position, player, onRemove }: { position: PlanPosit
         }}
         onPointerDown={(e) => e.stopPropagation()}
         aria-label={`Take ${player?.name ?? "player"} off ${position}`}
-        className="px-1 text-muted hover:text-pink"
+        className="px-1 text-muted hover:text-link"
       >
         ×
       </button>

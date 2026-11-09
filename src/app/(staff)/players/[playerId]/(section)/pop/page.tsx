@@ -63,7 +63,7 @@ export default async function PopPage({ params }: PageProps<"/players/[playerId]
       <StatsCard stats={stats} seasonLabel={seasonName} />
       {ownTeam && season && access.canAct && (
         <section className="mt-10 flex flex-col gap-3">
-          <h2 className="font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">Preseason questionnaire · {ownTeam.name}</h2>
+          <h2 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Preseason questionnaire · {ownTeam.name}</h2>
           <p className="text-sm text-muted">Sizes, jersey numbers and the positions she wants. Coaches see it; teammates don&apos;t.</p>
           <Disclosure summary={questionnaire ? "Edit the questionnaire ✓" : "Fill in the questionnaire"} open={!questionnaire}>
             <QuestionnaireForm action={saveQuestionnaire} hidden={{ player_id: player.id, team_id: ownTeam.id }} values={questionnaire} />

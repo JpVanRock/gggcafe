@@ -3,7 +3,7 @@ import Link from "next/link";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { canEditPlanRole } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
-import { Disclosure, EmptyState, RECENT_LIMIT, ShowAllLink } from "@/components/ui";
+import { Disclosure, EmptyState, RECENT_LIMIT, ShowAllLink, badgeClass } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import { PRACTICE_SETTING_LABEL, durationLabel, practiceRange, type PracticeSetting } from "@/lib/dugout";
 import { loadDugoutTeam } from "../data";
@@ -31,9 +31,7 @@ function StatusChip({ plan }: { plan: PlanRow }) {
   const label = plan.status === "draft" ? "Draft" : plan.shared_at ? "Final · Shared" : "Final";
   return (
     <span
-      className={`rounded px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase ${
-        plan.status === "final" ? "bg-neon text-on-accent" : "border border-pink text-pink-soft"
-      }`}
+      className={badgeClass(plan.status === "final" ? "neon" : "pink")}
     >
       {label}
     </span>
@@ -69,7 +67,7 @@ function PlanCard({ plan, viewOnly = false }: { plan: PlanRow; viewOnly?: boolea
         </div>
         <span className="flex shrink-0 flex-col items-end gap-1">
           <StatusChip plan={plan} />
-          {viewOnly && <span className="font-mono text-[10px] tracking-wider text-muted uppercase">View only</span>}
+          {viewOnly && <span className="font-mono text-2xs tracking-wider text-muted uppercase">View only</span>}
         </span>
       </Link>
     </li>
@@ -123,7 +121,7 @@ export default async function PracticePlansPage({ searchParams }: PageProps<"/du
       )}
 
       <section>
-        <h2 className="mb-3 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">Upcoming</h2>
+        <h2 className="mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Upcoming</h2>
         {upcoming.length ? (
           <ul className="flex flex-col gap-3">
             {upcoming.map((p) => (
@@ -137,7 +135,7 @@ export default async function PracticePlansPage({ searchParams }: PageProps<"/du
 
       {past.length > 0 && (
         <section>
-          <h2 className="mb-3 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">Past</h2>
+          <h2 className="mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Past</h2>
           <ul className="flex flex-col gap-3">
             {past.map((p) => (
               <PlanCard key={p.id} plan={p} viewOnly={viewOnly(p)} />

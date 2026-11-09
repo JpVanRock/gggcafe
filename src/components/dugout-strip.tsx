@@ -5,7 +5,7 @@
 // (Offseason Training, user 2026-11-08).
 import Link from "next/link";
 import { Modal } from "@/components/modal";
-import { EmptyState } from "@/components/ui";
+import { EmptyState, eyebrowClass } from "@/components/ui";
 import { CultureStatement, StandardsList, hasCulture, type TeamCulture, type TeamStandard } from "@/components/team-standards";
 
 export type DugoutTeam = {
@@ -18,7 +18,7 @@ const pill =
   "inline-flex items-center justify-center rounded-full px-4 py-1.5 text-sm font-semibold uppercase tracking-wider transition";
 
 function TeamHeading({ name }: { name: string }) {
-  return <h3 className="mb-4 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">{name}</h3>;
+  return <h3 className="mb-4 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">{name}</h3>;
 }
 
 export function DugoutStrip({
@@ -49,7 +49,7 @@ export function DugoutStrip({
     canEdit && (
       <>
         {" "}
-        <Link href={`/dugout?team=${teamId}`} className="text-pink hover:underline">
+        <Link href={`/dugout?team=${teamId}`} className="text-link hover:underline">
           Write them in the Coaches Dugout →
         </Link>
       </>
@@ -81,7 +81,7 @@ export function DugoutStrip({
       className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 rounded-2xl border border-navy-700 bg-navy-900/60 px-4 py-3 sm:px-5"
     >
       <div className="min-w-0">
-        <p className="font-mono text-[0.75rem] leading-4 tracking-[0.25em] text-pink-soft uppercase">{label}</p>
+        <p className={eyebrowClass}>{label}</p>
         {teams.map((t) => t.culture?.motto).filter(Boolean).slice(0, 1).map((m) => (
           <p key={m} className="font-display text-sm font-bold tracking-wide text-highlight uppercase italic">“{m}”</p>
         ))}
@@ -139,7 +139,7 @@ export function DugoutStrip({
                     {canEdit && (
                       <>
                         {" "}
-                        <Link href={`/dugout?team=${team.id}`} className="text-pink hover:underline">
+                        <Link href={`/dugout?team=${team.id}`} className="text-link hover:underline">
                           Write it in the Coaches Dugout →
                         </Link>
                       </>

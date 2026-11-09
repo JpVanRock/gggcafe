@@ -5,7 +5,7 @@
 // graded in the database through the same test flow as the other IQ tests.
 import Link from "next/link";
 import { useState, useTransition } from "react";
-import { buttonClass, secondaryButtonClass } from "@/components/ui";
+import { buttonClass, secondaryButtonClass, eyebrowClass } from "@/components/ui";
 import { ProgressBar } from "@/components/progress-bar";
 import { ManagerAward } from "@/components/manager-award";
 import { PositionField, ScoreBox, ScoreVisual } from "@/components/scorebook";
@@ -13,6 +13,7 @@ import { CHAPTERS, CHAPTER_COUNT, PASS_PCT, QUIZ_LENGTH, playNotation, type Step
 import { answerIqLevelQuestion, finishIqLevel, startIqLevel, type LevelQuestion } from "./iq-actions";
 import { finishScorebookLessons, saveScorebookStep } from "./scorebook-actions";
 import type { Nameplate } from "./iq-tests-client";
+import { confirmAction } from "@/components/confirm-submit";
 
 const LETTERS = ["A", "B", "C", "D"];
 
@@ -31,7 +32,7 @@ function LessonCheck({ check }: { check: NonNullable<Step["check"]> }) {
   const [chosen, setChosen] = useState<number | null>(null);
   return (
     <div className="mt-5 rounded-xl border border-navy-600 p-4">
-      <p className="font-mono text-[11px] tracking-widest text-pink-soft uppercase">Quick check</p>
+      <p className={eyebrowClass}>Quick check</p>
       <p className="mt-1 font-semibold">{check.question}</p>
       <ol className="mt-3 grid gap-2">
         {check.choices.map((c, i) => {
@@ -69,7 +70,7 @@ function TapPlay({ tap }: { tap: NonNullable<Step["tap"]> }) {
   const right = finished && picked.every((n, i) => n === tap.answer[i]);
   return (
     <div className="mt-5">
-      <p className="font-mono text-[11px] tracking-widest text-pink-soft uppercase">Your turn</p>
+      <p className={eyebrowClass}>Your turn</p>
       <p className="mt-1 font-semibold">{tap.prompt}</p>
       <PositionField
         spec={{ kind: "field" }}
@@ -109,7 +110,7 @@ function Explore({ items }: { items: NonNullable<Step["explore"]> }) {
             type="button"
             aria-pressed={k === i}
             onClick={() => setI(k)}
-            className={`rounded-full border px-3 py-1 font-mono text-[11px] tracking-wider uppercase ${
+            className={`rounded-full border px-3 py-1 font-mono text-2xs tracking-wider uppercase ${
               k === i ? "border-pink bg-pink/15 text-ink" : "border-navy-600 text-muted hover:border-pink"
             }`}
           >
@@ -148,7 +149,7 @@ function LessonStep({ step }: { step: Step }) {
         <div className="grid items-start gap-4 sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
           <ScoreVisual visual={pictures[0]} />
           <div>
-            <p className="mb-2 font-mono text-[11px] tracking-widest text-pink-soft uppercase">At the plate</p>
+            <p className={`${eyebrowClass} mb-2`}>At the plate</p>
             <ScoreBox marks={pictures[1] as Extract<Visual, { kind: "box" }>} />
           </div>
         </div>
@@ -278,7 +279,7 @@ export function ChapterRunner({
         </p>
         <h2 className="mt-1 font-display text-3xl font-bold tracking-wide text-highlight uppercase">{chapter.title}</h2>
       </div>
-      <Link href={iqHref} className="text-sm text-pink hover:underline">
+      <Link href={iqHref} className="text-sm text-link hover:underline">
         ← Softball IQ
       </Link>
     </div>
@@ -422,7 +423,7 @@ export function ChapterRunner({
               {quizOpen && (
                 <button
                   type="button"
-                  onClick={() => window.confirm("Start the quiz over? The saved answers will be cleared.") && startQuiz(true)}
+                  onClick={async () => (await confirmAction("Start the quiz over? The saved answers will be cleared.")) && startQuiz(true)}
                   disabled={!canEdit || pending}
                   className="text-xs text-muted underline hover:text-ink"
                 >

@@ -19,7 +19,7 @@ export const metadata: Metadata = { title: "My profile · GGG.Cafe" };
 export default function MePage({ searchParams }: PageProps<"/me">) {
   return (
     <div className="flex flex-1 flex-col">
-      <header className="sticky top-0 z-10 border-b border-pink/40 bg-navy-950/90 backdrop-blur">
+      <header className="z-10 border-b border-pink/40 bg-navy-950/90 backdrop-blur sm:sticky sm:top-0">
         <div className="mx-auto flex w-full max-w-3xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-2.5">
           <Link href="/me" aria-label="GGG.Cafe" className="shrink-0">
             <Logo size={44} className="h-11 w-11" />
@@ -37,7 +37,7 @@ export default function MePage({ searchParams }: PageProps<"/me">) {
           </div>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8">
+      <main id="main" className="mx-auto w-full max-w-3xl flex-1 px-4 py-8">
         <Suspense fallback={<Loading />}>
           <Me searchParams={searchParams} />
         </Suspense>
@@ -65,7 +65,7 @@ function Welcome({ team, season, message }: { team: string; season: string | nul
     <section className="relative overflow-hidden rounded-2xl border border-navy-600 bg-navy-900/80 p-6 sm:p-8">
       <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-pink via-pink to-neon" />
       <p className="flex items-center gap-3 font-mono text-xs tracking-[0.3em] text-pink-soft uppercase">
-        <SpeedStripes className="h-3 w-9 text-pink" />
+        <SpeedStripes className="h-3 w-9 text-link" />
         Welcome to
       </p>
       <h2 className="mt-2 text-3xl leading-tight font-bold tracking-tight text-highlight uppercase sm:text-4xl">{team}</h2>
@@ -73,7 +73,7 @@ function Welcome({ team, season, message }: { team: string; season: string | nul
       {message ? (
         <blockquote className="mt-5 border-l-2 border-pink pl-4 text-base leading-relaxed whitespace-pre-line text-ink">
           {message}
-          <footer className="mt-2 font-mono text-[0.75rem] tracking-[0.2em] text-pink-soft uppercase">Your coaches</footer>
+          <footer className="mt-2 font-mono text-2xs tracking-[0.2em] text-pink-soft uppercase">Your coaches</footer>
         </blockquote>
       ) : (
         <p className="mt-4 text-sm text-muted">Glad you&apos;re here. Claim your profile below.</p>

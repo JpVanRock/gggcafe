@@ -37,6 +37,10 @@ tests/unit/              node --test unit tests (npm run test:unit)
 ```
 
 ## Shared building blocks (use these, don't copy them)
+- UI components and the type scale: `docs/features/ui-components.md`. `Field`, `buttonStyles`/`SubmitButton`,
+  `Badge`/`badgeClass`, `CountBadge`, `Eyebrow`, `Card`, `EmptyState`, `Loading`, `TableScroll` (`components/ui.tsx`);
+  `ConfirmSubmit`/`confirmAction` instead of `window.confirm`. Nothing under 12px (`text-2xs`); pink text is
+  `text-link`. `tests/unit/ui-rules.test.ts` enforces these.
 - Form fields: `inputClass` is full width. An input that sets its own width uses `fieldClass` + `w-*` (never
   `${inputClass} w-20`: both widths apply and full width wins).
 - Dugout pages: `const dugout = await loadDugoutTeam(supabase, teamParam); if (!dugout) return <NoOwnTeam />;` then
@@ -131,6 +135,7 @@ tests/unit/              node --test unit tests (npm run test:unit)
 | Practice planning | `docs/features/practice-planning.md` | Install checklist, road to opening day, notes and cues for players |
 | Team Yearbook | `docs/features/yearbook.md` | Season photos, who can add and view, the viewer |
 | Team playbook & scouting | `docs/features/playbook-scouting.md` | Depth chart, call sheet and flashcards, team quizzes, scouting |
+| UI components | `docs/features/ui-components.md` | Type scale, shared components and props, states, accessibility rules |
 
 ## Softball conventions
 - Default format is fastpitch; `teams.format` allows slowpitch.
@@ -172,7 +177,7 @@ like a sports brand or media-day graphics. Never childish or preschool.
 - Night Game (dark, default) / Day Game (white) switch at the top right (`src/components/theme-toggle.tsx`,
   `html[data-theme="day"]`, saved in localStorage `ggg-theme`, applied before paint by a script in the
   root layout). Day Game only re-maps tokens in `globals.css`, so use tokens by ROLE:
-  `text-highlight` for emphasis text (neon at night, navy by day; never `text-neon`),
+  `text-highlight` for emphasis text (neon at night, navy by day; never `text-neon`), `text-link` for pink text,
   `text-on-accent` for text on neon/pink fills (never `text-navy-950`), `bg-neon`/`bg-pink` for fills.
   `keep-night` keeps a piece in night colors (the field diagram; the navy chip behind the footer
   wordmark, which the brand kit approves only over navy). `day:` variant for Day-only tweaks.
@@ -180,12 +185,12 @@ like a sports brand or media-day graphics. Never childish or preschool.
   in Day Game, with no panel behind it (user's choice).
 - Text sizes (user, 2026-11-07): body text is one notch larger than Tailwind's defaults
   (`text-xs` 13px, `text-sm` 15px, base 17px; set in globals.css @theme). Titles (text-lg and up)
-  are unchanged. Small headers (card section labels, DetailHeading, table headers) pin 12px with
-  `text-[0.75rem] leading-4`.
+  are unchanged. Small uppercase labels (card section labels, DetailHeading, table headers, badges) use
+  `text-2xs` (12px), the smallest size on the site.
 - Use the tokens from `src/app/globals.css`, never zinc/gray or `dark:` classes:
   `navy-950` page, `navy-900` cards, `navy-800` hover/inputs, `navy-700/600` borders,
   `ink` text, `muted` secondary text, `neon` (brand yellow) primary-button fills, `highlight` titles/numbers,
-  `pink` (logo pink) links/focus/selected/accents, `danger` errors.
+  `pink` (logo pink) focus/selected/accents and fills (`text-link` for pink text), `danger` errors.
 - Page titles: uppercase, letter-spaced, neon, with a short pink rule (see `PageHeader`).
 
 ## Next.js 16 notes

@@ -51,7 +51,7 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
   }
 
   const label = (on: boolean) =>
-    `font-mono text-[10px] tracking-[0.15em] uppercase transition ${on ? "text-ink" : "text-muted"}`;
+    `font-mono text-2xs tracking-[0.15em] uppercase transition ${on ? "text-ink" : "text-muted"}`;
 
   return (
     <button

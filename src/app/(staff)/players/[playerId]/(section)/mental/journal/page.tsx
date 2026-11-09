@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Disclosure, secondaryButtonClass } from "@/components/ui";
+import { Disclosure, secondaryButtonClass, eyebrowClass, badgeClass } from "@/components/ui";
 import { addDays, formatDay, formatWeekRange, isISODate, todayISO, weekDates, weekStart } from "@/lib/dates";
 import { JOURNAL_PROMPTS } from "@/lib/mental";
 import { loadJournalWeek } from "../../../mental-data";
@@ -34,7 +34,7 @@ export default async function JournalPage({ params, searchParams }: PageProps<"/
     <SectionShell title="Practice journal" subtitle={`Mental GP · ${formatWeekRange(monday)}`}>
       <div className="flex flex-col gap-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <Link href={`/players/${player.id}/mental`} className="text-sm text-pink hover:underline">
+          <Link href={`/players/${player.id}/mental`} className="text-sm text-link hover:underline">
             ← Mental GP
           </Link>
           <nav aria-label="Choose week" className="flex items-center gap-2 font-mono text-sm">
@@ -67,14 +67,14 @@ export default async function JournalPage({ params, searchParams }: PageProps<"/
               >
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                   <span className="font-display text-lg font-bold tracking-wide uppercase">{isToday ? "Today" : formatDay(date)}</span>
-                  {practice && <span className="rounded bg-neon px-1.5 py-px font-mono text-[10px] font-bold tracking-wider text-on-accent uppercase">{practice}</span>}
+                  {practice && <span className={badgeClass("neon")}>{practice}</span>}
                 </div>
                 {filled && (
                   <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-3">
                     {(["purpose", "worked", "fix"] as const).map((k) =>
                       entry?.[k] ? (
                         <div key={k}>
-                          <dt className="font-mono text-[11px] tracking-widest text-pink-soft uppercase">{JOURNAL_PROMPTS[k].label}</dt>
+                          <dt className={eyebrowClass}>{JOURNAL_PROMPTS[k].label}</dt>
                           <dd className="mt-1 whitespace-pre-wrap text-ink/90">{entry[k]}</dd>
                         </div>
                       ) : null,

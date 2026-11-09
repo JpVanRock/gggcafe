@@ -6,7 +6,7 @@
 // shows in each player's TWIS for that week.
 import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
-import { Field, FormMessage, inputClass, pillButtonClass, pillQuietClass } from "@/components/ui";
+import { Field, FormMessage, inputClass, pillButtonClass, pillQuietClass, badgeClass } from "@/components/ui";
 import { EVENT_KINDS, EVENT_KIND_LABEL, clockLabel, parseClock, type EventKind } from "@/lib/dugout";
 import { initialFormState, type FormState } from "@/lib/form";
 import { deleteCalendarEvent, saveCalendarEvent } from "./actions";
@@ -170,7 +170,7 @@ function Details({ rows }: { rows: [string, string | null][] }) {
         .filter(([, v]) => v)
         .map(([label, value]) => (
           <div key={label} className="contents">
-            <dt className="font-mono text-[0.75rem] leading-5 font-bold tracking-[0.15em] text-pink-soft uppercase">{label}</dt>
+            <dt className="font-mono text-2xs leading-5 font-bold tracking-[0.15em] text-pink-soft uppercase">{label}</dt>
             <dd className="text-sm whitespace-pre-line">{value}</dd>
           </div>
         ))}
@@ -230,7 +230,7 @@ export function CalendarView({
           {e.byline && ` · ${e.byline}`}
         </p>
         {e.planId && (
-          <Link href={`/dugout/plans/${e.planId}`} className="self-start text-sm font-semibold text-pink hover:underline">
+          <Link href={`/dugout/plans/${e.planId}`} className="self-start text-sm font-semibold text-link hover:underline">
             Open this day&apos;s practice plan →
           </Link>
         )}
@@ -255,7 +255,7 @@ export function CalendarView({
         <Details rows={[["When", [dayLabel(g.date), time(g.start)].filter(Boolean).join(" · ")], ["Where", g.place]]} />
         <p className="text-xs text-muted">
           Games are added and changed on the{" "}
-          <Link href={`/teams/${teamId}`} className="text-pink hover:underline">
+          <Link href={`/teams/${teamId}`} className="text-link hover:underline">
             team page
           </Link>
           .
@@ -276,7 +276,7 @@ export function CalendarView({
       <div className="hidden overflow-hidden rounded-xl border border-navy-700 sm:block">
         <div className="grid grid-cols-7 border-b border-navy-700 bg-navy-900">
           {WEEKDAYS.map((d) => (
-            <div key={d} className="px-2 py-2 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-muted uppercase">
+            <div key={d} className="px-2 py-2 font-mono text-2xs font-bold tracking-[0.2em] text-muted uppercase">
               {d}
             </div>
           ))}
@@ -317,10 +317,10 @@ export function CalendarView({
                 </div>
                 <div className="flex flex-col gap-1">
                   {offLabel && (
-                    <span className="rounded bg-neon px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wider text-on-accent uppercase">{offLabel}</span>
+                    <span className={badgeClass("neon")}>{offLabel}</span>
                   )}
                   {phaseStart && (
-                    <span className="rounded border border-pink px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wider text-pink-soft uppercase">
+                    <span className={badgeClass("pink")}>
                       {phaseStart.name} begins
                     </span>
                   )}
@@ -351,7 +351,7 @@ export function CalendarView({
             const { games: g, events: e } = byDay(date);
             return (
               <section key={date} className="rounded-xl border border-navy-700 bg-navy-900/60 p-3">
-                <h3 className={`mb-2 font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] uppercase ${date === today ? "text-highlight" : "text-pink-soft"}`}>
+                <h3 className={`mb-2 font-mono text-2xs font-bold tracking-[0.2em] uppercase ${date === today ? "text-highlight" : "text-pink-soft"}`}>
                   {dayLabel(date)}
                   {date === today && " · Today"}
                   {phases.find((p) => p.startsOn === date) && ` · ${phases.find((p) => p.startsOn === date)!.name} begins`}

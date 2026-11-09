@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Card, EmptyState, buttonClass, secondaryButtonClass, tableClass, tdClass, thClass } from "@/components/ui";
+import { Card, EmptyState, buttonClass, secondaryButtonClass, tableClass, tdClass, thClass, TableScroll } from "@/components/ui";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { isUuid } from "@/lib/softball";
 import { quizScore } from "@/lib/playbook";
@@ -129,7 +129,7 @@ export default async function QuizPage({ params }: PageProps<"/dugout/playbook/q
         {questions.length === 0 || roster.length === 0 ? (
           <p className="text-sm text-muted">Results show here once players start.</p>
         ) : (
-          <div className="overflow-x-auto">
+          <TableScroll label="Quiz results">
             <table className={tableClass}>
               <thead>
                 <tr>
@@ -155,7 +155,7 @@ export default async function QuizPage({ params }: PageProps<"/dugout/playbook/q
                 ))}
               </tbody>
             </table>
-          </div>
+          </TableScroll>
         )}
       </Card>
     </div>

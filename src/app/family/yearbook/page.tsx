@@ -15,7 +15,7 @@ export default function FamilyYearbookPage({ searchParams }: PageProps<"/family/
   return (
     <div className="flex flex-1 flex-col">
       <FamilyHeader />
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
+      <main id="main" className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
         <Suspense fallback={<Loading />}>
           <FamilyYearbook searchParams={searchParams} />
         </Suspense>
@@ -38,7 +38,7 @@ async function FamilyYearbook({ searchParams }: Pick<PageProps<"/family/yearbook
     return (
       <EmptyState>
         The Yearbook is part of G3 Advanced. It opens here once your daughter has it.{" "}
-        <Link href="/family" className="text-pink hover:underline">
+        <Link href="/family" className="text-link hover:underline">
           Back home
         </Link>
       </EmptyState>

@@ -16,7 +16,7 @@ export type Setup = {
 export const newKey = () => (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : String(Math.random()));
 
 export const chip = "rounded-full border px-2.5 py-0.5 text-xs font-semibold transition";
-export const labelClass = "font-mono text-[10px] font-bold tracking-wider text-muted uppercase";
+export const labelClass = "font-mono text-2xs font-bold tracking-wider text-muted uppercase";
 
 export function GripIcon() {
   return (

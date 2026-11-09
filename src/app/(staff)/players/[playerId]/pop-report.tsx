@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Disclosure, EmptyState, tableClass, tdClass, thClass } from "@/components/ui";
+import { Disclosure, EmptyState, tableClass, tdClass, thClass, TableScroll } from "@/components/ui";
 import { formatLongDate } from "@/lib/dates";
 import { BATS_LABEL, POSITION_LABEL, THROWS_LABEL, batsThrows, type Player } from "@/lib/softball";
 import { PlayerForm } from "../player-form";
@@ -103,7 +103,7 @@ export function PopDetail({
       {movementAccess === "locked" && (
         <p className="rounded-xl border border-dashed border-navy-600 px-4 py-3 text-sm text-muted">
           Movement Preferences is a G3 Advanced feature.{" "}
-          <Link href={`/players/${player.id}`} className="text-pink hover:underline">
+          <Link href={`/players/${player.id}`} className="text-link hover:underline">
             Unlock G3 Advanced on her menu
           </Link>{" "}
           to use it. Anything already saved is kept.
@@ -117,7 +117,7 @@ export function PopDetail({
         {pop.rosters.length === 0 ? (
           <EmptyState>Not on any roster yet. Add them from a team&apos;s page.</EmptyState>
         ) : (
-          <div className="overflow-x-auto">
+          <TableScroll label="Teams">
             <table className={tableClass}>
               <thead>
                 <tr>
@@ -146,7 +146,7 @@ export function PopDetail({
                 ))}
               </tbody>
             </table>
-          </div>
+          </TableScroll>
         )}
       </section>
 
@@ -155,7 +155,7 @@ export function PopDetail({
         {pop.metrics.length === 0 ? (
           <EmptyState>No measurements yet (exit velo, pop time, home to first…).</EmptyState>
         ) : (
-          <div className="overflow-x-auto">
+          <TableScroll label="Measurements">
             <table className={tableClass}>
               <thead>
                 <tr>
@@ -180,7 +180,7 @@ export function PopDetail({
                 ))}
               </tbody>
             </table>
-          </div>
+          </TableScroll>
         )}
       </section>
 

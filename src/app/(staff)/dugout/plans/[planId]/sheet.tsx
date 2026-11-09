@@ -1,13 +1,14 @@
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { DrillTags } from "@/components/drill-tags";
 import { FieldLineup } from "@/components/practice-field";
-import { Card, EmptyState, pillButtonClass, pillOutlineClass, pillQuietClass } from "@/components/ui";
+import { Card, EmptyState, pillButtonClass, pillOutlineClass, badgeClass } from "@/components/ui";
 import { formatLongDate } from "@/lib/dates";
 import { PRACTICE_SETTING_LABEL, durationLabel, equipmentChecklist, planTimeline, practiceRange, type PlanPosition } from "@/lib/dugout";
 import type { PracticePlan, RosterPlayer, StaffContact } from "@/lib/practice-plans";
 import { deletePracticePlan, reopenPracticePlan, sharePracticePlan } from "../actions";
 import { ShareButton } from "./share-button";
 import { ActionForm } from "@/components/action-form";
+import { SubmitButton } from "@/components/submit-button";
 
 /** A finalized plan (or any plan, for viewers): read-only, with Print and Share. */
 export function PlanSheet({
@@ -46,9 +47,7 @@ export function PlanSheet({
             {plan.focus && <p className="mt-2 font-semibold">Focus: {plan.focus}</p>}
           </div>
           <span
-            className={`rounded px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase ${
-              final ? "bg-neon text-on-accent" : "border border-pink text-pink-soft"
-            }`}
+            className={badgeClass(final ? "neon" : "pink")}
           >
             {final ? (plan.shared_at ? "Final · Shared" : "Final") : "Draft"}
           </span>
@@ -63,9 +62,9 @@ export function PlanSheet({
           {canEdit && final && (
             <ActionForm action={reopenPracticePlan}>
               <input type="hidden" name="id" value={plan.id} />
-              <button type="submit" className={pillQuietClass}>
+              <SubmitButton variant="pillQuiet">
                 Reopen to edit
-              </button>
+              </SubmitButton>
             </ActionForm>
           )}
           {canEdit && (
@@ -82,7 +81,7 @@ export function PlanSheet({
 
       <section aria-label="Practice timeline">
         <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase">Practice timeline</h2>
+          <h2 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Practice timeline</h2>
           <p className="text-sm text-muted">
             {used} of {plan.total_minutes} min planned
           </p>
@@ -103,7 +102,7 @@ export function PlanSheet({
                   <DrillTags tags={b.tags} className="mt-1" />
                   {b.description && <p className="mt-1.5 text-sm text-muted">{b.description}</p>}
                   {b.video_url && (
-                    <a href={b.video_url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block text-xs font-semibold text-pink hover:underline">
+                    <a href={b.video_url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block text-xs font-semibold text-link hover:underline">
                       ▶ Watch the drill
                     </a>
                   )}

@@ -40,7 +40,7 @@ export default async function ScorebookGamePage({ params }: PageProps<"/players/
           {iq.managerAwards.length < CHAPTER_COUNT
             ? "Finish all six chapters to unlock the games."
             : `Game ${n} opens after a clean book in game ${n - 1}.`}{" "}
-          <Link href={gamesHref} className="text-pink hover:underline">
+          <Link href={gamesHref} className="text-link hover:underline">
             All games →
           </Link>
         </EmptyState>

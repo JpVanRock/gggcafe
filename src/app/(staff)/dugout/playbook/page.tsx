@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Disclosure, EmptyState } from "@/components/ui";
+import { Disclosure, EmptyState, badgeClass } from "@/components/ui";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { INSTALL_STATUS_LABEL, type InstallStatus } from "@/lib/install";
 import { PLAY_CATEGORIES, PLAY_CATEGORY_LABEL } from "@/lib/playbook";
@@ -75,10 +75,10 @@ export default async function PlaybookPage({ searchParams }: PageProps<"/dugout/
                         <h3 className="font-display text-lg font-bold text-ink">{p.name}</h3>
                         <span className="flex flex-wrap gap-1.5">
                           {p.call_sheet && (
-                            <span className="rounded bg-pink px-1.5 py-px font-mono text-[10px] font-bold tracking-wider text-on-accent uppercase">Call sheet</span>
+                            <span className={badgeClass("pinkSolid")}>Call sheet</span>
                           )}
                           {p.team_id === null && (
-                            <span className="rounded border border-navy-600 px-1.5 py-px font-mono text-[10px] font-bold tracking-wider text-muted uppercase">All teams</span>
+                            <span className={badgeClass("neutral")}>All teams</span>
                           )}
                         </span>
                       </div>

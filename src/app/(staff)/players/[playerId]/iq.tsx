@@ -1,4 +1,4 @@
-import { Disclosure, secondaryButtonClass } from "@/components/ui";
+import { Disclosure, secondaryButtonClass, eyebrowClass } from "@/components/ui";
 import { FIELD_POSITIONS, POSITION_LABEL, type Position } from "@/lib/softball";
 import { setIqQuestionActive } from "./iq-actions";
 import type { IqData, IqQuestion } from "./data";
@@ -168,7 +168,7 @@ export function GloveCase({ positions, plate, size = 220 }: { positions: Positio
       {earned.map((p) => (
         <figure key={p.position} className="flex flex-col items-center gap-2">
           <GoldenGlove name={plate.name} number={plate.number} position={p.label} year={p.earnedYear} size={size} />
-          <figcaption className="font-mono text-[11px] tracking-wider text-muted uppercase">
+          <figcaption className="font-mono text-2xs tracking-wider text-muted uppercase">
             {p.label} · {p.earnedOn}
           </figcaption>
         </figure>
@@ -332,7 +332,7 @@ export function IqDetail({
           <ul className="grid gap-3 md:grid-cols-2">
             {missed.map((q) => (
               <li key={q.id} className="rounded-xl border border-pink/50 p-3 text-sm">
-                <p className="font-mono text-[11px] tracking-wider text-pink-soft uppercase">{topicLabel(q)}</p>
+                <p className={eyebrowClass}>{topicLabel(q)}</p>
                 <p className="mt-1 text-ink/80 italic">{q.scenario}</p>
                 <p className="mt-1 font-semibold">{q.question}</p>
                 <p className="mt-2 text-highlight">✓ {q.choices[q.correct_index]}</p>
@@ -354,7 +354,7 @@ export function IqDetail({
                 <li key={q.id} className={`py-3 ${q.active ? "" : "opacity-60"}`}>
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <p className="font-mono text-[11px] tracking-wider text-pink-soft uppercase">
+                      <p className={eyebrowClass}>
                         {topicLabel(q)}
                         {!q.active && " · hidden"}
                       </p>

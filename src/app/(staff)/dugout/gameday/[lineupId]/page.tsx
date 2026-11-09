@@ -5,7 +5,7 @@ import { canEdit, requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { isUuid } from "@/lib/softball";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Card, pillButtonClass, pillOutlineClass, pillQuietClass } from "@/components/ui";
+import { Card, pillButtonClass, pillOutlineClass, badgeClass, TableScroll } from "@/components/ui";
 import { formatLongDate } from "@/lib/dates";
 import { emailConfigured } from "@/lib/email";
 import { BASE_RUNNING_LABEL, HITTING_TYPE_LABEL, percent, pitcherOf, rate } from "@/lib/gameday";
@@ -19,6 +19,7 @@ import { SubTracker } from "./subs";
 import { gameJobsFromDuties, type DutyPhase } from "@/lib/staff-duties";
 import type { DepthChart, DepthPosition } from "@/lib/playbook";
 import { ActionForm } from "@/components/action-form";
+import { SubmitButton } from "@/components/submit-button";
 
 export const metadata: Metadata = { title: "Lineup · GameDay · GGG.Cafe" };
 
@@ -68,7 +69,7 @@ export default async function LineupPage({ params, searchParams }: PageProps<"/d
                 </h2>
                 <p className="mt-1 text-sm text-muted">{[formatLongDate(lineup.game_date), lineup.title].filter(Boolean).join(" · ")}</p>
               </div>
-              <span className={`rounded px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider uppercase ${lineup.status === "final" ? "bg-neon text-on-accent" : "border border-pink text-pink-soft"}`}>
+              <span className={badgeClass(lineup.status === "final" ? "neon" : "pink")}>
                 {lineup.status === "final" ? (lineup.shared_at ? "Final · Shared" : "Final") : "Draft"}
               </span>
             </div>
@@ -93,9 +94,9 @@ export default async function LineupPage({ params, searchParams }: PageProps<"/d
               {editor && lineup.status === "final" && (
                 <ActionForm action={reopenLineup}>
                   <input type="hidden" name="id" value={lineup.id} />
-                  <button type="submit" className={pillQuietClass}>
+                  <SubmitButton variant="pillQuiet">
                     Reopen to edit
-                  </button>
+                  </SubmitButton>
                 </ActionForm>
               )}
               {editor && (
@@ -119,7 +120,7 @@ export default async function LineupPage({ params, searchParams }: PageProps<"/d
                       <span className="w-6 font-display text-lg font-bold text-highlight tabular-nums">{i + 1}</span>
                       <span className="min-w-0 flex-1">
                         <span className="font-semibold">{p?.short ?? "Player"}</span>
-                        {id === lineup.dp_player_id && lineup.flex_player_id && <span className="ml-1.5 font-mono text-[10px] font-bold text-pink-soft">DP</span>}
+                        {id === lineup.dp_player_id && lineup.flex_player_id && <span className="ml-1.5 font-mono text-2xs font-bold text-pink-soft">DP</span>}
                         <span className="ml-2 text-xs text-muted">
                           {[p?.hitting_type && HITTING_TYPE_LABEL[p.hitting_type], p?.base_running && BASE_RUNNING_LABEL[p.base_running]].filter(Boolean).join(" · ")}
                         </span>
@@ -156,10 +157,10 @@ export default async function LineupPage({ params, searchParams }: PageProps<"/d
             </Card>
           </div>
           <Card title="Defensive rotations">
-            <div className="overflow-x-auto">
+            <TableScroll label="Defensive rotations">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-navy-700 text-[0.75rem] leading-4 font-semibold tracking-wider text-muted uppercase">
+                  <tr className="border-b border-navy-700 text-2xs font-semibold tracking-wider text-muted uppercase">
                     <th className="py-2 pr-3">Player</th>
                     {rotations.map((r) => (
                       <th key={r} className="px-2 py-2 text-center">
@@ -184,7 +185,7 @@ export default async function LineupPage({ params, searchParams }: PageProps<"/d
                   ))}
                 </tbody>
               </table>
-            </div>
+            </TableScroll>
           </Card>
           {lineup.jobs.length > 0 && (
             <Card title="Game-day jobs">

@@ -17,7 +17,7 @@ export const metadata: Metadata = { title: "Testing · Training · Coaches Dugou
 // The athletic testing pack (Phase 2): results save as measurements; each is rated
 // 1-5 against the team's age-group bands, with a composite score. Coaches only:
 // players see their own results in Performance Training (no public rankings).
-const heading = "font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
 const TIER_LABEL = { youth: "8U-10U", u12: "11U-12U", u14: "13U-14U", u16: "15U-16U", u18: "17U-18U" } as const;
 
 export default async function TestingPage({ searchParams }: PageProps<"/dugout/training/testing">) {
@@ -56,13 +56,13 @@ export default async function TestingPage({ searchParams }: PageProps<"/dugout/t
             <table className="w-full min-w-max text-sm">
               <thead className="bg-navy-900">
                 <tr>
-                  <th className="px-3 py-2 text-left text-[0.75rem] leading-4 font-semibold tracking-wider text-muted uppercase">Player</th>
+                  <th className="px-3 py-2 text-left text-2xs font-semibold tracking-wider text-muted uppercase">Player</th>
                   {tested.map((t) => (
-                    <th key={t.key} className="px-2 py-2 text-left text-[0.75rem] leading-4 font-semibold tracking-wider text-muted uppercase">
+                    <th key={t.key} className="px-2 py-2 text-left text-2xs font-semibold tracking-wider text-muted uppercase">
                       {t.name.replace(/ \(.*\)/, "")}
                     </th>
                   ))}
-                  <th className="px-3 py-2 text-left text-[0.75rem] leading-4 font-semibold tracking-wider text-highlight uppercase">Score</th>
+                  <th className="px-3 py-2 text-left text-2xs font-semibold tracking-wider text-highlight uppercase">Score</th>
                 </tr>
               </thead>
               <tbody>

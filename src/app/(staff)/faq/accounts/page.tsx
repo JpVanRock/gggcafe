@@ -3,14 +3,14 @@ import { notFound } from "next/navigation";
 import { requireStaffPage } from "@/lib/auth";
 import { ACCOUNT_TYPES, QUESTIONS, SECTIONS, type Level } from "@/lib/account-types";
 import { Softball } from "@/components/softball-icon";
-import { Disclosure, PageHeader } from "@/components/ui";
+import { Disclosure, PageHeader, eyebrowClass } from "@/components/ui";
 import { FaqNav } from "../faq-nav";
 
 export const metadata: Metadata = { title: "Account types · FAQ · GGG.Cafe" };
 
 // Admin-only (user, 2026-11-08): the five registration types and what each
 // one's dashboard can use, side by side. Content: src/lib/account-types.ts.
-const heading = "font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
 const TAG: Partial<Record<Level, string>> = { part: "Part", own: "Own", view: "View" };
 const SAYS: Record<Level, string> = { yes: "Yes", part: "Part of it", own: "Only their own", view: "View only", no: "No" };
 
@@ -19,7 +19,7 @@ function Mark({ level, who }: { level: Level; who: string }) {
   return (
     <span className="inline-flex flex-col items-center gap-0.5">
       <Softball size={22} label={`${who}: ${SAYS[level]}`} />
-      {TAG[level] && <span className="font-mono text-[9px] leading-none tracking-wider text-pink-soft uppercase">{TAG[level]}</span>}
+      {TAG[level] && <span className="font-mono text-2xs leading-none tracking-wider text-pink-soft uppercase">{TAG[level]}</span>}
     </span>
   );
 }
@@ -60,7 +60,7 @@ export default async function AccountTypesPage() {
         {(["part", "own", "view"] as const).map((l) => (
           <span key={l} className="inline-flex items-center gap-1.5">
             <Softball size={18} label={SAYS[l]} />
-            <span className="font-mono text-[10px] tracking-wider text-pink-soft uppercase">{TAG[l]}</span> {SAYS[l]}
+            <span className={eyebrowClass}>{TAG[l]}</span> {SAYS[l]}
           </span>
         ))}
         <span className="inline-flex items-center gap-1.5">
@@ -72,9 +72,9 @@ export default async function AccountTypesPage() {
         <table className="w-full min-w-[40rem] text-sm">
           <thead className="bg-navy-900">
             <tr>
-              <th className="px-4 py-3 text-left font-mono text-[0.75rem] leading-4 font-bold tracking-[0.2em] text-muted uppercase">Feature</th>
+              <th className="px-4 py-3 text-left font-mono text-2xs font-bold tracking-[0.2em] text-muted uppercase">Feature</th>
               {ACCOUNT_TYPES.map((t) => (
-                <th key={t.key} className="w-20 px-1 py-3 text-center font-mono text-[0.75rem] leading-4 font-bold tracking-[0.1em] text-highlight uppercase sm:w-24">
+                <th key={t.key} className="w-20 px-1 py-3 text-center font-mono text-2xs font-bold tracking-[0.1em] text-highlight uppercase sm:w-24">
                   {t.label.split(" ").map((w) => (
                     <span key={w} className="block">
                       {w}

@@ -3,7 +3,7 @@
 // journal. Server component; the forms are in mental-game-client.tsx.
 import Link from "next/link";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Disclosure } from "@/components/ui";
+import { Disclosure, eyebrowClass } from "@/components/ui";
 import { formatDay } from "@/lib/dates";
 import {
   CONTEXT_LABEL, DEFAULT_ZONE, GUIDED_SESSIONS, SCAN_LABELS, SCAN_SKILLS, SIGNALS, monthStart, scanAverage, scanChange, scanExtremes, zoneStatus,
@@ -70,7 +70,7 @@ export function MentalTools({
                 <p className="mt-2 text-sm whitespace-pre-wrap text-ink/90">{plan?.[s.signs] || <span className="text-muted">Not filled in yet.</span>}</p>
                 {s.release && plan?.[s.release] && (
                   <p className="mt-3 text-sm">
-                    <span className="font-mono text-[11px] font-bold tracking-widest text-pink-soft uppercase">Release · </span>
+                    <span className="font-mono text-2xs font-bold tracking-widest text-pink-soft uppercase">Release · </span>
                     <span className="whitespace-pre-wrap">{plan[s.release]}</span>
                   </p>
                 )}
@@ -173,9 +173,9 @@ export function MentalTools({
               <div className="flex h-24 items-end gap-2" aria-label="Average by month">
                 {[...scans].reverse().map((s) => (
                   <span key={s.month} className="flex flex-1 flex-col items-center gap-1">
-                    <span className="font-mono text-[10px] text-muted tabular-nums">{scanAverage(s.scores)}</span>
+                    <span className="font-mono text-2xs text-muted tabular-nums">{scanAverage(s.scores)}</span>
                     <span className="w-full rounded-t bg-linear-to-t from-pink to-neon" style={{ height: `${scanAverage(s.scores) * 12}px` }} />
-                    <span className="font-mono text-[10px] text-muted uppercase">{monthName.format(new Date(`${s.month}T00:00:00Z`))}</span>
+                    <span className="font-mono text-2xs text-muted uppercase">{monthName.format(new Date(`${s.month}T00:00:00Z`))}</span>
                   </span>
                 ))}
               </div>
@@ -205,7 +205,7 @@ export function MentalTools({
                 href={`${base}/session/${s.slug}`}
                 className="flex h-full flex-col gap-1.5 rounded-2xl border border-navy-600 bg-navy-900/70 p-4 transition hover:border-pink hover:bg-navy-800"
               >
-                <span className="flex items-center justify-between gap-2 font-mono text-[11px] tracking-widest text-pink-soft uppercase">
+                <span className={`${eyebrowClass} flex items-center justify-between gap-2`}>
                   <span>
                     {s.kind === "breathing" ? "Breathing" : "Imagery"} · {s.minutes} min
                   </span>
@@ -220,7 +220,7 @@ export function MentalTools({
         {canEdit && (
           <p className="text-sm text-muted">
             To make one a routine, add a mental routine in{" "}
-            <Link href={`/players/${playerId}/training`} className="text-pink hover:underline">
+            <Link href={`/players/${playerId}/training`} className="text-link hover:underline">
               Performance Training
             </Link>
             .

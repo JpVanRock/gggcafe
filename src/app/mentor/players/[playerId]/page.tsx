@@ -98,7 +98,7 @@ export default async function MentorPlayerPage({ params }: PageProps<"/mentor/pl
                     <img src={messagePhotos.get(m.photo_path)!} alt="Photo sent" className="mt-2 h-20 rounded-lg object-cover" />
                   )}
                 </span>
-                <span className="font-mono text-[10px] tracking-wider text-muted uppercase">{m.read_at ? "Seen" : "Not seen yet"}</span>
+                <span className="font-mono text-2xs tracking-wider text-muted uppercase">{m.read_at ? "Seen" : "Not seen yet"}</span>
                 <RemoveMessage id={m.id} />
               </li>
             ))}
