@@ -3,6 +3,8 @@
   its own home: Head Coach (staff role `coach`, an admin approves) and Assistant Coach (role `assistant`, a head coach or
   admin approves) → /dashboard; Player → /me; Parent → /family; Mentor → /mentor. Admin (`admin`) isn't
   a sign-up: head coach + staff, mentors, G3 Advanced, FAQ. `viewer` stays as read-only staff (admins set it).
+- Every sign-up checks the Terms of Service box, and players confirm they're 13 or older (younger players get a
+  parent-made login); accounts without an agreement are asked once on /terms/accept (`docs/features/legal.md`).
 - Account type is a dropdown (players and parents first). Team code (user, 2026-11-09; migration 20261109140000): one
   6-character code per team (`teams.team_code`, unique, no 0/O/1/I; `CODE_TYPES` in account-types.ts). Players, parents
   and assistant coaches enter it at sign-up; the action checks it with `signup_team(code)` (the only function signed-out

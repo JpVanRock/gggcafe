@@ -13,6 +13,7 @@ import { loadRoadmap } from "./data";
 import { deletePhase, deleteTeamRoutine, endTeamRoutine } from "./actions";
 import { PhaseForm, SuggestForm, TeamRoutineForm } from "./forms";
 import { ActionForm } from "@/components/action-form";
+import { SafetyNote } from "@/components/legal";
 
 export const metadata: Metadata = { title: "Training · Coaches Dugout · GGG.Cafe" };
 
@@ -96,6 +97,7 @@ export default async function TrainingPage({ searchParams }: PageProps<"/dugout/
     <div className="flex flex-col gap-8">
       <TeamPicker teams={teams} current={team.id} basePath="/dugout/training" />
       <TrainingNav current="roadmap" teamId={team.id} head={isHeadCoach(user.staff.role)} />
+      <SafetyNote audience="coach" />
 
       {/* Roadmap ----------------------------------------------------------------- */}
       <section className="flex flex-col gap-4">

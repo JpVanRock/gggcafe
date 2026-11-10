@@ -5,6 +5,7 @@ import { registerAccount, type RegisterState } from "./actions";
 import { CODE_TYPES, SIGNUP_LABEL, type SignupType } from "@/lib/account-types";
 import { Field, FormMessage, inputClass } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
+import { AgreementCheckbox } from "@/components/agreement-checkbox";
 
 const initial: RegisterState = { error: null, values: { role: "", name: "", email: "", code: "", child: "", specialty: "", org: "" } };
 
@@ -100,6 +101,16 @@ export function RegisterForm() {
       <Field label="Confirm password">
         <input type="password" name="confirm" required minLength={8} autoComplete="new-password" className={inputClass} />
       </Field>
+
+      {player && (
+        <label className="flex items-start gap-3 text-sm text-ink">
+          <input type="checkbox" name="age13" required className="mt-1 size-4 shrink-0 accent-pink" />
+          <span>
+            I&apos;m 13 or older. <span className="text-muted">Younger players: a parent makes your login from the family page.</span>
+          </span>
+        </label>
+      )}
+      <AgreementCheckbox />
 
       <FormMessage error={state.error} fields={state.fields} />
       <SubmitButton pendingLabel="Creating your account…" className="w-full">

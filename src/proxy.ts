@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { supabaseConfig } from "@/lib/supabase/env";
 import { sampleDataEnabled } from "@/lib/supabase/sample/enabled";
+import { needsTermsAgreement } from "@/lib/legal";
 
 /** Pages that need a signed-in user. The page itself still checks staff access. */
 const PROTECTED_PREFIXES = ["/dashboard", "/dugout", "/teams", "/players", "/family", "/me"];
@@ -12,6 +13,8 @@ const PROTECTED_PREFIXES = ["/dashboard", "/dugout", "/teams", "/players", "/fam
  *    (Server Components can't set cookies themselves)
  *  - sends signed-out visitors away from protected pages, and signed-in
  *    users away from /login
+ *  - sends signed-in users who haven't agreed to the current Terms of Service to
+ *    /terms/accept first (src/lib/legal.ts)
  */
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -53,14 +56,18 @@ export async function proxy(request: NextRequest) {
   if (signedIn && (path === "/login" || path === "/register")) {
     return redirectKeepingCookies(request, response, "/dashboard");
   }
+  if (signedIn && needsTermsAgreement(path, request.method, data?.claims?.user_metadata?.terms_version)) {
+    const next = path + request.nextUrl.search;
+    return redirectKeepingCookies(request, response, "/terms/accept", `?next=${encodeURIComponent(next)}`);
+  }
 
   return response;
 }
 
-function redirectKeepingCookies(request: NextRequest, from: NextResponse, pathname: string) {
+function redirectKeepingCookies(request: NextRequest, from: NextResponse, pathname: string, search = "") {
   const url = request.nextUrl.clone();
   url.pathname = pathname;
-  url.search = "";
+  url.search = search;
   const redirect = NextResponse.redirect(url);
   from.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie));
   from.headers.forEach((value, key) => {

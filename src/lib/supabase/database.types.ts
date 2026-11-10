@@ -5026,6 +5026,24 @@ export type Database = {
         }
         Relationships: []
       }
+      terms_acceptances: {
+        Row: {
+          user_id: string
+          version: string
+          accepted_at: string
+        }
+        Insert: {
+          user_id?: string
+          version: string
+          accepted_at?: string
+        }
+        Update: {
+          user_id?: string
+          version?: string
+          accepted_at?: string
+        }
+        Relationships: []
+      }
       test_bands: {
         Row: {
           metric_key: string

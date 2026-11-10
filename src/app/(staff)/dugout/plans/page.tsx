@@ -10,6 +10,7 @@ import { loadDugoutTeam } from "../data";
 import { NoOwnTeam, TeamPicker } from "../team-picker";
 import { NewPlanForm } from "./new-plan-form";
 import { PlansNav } from "./plans-nav";
+import { SafetyNote } from "@/components/legal";
 
 export const metadata: Metadata = { title: "Practice Plans · Coaches Dugout · GGG.Cafe" };
 
@@ -113,6 +114,7 @@ export default async function PracticePlansPage({ searchParams }: PageProps<"/du
     <div className="flex flex-col gap-8">
       <TeamPicker teams={teams} current={team.id} basePath="/dugout/plans" />
       <PlansNav current="plans" teamId={team.id} />
+      <SafetyNote audience="coach" />
 
       {editor && (
         <Disclosure summary={`New practice plan for ${team.name}`} open={upcoming.length === 0 && pastTotal === 0}>

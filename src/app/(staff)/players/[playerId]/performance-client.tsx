@@ -48,6 +48,10 @@ export function RoutineForm({
       {isNew && (
         <fieldset className="grid gap-3 rounded-xl border border-navy-700 p-3 sm:col-span-2 sm:grid-cols-2">
           <legend className="px-1 text-sm font-medium">New {label.one} (saved to the library for every player)</legend>
+          <p className="text-sm text-muted sm:col-span-2">
+            Only add exercises that are safe to do with good form. You&apos;re responsible for what you add, and everyone who uses it does
+            so at their own risk.
+          </p>
           <div className="sm:col-span-2">
             <Field label="Name">
               <input name="new_name" required className={inputClass} />

@@ -15,6 +15,7 @@ import { loadLeaderboard, loadTeamSessions } from "../../leaderboard-data";
 import { RemoveTeamSession } from "../../leaderboard-client";
 import { firstName, loadPlayer } from "../../section-data";
 import { SectionShell } from "../section-shell";
+import { RewardsNote } from "@/components/legal";
 import { pickTeam } from "../../../../dugout/team-picker";
 
 export const metadata: Metadata = { title: "Leaderboard · GGG.Cafe" };
@@ -119,7 +120,7 @@ export default async function LeaderboardPage({ params, searchParams }: PageProp
   };
 
   return (
-    <SectionShell title="Leaderboard" subtitle={`${team.name} · Offseason Training · ${span}`}>
+    <SectionShell title="Leaderboard" subtitle={`${team.name} · Offseason Training · ${span}`} notice={<RewardsNote />}>
       <div className="flex flex-col gap-10">
         {teamPills}
 

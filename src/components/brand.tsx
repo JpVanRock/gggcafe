@@ -2,6 +2,7 @@ import Image from "next/image";
 import taglineArt from "../../public/brand/elevate-together-yellow.png";
 import taglineNavyArt from "../../public/brand/elevate-together-navy.png";
 import Link from "next/link";
+import { COPYRIGHT, FOOTER_DISCLAIMER } from "@/lib/legal";
 
 /** The GGG.Cafe logo (round badge). */
 export function Logo({ size, priority = false, className = "" }: { size: number; priority?: boolean; className?: string }) {
@@ -30,12 +31,28 @@ export function Wordmark({ className = "" }: { className?: string }) {
   );
 }
 
-/** Site-wide footer: the type logo in the bottom-right corner of every page. */
+/**
+ * Site-wide footer on every page: the short legal disclaimer and links on the left (small and quiet,
+ * but full-contrast text), the type logo in the bottom-right corner.
+ */
 export function SiteFooter() {
+  const legalLink = "underline underline-offset-2 hover:text-ink";
   return (
-    <footer className="mx-auto flex w-full max-w-5xl justify-end px-4 pt-10 pb-6">
+    <footer className="mx-auto flex w-full max-w-5xl flex-col gap-5 px-4 pt-10 pb-6 sm:flex-row sm:items-end sm:justify-between sm:gap-10">
+      <div className="max-w-2xl text-xs leading-relaxed text-muted">
+        <p>{FOOTER_DISCLAIMER}</p>
+        <nav aria-label="Legal" className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+          <Link href="/terms" className={legalLink}>
+            Terms of Service
+          </Link>
+          <Link href="/privacy" className={legalLink}>
+            Privacy &amp; Security
+          </Link>
+          <span>{COPYRIGHT}</span>
+        </nav>
+      </div>
       {/* keep-night: in Day Game the wordmark sits on a navy chip (brand kit: artwork over navy) */}
-      <Link href="/" aria-label="GGG.Cafe home" className="keep-night rounded-xl bg-navy-950 px-3 py-2 opacity-90 transition hover:opacity-100">
+      <Link href="/" aria-label="GGG.Cafe home" className="keep-night shrink-0 self-end rounded-xl bg-navy-950 px-3 py-2 opacity-90 transition hover:opacity-100">
         <Wordmark className="w-36 sm:w-44" />
       </Link>
     </footer>

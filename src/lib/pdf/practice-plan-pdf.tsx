@@ -239,6 +239,7 @@ function PlanDocument({ plan, roster }: { plan: PracticePlan; roster: RosterPlay
 
         <View style={s.footer} fixed>
           <Text>GGG.Cafe · Coaches Dugout</Text>
+          <Text>Drills are done at your own risk and aren&apos;t medical advice. Supervise every drill.</Text>
           <Text render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`} />
         </View>
       </Page>

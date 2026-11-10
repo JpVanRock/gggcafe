@@ -191,6 +191,13 @@ export const QUESTIONS: { q: string; a: string[] }[] = [
     a: ["Coaches Dugout → Roster → Coaching staff. Admins can switch anyone between Head Coach, Assistant Coach and Viewer, or remove them from the staff."],
   },
   {
+    q: "What does everyone agree to?",
+    a: [
+      "The Terms of Service and the Privacy & Security Notice: with a checkbox at sign-up, or on a one-time page the next time they open GGG.Cafe (accounts made before the Terms, and player logins a parent made). A parent or guardian agrees for a player under 18. Players under 13 can't sign themselves up: a parent makes their login.",
+      "Each agreement is saved with its date and version. When the Terms change in a way that matters, everyone is asked again.",
+    ],
+  },
+  {
     q: "Can people put GGG.Cafe on their phone like an app?",
     a: [
       "Yes, with nothing to download from an app store. iPhone: open the site in Safari, tap Share, then Add to Home Screen. Android: open it in Chrome and tap Install app (or Add to Home screen in the ⋮ menu).",

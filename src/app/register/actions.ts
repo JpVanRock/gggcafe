@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { CODE_TYPES, SIGNUP_TYPES, type SignupType } from "@/lib/account-types";
+import { TERMS_VERSION } from "@/lib/legal";
 
 export type RegisterState = {
   error: string | null;
@@ -58,6 +59,9 @@ export async function registerAccount(_prev: RegisterState, fd: FormData): Promi
   if (!/^\S+@\S+\.\S+$/.test(values.email)) return fail("Enter a valid email address.", "email");
   if (password.length < 8) return fail("Use a password of at least 8 characters.", "password");
   if (password !== String(fd.get("confirm") ?? "")) return fail("The two passwords don't match.", "confirm");
+  // Children under 13 don't sign themselves up (privacy law): a parent makes their login.
+  if (player && fd.get("age13") !== "on") return fail("Players under 13: ask a parent to make your login from the family page.", "age13");
+  if (fd.get("agree") !== "on") return fail("Check the box to agree to the Terms of Service and the Privacy & Security Notice.", "agree");
 
   const supabase = await createClient();
   let team: { id: string; name: string } | null = null;
@@ -82,6 +86,8 @@ export async function registerAccount(_prev: RegisterState, fd: FormData): Promi
       data: {
         display_name: values.name,
         role: values.role,
+        // the Terms version she agreed to; a database trigger records the agreement (terms_acceptances)
+        terms_version: TERMS_VERSION,
         ...(mentor && values.specialty ? { specialty: values.specialty } : {}),
         ...(team ? { team: team.id } : {}),
         ...(parent ? { team_code: values.code, child: values.child } : {}),

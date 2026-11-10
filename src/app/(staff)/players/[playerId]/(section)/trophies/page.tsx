@@ -9,6 +9,7 @@ import { summarizePerformance } from "../../performance";
 import { TrophyRoomDetail, buildTrophyRoom } from "../../trophy-room";
 import { firstName, loadPlayer, plateFor, positionsOf } from "../../section-data";
 import { SectionShell } from "../section-shell";
+import { RewardsNote } from "@/components/legal";
 
 export const metadata: Metadata = { title: "Trophy Room · GGG.Cafe" };
 
@@ -22,7 +23,7 @@ export default async function TrophiesPage({ params }: PageProps<"/players/[play
   const training = summarizePerformance(performance, positions, todayISO());
   const room = buildTrophyRoom(iq, buildPositions(iq, positions), training.achievements, plateFor(player, pop));
   return (
-    <SectionShell title={`${possessive(firstName(player))} Trophy Room`} subtitle="Trophies · rings · Golden Gloves · MVP badges · achievements">
+    <SectionShell title={`${possessive(firstName(player))} Trophy Room`} subtitle="Trophies · rings · Golden Gloves · MVP badges · achievements" notice={<RewardsNote />}>
       <TrophyRoomDetail room={room} />
     </SectionShell>
   );

@@ -11,6 +11,7 @@ import type { LibraryDrill } from "@/lib/dugout";
 import { loadCoachNames, loadCoachingStaff, loadPlanRoster, loadPracticePlan } from "@/lib/practice-plans";
 import { PlanBuilder } from "./builder";
 import { PlanSheet } from "./sheet";
+import { SafetyNote } from "@/components/legal";
 import { PlanExtrasForm, type PlanNotes } from "./notes";
 
 export const metadata: Metadata = { title: "Practice Plan · Coaches Dugout · GGG.Cafe" };
@@ -87,6 +88,7 @@ export default async function PracticePlanPage({ params, searchParams }: PagePro
       ) : (
         <PlanSheet plan={plan} roster={roster} canEdit={mine} staff={staff} emailReady={emailConfigured()} />
       )}
+      <SafetyNote audience="coach" />
       <Card title="Notes for players">
         {mine ? (
           <PlanExtrasForm

@@ -30,6 +30,7 @@ src/components/main-nav.tsx  top menu: staff get Dashboard/Coaches Dugout (opens
                          including /me and /family; players get "My profile". Every header is <SiteHeader>
                          (site-header.tsx): on phones the links fold behind a Menu button
 src/proxy.ts             refreshes the Supabase auth session each request (Next 16 "proxy", formerly middleware)
+src/app/terms, privacy   Terms of Service and Privacy & Security (public); /terms/accept asks signed-in users to agree
 src/app/manifest.ts      the phone app (installable web app; opens /dashboard, which routes each account home).
                          Icons in public/icons/ (maskable = logo inside the 80% safe zone); iPhone settings are
                          `appleWebApp` in the root layout. No service worker: nothing private is cached on phones
@@ -121,6 +122,10 @@ tests/unit/              node --test unit tests (npm run test:unit)
   teams (sign-up checks one team code with `signup_team()`).
 - When a feature or its access changes, update `src/lib/access-faq.ts` and `src/lib/account-types.ts` (admin FAQ).
 - Copy for players: direct and confident, for teenage athletes; fastpitch terms (innings, the circle, the dugout).
+- Legal (`docs/features/legal.md`, words in `src/lib/legal.ts`): every page has the footer disclaimer; a page with
+  workouts, drills or routines shows `SafetyNote`, one with points, badges or awards `RewardsNote`
+  (`components/legal.tsx`). Signed-in users must have agreed to the current `TERMS_VERSION` (`src/proxy.ts` sends them
+  to /terms/accept); a change people should agree to again bumps it. /terms and /privacy stay public.
 
 ## Feature docs (read the one you're changing first; keep it current)
 | Area | Doc | What's in it |
@@ -135,6 +140,7 @@ tests/unit/              node --test unit tests (npm run test:unit)
 | G3 Leadership Guide | `docs/features/leadership-guide.md` | Leadership lessons, plan, sign-off, certificate, Leader Badge; voice rules |
 | Game-day production | `docs/features/game-day-production.md` | DP/FLEX, umpire card, jobs, substitutions, staff duties, box scores, QAB/BP, stat explainers |
 | Hitting & Softball IQ | `docs/features/hitting-iq.md` | Offense IQ, My Zone, Hitting Approach chapter |
+| Legal | `docs/features/legal.md` | Terms of Service, Privacy & Security, footer disclaimer, sign-up agreement, safety and rewards notes |
 | Mental game | `docs/features/mental-game.md` | Mental GP tools: signals, intensity, self-scan, guided sessions, journal; G3 Mental Toughness |
 | Mentors | `docs/features/mentors.md` | Mentor sign-up, assignments, messages, calendar dates |
 | Movement Preferences and Preferred Hitting Style | `docs/features/movement-hitting.md` | Movement Preferences (G3) and Preferred Hitting Style |

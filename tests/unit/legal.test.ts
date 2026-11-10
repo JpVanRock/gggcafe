@@ -1,0 +1,66 @@
+// Run with: npm run test:unit
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import {
+  PRIVACY_INTRO,
+  PRIVACY_SECTIONS,
+  TERMS_INTRO,
+  TERMS_SECTIONS,
+  TERMS_VERSION,
+  needsTermsAgreement,
+  safeNext,
+} from "../../src/lib/legal.ts";
+
+test("signed-in page loads ask for the agreement until the current version is agreed", () => {
+  assert.equal(needsTermsAgreement("/dashboard", "GET", undefined), true);
+  assert.equal(needsTermsAgreement("/players/abc/training", "GET", "2020-01-01"), true, "an older version asks again");
+  assert.equal(needsTermsAgreement("/dashboard", "GET", TERMS_VERSION), false);
+  assert.equal(needsTermsAgreement("/dashboard", "POST", undefined), false, "a save in flight isn't interrupted");
+});
+
+test("the documents, sign-in help and the home page stay open", () => {
+  for (const path of ["/", "/terms", "/terms/accept", "/privacy", "/login", "/register", "/forgot-password", "/reset-password", "/auth/confirm", "/manifest.webmanifest"]) {
+    assert.equal(needsTermsAgreement(path, "GET", undefined), false, path);
+  }
+  assert.equal(needsTermsAgreement("/termsx", "GET", undefined), true, "only the exact paths");
+});
+
+test("after agreeing, only a path on this site", () => {
+  assert.equal(safeNext("/me?team=1"), "/me?team=1");
+  for (const bad of ["//evil.example", "/\\evil.example", "https://evil.example", "", undefined, null, 7]) assert.equal(safeNext(bad), "/dashboard", String(bad));
+});
+
+test("the section numbers the notes and the intro point to", () => {
+  const n = (id: string) => TERMS_SECTIONS.findIndex((s) => s.id === id) + 1;
+  // SafetyNote says "Terms, section 4" (#risk); RewardsNote "Terms, section 7" (#rewards)
+  assert.equal(n("risk"), 4);
+  assert.equal(n("rewards"), 7);
+  const intro = TERMS_INTRO.join(" ");
+  assert.match(intro, new RegExp(`assumption of risk and a release of claims \\(section ${n("risk")}\\)`));
+  assert.match(intro, new RegExp(`disclaimer of warranties \\(section ${n("warranties")}\\)`));
+  assert.match(intro, new RegExp(`limits on our liability \\(section ${n("liability")}\\)`));
+  assert.match(intro, new RegExp(`waiver of class actions \\(section ${n("disputes")}\\)`));
+  const risk = JSON.stringify(TERMS_SECTIONS.find((s) => s.id === "risk"));
+  assert.match(risk, new RegExp(`the indemnity in section ${n("indemnity")} `));
+  const legal = readFileSync(new URL("../../src/components/legal.tsx", import.meta.url), "utf8");
+  assert.match(legal, /\/terms#risk[\s\S]{0,80}Terms, section 4/);
+  assert.match(legal, /\/terms#rewards[\s\S]{0,80}Terms, section 7/);
+});
+
+test("section ids are unique anchors", () => {
+  for (const doc of [TERMS_SECTIONS, PRIVACY_SECTIONS]) {
+    const ids = doc.map((s) => s.id);
+    assert.equal(new Set(ids).size, ids.length);
+  }
+});
+
+test("no placeholders left in the documents", () => {
+  const text = JSON.stringify([TERMS_INTRO, TERMS_SECTIONS, PRIVACY_INTRO, PRIVACY_SECTIONS]);
+  assert.doesNotMatch(text, /\[[A-Z][A-Z ]+\]/, "a [BRACKETED] blank is still in the text");
+  assert.match(text, /GMI Digital LLC/);
+});
+
+test("the version is a date (the database checks the same shape)", () => {
+  assert.match(TERMS_VERSION, /^\d{4}-\d{2}-\d{2}$/);
+});
