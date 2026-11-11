@@ -100,7 +100,7 @@ export const LESSONS: Lesson[] = core([
     title: "Why Leadership?",
     bigIdea: "Your team's real culture is whatever its players allow when the coach isn't around.",
     body: [
-      "Every team has three groups: the coaches, the leaders, and everyone else. Coaches set the standard. But coaches aren't in the dugout chatter, the hotel hallway, the group chat or the bus ride home. You are.",
+      "Every team has three groups: the coaches, the leaders, and everyone else. Coaches set the standard. But coaches aren't in the dugout chatter, the downtime between games, the team chat or the ride home. You are.",
       "What happens in those places is the real culture of your team, and leaders decide it. Raise the bar or let it slide. Include everyone or let cliques form. Speak up or stay quiet. That choice comes up every single season, and the best teams have players who make it the right way.",
       "The best teams don't wait for leaders to show up. They build them. That's what this guide is for.",
     ],
@@ -168,7 +168,7 @@ export const LESSONS: Lesson[] = core([
       {
         title: "Myth, then the truth",
         points: [
-          "Only seniors lead. Truth: any grade can, freshmen included.",
+          "Only the oldest players lead. Truth: anyone can, even the youngest player on the team.",
           "Only captains lead. Truth: every great team has many leaders.",
           "Leaders know the most. Truth: leaders keep learning and use everyone's strengths.",
           "Leading comes naturally. Truth: it takes work, like any skill.",
@@ -324,7 +324,7 @@ export const LESSONS: Lesson[] = core([
     bigIdea: "People follow people they trust. Relationships come before everything else you'll ask of them.",
     body: [
       "Leading others starts with connection. Leading out loud means talking to your teammates, all of them, not just your friends. Aim for at least five positive moments for every critical one.",
-      "Connect: include everyone, every role, every grade. Celebrate: cheer the bench player's good at-bat as loud as the home run. Bring energy-giving plays: the hustle back to the dugout, the high five, the fist bump after a great inning.",
+      "Connect: include everyone, every role, every age. Celebrate: cheer the bench player's good at-bat as loud as the home run. Bring energy-giving plays: the hustle back to the dugout, the high five, the fist bump after a great inning.",
       "Relationships are the foundation. Without them, holding someone accountable feels like an attack. With them, it feels like someone who believes in you.",
     ],
     questions: [
@@ -365,7 +365,7 @@ export const LESSONS: Lesson[] = core([
     bigIdea: "Culture is what you allow, what you emphasize, and what you do every single day.",
     body: [
       "Culture isn't a poster on the wall. It's built one decision at a time: what you let slide, what you make a big deal of, and what you do every day when nobody's grading it.",
-      "Leaders are the gatekeepers. The coach can't be in the hotel lobby at a tournament, the back of the bus or the group chat, so what you allow there is your culture. That's why player-led teams win. Check in with your coach often so you're building the same thing.",
+      "Leaders are the gatekeepers. The coach can't be everywhere: between games at a tournament, on the ride home or in the team chat, so what you allow there is your culture. That's why player-led teams win. Check in with your coach often so you're building the same thing.",
     ],
     lists: [{ title: "Culture is", points: ["What you allow.", "What you emphasize.", "What you do every day."] }],
     questions: [
@@ -447,7 +447,7 @@ export const LESSONS: Lesson[] = core([
     bigIdea: "Some of the best leading happens in a circle: players talking, everyone heard, and one thing to do when it's over.",
     body: [
       "A coach's speech only goes so far. Players leading players is what sticks. Pick one question, ask it, and then listen more than you talk.",
-      "Run one a week: before practice, on the bus, after a game. Use one of these questions or a situation from What Would You Do? Every talk ends with a takeaway, one thing the team will do this week.",
+      "Run one a week: before practice, between games, after a game. Use one of these questions or a situation from What Would You Do? Every talk ends with a takeaway, one thing the team will do this week.",
     ],
     lists: [
       {
@@ -523,7 +523,7 @@ export const LESSONS: Lesson[] = core([
     bigIdea: "Teams that know each other trust each other, and trust shows up when the game gets tight.",
     body: [
       "Team-building isn't a day off. It's practice for trusting each other: talking under pressure, solving problems together, and getting to know the teammate you'd never sit with at lunch.",
-      "Pick one, get your coach's OK, and run it. Mix up the groups every time: different grades, different friend groups. Afterward, lead a quick talk: what did that teach us about our team?",
+      "Pick one, get your coach's OK, and run it. Mix up the groups every time: different ages, different friend groups. Afterward, lead a quick talk: what did that teach us about our team?",
     ],
     lists: [
       {
@@ -593,7 +593,7 @@ export const LESSONS: Lesson[] = core([
     body: [
       "A researcher once planted an actor in small groups that had a job to do. Sometimes he played the jerk, sometimes the slacker, sometimes the downer. Every time, the group did a lot worse, and the others started acting like him. When he played the downer, the whole room went flat.",
       "Except one group. One member there kept defusing him: leaning in, staying upbeat, asking questions and steering everyone back to the work. That group did the best of all.",
-      "Picture a college coach choosing between two recruits. One is the better player, but she stays out late the night before games and takes teammates with her, and they're the ones who play flat in the morning. The other is a little less talented, and she's the one who keeps everyone in the hotel the night before the championship game. The coach takes the second one every time. Influence spreads both ways. Which way will yours go?",
+      "Picture a college coach choosing between two recruits. One is the better player, but she gets teammates goofing around and up late the night before a tournament, and they're the ones who play flat in the morning. The other is a little less talented, and she's the one who gets everyone rested and ready the night before the championship game. The coach takes the second one every time. Influence spreads both ways. Which way will yours go?",
     ],
     lists: [
       {
@@ -610,7 +610,7 @@ export const LESSONS: Lesson[] = core([
     questions: [
       { key: "q1", text: "Why does one person's negativity spread so fast?" },
       { key: "q2", text: "What can you do the moment you feel negative energy creeping in?" },
-      { key: "q3", text: "Who keeps your team in the hotel the night before a big tournament? Is it you?" },
+      { key: "q3", text: "Who keeps your team focused and ready the night before a big tournament? Is it you?" },
     ],
     steps: [
       { key: "s1", text: "The next time negativity starts, be the first positive voice." },
@@ -1029,7 +1029,7 @@ export const BONUS: Lesson[] = bonus([
   {
     slug: "everyone-on-the-bus",
     part: "Team and culture",
-    title: "Everyone on the Bus",
+    title: "Everyone Bought In",
     bigIdea: "Great culture starts when everyone buys into the same standards.",
     body: [
       "Players who push hard and players who settle don't mix well. Picking the roster is the coach's job. Getting everyone to buy in is the leaders' job.",
@@ -1118,8 +1118,8 @@ export const BONUS: Lesson[] = bonus([
     title: "Leave It Better",
     bigIdea: "Lead yourself first. Then leave every place better than you found it.",
     body: [
-      "Some of the best athletes in any sport are known for cleaning up after their team: the dugout, the bus, the locker room. Nobody asked them to. They know that how you do the small things is how you do everything.",
-      "Leave the dugout, the bus and the field cleaner than you found them. It's a small thing. That's the point.",
+      "Some of the best athletes in any sport are known for cleaning up after their team: the dugout, the bench, the field after practice. Nobody asked them to. They know that how you do the small things is how you do everything.",
+      "Leave the dugout, the bench and the field cleaner than you found them. It's a small thing. That's the point.",
     ],
     questions: [
       { key: "q1", text: "Why should a leader clean up after the team?" },
@@ -1270,7 +1270,7 @@ export const BONUS: Lesson[] = bonus([
     title: "Why I Play",
     bigIdea: "Your why is what you hold on to when the game gets hard.",
     body: [
-      "Everybody loves softball on the days you go 3-for-3. Your why is for the other days: the 0-for-4, the error that cost a run, the 6 a.m. bus to a tournament in the rain.",
+      "Everybody loves softball on the days you go 3-for-3. Your why is for the other days: the 0-for-4, the error that cost a run, the 6 a.m. drive to a tournament in the rain.",
       "It doesn't have to sound impressive. Maybe it's your teammates, the feeling of a perfect throw, the player you want to become or the people who drive you to every game. It has to be true, and it has to be yours.",
     ],
     questions: [
@@ -1639,7 +1639,7 @@ export const SCENARIOS: Scenario[] = [
   { key: "sc-coasting", group: "Effort and standards", title: "Coasting", situation: "During conditioning, one teammate coasts while everyone else is dying.", move: "Pull up next to her and finish the next one together. Correct without shaming. Save the real talk for after, one on one." },
   { key: "sc-half-jog", group: "Effort and standards", title: "Half the team jogs", situation: "Half the team is going all out in conditioning. The other half is jogging it in.", move: "Get louder, not angrier. Bring the group together, name the standard, and go first. Energy spreads both ways, so make it spread your way." },
   { key: "sc-best-friend", group: "Effort and standards", title: "My best friend", situation: "Your best friend is the worst on the team at following the standards.", move: "Real friends hold each other to the standard. Tell her privately, as her friend: you're better than this, and the team needs you." },
-  { key: "sc-school", group: "Effort and standards", title: "School rules", situation: "Some teammates are skipping class, breaking school rules or being rude to teachers.", move: "The standard doesn't stop at the field. Say it plainly: how we act at school is how people see our team. If it keeps happening, it goes to your coach." },
+  { key: "sc-school", group: "Effort and standards", title: "School rules", situation: "Some teammates are goofing off in school, breaking school rules or being rude to teachers.", move: "The standard doesn't stop at the field. Say it plainly: how we act at school is how people see our team. If it keeps happening, it goes to your coach." },
   { key: "sc-weekend", group: "Effort and standards", title: "Weekend choices", situation: "A teammate's choices on weekends are getting around school, and it's starting to hurt the team's culture.", move: "Talk to her early, privately and with care. Bad choices off the field are a big fire, so bring your coach in." },
   { key: "sc-flat", group: "Attitude and energy", title: "Flat practice", situation: "Practice is dead: no talking, no energy, everyone going through the motions.", move: "Be the thermostat. Start the chatter, make the first big play of energy, challenge a teammate to a race. Energy is contagious." },
   { key: "sc-griping", group: "Attitude and energy", title: "Losing-streak griping", situation: "You've lost four straight. Players are griping about the team and the coaches.", move: "Don't agree and don't join in. Steer the talk to what you control: effort, attitude, the next practice. Ask what each of you can fix." },
@@ -1651,7 +1651,7 @@ export const SCENARIOS: Scenario[] = [
   { key: "sc-playing-time", group: "Conflict and drama", title: "Playing time", situation: "Two teammates are fighting about who should be playing more. It's spilling into practice and the dugout.", move: "Playing time is the coach's call, so don't referee it. Remind both that the team needs them either way, and point them to the coach for that conversation." },
   { key: "sc-position", group: "Conflict and drama", title: "Same spot", situation: "You and a close friend are competing for the same position, and it's getting tense.", move: "Compete hard and cheer harder. Tell her straight up: may the best player win, and I've got your back either way." },
   { key: "sc-gossip", group: "Conflict and drama", title: "Gossip and cliques", situation: "Small groups are gossiping about teammates, and the team is splitting into groups that don't talk.", move: "Shut it down when you hear it: we don't talk about teammates. Then mix it up: sit with a different group, pair across cliques in drills." },
-  { key: "sc-old-young", group: "Conflict and drama", title: "Old and young", situation: "Older and younger players don't mix. The upperclassmen stick together and the young ones feel like outsiders.", move: "Cross the line yourself. Learn the younger players' names, include them in warmups, invite them in. It only takes one leader to start." },
+  { key: "sc-old-young", group: "Conflict and drama", title: "Old and young", situation: "Older and younger players don't mix. The older players stick together and the younger ones feel like outsiders.", move: "Cross the line yourself. Learn the younger players' names, include them in warmups, invite them in. It only takes one leader to start." },
   { key: "sc-umpire", group: "Conflict and drama", title: "The umpire", situation: "A bad call, and teammates start yelling at the umpire.", move: "Get them back on the game. Arguing calls is the coach's job. Ours is the next pitch. Sportsmanship includes the umpires." },
   { key: "sc-benched", group: "Teammates who need you", title: "Coach doesn't like me", situation: "A teammate tells you she's on the bench because the coach doesn't like her.", move: "Listen first, but don't agree. Steer her to what she controls: her work, her attitude, and asking the coach what she needs to do to earn more time." },
   { key: "sc-personal", group: "Teammates who need you", title: "Something's wrong", situation: "A teammate is clearly distracted by something going on outside softball.", move: "Show you care without prying. Let her know you're there if she wants to talk. If it sounds serious, tell a coach or another adult you trust." },
@@ -1665,7 +1665,7 @@ export const SCENARIOS: Scenario[] = [
   { key: "sc-stats", group: "Game day", title: "Me over we", situation: "Your team just lost, and a teammate is celebrating her own stats.", move: "Talk to her one on one. Her numbers matter when they help the team win. We celebrate wins together and own losses together." },
   { key: "sc-spotlight", group: "Game day", title: "The spotlight", situation: "Your team is ranked, people are talking, and the pressure is starting to show.", move: "Shrink the game: one pitch, one inning, one game at a time. Keep doing what got you here and tune out the noise." },
   { key: "sc-post", group: "Off the field", title: "The post", situation: "A teammate posts something negative about the team online.", move: "Talk to her privately and ask her to take it down. Our standards go online too. If it's serious, bring in the coach." },
-  { key: "sc-bonding", group: "Off the field", title: "Team bonding", situation: "Your coach asks the leaders to plan a team-bonding activity.", move: "Pick something that mixes everyone up: different grades, different friend groups. Build the Bond has ideas." },
+  { key: "sc-bonding", group: "Off the field", title: "Team bonding", situation: "Your coach asks the leaders to plan a team-bonding activity.", move: "Pick something that mixes everyone up: different ages, different friend groups. Build the Bond has ideas." },
   { key: "sc-pass-it-on", group: "Off the field", title: "Passing it on", situation: "It's your last season, and your coach asks you to get the next leaders ready.", move: "Start early. Pick the next leaders, show them what you do, give them real jobs before you leave, and tell them why it matters." },
 ];
 
