@@ -7,7 +7,10 @@ import Link from "next/link";
 import { Modal } from "@/components/modal";
 import { EmptyState, eyebrowClass } from "@/components/ui";
 import { CultureStatement, StandardsList, hasCulture, type TeamCulture, type TeamStandard } from "@/components/team-standards";
-import { COACH_RESPONSIBILITIES, COACH_RESPONSIBILITIES_MOTTO, COACH_RESPONSIBILITIES_TITLE } from "@/lib/coach-responsibilities";
+import {
+  COACHING_ETIQUETTE, COACHING_ETIQUETTE_MOTTO, COACHING_ETIQUETTE_TITLE, COACH_RESPONSIBILITIES, COACH_RESPONSIBILITIES_MOTTO,
+  COACH_RESPONSIBILITIES_TITLE,
+} from "@/lib/coach-responsibilities";
 
 export type DugoutTeam = {
   team: { id: string; name: string };
@@ -120,6 +123,15 @@ export function DugoutStrip({
                   </li>
                 ))}
               </ol>
+              <section className="flex flex-col gap-3 border-t-2 border-pink pt-5">
+                <h3 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">{COACHING_ETIQUETTE_TITLE}</h3>
+                <p className="font-display text-2xl font-bold tracking-wide text-link italic">{COACHING_ETIQUETTE_MOTTO}</p>
+                {COACHING_ETIQUETTE.map((p) => (
+                  <p key={p} className="text-ink/90">
+                    {p}
+                  </p>
+                ))}
+              </section>
             </div>
           </Modal>
         )}

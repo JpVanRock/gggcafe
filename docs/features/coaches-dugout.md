@@ -39,7 +39,8 @@
   Standards / Team Culture pill buttons open pop-ups, one section per active own team.
 - Coach's Responsibilities (user, 2026-11-11, from the user's own sheet): the first pill on the strip at the bottom of
   the Coaches Dugout (`coachResponsibilities` prop), coaches only. Sixteen responsibilities and "Teaching Creates
-  Understanding" in `src/lib/coach-responsibilities.ts` (`key: true` = the ones the user set in bold).
+  Understanding" in `src/lib/coach-responsibilities.ts` (`key: true` = the ones the user set in bold), then
+  Coaching Etiquette ("Creating a Habit of Excellence", four points; the sheet's "11 Strong" title left out, user's call).
 - Drill library: `practice_drills` (shared by all teams), tags `drill_tag` (labels in `src/lib/dugout.ts`,
   user's list: infield, outfield, defense, catchers, pitchers, catchers & pitchers, warm-up routine,
   throwing routine), optional usual equipment and video link (`video_url`, https) copied into plans;

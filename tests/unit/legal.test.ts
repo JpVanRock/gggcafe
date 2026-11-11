@@ -70,4 +70,8 @@ test("Coach's Responsibilities: the user's sixteen, three in bold", async () => 
   assert.equal(COACH_RESPONSIBILITIES.length, 16);
   assert.deepEqual(COACH_RESPONSIBILITIES.flatMap((r, i) => (r.key ? [i + 1] : [])), [3, 7, 14]);
   assert.equal(COACH_RESPONSIBILITIES_MOTTO, "Teaching Creates Understanding");
+  const { COACHING_ETIQUETTE, COACHING_ETIQUETTE_MOTTO } = await import("../../src/lib/coach-responsibilities.ts");
+  assert.equal(COACHING_ETIQUETTE.length, 4);
+  assert.equal(COACHING_ETIQUETTE_MOTTO, "Creating a Habit of Excellence");
+  assert.ok(!JSON.stringify(COACHING_ETIQUETTE).includes("11 Strong"));
 });
