@@ -39,7 +39,7 @@ async function FamilyMentors({ searchParams }: Pick<PageProps<"/family/mentors">
     return (
       <EmptyState>
         Once your coach approves you, your daughter&apos;s mentors show up here.{" "}
-        <Link href="/family" className="text-link hover:underline">
+        <Link href="/family" className="text-link underline underline-offset-2">
           Back to your page
         </Link>
       </EmptyState>
@@ -130,7 +130,7 @@ async function FamilyMentors({ searchParams }: Pick<PageProps<"/family/mentors">
                       {m.drill_video_url && (
                         <>
                           {" · "}
-                          <a href={m.drill_video_url} target="_blank" rel="noreferrer" className="text-link hover:underline">
+                          <a href={m.drill_video_url} target="_blank" rel="noreferrer" className="text-link underline underline-offset-2">
                             video
                           </a>
                         </>
