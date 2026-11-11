@@ -26,5 +26,7 @@
   the team's current roster (`create_player_login`: auth user at `<username>@player.gggcafe.invalid`, confirmed, plus an
   approved claim; `player_logins`). She signs in with the username (`signInEmail()` in `src/lib/player-logins.ts`);
   her parent or a head coach resets it (`reset_player_password`); forgot-password sends usernames to the parent.
+  Her birth date must be on her profile (P0009), and under 13 the parent's verified consent must be on file first (P0008;
+  see "Verified parental consent" in player-accounts.md).
 - Admin FAQ second page `/faq/accounts` (content `src/lib/account-types.ts`, unit-tested; `FaqNav` links both pages):
   update it with any access change. DB tests: `tests/db/account_types.test.sql`.

@@ -90,6 +90,11 @@ test("the protections an audit asked for are in the documents (2026-11-11)", () 
   assert.match(AGREEMENT_LABEL, /arbitration/);
   for (const id of ["sources", "sharing", "cookies", "children", "retention", "international"]) assert.notEqual(privacy(id), "null", id);
   assert.match(privacy("children"), /COPPA/);
+  // verified parental consent (2026-11-11): a signed form or a video call, checked by our staff
+  assert.match(privacy("children"), /signing our consent form by hand/);
+  assert.match(privacy("children"), /video call with our staff/);
+  assert.match(privacy("children"), /withdraw consent on the family page/);
+  assert.match(terms("agreeing"), /verified consent \(a signed consent form or a short video call/);
   assert.match(privacy("retention"), /within 30 days after a parent asks/, "a written retention period for children's information");
   assert.match(privacy("cookies"), /Global Privacy Control/);
   assert.match(privacy("sharing"), /don't sell personal information/);

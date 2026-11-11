@@ -166,6 +166,12 @@ select pg_temp.expect('parent sees her daughter', (select player_name || '/' || 
 select pg_temp.expect('short password', pg_temp.err($$select public.create_player_login('00000000-0000-0000-0000-0000000000c1', 'avery7', 'short')$$), '22023');
 select pg_temp.expect('bad username', pg_temp.err($$select public.create_player_login('00000000-0000-0000-0000-0000000000c1', 'a!', 'goodpass123')$$), '22023');
 select pg_temp.expect('not her daughter', pg_temp.err($$select public.create_player_login('00000000-0000-0000-0000-0000000000c2', 'jordan21', 'goodpass123')$$), '42501');
+-- her age has to be known first (under 13 also needs verified consent: parental_consent.test.sql)
+select pg_temp.expect('no birth date, no login', pg_temp.err($$select public.create_player_login('00000000-0000-0000-0000-0000000000c1', 'avery7', 'goodpass123')$$), 'P0009');
+reset role;
+update public.players set birth_date = '2010-04-02' where id = '00000000-0000-0000-0000-0000000000c1';
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"dddddddd-0000-0000-0000-000000000004"}', false);
 select pg_temp.expect('login made', public.create_player_login('00000000-0000-0000-0000-0000000000c1', ' Avery7 ', 'goodpass123'), 'avery7');
 select pg_temp.expect('only one login', pg_temp.err($$select public.create_player_login('00000000-0000-0000-0000-0000000000c1', 'avery8', 'goodpass123')$$), '23505');
 select pg_temp.expect('parent sees the username', (select username || '/' || has_account from public.parent_player_logins()), 'avery7/true');
@@ -226,6 +232,7 @@ delete from public.team_events where title = 'Assistant practice';
 delete from public.practice_plans where id::text like 'dddddddd-%';
 delete from public.player_claims where user_id in (select id from auth.users where email like 'avery7@%');
 delete from auth.users where email like 'avery7@%';
+update public.players set birth_date = null where id = '00000000-0000-0000-0000-0000000000c1';
 delete from public.parent_links where parent_id::text like 'dddddddd-%';
 delete from public.parent_accounts where user_id::text like 'dddddddd-%';
 delete from public.staff_requests where user_id::text like 'dddddddd-%';

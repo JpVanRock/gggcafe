@@ -304,7 +304,7 @@ export async function decidePlayerClaim(_prev: FormState, fd: FormData): Promise
     if (approve && !isUuid(entry)) return failed(STALE);
     const supabase = await createClient();
     const { data: auth } = await supabase.auth.getClaims();
-    must(await supabase
+    const result = await supabase
       .from("player_claims")
       .update({
         status: approve ? "approved" : "declined",
@@ -312,7 +312,12 @@ export async function decidePlayerClaim(_prev: FormState, fd: FormData): Promise
         decided_by: auth?.claims?.sub ?? null,
         decided_at: new Date().toISOString(),
       })
-      .eq("id", id));
+      .eq("id", id);
+    // under 13 without verified parental consent (COPPA): the database refuses
+    if (result.error?.code === "P0008") {
+      return failed("She's under 13, so she can't have her own account yet. Decline this claim: her parent gives verified consent on the family page, then makes her login.");
+    }
+    must(result);
     refresh();
   });
 }

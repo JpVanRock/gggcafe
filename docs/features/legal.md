@@ -92,6 +92,8 @@ Open for the user and the attorney:
   notice and the copyright-notice process both expect them.
 - Register a DMCA designated agent with the U.S. Copyright Office (copyright.gov, small fee) for the
   copyright safe harbor; the Terms name the contact email.
-- COPPA's 2025 rule changes also expect a written information security program; confirm the parental-consent
-  method (a head-coach-approved parent making the login).
+- COPPA's 2025 rule changes also expect a written information security program.
+- Parental consent method (fixed, user 2026-11-11): verifiable parental consent by a signed consent form returned as a
+  photo or scan, or a video call with our staff, both checked by a GGG.Cafe admin before an under-13 player can sign in
+  (details in player-accounts.md). For the attorney: confirm both methods and the form's notice (`CONSENT_NOTICE`).
 - Whether arbitration binds minors and how a minor's right to cancel a contract affects the Terms.

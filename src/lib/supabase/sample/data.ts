@@ -294,7 +294,19 @@ export function sampleRpc(name: string, args: Row = {}): unknown {
     case "parent_home":
       return [maya, emma].map((pid, i) => ({ link_id: id("agag00", i + 1), team_id: T.us, team_name: "GGG Sample 14U", child_name: playerFull(pid), player_name: playerFull(pid), status: "approved" }));
     case "parent_player_logins":
-      return [maya, emma].map((pid) => ({ player_id: pid, player_name: playerFull(pid), team_name: "GGG Sample 14U", on_roster: true, username: null, has_account: true }));
+      // Emma has no account yet: she's under 13, so the family page shows the parental-consent steps
+      return [maya, emma].map((pid) => ({ player_id: pid, player_name: playerFull(pid), team_name: "GGG Sample 14U", on_roster: true, username: null, has_account: pid === maya }));
+    case "parent_consent_status":
+      return [
+        { player_id: maya, birth_date: "2010-03-14", under_13: false, consent_id: null, status: null, method: null, parent_name: null, submitted_at: null, reviewed_at: null, review_note: null },
+        { player_id: emma, birth_date: "2014-06-02", under_13: true, consent_id: null, status: null, method: null, parent_name: null, submitted_at: null, reviewed_at: null, review_note: null },
+      ];
+    // two parents waiting for an admin to check their consent (the Roster tab's "Waiting for approval")
+    case "pending_parental_consents":
+      return [
+        { id: id("acac00", 1), player_id: lila, player_name: playerFull(lila), birth_date: "2014-09-20", team_name: "GGG Sample 14U", parent_name: "Dana Park", parent_account: "Dana Park", parent_email: "dana@sample.test", relationship: "parent", method: "signed_form", form_path: `${U.admin}/1762900000000.jpg`, submitted_at: "2026-11-10T15:00:00Z" },
+        { id: id("acac00", 2), player_id: nora, player_name: playerFull(nora), birth_date: "2014-02-11", team_name: "GGG Sample 14U", parent_name: "Chris Bennett", parent_account: "Chris Bennett", parent_email: "chris@sample.test", relationship: "guardian", method: "video_call", form_path: null, submitted_at: "2026-11-11T13:30:00Z" },
+      ];
     case "mentor_requests_waiting": return mentor_links.filter((l) => l.status === "pending" && !l.player_id).length;
     case "my_mentor_links":
       return mentor_links
@@ -316,5 +328,5 @@ export function sampleRpc(name: string, args: Row = {}): unknown {
 /** Ids the page smoke test uses for dynamic routes. */
 export const SAMPLE_IDS = {
   player: maya, lightLeader: lila, team: T.us, opponent: T.storm, lineup: id("abab00", 1), game: G.g1, quiz: QZ, plan: PL,
-  bullpenScript: bullpen_scripts[0].id, spotlight: player_spotlights[0].id, mentor: U.admin,
+  bullpenScript: bullpen_scripts[0].id, spotlight: player_spotlights[0].id, mentor: U.admin, consentPlayer: emma,
 };

@@ -19,3 +19,15 @@
   answered ones for a player); `start_iq_level`/`finish_iq_level`/`iq_review_status` are private
   definer functions (behind `private.expose` wrappers) that check `private.can_act_for()`. Players can't write answers or awards directly.
 - DB tests: `tests/db/players.test.sql`.
+- Verified parental consent for players under 13 (COPPA; user, 2026-11-11; migration 20261111235221_parental_consent):
+  a parent-made login, and any approved profile claim, for a player under 13 (by her profile's birth date) needs a
+  verified `parental_consents` row first. On /family (`family/consent.tsx`) the parent downloads the consent form
+  (`/family/consent/[playerId]/pdf`, `src/lib/pdf/consent-form-pdf.tsx`; words in `src/lib/legal.ts`: `CONSENT_NOTICE`,
+  `CONSENT_STATEMENT`), signs it by hand and uploads a photo or scan (private bucket `consent-forms`, her own folder;
+  images shrunk to 2000px), types her name and relationship and ticks the statement (`submit_parental_consent`); or asks
+  for a video call. A GGG.Cafe admin checks it in the Roster tab's "Waiting for approval" (`pending_parental_consents`,
+  `review_parental_consent`: a reason to decline, a note to verify a video call); it counts in `countWaiting`. Coaches never
+  read consents or forms. The trigger `claims_need_consent` refuses approving a claim for an under-13 player without it
+  (P0008, shown in `decidePlayerClaim`). The parent can cancel or withdraw on /family (`withdraw_parental_consent`: her
+  parent-made login is deleted and approved claims are declined). Status per daughter: `parent_consent_status`,
+  `consentStep()` in `src/lib/consent.ts`. DB tests: `tests/db/parental_consent.test.sql`.

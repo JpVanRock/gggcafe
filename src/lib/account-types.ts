@@ -42,7 +42,7 @@ export const ACCOUNT_TYPES: AccountType[] = [
   {
     key: "player",
     label: "Player",
-    signup: "Signs up with an email and the team code, then claims her spot on the roster (a coach approves), or her parent creates a username login for her.",
+    signup: "Signs up with an email and the team code, then claims her spot on the roster (a coach approves), or her parent creates a username login for her. Under 13: her parent's verified consent comes first.",
     home: "Her player menu",
   },
   {
@@ -139,7 +139,9 @@ export const SECTIONS: { title: string; rows: Row[] }[] = [
       row("Approve player claims", "Match a player's claim to her roster spot.", ["yes", "yes", "no", "no", "no"]),
       row("Approve parents", "Match a parent to the daughter on the roster.", ["yes", "no", "no", "no", "no"]),
       row("Create a player's login", "A username and password for a daughter without an email.", ["no", "no", "no", "own", "no"],
-        "An approved parent, for a daughter on the team's current roster."),
+        "An approved parent, for a daughter on the team's current roster with her birth date on her profile. Under 13: only after an admin verifies the parent's consent."),
+      row("Verify parental consent", "Check a parent's signed consent form, or hold a short video call, before a player under 13 can sign in (COPPA).", ["no", "no", "no", "own", "no"],
+        "Parents give consent and can withdraw it on the family page. Admins check it on the Roster tab; coaches never see the forms."),
       row("Reset that login's password", "A new password for a parent-made player login.", ["yes", "no", "no", "own", "no"]),
       row("Medical & emergency card", "Emergency contacts, allergies, conditions and medications; a game-day view.", ["yes", "no", "no", "own", "no"],
         "Head coaches and her approved parents only (not assistants, teammates or the player)."),
@@ -172,7 +174,8 @@ export const QUESTIONS: { q: string; a: string[] }[] = [
     q: "A player has no email. How does she get in?",
     a: [
       "Her parent signs up as a Parent with the team code. Once a head coach approves the parent, the family page shows \"Create her login\": the parent picks a username and password.",
-      "It works only for a daughter on the official roster the head coach built for the current season, and only once per player. She signs in with the username instead of an email; her parent or a head coach can reset the password.",
+      "It works only for a daughter on the official roster the head coach built for the current season, with her birth date on her profile, and only once per player. She signs in with the username instead of an email; her parent or a head coach can reset the password.",
+      "If she's under 13, the parent first gives verified consent on the family page: signs our consent form by hand and uploads a photo of it, or asks for a short video call. An admin checks it on the Roster tab, then \"Create her login\" appears. A coach can't approve an under-13 player's own profile claim until that consent is checked.",
     ],
   },
   {
@@ -185,7 +188,7 @@ export const QUESTIONS: { q: string; a: string[] }[] = [
   {
     q: "Where does the admin fit?",
     a: [
-      "The admin isn't a sign-up type. It has everything a head coach has, plus approving head coaches, approving any mentor request, reading every mentor message, changing roles, G3 Advanced and these FAQ pages.",
+      "The admin isn't a sign-up type. It has everything a head coach has, plus approving head coaches, approving any mentor request, reading every mentor message, checking parents' consent for players under 13, changing roles, G3 Advanced and these FAQ pages.",
     ],
   },
   {
@@ -195,7 +198,7 @@ export const QUESTIONS: { q: string; a: string[] }[] = [
   {
     q: "What does everyone agree to?",
     a: [
-      "The Terms of Service and the Privacy & Security Notice: with a checkbox at sign-up, or on a one-time page the next time they open GGG.Cafe (accounts made before the Terms, and player logins a parent made). A parent or guardian agrees for a player under 18. Players under 13 can't sign themselves up: a parent makes their login.",
+      "The Terms of Service and the Privacy & Security Notice: with a checkbox at sign-up, or on a one-time page the next time they open GGG.Cafe (accounts made before the Terms, and player logins a parent made). A parent or guardian agrees for a player under 18. Players under 13 can't sign themselves up: a parent gives verified consent, then makes their login.",
       "Each agreement is saved with its date and version. When the Terms change in a way that matters, everyone is asked again.",
     ],
   },

@@ -8,6 +8,8 @@ import { isUuid } from "@/lib/softball";
 import { isValidUsername, normalizeUsername } from "@/lib/player-logins";
 import { cleanMedical, cleanQuestionnaire } from "@/lib/family";
 import { STALE, failed, must, runAction } from "@/lib/actions";
+import { RELATIONSHIPS } from "@/lib/consent";
+import { TERMS_VERSION } from "@/lib/legal";
 
 /** Creates her parent profile if needed, then asks to join a team with its code. */
 export async function joinTeam(_prev: FormState, fd: FormData): Promise<FormState> {
@@ -65,12 +67,68 @@ export async function createPlayerLogin(_prev: FormState, fd: FormData): Promise
     if (error.code === "23505") return { error: error.message.includes("taken") ? "That username is taken. Try another." : "She already has a login." };
     if (error.code === "P0006") return { error: "She isn't on the team's current roster yet. Ask your head coach to add her first." };
     if (error.code === "P0007") return { error: "She already has her own account. She signs in with her email." };
+    if (error.code === "P0008") return { error: "She's under 13, so your verified consent comes first. Use the consent steps above." };
+    if (error.code === "P0009") return { error: "Her birth date isn't on her profile yet. Ask her head coach to add it, then make her login." };
     if (error.code === "42501") return { error: "Your coach needs to approve you as her parent first." };
     if (error.code === "22023") return { error: "Check the username and password." };
     return { error: "Couldn't create her login. Try again." };
   }
   refresh();
   return { error: null, saved: true };
+}
+
+/**
+ * Verified parental consent for a daughter under 13 (COPPA): the signed form she uploaded
+ * (form_path, already in her folder of the consent-forms bucket) or a request for a video
+ * call. A GGG.Cafe admin checks it before her login can be made.
+ */
+export async function submitParentalConsent(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const user = await getCurrentUser();
+    if (!user) return failed("Your session has ended. Sign in again.");
+    const playerId = text(fd, "player_id");
+    if (!isUuid(playerId)) return failed(STALE);
+    const method = fd.get("method") === "video_call" ? "video_call" : "signed_form";
+    const name = text(fd, "parent_name");
+    if (!name || name.length < 2) return invalid("parent_name", "Enter your full name, as you signed the form.");
+    if (name.length > 120) return invalid("parent_name", "Keep your name to 120 characters.");
+    const relationship = text(fd, "relationship");
+    if (!relationship || !(RELATIONSHIPS as readonly string[]).includes(relationship)) return invalid("relationship", "Choose parent or legal guardian.");
+    if (fd.get("agree") !== "on") return invalid("agree", "Tick the box to confirm the consent statement.");
+    const formPath = text(fd, "form_path");
+    if (method === "signed_form" && !formPath) return failed("Upload a photo or scan of the signed form first.");
+
+    const supabase = await createClient();
+    const { error } = await supabase.rpc("submit_parental_consent", {
+      p_player_id: playerId,
+      p_method: method,
+      p_parent_name: name,
+      p_relationship: relationship,
+      p_form_path: method === "signed_form" ? formPath : null,
+      p_notice_version: TERMS_VERSION,
+    });
+    if (error) {
+      if (error.code === "42501") return failed("Only her approved parent can give consent.");
+      if (error.code === "23505") return failed("Your consent is already on file or waiting to be checked.");
+      if (error.code === "22023") return failed(error.message.includes("upload") ? "Upload the signed form first." : "Check the form and try again.");
+      return failed("Couldn't send it. Try again.");
+    }
+    refresh();
+  });
+}
+
+/** Withdraws consent (or cancels a request): her parent-made login is deleted right away. */
+export async function withdrawParentalConsent(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const user = await getCurrentUser();
+    if (!user) return failed("Your session has ended. Sign in again.");
+    const playerId = text(fd, "player_id");
+    if (!isUuid(playerId)) return failed(STALE);
+    const supabase = await createClient();
+    const { error } = await supabase.rpc("withdraw_parental_consent", { p_player_id: playerId });
+    if (error) return failed(error.code === "P0002" ? "There's no consent on file to withdraw." : "Couldn't withdraw it. Try again.");
+    refresh();
+  });
 }
 
 export async function resetPlayerPassword(_prev: FormState, fd: FormData): Promise<FormState> {

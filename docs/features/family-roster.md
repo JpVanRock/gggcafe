@@ -12,3 +12,6 @@
   Logic: `src/lib/family.ts` (unit-tested). DB tests: `tests/db/family.test.sql`.
 - Her mentors (user, 2026-11-11): a card per daughter on /family (approve or decline a mentor's request, remove one) and
   `/family/mentors` (every message, focus area and note about her). See `mentors.md`.
+- Her login card on /family also carries verified parental consent for a daughter under 13 (signed form upload or a video
+  call, checked by an admin; withdraw deletes her login): see player-accounts.md. Without a birth date on her profile the
+  card asks the parent to have the head coach add it.

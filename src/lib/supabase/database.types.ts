@@ -2687,6 +2687,65 @@ export type Database = {
           },
         ]
       }
+      parental_consents: {
+        Row: {
+          id: string
+          player_id: string
+          parent_id: string
+          method: string
+          status: string
+          parent_name: string
+          relationship: string
+          form_path: string | null
+          notice_version: string
+          submitted_at: string
+          reviewed_by: string | null
+          reviewed_at: string | null
+          review_note: string | null
+          withdrawn_at: string | null
+        }
+        Insert: {
+          id?: string
+          player_id: string
+          parent_id: string
+          method: string
+          status?: string
+          parent_name: string
+          relationship: string
+          form_path?: string | null
+          notice_version: string
+          submitted_at?: string
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          review_note?: string | null
+          withdrawn_at?: string | null
+        }
+        Update: {
+          id?: string
+          player_id?: string
+          parent_id?: string
+          method?: string
+          status?: string
+          parent_name?: string
+          relationship?: string
+          form_path?: string | null
+          notice_version?: string
+          submitted_at?: string
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          review_note?: string | null
+          withdrawn_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parental_consents_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pitcher_game_plans: {
         Row: {
           id: string
@@ -5802,11 +5861,13 @@ export type Database = {
       pa_is_hit: { Args: { r: Database["public"]["Enums"]["pa_result"] | null }; Returns: boolean }
       pa_on_base: { Args: { r: Database["public"]["Enums"]["pa_result"] | null }; Returns: boolean }
       pa_total_bases: { Args: { r: Database["public"]["Enums"]["pa_result"] | null }; Returns: number }
+      parent_consent_status: { Args: Record<PropertyKey, never>; Returns: { player_id: string; birth_date: string; under_13: boolean; consent_id: string; status: string; method: string; parent_name: string; submitted_at: string; reviewed_at: string; review_note: string }[] }
       parent_home: { Args: Record<PropertyKey, never>; Returns: { link_id: string; team_id: string; team_name: string; child_name: string; player_name: string; status: Database["public"]["Enums"]["parent_link_status"] }[] }
       parent_medical_card: { Args: { p_player_id: string | null }; Returns: Json }
       parent_player_logins: { Args: Record<PropertyKey, never>; Returns: { player_id: string; player_name: string; team_name: string; on_roster: boolean; username: string; has_account: boolean }[] }
       parent_questionnaire: { Args: { p_player_id: string | null }; Returns: Json }
       pending_approvals: { Args: Record<PropertyKey, never>; Returns: { team_id: string; team_name: string; player_claims: number; parent_requests: number }[] }
+      pending_parental_consents: { Args: Record<PropertyKey, never>; Returns: { id: string; player_id: string; player_name: string; birth_date: string; team_name: string; parent_name: string; parent_account: string; parent_email: string; relationship: string; method: string; form_path: string; submitted_at: string }[] }
       record_iq_answer: { Args: { p_player_id: string | null; p_question_id: string | null; p_chosen: number | null; p_attempt_id?: string | null; p_review_of?: string | null; p_hint_used?: boolean | null }; Returns: { correct: boolean; correct_index: number; explanation: string }[] }
       reimburse_coach_expenses: { Args: { p_ids: string[] | null; p_paid_on: string | null; p_from_team_funds: boolean | null }; Returns: undefined }
       request_mentor: { Args: { p_code: string | null; p_player_name: string | null }; Returns: string }
@@ -5814,6 +5875,7 @@ export type Database = {
       request_player_claim: { Args: { p_team_id: string | null; p_name: string | null; p_jersey: string | null }; Returns: boolean }
       request_staff_access: { Args: { p_role: string | null; p_name: string | null; p_team_id?: string | null; p_note?: string | null }; Returns: string }
       reset_player_password: { Args: { p_player_id: string | null; p_password: string | null }; Returns: undefined }
+      review_parental_consent: { Args: { p_id: string | null; p_verify: boolean | null; p_note: string | null }; Returns: undefined }
       save_box_score: { Args: { p_game_id: string | null; p_team_id: string | null; p_box: Json | null }; Returns: undefined }
       save_budget_fees: { Args: { p_team_id: string | null; p_season_id: string | null; p_fees: Json | null }; Returns: undefined }
       save_harada_plan: { Args: { p_player_id: string | null; p_chart: Json | null }; Returns: string }
@@ -5827,6 +5889,7 @@ export type Database = {
       staff_requests_to_decide: { Args: Record<PropertyKey, never>; Returns: { user_id: string; display_name: string; email: string; role: string; team_id: string; team_name: string; note: string; requested_at: string }[] }
       start_iq_level: { Args: { p_player_id: string | null; p_track: Database["public"]["Enums"]["iq_track"] | null; p_level: number | null; p_restart?: boolean | null; p_position?: Database["public"]["Enums"]["field_position"] | null }; Returns: string }
       start_scorebook_game: { Args: { p_player_id: string | null; p_game?: number | null; p_restart?: boolean | null }; Returns: Database["public"]["Tables"]["scorebook_game_runs"]["Row"][] }
+      submit_parental_consent: { Args: { p_player_id: string | null; p_method: string | null; p_parent_name: string | null; p_relationship: string | null; p_form_path: string | null; p_notice_version: string | null }; Returns: string }
       sync_team_routine: { Args: { p_routine_id: string | null }; Returns: number }
       team_bp_leaders: { Args: { p_team_id: string | null }; Returns: { player_id: string; first_name: string; last_name: string; jersey_number: string; swings: number; production: number }[] }
       team_budget_summary: { Args: { p_team_id: string | null; p_season_id?: string | null }; Returns: Json }
@@ -5840,6 +5903,7 @@ export type Database = {
       team_welcome: { Args: { p_team_id: string | null }; Returns: { team_name: string; season_name: string; welcome_message: string }[] }
       team_yearbook: { Args: { p_team_id: string | null; p_season_id?: string | null }; Returns: Json }
       unread_notifications: { Args: Record<PropertyKey, never>; Returns: number }
+      withdraw_parental_consent: { Args: { p_player_id: string | null }; Returns: undefined }
       yearbook_access: { Args: { p_team_id: string | null }; Returns: string }
     }
     Enums: {

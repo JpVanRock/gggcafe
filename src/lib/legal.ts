@@ -62,7 +62,7 @@ export const TERMS_SECTIONS: LegalSection[] = [
     blocks: [
       "You accept these Terms when you create an account, check the box agreeing to them, or use the Service. Checking the box is your electronic signature and has the same effect as signing on paper. If you don't agree, don't use the Service.",
       "If you're under 18, your parent or legal guardian must read and agree to these Terms for you. A parent or guardian who lets a minor use the Service agrees to these Terms on the minor's behalf and on their own, and is responsible for the minor's use, including the assumption of risk, the release, the indemnity and the arbitration agreement below.",
-      "Children under 13 can't create their own account. Their parent or guardian makes the player's login from the family page, which gives the consent described in our Privacy & Security Notice.",
+      "Children under 13 can't create their own account. Their parent or guardian first gives verified consent (a signed consent form or a short video call, checked by our staff), then makes the player's login from the family page, as our Privacy & Security Notice describes.",
       "If you use the Service for a team, club, school or other organization, you confirm that you're allowed to accept these Terms for it, and these Terms bind both you and the organization. Either way, you're personally bound.",
       "You can't use the Service if the law doesn't allow you to, or if we've removed you from it before.",
     ],
@@ -417,9 +417,9 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     title: "Children's privacy (under 13)",
     blocks: [
       "GGG.Cafe is built for youth athletes, with parents involved. This section is our notice to parents under the Children's Online Privacy Protection Act (COPPA).",
-      "Children under 13 can't sign themselves up. A parent or guardian, approved for that player by the team's head coach, creates the child's login from the family page; doing so is their consent to us collecting and using the child's information as this notice describes. Coaches may also add a child's profile and stats to a team roster.",
+      "Children under 13 can't sign themselves up. Before a child under 13 can sign in, a parent or guardian (approved for that player by the team's head coach) gives verified consent in one of two ways: by signing our consent form by hand and uploading a photo or scan of it, or by a short video call with our staff. Our staff check the consent before the parent can create the child's login, and no coach can approve a profile claim for a child under 13 until it's checked. We keep the signed form, or a note of the call, as the record of consent while we keep the child's information, and afterward only as long as needed to show that consent was given. Coaches may also add a child's profile and stats to a team roster.",
       "What we collect from or about a child: the profile, training, goals, mental-game, quiz, stats, photo and message information listed above, and the medical card and questionnaire a parent adds. We use it only to provide the Service to the child and their team. We don't show it publicly, we don't use it for advertising, and we don't share it with third parties except our service providers and as the law requires. We don't ask a child for more information than a feature needs, and a child doesn't have to give more than that to take part.",
-      "Parents can review their child's information, have it corrected or deleted, and refuse to let us collect or use any more of it, at any time, by contacting us or the head coach. Deleting the information ends the child's access. We'll confirm a parent's identity and connection to the child before acting on a request.",
+      "Parents can review their child's information, have it corrected or deleted, and refuse to let us collect or use any more of it, at any time, by contacting us or the head coach. A parent can also withdraw consent on the family page: that deletes the child's login right away, so she can't sign in. Deleting the information ends the child's access. We'll confirm a parent's identity and connection to the child before acting on a request.",
       "If we learn we collected information from a child under 13 without a parent's consent, we'll delete it.",
     ],
   },
@@ -499,6 +499,40 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     blocks: [`Privacy questions and requests: ${contactLine}`],
   },
 ];
+
+/**
+ * Verified parental consent for players under 13 (COPPA; docs/features/legal.md). The family page and the
+ * printable form (src/lib/pdf/consent-form-pdf.tsx) use these words; the form's version is TERMS_VERSION.
+ */
+export const PRIVACY_URL = "https://gggcafe.vercel.app/privacy";
+export const CONSENT_FORM_TITLE = "Parental Consent for a Player Under 13";
+export const CONSENT_NOTICE: { heading: string; text: string }[] = [
+  {
+    heading: "Why we're asking",
+    text: `${LEGAL.name} is run by ${LEGAL.owner}. A federal law, the Children's Online Privacy Protection Act (COPPA), requires a parent's verified consent before we collect personal information from a child under 13. Until we've checked your consent, we won't collect information from her and she can't sign in.`,
+  },
+  {
+    heading: "What she adds when she signs in",
+    text: "Her goals, training check-offs and workouts, journal and mental-game entries, quiz and test answers, messages with her coaches and the mentors you approve, and a profile photo if one is added. Her coaches also add her roster details, stats and evaluations.",
+  },
+  {
+    heading: "How it's used and who sees it",
+    text: "Only to run GGG.Cafe for her and her team. She sees her own information; so do you, her other approved parents, her team's coaches, mentors you approve and GGG.Cafe admins. Teammates see her only in team views such as the leaderboard and yearbook. Nothing is public, sold, used for advertising or used to train AI. Our hosting providers (Supabase, Vercel and Resend) process it only for us.",
+  },
+  {
+    heading: "Your rights",
+    text: `At any time you can review her information, have it corrected or deleted, and refuse to let us collect any more. Withdraw your consent on the family page (it deletes her login right away) or email ${LEGAL.contact}.`,
+  },
+  {
+    heading: "How we check it",
+    text: "Sign this form by hand and upload a photo or scan of it on your family page, or ask for a short video call with our staff instead. We compare it with your parent account before her login can be made, and keep the signed form (or a note of the call) as the record of your consent.",
+  },
+  {
+    heading: "Full details",
+    text: `Our Privacy & Security Notice, section 8, "Children's privacy (under 13)": ${PRIVACY_URL}`,
+  },
+];
+export const CONSENT_STATEMENT = `I am the parent or legal guardian of the player named on this form. I have read this notice and the ${LEGAL.name} Privacy & Security Notice. I consent to ${LEGAL.owner} collecting, using and storing my daughter's personal information through ${LEGAL.name} as described, including what she enters herself. I understand that I can review it, have it deleted, or withdraw this consent at any time.`;
 
 /** The site-wide footer disclaimer (every page). */
 export const FOOTER_DISCLAIMER =

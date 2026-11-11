@@ -16,6 +16,9 @@ import { markPacketRead, saveMedicalAsParent, saveQuestionnaireAsParent } from "
 import { PACKET_KIND_LABEL, medicalOnFile, type PacketKind, type Questionnaire } from "@/lib/family";
 import { ActionForm } from "@/components/action-form";
 import { DaughterMentors, loadFamilyMentors } from "./mentors";
+import { ConsentOnFile, ConsentSteps } from "./consent";
+import { consentStep } from "@/lib/consent";
+import { formatLongDateAt } from "@/lib/dates";
 
 export const metadata: Metadata = { title: "Family · GGG.Cafe" };
 
@@ -49,13 +52,16 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
   const { code } = await searchParams;
 
   const supabase = await createClient();
-  const [{ data: account }, { data: claims }, linksResult, daughtersResult] = await Promise.all([
+  const [{ data: account }, { data: claims }, linksResult, daughtersResult, { data: consentRows }] = await Promise.all([
     supabase.from("parent_accounts").select("display_name").eq("user_id", user.id).maybeSingle(),
     supabase.auth.getClaims(),
     supabase.rpc("parent_home"),
     supabase.rpc("parent_player_logins"),
+    // verified parental consent for daughters under 13 (COPPA)
+    supabase.rpc("parent_consent_status"),
   ]);
   const daughters = (daughtersResult.data ?? []) as Daughter[];
+  const consents = new Map((consentRows ?? []).map((c) => [c.player_id, c]));
   // Phase 6: her questionnaire and medical card (through the database functions), and the welcome packet
   const [forms, packetResult, readsResult, familyMentors] = await Promise.all([
     Promise.all(
@@ -132,6 +138,8 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
           <ul className="flex flex-col gap-5">
             {daughters.map((d) => {
               const first = d.player_name.split(" ")[0];
+              const consent = consents.get(d.player_id);
+              const step = consentStep(consent);
               return (
                 <li key={d.player_id} className="flex flex-col gap-3">
                   <p className="font-semibold">
@@ -146,6 +154,9 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
                       <Disclosure summary={`Set a new password for ${first}`}>
                         <ResetPlayerPasswordForm playerId={d.player_id} firstName={first} />
                       </Disclosure>
+                      {step === "verified" && consent?.reviewed_at && (
+                        <ConsentOnFile playerId={d.player_id} firstName={first} status="verified" method={consent.method} date={formatLongDateAt(consent.reviewed_at)} />
+                      )}
                     </>
                   ) : d.has_account ? (
                     <p className="text-sm text-muted">{first} has her own account and signs in with her email.</p>
@@ -153,8 +164,25 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
                     <p className="text-sm text-muted">
                       {first} isn&apos;t on the team&apos;s current roster yet. Once the head coach adds her, you can make her login here.
                     </p>
+                  ) : step === "birth-date" ? (
+                    <p className="text-sm text-muted">
+                      Her birth date isn&apos;t on her profile yet. Ask her head coach to add it; then you can make {first}&apos;s login here.
+                    </p>
+                  ) : step === "needed" ? (
+                    <ConsentSteps
+                      playerId={d.player_id}
+                      firstName={first}
+                      userId={user.id}
+                      defaultName={account?.display_name ?? metaName}
+                      declinedNote={consent?.status === "declined" ? consent.review_note : null}
+                    />
+                  ) : step === "pending" && consent ? (
+                    <ConsentOnFile playerId={d.player_id} firstName={first} status="pending" method={consent.method} date={formatLongDateAt(consent.submitted_at)} />
                   ) : (
                     <>
+                      {step === "verified" && consent?.reviewed_at && (
+                        <ConsentOnFile playerId={d.player_id} firstName={first} status="verified" method={consent.method} date={formatLongDateAt(consent.reviewed_at)} />
+                      )}
                       <p className="text-sm text-muted">
                         No email for {first}? Make her a username and password; she signs in with them instead of an email. If she has
                         an email, she can sign up herself and claim her profile.

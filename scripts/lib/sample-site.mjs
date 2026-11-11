@@ -54,6 +54,8 @@ export const samplePdfRoutes = () => [
   `/dugout/gameday/${ID.lineup}/pdf`,
   `/dugout/gameday/${ID.lineup}/pdf?card=umpire`,
   `/dugout/plans/${ID.plan}/pdf`,
+  // the parental consent form (Emma: the sample admin's daughter under 13)
+  `/family/consent/${ID.consentPlayer}/pdf`,
 ];
 
 /** Starts `next start` in sample-data mode; resolves once it answers. */

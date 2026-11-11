@@ -14,6 +14,8 @@ import { loadLeaderBadges } from "@/lib/leader-badges";
 import { PendingStaffList, StaffList, type StaffMember } from "./staff";
 import { TeamCodeCard } from "../team-code";
 import { MoveTeamForm, type MoveTeam } from "../../players/move-form";
+import { PendingConsentList } from "./consents";
+import { CONSENT_BUCKET } from "@/lib/consent";
 
 export const metadata: Metadata = { title: "Roster · Coaches Dugout · GGG.Cafe" };
 
@@ -30,12 +32,14 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
   const editor = canEdit(user.staff.role);
   // Head coaches and admins also handle parents and coach sign-ups; assistants don't.
   const head = isHeadCoach(user.staff.role);
+  // GGG.Cafe admins also check parents' consent for players under 13 (COPPA), for every team
+  const admin = user.staff.role === "admin";
   const { team: teamParam, season: seasonParam } = await searchParams;
   const supabase = await createClient();
   const dugout = await loadDugoutTeam(supabase, teamParam);
   if (!dugout) return <NoOwnTeam />;
   const { teams, team } = dugout;
-  const [seasonsResult, currentSeason, approvals, staffRequests, staffResult, codeResult, moveTeamsResult, mentorWaiting] = await Promise.all([
+  const [seasonsResult, currentSeason, approvals, staffRequests, staffResult, codeResult, moveTeamsResult, mentorWaiting, consentsResult] = await Promise.all([
     supabase.from("seasons").select("*").order("start_date", { ascending: false, nullsFirst: false }).order("created_at", { ascending: false }),
     seasonOrCurrent(supabase, team.id, null),
     editor ? loadTeamApprovals(supabase, team.id) : Promise.resolve(null),
@@ -47,7 +51,12 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
       ? supabase.from("teams").select("id, name, organization, age_group, is_own_team").order("is_own_team", { ascending: false }).order("name")
       : Promise.resolve({ data: null }),
     head ? supabase.rpc("mentor_requests_waiting").then((r) => Number(r.data ?? 0)) : Promise.resolve(0),
+    admin ? supabase.rpc("pending_parental_consents") : Promise.resolve({ data: [] }),
   ]);
+  const consents = consentsResult.data ?? [];
+  const formPaths = consents.map((c) => c.form_path).filter((p): p is string => Boolean(p));
+  const { data: formLinks } = formPaths.length ? await supabase.storage.from(CONSENT_BUCKET).createSignedUrls(formPaths, 600) : { data: [] };
+  const formUrls = new Map((formLinks ?? []).flatMap((l) => (l.path && l.signedUrl ? [[l.path, l.signedUrl] as const] : [])));
   // Coach sign-ups for this team, plus head-coach sign-ups (no team; admins only)
   const pendingStaff = staffRequests.filter((r) => r.team_id === team.id || r.team_id === null);
   const staff = (staffResult.data ?? []) as StaffMember[];
@@ -71,7 +80,7 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
   const pendingClaims = claims.filter((c) => c.status === "pending");
   const approvedClaims = claims.filter((c) => c.status === "approved");
   const pendingParents = (approvals?.parentLinks ?? []).filter((l) => l.status === "pending");
-  const waiting = pendingClaims.length + pendingParents.length + pendingStaff.length + mentorWaiting;
+  const waiting = pendingClaims.length + pendingParents.length + pendingStaff.length + mentorWaiting + consents.length;
   const claimOf = new Map(claims.filter((c) => c.roster_entry_id && c.status !== "declined").map((c) => [c.roster_entry_id!, c.status]));
   const parentsOf = new Map<string, number>();
   for (const l of approvals?.parentLinks ?? []) if (l.status === "approved" && l.player_id) parentsOf.set(l.player_id, (parentsOf.get(l.player_id) ?? 0) + 1);
@@ -119,6 +128,12 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
             </p>
           ) : (
             <div className="mt-4 flex flex-col gap-6">
+              {consents.length > 0 && (
+                <div>
+                  <h3 className="mb-2 text-sm font-semibold">Parental consent to check, players under 13 ({consents.length})</h3>
+                  <PendingConsentList consents={consents} formUrls={formUrls} />
+                </div>
+              )}
               {pendingStaff.length > 0 && (
                 <div>
                   <h3 className="mb-2 text-sm font-semibold">Coaches signing up ({pendingStaff.length})</h3>
