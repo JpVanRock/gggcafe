@@ -22,7 +22,8 @@
   (everything above) or Leadership Light (`player_leadership_access.program` = `full` | `light`; picks made
   before default to `full`). Both are part of G3 Advanced (`has_leadership()` unchanged).
   Leadership Light, for players 11 and under: `LIGHT_LESSONS` (8 lessons, slugs `light-...`, parts
-  `LIGHT_PARTS`: Lead yourself, Lead your team; two questions and two challenges each, no tools), `LIGHT_INTRO`,
+  `LIGHT_PARTS`: Lead yourself, Lead your team; two questions and two challenges each, no tools), `LIGHT_INTRO`
+  (then `GUIDE_CLOSER`, "Player-led teams know how to win.", which ends Read this first in both programs),
   `LIGHT_KEYS` (what she'll build, on the first page and the certificate's edge), "My Leader Plan" (the same plan
   record, showing `LIGHT_PLAN_SHOW`: her why, one habit, one goal with two steps, two check-ins; the rest of
   the plan is kept untouched), `LIGHT_COMMITMENT`. No Extra Reps, no rubric. Same voice in simpler words for

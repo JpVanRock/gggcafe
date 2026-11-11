@@ -3,7 +3,6 @@ import { Disclosure, EmptyState, tableClass, tdClass, thClass, TableScroll } fro
 import { formatLongDate } from "@/lib/dates";
 import { BATS_LABEL, POSITION_LABEL, THROWS_LABEL, batsThrows, type Player } from "@/lib/softball";
 import { PlayerForm } from "../player-form";
-import { MoveTeamForm, type MoveSeason, type MoveTeam } from "../move-form";
 import { currentRostering, type MetricProgress, type PopReport } from "./data";
 import { DetailHeading, MenuItem } from "./menu";
 import { HittingSection, MovementSection, movementHeadline } from "./movement";
@@ -56,7 +55,6 @@ export function PopDetail({
   pop,
   canEdit,
   photoUrl,
-  move,
   styles,
   canAct = canEdit,
   movementAccess = "open",
@@ -72,8 +70,6 @@ export function PopDetail({
   /** the player herself or a coach: can change her hitting style */
   canAct?: boolean;
   photoUrl?: string | null;
-  /** coaches: teams and seasons to move her to */
-  move?: { teams: MoveTeam[]; seasons: MoveSeason[] } | null;
   /** measurements by season (MeasurementsBySeason); without it, the latest/best table */
   measurements?: React.ReactNode;
 }) {
@@ -212,11 +208,6 @@ export function PopDetail({
       {canEdit && (
         <Disclosure summary="Edit profile">
           <PlayerForm player={player} photoUrl={photoUrl} />
-        </Disclosure>
-      )}
-      {canEdit && move && (
-        <Disclosure summary="Move to another team">
-          <MoveTeamForm playerId={player.id} teams={move.teams} seasons={move.seasons} />
         </Disclosure>
       )}
     </div>

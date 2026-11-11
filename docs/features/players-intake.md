@@ -8,9 +8,8 @@
   after it's created). New player: `players/intake-form.tsx` (name, date of birth, jersey number, class
   year, batting/throwing hand, positions; optional profile picture and up to three walk-up songs).
   Returning player: add her existing profile to this season (keeps history). Opponent teams keep the
-  short roster form. "Edit profile" (Pop Report) uses the same fields (`player-fields.tsx`); coaches can
-  also "Move to another team" (`move-form.tsx`): her active spots go inactive (history) and she gets a
-  spot on the new team/organization.
+  short roster form. "Edit profile" (Pop Report) uses the same fields (`player-fields.tsx`). Moving a
+  player to another team is on the Dugout's Roster tab (see `dugout-roster.md`), not her profile.
 - Profile pictures: PRIVATE bucket `player-photos` (photos of minors): staff read, coaches write;
   shown through signed URLs (`src/lib/player-photos.ts`). The browser shrinks photos to 900px JPEG
   before upload; replaced photos are deleted. Photo and walk-up songs show in the dashboard header.

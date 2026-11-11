@@ -121,7 +121,7 @@ export default async function LeadershipPage({ params }: PageProps<"/players/[pl
                   {p}
                 </p>
               ))}
-              {!light && <p className="font-display text-xl font-bold tracking-wide text-highlight uppercase">{GUIDE_CLOSER}</p>}
+              <p className="font-display text-xl font-bold tracking-wide text-highlight uppercase">{GUIDE_CLOSER}</p>
             </div>
             <div className="mt-6 max-w-md">
               <ProgressBar value={progress.done} max={progress.total} label={`${progress.done} of ${progress.total} lessons complete`} />

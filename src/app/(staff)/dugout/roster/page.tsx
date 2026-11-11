@@ -13,6 +13,7 @@ import { LeaderBadge } from "@/components/leader-badge";
 import { loadLeaderBadges } from "@/lib/leader-badges";
 import { PendingStaffList, StaffList, type StaffMember } from "./staff";
 import { TeamCodeCard } from "../team-code";
+import { MoveTeamForm, type MoveTeam } from "../../players/move-form";
 
 export const metadata: Metadata = { title: "Roster · Coaches Dugout · GGG.Cafe" };
 
@@ -34,13 +35,17 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
   const dugout = await loadDugoutTeam(supabase, teamParam);
   if (!dugout) return <NoOwnTeam />;
   const { teams, team } = dugout;
-  const [seasonsResult, currentSeason, approvals, staffRequests, staffResult, codeResult] = await Promise.all([
+  const [seasonsResult, currentSeason, approvals, staffRequests, staffResult, codeResult, moveTeamsResult] = await Promise.all([
     supabase.from("seasons").select("*").order("start_date", { ascending: false, nullsFirst: false }).order("created_at", { ascending: false }),
     seasonOrCurrent(supabase, team.id, null),
     editor ? loadTeamApprovals(supabase, team.id) : Promise.resolve(null),
     head ? loadStaffRequests(supabase) : Promise.resolve([]),
     supabase.from("staff").select("user_id, display_name, role"),
     editor ? supabase.from("teams").select("team_code").eq("id", team.id).maybeSingle() : Promise.resolve({ data: null }),
+    // teams a coach can move a player to (Move a player to another team)
+    editor
+      ? supabase.from("teams").select("id, name, organization, age_group, is_own_team").order("is_own_team", { ascending: false }).order("name")
+      : Promise.resolve({ data: null }),
   ]);
   // Coach sign-ups for this team, plus head-coach sign-ups (no team; admins only)
   const pendingStaff = staffRequests.filter((r) => r.team_id === team.id || r.team_id === null);
@@ -57,6 +62,9 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
 
   // Leader Badge: coaches/admins only (the certificates' RLS hides them from view-only staff)
   const leaders = editor ? await loadLeaderBadges(supabase, roster.map((r) => r.player.id)) : new Set<string>();
+
+  const moveTeams = ((moveTeamsResult.data ?? []) as MoveTeam[]).filter((t) => t.id !== team.id);
+  const movable = roster.filter((r) => r.active).map((r) => ({ id: r.player.id, label: `${r.jersey_number ? `#${r.jersey_number} ` : ""}${playerName(r.player)}` }));
 
   const claims = approvals?.claims ?? [];
   const pendingClaims = claims.filter((c) => c.status === "pending");
@@ -198,6 +206,11 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
       {editor && approvedClaims.length > 0 && (
         <Disclosure summary={`Player accounts (${approvedClaims.length})`}>
           <ApprovedClaimList claims={approvedClaims} spots={approvals!.spots} />
+        </Disclosure>
+      )}
+      {editor && movable.length > 0 && moveTeams.length > 0 && (
+        <Disclosure summary="Move a player to another team">
+          <MoveTeamForm players={movable} teams={moveTeams} seasons={seasons} />
         </Disclosure>
       )}
       {staff.length > 0 && (

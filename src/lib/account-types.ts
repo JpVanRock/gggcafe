@@ -98,7 +98,7 @@ export const SECTIONS: { title: string; rows: Row[] }[] = [
   {
     title: "Coaches Dugout",
     rows: [
-      row("Roster", "The season's roster, player accounts, approvals, the coaching staff, and staff duties & standards (the duty matrix, the staff commitment, the before-practice checklist).", ["yes", "part", "no", "no", "no"],
+      row("Roster", "The season's roster, player accounts, approvals, moving a player to another team, the coaching staff, and staff duties & standards (the duty matrix, the staff commitment, the before-practice checklist).", ["yes", "part", "no", "no", "no"],
         "Assistants approve player claims and see the staff duties; parent requests, coach sign-ups and the duty matrix go to head coaches."),
       row("Culture", "Team Standards and Team Culture.", ["yes", "no", "view", "no", "no"], "Players read them in From the Dugout."),
       row("Calendar", "Practices and events that show in TWIS; offseason dates.", ["yes", "yes", "view", "no", "no"], "Players see the dates in TWIS."),
