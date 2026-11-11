@@ -14,6 +14,9 @@ import {
 import { GoalsDetail } from "@/app/(staff)/players/[playerId]/goals";
 import { SmartGoalsPanel } from "@/app/(staff)/players/[playerId]/smart";
 import { PopDetail } from "@/app/(staff)/players/[playerId]/pop-report";
+import { MeasurementsBySeason, loadMeasurements } from "@/app/(staff)/players/[playerId]/measurements";
+import { BestVersion } from "@/app/(staff)/players/[playerId]/best-version";
+import type { BestVersionAnswers } from "@/lib/best-version";
 import { MentalDetail } from "@/app/(staff)/players/[playerId]/mental";
 import { DateForm, MessageForm, RemoveDate, RemoveMessage, type LibraryDrill } from "../../mentor-client";
 
@@ -28,8 +31,9 @@ function Panel({ title, children }: { title: string; children: React.ReactNode }
   );
 }
 
-export default async function MentorPlayerPage({ params }: PageProps<"/mentor/players/[playerId]">) {
+export default async function MentorPlayerPage({ params, searchParams }: PageProps<"/mentor/players/[playerId]">) {
   const { playerId } = await params;
+  const { year } = await searchParams;
   if (!isUuid(playerId)) notFound();
   const user = await getCurrentUser();
   if (!user) redirect("/login");
@@ -45,7 +49,7 @@ export default async function MentorPlayerPage({ params }: PageProps<"/mentor/pl
   const first = player.preferred_name || player.first_name;
   const method = player.goal_method ?? "harada";
 
-  const [chart, smartGoals, metricOptions, pop, mental, styles, { data: drillRows }, { data: sentRows }, { data: dateRows }] = await Promise.all([
+  const [chart, smartGoals, metricOptions, pop, mental, styles, { data: drillRows }, { data: sentRows }, { data: dateRows }, measurements, { data: best }] = await Promise.all([
     loadHarada(supabase, player.id),
     loadSmartGoals(supabase, player.id),
     loadMetricOptions(supabase),
@@ -55,6 +59,9 @@ export default async function MentorPlayerPage({ params }: PageProps<"/mentor/pl
     supabase.from("practice_drills").select("id, name, video_url").order("name"),
     supabase.from("mentor_messages").select(MESSAGE_COLUMNS).eq("player_id", player.id).eq("sender_id", mentor.userId).order("created_at", { ascending: false }).limit(20),
     supabase.from("player_activities").select("id, title, details, starts_on").eq("player_id", player.id).eq("source", "mentor").order("starts_on"),
+    // mentors can't read team lists: her defaults plus whatever she has been measured on
+    loadMeasurements(supabase, player, null),
+    supabase.from("player_best_version").select("answers").eq("player_id", player.id).maybeSingle(),
   ]);
   const sent = (sentRows ?? []) as MentorMessage[];
   const [photos, messagePhotos] = await Promise.all([
@@ -128,6 +135,7 @@ export default async function MentorPlayerPage({ params }: PageProps<"/mentor/pl
       )}
 
       <Panel title={`${first}'s Goals`}>
+        <BestVersion playerId={player.id} answers={(best?.answers ?? {}) as BestVersionAnswers} canEdit={false} safety={null} />
         <p className="-mt-2 font-mono text-xs tracking-[0.2em] text-pink-soft uppercase">{GOAL_METHOD_LABEL[method]}</p>
         {method === "smart" ? (
           <SmartGoalsPanel playerId={player.id} goals={smartGoals} metrics={pop.metrics} metricOptions={metricOptions} canEdit={false} />
@@ -144,6 +152,15 @@ export default async function MentorPlayerPage({ params }: PageProps<"/mentor/pl
           canAct={false}
           styles={styles}
           movementAccess={styles.movement.length ? "open" : "hidden"}
+          measurements={
+            <MeasurementsBySeason
+              playerId={player.id}
+              data={measurements}
+              year={typeof year === "string" && /^\d{4}$/.test(year) ? Number(year) : null}
+              basePath={`/mentor/players/${player.id}`}
+              canEdit={false}
+            />
+          }
         />
       </Panel>
 

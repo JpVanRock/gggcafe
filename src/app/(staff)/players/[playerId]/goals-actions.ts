@@ -8,6 +8,7 @@ import { todayISO } from "@/lib/dates";
 import { friendlyDbError, isoDate, oneOf, text, type FormState, invalid } from "@/lib/form";
 import { GOAL_METHODS, SKILL_AREAS, isUuid, type GoalMethod } from "@/lib/softball";
 import { STALE, failed, must, runAction } from "@/lib/actions";
+import { cleanBestVersion } from "@/lib/best-version";
 
 // ---------------------------------------------------------------------------
 // Goals (Harada Method)
@@ -179,3 +180,24 @@ export async function deleteSmartGoal(_prev: FormState, fd: FormData): Promise<F
 }
 
 // ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// The Best Version of You (top of the Goals page): her answers and her 15-minute challenge
+// ---------------------------------------------------------------------------
+
+export async function saveBestVersion(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const playerId = text(fd, "player_id");
+    if (!isUuid(playerId)) return failed(STALE);
+    const denied = await actForCheck(playerId);
+    if (denied) return failed(denied);
+    const answers = cleanBestVersion(Object.fromEntries(fd.entries()));
+    const supabase = await createClient();
+    must(
+      await supabase
+        .from("player_best_version")
+        .upsert({ player_id: playerId, answers, updated_at: new Date().toISOString() }, { onConflict: "player_id" }),
+    );
+    refresh();
+  });
+}

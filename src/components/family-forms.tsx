@@ -1,8 +1,8 @@
 "use client";
 
-// The preseason questionnaire and the medical & emergency card (Phase 6). The same
-// forms serve parents (/family), the player and coaches (Pop Report) and head coaches
-// (Dugout); the page passes the server action that saves for that person.
+// The preseason questionnaire and the medical & emergency card (Phase 6). Parents fill in
+// the questionnaire on /family (only there, user 2026-11-10); the medical card serves parents
+// and head coaches (Dugout). The page passes the server action that saves for that person.
 import { useActionState } from "react";
 import { Field, FormMessage, fieldClass, inputClass } from "@/components/ui";
 import { initialFormState, type FormState } from "@/lib/form";
@@ -39,15 +39,12 @@ function SizeSelect({ name, label, value }: { name: string; label: string; value
 export function QuestionnaireForm({ action, hidden, values }: { action: Action; hidden: Record<string, string>; values: Partial<Questionnaire> | null }) {
   const [state, formAction] = useActionState(action, initialFormState);
   return (
-    <form action={formAction} className="grid gap-3 sm:grid-cols-4">
+    <form action={formAction} className="grid gap-3 sm:grid-cols-3">
       <Hidden values={hidden} />
       <SizeSelect name="top_size" label="Jersey / top" value={values?.top_size ?? null} />
       <SizeSelect name="bottom_size" label="Pants" value={values?.bottom_size ?? null} />
-      <SizeSelect name="jacket_size" label="Jacket" value={values?.jacket_size ?? null} />
-      <Field label="Hat / visor">
-        <input name="hat_size" maxLength={12} defaultValue={values?.hat_size ?? ""} placeholder="S/M" className={inputClass} />
-      </Field>
-      <fieldset className="sm:col-span-4">
+      <SizeSelect name="sock_size" label="Socks" value={values?.sock_size ?? null} />
+      <fieldset className="sm:col-span-3">
         <legend className="mb-1.5 text-sm font-medium">Jersey numbers, in order of choice</legend>
         <div className="flex gap-2">
           {[0, 1, 2].map((i) => (
@@ -55,7 +52,7 @@ export function QuestionnaireForm({ action, hidden, values }: { action: Action; 
           ))}
         </div>
       </fieldset>
-      <fieldset className="sm:col-span-4">
+      <fieldset className="sm:col-span-3">
         <legend className="mb-1.5 text-sm font-medium">Positions she wants to play (up to four)</legend>
         <div className="flex flex-wrap gap-x-4 gap-y-2">
           {QUESTIONNAIRE_POSITIONS.map((p) => (
@@ -66,22 +63,22 @@ export function QuestionnaireForm({ action, hidden, values }: { action: Action; 
           ))}
         </div>
       </fieldset>
-      <div className="sm:col-span-2">
+      <div className="sm:col-span-3">
         <Field label="Experience" hint="Teams, years, positions">
           <textarea name="experience" rows={2} maxLength={300} defaultValue={values?.experience ?? ""} className={inputClass} />
         </Field>
       </div>
-      <div className="sm:col-span-2">
+      <div className="sm:col-span-3">
         <Field label="Goals for this season">
           <textarea name="goals" rows={2} maxLength={500} defaultValue={values?.goals ?? ""} className={inputClass} />
         </Field>
       </div>
-      <div className="sm:col-span-4">
+      <div className="sm:col-span-3">
         <Field label="Anything else">
           <input name="notes" maxLength={300} defaultValue={values?.notes ?? ""} className={inputClass} />
         </Field>
       </div>
-      <div className="flex items-center gap-4 sm:col-span-4">
+      <div className="flex items-center gap-4 sm:col-span-3">
         <SubmitButton>Save questionnaire</SubmitButton>
         <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>

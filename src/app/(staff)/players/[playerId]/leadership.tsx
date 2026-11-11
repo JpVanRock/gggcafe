@@ -44,10 +44,10 @@ export function LeadershipClosed({
     <div className="flex flex-col gap-4">
       <EmptyState>
         {!hasAdvanced
-          ? `The Leadership Guide is part of G3 Advanced, which isn't unlocked for ${name} yet.`
+          ? `Leadership is part of G3 Advanced, which isn't unlocked for ${name} yet.`
           : `${name} isn't being trained as a leader yet.`}
       </EmptyState>
-      {canManage && hasAdvanced && !picked && <LeaderToggle playerId={playerId} name={name} on={false} />}
+      {canManage && hasAdvanced && !picked && <LeaderToggle playerId={playerId} name={name} program={null} />}
       <Link href={`/players/${playerId}`} className="text-sm text-link hover:underline">
         ← Back to {name}&apos;s menu
       </Link>

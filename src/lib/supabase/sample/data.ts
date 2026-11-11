@@ -162,17 +162,36 @@ const bullpen_scripts: Row[] = [{ id: id("cdcd00", 1), team_id: T.us, name: "Com
 const player_spotlights: Row[] = [{ id: id("cece00", 1), team_id: T.us, player_id: maya, player_name: "Maya Torres", jersey: "2", headline: "Engine of the infield", body: "Leads the team in steals.", published_on: "2026-11-02" }];
 const team_culture: Row[] = [{ team_id: T.us, headline: "Compete. Connect. Elevate.", statement: "We show up for each other.", motto: "Every pitch" }];
 const team_standards: Row[] = [{ team_id: T.us, title: "Be early", detail: null, position: 0 }];
-// Maya has G3 Advanced and the Leadership Guide, so those pages render too.
-const player_advanced_access: Row[] = [{ player_id: maya, source: "admin", granted_at: "2026-11-01T00:00:00Z" }];
-const player_leadership_access: Row[] = [{ player_id: maya, granted_at: "2026-11-01T00:00:00Z" }];
-const player_leadership_certificates: Row[] = [{ player_id: maya, team_id: T.us, awarded_at: "2026-11-06T18:00:00Z", coach_name: "Coach Sample" }];
+// Maya has G3 Advanced and the Full Leadership Program, and Lila is in Leadership Light,
+// so both programs' pages render too.
+const player_advanced_access: Row[] = [
+  { player_id: maya, source: "admin", granted_at: "2026-11-01T00:00:00Z" },
+  { player_id: lila, source: "admin", granted_at: "2026-11-01T00:00:00Z" },
+];
+const player_leadership_access: Row[] = [
+  { player_id: maya, program: "full", granted_at: "2026-11-01T00:00:00Z" },
+  { player_id: lila, program: "light", granted_at: "2026-11-08T00:00:00Z" },
+];
+const player_leadership_certificates: Row[] = [
+  { player_id: maya, program: "full", team_id: T.us, awarded_at: "2026-11-06T18:00:00Z", coach_name: "Coach Sample" },
+];
+
+// Measurements by season on Maya's Pop Report (fall and winter of 2026-27, one from last year).
+const measurements: Row[] = [
+  { id: id("dede00", 1), player_id: maya, metric_key: "home_to_first", value: 3.21, measured_on: "2026-09-18", created_at: "2026-09-18T20:00:00Z" },
+  { id: id("dede00", 2), player_id: maya, metric_key: "home_to_first", value: 3.12, measured_on: "2026-10-30", created_at: "2026-10-30T20:00:00Z" },
+  { id: id("dede00", 3), player_id: maya, metric_key: "first_to_second", value: 3.05, measured_on: "2026-10-30", created_at: "2026-10-30T20:05:00Z" },
+  { id: id("dede00", 4), player_id: maya, metric_key: "throw_velo_overhand", value: 54, measured_on: "2026-11-04", created_at: "2026-11-04T20:00:00Z" },
+  { id: id("dede00", 5), player_id: maya, metric_key: "connection_score", value: 61, measured_on: "2026-11-04", created_at: "2026-11-04T20:10:00Z" },
+  { id: id("dede00", 6), player_id: maya, metric_key: "home_to_first", value: 3.3, measured_on: "2026-04-12", created_at: "2026-04-12T20:00:00Z" },
+];
 
 export const TABLES: Record<string, Row[]> = {
   players, teams, seasons, roster_entries, staff, games, batting_lines, pitching_lines, fielding_lines, pa_grades,
   batting_season, pitching_season, fielding_season, qab_season, gameday_profiles, gameday_lineups, depth_chart, staff_duties, staff_standards,
   playbook_plays, play_effectiveness, team_quizzes, team_quiz_questions, team_quiz_answers, scouting_reports, practice_plans, practice_plan_cues,
   install_items, install_item_plans, team_events, training_phases, team_offseason, bp_rounds, bullpen_scripts, player_spotlights,
-  team_culture, team_standards, player_advanced_access, player_leadership_access, player_leadership_certificates,
+  team_culture, team_standards, player_advanced_access, player_leadership_access, player_leadership_certificates, measurements,
 };
 
 /** table -> the column other tables use to point at it (for embedded selects) */
@@ -222,6 +241,6 @@ export function sampleRpc(name: string, args: Row = {}): unknown {
 
 /** Ids the page smoke test uses for dynamic routes. */
 export const SAMPLE_IDS = {
-  player: maya, team: T.us, opponent: T.storm, lineup: id("abab00", 1), game: G.g1, quiz: QZ, plan: PL,
+  player: maya, lightLeader: lila, team: T.us, opponent: T.storm, lineup: id("abab00", 1), game: G.g1, quiz: QZ, plan: PL,
   bullpenScript: bullpen_scripts[0].id, spotlight: player_spotlights[0].id,
 };

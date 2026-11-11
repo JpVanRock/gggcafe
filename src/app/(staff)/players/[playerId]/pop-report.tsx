@@ -60,6 +60,7 @@ export function PopDetail({
   styles,
   canAct = canEdit,
   movementAccess = "open",
+  measurements,
 }: {
   player: Player;
   pop: PopReport;
@@ -73,6 +74,8 @@ export function PopDetail({
   photoUrl?: string | null;
   /** coaches: teams and seasons to move her to */
   move?: { teams: MoveTeam[]; seasons: MoveSeason[] } | null;
+  /** measurements by season (MeasurementsBySeason); without it, the latest/best table */
+  measurements?: React.ReactNode;
 }) {
   const facts: [string, string][] = [
     ["Position", player.primary_position ? `${player.primary_position} · ${POSITION_LABEL[player.primary_position]}` : "–"],
@@ -150,6 +153,7 @@ export function PopDetail({
         )}
       </section>
 
+      {measurements ?? (
       <section>
         <DetailHeading>Measurements</DetailHeading>
         {pop.metrics.length === 0 ? (
@@ -183,6 +187,7 @@ export function PopDetail({
           </TableScroll>
         )}
       </section>
+      )}
 
       {pop.evaluations.length > 0 && (
         <section>

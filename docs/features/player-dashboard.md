@@ -16,6 +16,18 @@
   active teams, plus `player_activities`; check-offs in `twis_checks`. Weeks start Monday;
   "today" uses `APP_TIME_ZONE` (default America/New_York) in `src/lib/dates.ts`.
 - Harada charts save through the `save_harada_plan` RPC (one transaction, RLS applies).
+- The top of her Goals page (user, 2026-11-10): "The Best Version of You" (`src/lib/best-version.ts`, the user's own
+  framework in our words): what she wants (her roadmap), what it will cost (her time), the price of admission, would I
+  want to be my teammate, then the 15 Minutes a Day Personal Challenge (what she'll do on her off days, with ideas and the
+  SafetyNote). Answers in `player_best_version` (she and coaches write; view-only staff and her mentors read). Shown
+  read-only on the mentor's page.
+- Measurements on her Pop Report (user, 2026-11-10; `src/lib/measurements.ts`, `measurements.tsx`): one row per
+  measurement, a column for each season of the softball year (Fall Season Sep-Nov, Winter Offseason Dec-Feb, Spring Season
+  Mar-May, Summer Season Jun-Aug; set by the date measured; latest value per season) and her best. Defaults for every
+  player: time to first, first to second, first to home, overhand throwing speed, rotational acceleration, connection score,
+  on-plane score; fastball speed for pitchers, pop time for catchers (primary or secondary position); her team's extras
+  (`team_measurements`, chosen in Dugout → Training → Measurements); anything else she's been measured on. Coaches add and
+  remove values on her Pop Report; earlier years by `?year=`. Rows are `measurements` (Testing results land there too).
 - Goals have two methods, chosen per player in the Goals pop-up (`players.goal_method`):
   Harada (full chart) or SMART (lighter; rows in `development_goals` with specific/measurable/
   achievable/relevant + target_date, optionally a metric target tracked against measurements).

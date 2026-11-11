@@ -137,7 +137,7 @@ tests/unit/              node --test unit tests (npm run test:unit)
 | Dugout Roster tab | `docs/features/dugout-roster.md` | The Roster tab: approvals, roster, player accounts |
 | Family & roster | `docs/features/family-roster.md` | Medical card, preseason questionnaire, parent welcome packet |
 | G3 Advanced | `docs/features/g3-advanced.md` | The paid book "How to Cook": chapters, position chapters, access |
-| G3 Leadership Guide | `docs/features/leadership-guide.md` | Leadership lessons, plan, sign-off, certificate, Leader Badge; voice rules |
+| G3 Leadership Guide | `docs/features/leadership-guide.md` | Full program and Leadership Light, lessons, plan, sign-off, certificate, Leader Badge; voice rules |
 | Game-day production | `docs/features/game-day-production.md` | DP/FLEX, umpire card, jobs, substitutions, staff duties, box scores, QAB/BP, stat explainers |
 | Hitting & Softball IQ | `docs/features/hitting-iq.md` | Offense IQ, My Zone, Hitting Approach chapter |
 | Legal | `docs/features/legal.md` | Terms of Service, Privacy & Security, footer disclaimer, sign-up agreement, safety and rewards notes |

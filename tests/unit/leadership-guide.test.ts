@@ -4,7 +4,8 @@ import assert from "node:assert/strict";
 import {
   ALL_LESSONS, BONUS, CHECKIN_SOURCE, checkInActivity, checkInChanges, BONUS_SHELVES, CORE_PARTS, ENGAGEMENT_ASK, HABITS, LADDER, LEADER_ROLES, LESSONS, RUBRIC, RUBRIC_MAX, SCENARIOS,
   SCENARIO_GROUPS, STARTER_GROUPS, answerKeys, bonusProgress, cleanAnswer, cleanPlan, courseReady, findLesson, guideProgress, lessonLabel,
-  lessonNumber, planReady, rubricTotal, validCoachRating,
+  lessonNumber, planReady, rubricTotal, validCoachRating, LIGHT_LESSONS, LIGHT_PARTS, LIGHT_KEYS, LIGHT_PLAN_SHOW, LIGHT_COMMITMENT, PROGRAMS, isProgram,
+  programLessons, lessonProgram, certificateFor, certificateProgram, CERTIFICATE, CERTIFICATE_LIGHT,
 } from "../../src/lib/leadership-guide.ts";
 
 test("twenty-five core lessons on a seven-rung ladder, and twenty-two Extra Reps", () => {
@@ -29,7 +30,7 @@ test("every lesson is complete and its keys are safe to store", () => {
   for (const l of ALL_LESSONS) {
     assert.match(l.slug, /^[a-z0-9-]{1,40}$/);
     assert.ok(l.bigIdea && l.body.length, `${l.slug}: text`);
-    assert.equal(l.questions.length, 3, `${l.slug}: three questions`);
+    assert.equal(l.questions.length, l.kind === "light" ? 2 : 3, `${l.slug}: questions`);
     assert.ok(l.steps.length >= 2 && l.steps.length <= 3, `${l.slug}: two or three steps`);
     const keys = answerKeys(l);
     assert.equal(new Set(keys).size, keys.length, `${l.slug}: unique answer keys`);
@@ -113,4 +114,50 @@ test("check-in dates become one-day TWIS reminders, kept in step with the plan",
     remove: ["drop"],
   });
   assert.deepEqual(checkInChanges([], existing).remove, ["keep", "drop"]);
+});
+
+test("Leadership Light: eight short lessons of its own, for players 11 and under", () => {
+  assert.equal(LIGHT_LESSONS.length, 8);
+  assert.deepEqual([...PROGRAMS], ["full", "light"]);
+  assert.ok(isProgram("light") && isProgram("full") && !isProgram("medium") && !isProgram(undefined));
+  assert.equal(programLessons("light"), LIGHT_LESSONS);
+  assert.equal(programLessons("full"), LESSONS);
+  for (const [i, l] of LIGHT_LESSONS.entries()) {
+    assert.equal(l.kind, "light");
+    assert.match(l.slug, /^light-/, `${l.slug}: light- slug`);
+    assert.ok((LIGHT_PARTS as readonly string[]).includes(l.part), `${l.slug}: part`);
+    assert.equal(l.tool, undefined, `${l.slug}: no tools in Light`);
+    assert.equal(l.steps.length, 2, `${l.slug}: two challenges`);
+    assert.equal(lessonNumber(l.slug), i + 1);
+    assert.equal(lessonLabel(l), `Lesson ${i + 1}`);
+    assert.equal(lessonProgram(l), "light");
+    // short and readable: a big idea of one sentence and two short paragraphs
+    assert.ok(l.bigIdea.length <= 100 && l.body.length <= 2, `${l.slug}: short`);
+    assert.ok(l.body.every((p) => p.length <= 320), `${l.slug}: short paragraphs`);
+  }
+  assert.equal(lessonProgram(LESSONS[0]), "full");
+  assert.equal(lessonProgram(BONUS[0]), "full");
+  for (const part of LIGHT_PARTS) assert.ok(LIGHT_LESSONS.some((l) => l.part === part), `${part}: has lessons`);
+  assert.ok(LIGHT_KEYS.length >= 3 && LIGHT_COMMITMENT.length >= 3);
+});
+
+test("Leadership Light: its own progress, a short plan and its own certificate", () => {
+  const done = (lesson: string) => ({ lesson, answers: {}, steps: [], completedAt: "2026-11-10T12:00:00Z" });
+  const light = LIGHT_LESSONS.map((l) => done(l.slug));
+  assert.equal(guideProgress([], "light").next?.slug, LIGHT_LESSONS[0].slug);
+  assert.equal(guideProgress(light, "light").done, 8);
+  assert.ok(courseReady(light, "2026-11-10T12:00:00Z", "light"));
+  assert.ok(!courseReady(light, "2026-11-10T12:00:00Z"), "Light lessons don't finish the Full program");
+  assert.ok(!courseReady(LESSONS.map((l) => done(l.slug)), "2026-11-10T12:00:00Z", "light"), "Full lessons don't finish Light");
+  // the short plan still meets the commit rule: a why, one habit, one goal
+  assert.deepEqual([LIGHT_PLAN_SHOW.habits, LIGHT_PLAN_SHOW.goals], [1, 1]);
+  assert.ok(planReady(cleanPlan({ why: "Make my team better", habits: ["Cheer every pitch"], goals: [{ goal: "Learn every teammate's name", steps: [] }] })));
+  assert.equal(certificateFor("light").text, CERTIFICATE_LIGHT);
+  assert.equal(certificateFor("full").text, CERTIFICATE);
+  assert.match(CERTIFICATE_LIGHT.completed, /Leadership Light/);
+  assert.equal(CERTIFICATE_LIGHT.honor, CERTIFICATE.honor, "both earn the Team Leader badge");
+  // finishing Full after Light upgrades the certificate; a Full certificate is never traded down
+  assert.equal(certificateProgram("full", "light"), "full");
+  assert.equal(certificateProgram("light", null), "light");
+  assert.equal(certificateProgram("light", "full"), "full");
 });

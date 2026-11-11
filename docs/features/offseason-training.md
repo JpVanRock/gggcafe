@@ -13,6 +13,9 @@
     (context "Testing"), rated 1-5 (Building..Elite) against starter bands for girls by age tier, or the coach's own
     (`test_bands`, per age group); composite = average rating on 100. Coaches see the team table; a player sees only her
     own (Performance Training, `testing-data.ts`). No public rankings.
+  - Measurements (`/dugout/training/measurements`, user 2026-11-10): the built-in list every player's Pop Report shows by
+    season, and the extras a team's coaches tick for their team (`team_measurements`, up to 20; players read their own
+    team's list). See docs/features/player-dashboard.md.
   - Library: starter conditioning and landing/ACL drills (`drills.focus`: speed, agility, core, power, med-ball, landing).
   - Offseason draft (`/dugout/training/draft`, head coach/admin; user: the head coach names captains): `offseason_squads`
     + `offseason_squad_members` (captain = pick 0, snake order `onTheClock`), head-coach writes; players see squads via

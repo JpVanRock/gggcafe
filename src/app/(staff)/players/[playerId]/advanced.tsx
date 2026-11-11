@@ -7,7 +7,7 @@ import { EmptyState } from "@/components/ui";
 import type { AdvancedBook } from "./advanced-data";
 import { AdvancedAccessToggle } from "./advanced-client";
 import { MenuItem } from "./menu";
-import { guideProgress, type LessonWork } from "@/lib/leadership-guide";
+import { guideProgress, PROGRAM_NAME, type LessonWork, type Program } from "@/lib/leadership-guide";
 
 export const LEVEL_LABEL = "G3 Advanced · Level 2";
 
@@ -15,9 +15,9 @@ export function advancedHref(playerId: string, slug?: string) {
   return `/players/${playerId}/advanced${slug ? `/${slug}` : ""}`;
 }
 
-/** Menu board summary: her book, where she is in it. */
-export function AdvancedSummary({ book, leadership = null }: { book: AdvancedBook; leadership?: LessonWork[] | null }) {
-  const lead = leadership ? guideProgress(leadership) : null;
+/** Menu board summary: her book, where she is in it, and her leadership program when a coach picked her. */
+export function AdvancedSummary({ book, leadership = null }: { book: AdvancedBook; leadership?: { work: LessonWork[]; program: Program } | null }) {
+  const lead = leadership ? guideProgress(leadership.work, leadership.program) : null;
   const chapters = visibleChapters(book.confirmed);
   const progress = bookProgress(book.work, chapters);
   const coming = chapters.filter((c) => c.status === "coming").length;
@@ -32,7 +32,11 @@ export function AdvancedSummary({ book, leadership = null }: { book: AdvancedBoo
           note={progress.next ? progress.next.title : "Every chapter so far is complete"}
         />
         {lead && (
-          <MenuItem name="Leadership Guide" value={`${lead.done}/${lead.total}`} note={lead.next ? `Next: ${lead.next.title}` : "Every lesson complete"} />
+          <MenuItem
+            name={leadership?.program === "light" ? PROGRAM_NAME.light : "Leadership Guide"}
+            value={`${lead.done}/${lead.total}`}
+            note={lead.next ? `Next: ${lead.next.title}` : "Every lesson complete"}
+          />
         )}
       </div>
       <div className="mt-5">

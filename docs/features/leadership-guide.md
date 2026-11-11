@@ -18,6 +18,22 @@
   `habits` 44 grouped, `scenarios` 32 grouped with "A leader's move", `rubric` 13 areas rated 1-5 by
   her and her coach), My Leadership Plan (`/plan`), coach notes. Her work is keyed by lesson slug
   (`player_leadership_lessons`; slugs must never be "plan" or "certificate", which are pages).
+- Two programs (user, 2026-11-10): when a coach picks a player they choose the Full Leadership Program
+  (everything above) or Leadership Light (`player_leadership_access.program` = `full` | `light`; picks made
+  before default to `full`). Both are part of G3 Advanced (`has_leadership()` unchanged).
+  Leadership Light, for players 11 and under: `LIGHT_LESSONS` (8 lessons, slugs `light-...`, parts
+  `LIGHT_PARTS`: Lead yourself, Lead your team; two questions and two challenges each, no tools), `LIGHT_INTRO`,
+  `LIGHT_KEYS` (what she'll build, on the first page and the certificate's edge), "My Leader Plan" (the same plan
+  record, showing `LIGHT_PLAN_SHOW`: her why, one habit, one goal with two steps, two check-ins; the rest of
+  the plan is kept untouched), `LIGHT_COMMITMENT`. No Extra Reps, no rubric. Same voice in simpler words for
+  younger players: still sleek and athletic, never babyish, no emoji.
+  Pages follow her program (`lead.program`); a lesson of the other program is a 404. Coaches pick, switch
+  and remove on her book page and the guide's first page (`LeaderToggle`). Switching keeps every lesson and
+  the plan text, puts the plan back to draft and clears the sign-off (each program is signed off on its
+  own); the certificate stays until she earns the next one.
+  Finishing Light earns its own certificate (`CERTIFICATE_LIGHT`, "has completed G3 Leadership Light") and
+  the same Leader Badge (`player_leadership_certificates.program`). Finishing Full later upgrades it; a Full
+  certificate is never traded down (`certificateProgram`). Sample data: Lila is in Light (smoke-tested pages).
 - Completion (user, 2026-11-08): every core lesson complete + plan committed, then the coach signs
   off on the plan page, which awards the Certificate of Leadership and the Leader Badge
   (`player_leadership_certificates`: team at the time for the logo, coach's printed name).

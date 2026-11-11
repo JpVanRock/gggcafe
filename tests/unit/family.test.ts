@@ -4,11 +4,13 @@ import assert from "node:assert/strict";
 import { PACKET_STARTERS, cleanMedical, cleanQuestionnaire, medicalOnFile } from "../../src/lib/family.ts";
 
 test("questionnaire: sizes, numbers, positions", () => {
-  const q = cleanQuestionnaire({ top_size: "AM", bottom_size: "XL", numbers: ["7", "7", "00", "21", "3"], positions: ["SS", "P", "XX", "SS"], goals: "  Start at short  " });
+  const q = cleanQuestionnaire({ top_size: "AM", bottom_size: "XL", sock_size: "YL", jacket_size: "AL", numbers: ["7", "7", "00", "21", "3"], positions: ["SS", "P", "XX", "SS"], goals: "  Start at short  " });
   assert.ok(typeof q !== "string");
   if (typeof q === "string") return;
   assert.equal(q.top_size, "AM");
   assert.equal(q.bottom_size, null);
+  assert.equal(q.sock_size, "YL");
+  assert.ok(!("jacket_size" in q), "no jacket size any more");
   assert.deepEqual(q.numbers, ["7", "00", "21"]);
   assert.deepEqual(q.positions, ["SS", "P"]);
   assert.equal(q.goals, "Start at short");

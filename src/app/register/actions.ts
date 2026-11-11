@@ -56,6 +56,7 @@ export async function registerAccount(_prev: RegisterState, fd: FormData): Promi
   if (!values.name || values.name.length > 80) return fail("Enter your name.", "name");
   if ((player || mentor || coach) && !/\s/.test(values.name)) return fail("Enter your first and last name.", "name");
   if (parent && (!values.child || values.child.length > 80)) return fail("Enter your daughter's first and last name.", "child");
+  if (headCoach && !values.org) return fail("Enter your team or organization.", "org");
   if (!/^\S+@\S+\.\S+$/.test(values.email)) return fail("Enter a valid email address.", "email");
   if (password.length < 8) return fail("Use a password of at least 8 characters.", "password");
   if (password !== String(fd.get("confirm") ?? "")) return fail("The two passwords don't match.", "confirm");

@@ -22,7 +22,7 @@ import { SmartSummary } from "./smart";
 import { TwisBoard } from "./twis";
 import { AdvancedLocked, AdvancedSummary, LEVEL_LABEL, advancedHref } from "./advanced";
 import type { AdvancedBook } from "./advanced-data";
-import type { LessonWork } from "@/lib/leadership-guide";
+import type { LessonWork, Program } from "@/lib/leadership-guide";
 import { PlayerName } from "./player-name";
 import { MentorAlerts } from "./mentor-messages";
 import type { MentorMessage } from "@/lib/message-photos";
@@ -69,7 +69,7 @@ export function PlayerMenu({
   /** G3 Advanced: shown only when unlocked for her */
   advanced: AdvancedBook;
   /** her G3 Leadership Guide work, when she's in it */
-  leadership?: LessonWork[] | null;
+  leadership?: { work: LessonWork[]; program: Program } | null;
   /** she earned the Leader Badge (only coaches/admins and she herself are told) */
   leader?: boolean;
   /** messages from her mentors: new ones show as alerts at the top */

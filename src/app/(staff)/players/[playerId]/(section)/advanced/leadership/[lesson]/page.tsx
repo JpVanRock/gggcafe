@@ -3,8 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buttonClass, secondaryButtonClass, eyebrowClass } from "@/components/ui";
 import {
-  ANSWER_MAX, BONUS, BONUS_TITLE, ENGAGEMENT_ASK, ENGAGEMENT_LEVELS, GUIDE_TITLE, HABITS, LEADER_ROLES, LESSONS, RUBRIC, RUBRIC_LEVELS,
-  SCENARIOS, SCENARIO_GROUPS, STARTER_GROUPS, findLesson, lessonLabel,
+  ANSWER_MAX, BONUS, BONUS_TITLE, ENGAGEMENT_ASK, ENGAGEMENT_LEVELS, GUIDE_TITLE, HABITS, LEADER_ROLES, RUBRIC, RUBRIC_LEVELS,
+  SCENARIOS, SCENARIO_GROUPS, STARTER_GROUPS, findLesson, lessonLabel, lessonList, lessonProgram, programTitle,
 } from "@/lib/leadership-guide";
 import { AnswerBox, HabitsTool, LessonDone, RubricTool, StepChecks } from "../../../../leadership-client";
 import { LeadershipClosed, leadershipContext, leadershipHref } from "../../../../leadership";
@@ -29,23 +29,26 @@ export default async function LeadershipLessonPage({ params }: PageProps<"/playe
     );
   }
 
-  const list = lesson.kind === "core" ? LESSONS : BONUS;
+  // each program shows only its own lessons (Extra Reps are part of the Full program)
+  if (lessonProgram(lesson) !== lead.program) notFound();
+  const light = lead.program === "light";
+  const list = lessonList(lesson);
   const index = list.indexOf(lesson);
   const work = lead.work.find((w) => w.lesson === lesson.slug);
   const answers = work?.answers ?? {};
   const prev = list[index - 1];
   const next = list[index + 1];
   const canEdit = access.canAct;
-  const of = lesson.kind === "core" ? `of ${LESSONS.length}` : `of ${BONUS.length} · ${BONUS_TITLE}`;
+  const of = lesson.kind === "bonus" ? `of ${BONUS.length} · ${BONUS_TITLE}` : `of ${list.length}`;
   const answerBox = (key: string, label: string, rows = 3) => (
     <AnswerBox playerId={player.id} lesson={lesson.slug} answerKey={key} label={label} initial={answers[key] ?? ""} canEdit={canEdit} maxLength={ANSWER_MAX} rows={rows} />
   );
 
   return (
-    <SectionShell title={lesson.title} subtitle={`${lessonLabel(lesson)} ${of} · ${lesson.part} · ${GUIDE_TITLE}`}>
+    <SectionShell title={lesson.title} subtitle={`${lessonLabel(lesson)} ${of} · ${lesson.part} · ${programTitle(lead.program)}`}>
       <div className="flex flex-col gap-10">
         <Link href={leadershipHref(player.id)} className="-mt-2 self-start text-sm text-link hover:underline">
-          ← Leadership Guide
+          ← {light ? "Leadership Light" : "Leadership Guide"}
         </Link>
 
         <p className="max-w-3xl border-l-4 border-neon pl-4 text-2xl leading-snug font-semibold text-ink sm:text-3xl">{lesson.bigIdea}</p>
@@ -219,9 +222,9 @@ export default async function LeadershipLessonPage({ params }: PageProps<"/playe
             <Link href={leadershipHref(player.id, next.slug)} className={buttonClass}>
               {lessonLabel(next)}: {next.title} →
             </Link>
-          ) : lesson.kind === "core" ? (
+          ) : lesson.kind !== "bonus" ? (
             <Link href={leadershipHref(player.id, "plan")} className={buttonClass}>
-              Write my Leadership Plan →
+              {light ? "Write my Leader Plan →" : "Write my Leadership Plan →"}
             </Link>
           ) : (
             <Link href={`${leadershipHref(player.id)}#extra-reps`} className={buttonClass}>

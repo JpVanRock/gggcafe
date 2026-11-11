@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { COMMITMENT, GUIDE_TITLE, PLAN_LIMITS, RUBRIC, RUBRIC_LEVELS, RUBRIC_MAX, courseReady, guideProgress, lessonNumber, rubricTotal } from "@/lib/leadership-guide";
+import {
+  COMMITMENT, GUIDE_TITLE, LIGHT_COMMITMENT, LIGHT_PLAN_SHOW, PLAN_LIMITS, RUBRIC, RUBRIC_LEVELS, RUBRIC_MAX, courseReady, guideProgress, lessonNumber,
+  programTitle, rubricTotal,
+} from "@/lib/leadership-guide";
 import { LeaderBadge } from "@/components/leader-badge";
 import { CoachSignOff, PlanForm } from "../../../../leadership-client";
 import { LeadershipClosed, leadershipContext, leadershipHref } from "../../../../leadership";
@@ -23,16 +26,18 @@ export default async function LeadershipPlanPage({ params }: PageProps<"/players
   const level = (v: string | undefined) => (v ? `${v} · ${RUBRIC_LEVELS[Number(v) - 1]}` : "–");
   const mine = rubricTotal(self);
   const coach = rubricTotal(lead.review.ratings);
-  const progress = guideProgress(lead.work);
-  const ready = courseReady(lead.work, lead.committedAt);
+  const light = lead.program === "light";
+  const progress = guideProgress(lead.work, lead.program);
+  const ready = courseReady(lead.work, lead.committedAt, lead.program);
 
   return (
-    <SectionShell title="My Leadership Plan" subtitle={`${name} · ${GUIDE_TITLE}`}>
+    <SectionShell title={light ? "My Leader Plan" : "My Leadership Plan"} subtitle={`${name} · ${programTitle(lead.program)}`}>
       <div className="flex flex-col gap-10">
         <Link href={leadershipHref(player.id)} className="-mt-2 self-start text-sm text-link hover:underline">
-          ← Leadership Guide
+          ← {light ? "Leadership Light" : "Leadership Guide"}
         </Link>
 
+        {!light && (
         <section>
           <h2 className="mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Where I stand</h2>
           <div className="overflow-x-auto rounded-xl border border-navy-700">
@@ -70,8 +75,18 @@ export default async function LeadershipPlanPage({ params }: PageProps<"/players
             .
           </p>
         </section>
+        )}
 
-        <PlanForm playerId={player.id} plan={lead.plan} committedAt={lead.committedAt} commitment={COMMITMENT} canEdit={access.canAct} limits={PLAN_LIMITS} />
+        <PlanForm
+          playerId={player.id}
+          plan={lead.plan}
+          committedAt={lead.committedAt}
+          commitment={light ? LIGHT_COMMITMENT : COMMITMENT}
+          canEdit={access.canAct}
+          limits={PLAN_LIMITS}
+          light={light}
+          show={light ? LIGHT_PLAN_SHOW : undefined}
+        />
 
         <section className="border-t border-navy-700 pt-5">
           <h2 className="mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Coach sign-off</h2>

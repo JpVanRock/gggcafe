@@ -1,6 +1,7 @@
 // G3 Leadership Guide: part of G3 Advanced, for the players a coach chooses to
-// train as leaders. Twenty-five core lessons, a personal leadership plan, and
-// Extra Reps (optional short lessons), written for GGG.Cafe in the voice of a
+// train as leaders. The coach picks the Full Leadership Program (twenty-five core
+// lessons, a personal leadership plan, Extra Reps) or Leadership Light (eight short
+// lessons and a short plan, for players 11 and under), written for GGG.Cafe in the voice of a
 // veteran athlete talking to her teammate: bold, honest about fear and failure,
 // all about owning your choices and lifting the team. Simple, direct, no quotes.
 //
@@ -34,8 +35,23 @@ export const LADDER = [
 
 export const CORE_PARTS = ["Why it matters", "Lead yourself", "Lead others", "Lead the team", "Learn from the greats", "Keep climbing"] as const;
 export const BONUS_SHELVES = ["Lead", "Team and culture", "Character", "Mental toughness", "Know your why"] as const;
+export const LIGHT_PARTS = ["Lead yourself", "Lead your team"] as const;
 export type CorePart = (typeof CORE_PARTS)[number];
 export type BonusShelf = (typeof BONUS_SHELVES)[number];
+export type LightPart = (typeof LIGHT_PARTS)[number];
+
+/**
+ * The two programs a coach can pick (user, 2026-11-10): the Full Leadership Program (the
+ * 25-lesson guide, Extra Reps, the rubric) or Leadership Light, eight short lessons for
+ * players 11 and under. Both are part of G3 Advanced and both earn the Leader Badge.
+ */
+export type Program = "full" | "light";
+export const PROGRAMS: readonly Program[] = ["full", "light"];
+export const isProgram = (v: unknown): v is Program => v === "full" || v === "light";
+export const PROGRAM_NAME: Record<Program, string> = { full: "Full Leadership Program", light: "Leadership Light" };
+/** What the player sees at the top of her pages. */
+export const LIGHT_TITLE = "G3 Leadership Light";
+export const programTitle = (p: Program) => (p === "light" ? LIGHT_TITLE : GUIDE_TITLE);
 
 export type HabitItem = { key: string; group: string; text: string };
 export type Scenario = { key: string; group: string; title: string; situation: string; move: string };
@@ -46,9 +62,10 @@ export type LessonTool = "habits" | "rubric" | "scenarios" | "starters" | "roles
 
 export type Lesson = {
   slug: string;
-  kind: "core" | "bonus";
-  /** the core part or the bonus shelf it sits in */
-  part: CorePart | BonusShelf;
+  /** core: the Full program's course; bonus: its Extra Reps; light: Leadership Light */
+  kind: "core" | "bonus" | "light";
+  /** the core part, the bonus shelf or the Leadership Light part it sits in */
+  part: CorePart | BonusShelf | LightPart;
   title: string;
   /** the one thing to remember */
   bigIdea: string;
@@ -67,6 +84,7 @@ export type Lesson = {
 type LessonText = Omit<Lesson, "kind">;
 const core = (lessons: LessonText[]): Lesson[] => lessons.map((l) => ({ ...l, kind: "core" }));
 const bonus = (lessons: LessonText[]): Lesson[] => lessons.map((l) => ({ ...l, kind: "bonus" }));
+const light = (lessons: LessonText[]): Lesson[] => lessons.map((l) => ({ ...l, kind: "light" }));
 
 // ---------------------------------------------------------------------------
 // The core lessons (the course: all of them, plus a committed plan and the
@@ -1303,7 +1321,219 @@ export const BONUS: Lesson[] = bonus([
   },
 ]);
 
-export const ALL_LESSONS: Lesson[] = [...LESSONS, ...BONUS];
+// ---------------------------------------------------------------------------
+// Leadership Light: the heart of the guide for players 11 and under. Eight short
+// lessons, a short plan, the coach's sign-off. Same voice, simpler words: never
+// babyish, never cutesy, no emoji. Slugs start with "light-".
+// ---------------------------------------------------------------------------
+
+export const LIGHT_INTRO = [
+  "Your coach picked you for this because they see a leader in you. Leading doesn't mean being perfect, the oldest or the best player. It means making your team better.",
+  "Eight short lessons. Read each one, answer the questions, and take the challenges to practice. Then write your leader plan, get your coach's sign-off, and earn your certificate.",
+];
+
+/** What the eight lessons build, shown on the program's first page and the certificate. */
+export const LIGHT_KEYS = ["Choose to lead", "Give your best", "Lead by example", "Lift your teammates", "Protect your team"] as const;
+
+export const LIGHT_LESSONS: Lesson[] = light([
+  {
+    slug: "light-what-is-a-leader",
+    part: "Lead yourself",
+    title: "What Is a Leader?",
+    bigIdea: "A leader makes her team better. You don't need a title to do it.",
+    body: [
+      "A leader isn't always the oldest, the loudest or the best player on the field. A leader is anyone who helps her team get better: by how she works, how she talks and how she treats people.",
+      "That means you can lead right now. Every practice and every game, what you do rubs off on your teammates. Leaders make sure it rubs off the right way.",
+    ],
+    lists: [
+      {
+        title: "Leaders on our team",
+        points: [
+          "Hustle on and off the field.",
+          "Cheer for teammates, even from the bench.",
+          "Pick up the gear without being asked.",
+          "Tell a teammate \"nice play\" and mean it.",
+          "Listen the first time the coach talks.",
+        ],
+      },
+    ],
+    questions: [
+      { key: "q1", text: "Who's a leader you look up to? What does she do that makes people want to follow her?" },
+      { key: "q2", text: "What's one way you already help your team?" },
+    ],
+    steps: [
+      { key: "s1", text: "Do one thing at practice this week that helps the team, without being asked." },
+      { key: "s2", text: "Tell a teammate one thing she did well." },
+    ],
+  },
+  {
+    slug: "light-choose-to-lead",
+    part: "Lead yourself",
+    title: "Choose to Lead",
+    bigIdea: "Leading is a choice you make every day, not something you wait for.",
+    body: [
+      "Nobody hands you leadership. You choose it. You choose to show up ready, to try your hardest, and to be a good teammate, even when you're tired or things aren't going your way.",
+      "Leaders own their stuff. When you make a mistake, say so, fix it and move on. No excuses, and no blaming the umpire, the field or a teammate.",
+    ],
+    questions: [
+      { key: "q1", text: "What does choosing to lead look like at your next practice?" },
+      { key: "q2", text: "Think of a mistake you made. How could you own it like a leader?" },
+    ],
+    steps: [
+      { key: "s1", text: "When you mess up this week, say \"that's on me\" and get ready for the next play." },
+      { key: "s2", text: "Get to practice early and ready, with all your gear." },
+    ],
+  },
+  {
+    slug: "light-all-in",
+    part: "Lead yourself",
+    title: "All In",
+    bigIdea: "Bring your best effort and your best attitude, every inning and every practice.",
+    body: [
+      "Being all in means your body, your focus and your attitude all show up. You run hard to first even on a routine grounder. You stay locked in out in right field, even when nothing's been hit to you for three innings.",
+      "Effort and attitude are two things you control every single day. Nobody can take them away from you, and your teammates notice when you bring them.",
+    ],
+    lists: [
+      {
+        title: "All in looks like",
+        points: [
+          "Sprinting on and off the field.",
+          "Running out every ball you hit.",
+          "Backing up every play.",
+          "Staying in the game from the dugout.",
+          "Going hard at the drill you don't love.",
+        ],
+      },
+    ],
+    questions: [
+      { key: "q1", text: "When is it hardest for you to stay all in? What can you do about it?" },
+      { key: "q2", text: "What's one thing you'll do at every practice to show you're all in?" },
+    ],
+    steps: [
+      { key: "s1", text: "Run out every ball you hit this week, all the way through first base." },
+      { key: "s2", text: "Pick one drill you don't love and give it your best effort." },
+    ],
+  },
+  {
+    slug: "light-actions-first",
+    part: "Lead yourself",
+    title: "Actions Speak Loudest",
+    bigIdea: "Your teammates watch what you do more than they listen to what you say.",
+    body: [
+      "It's easy to tell people to work hard. Leaders show them. Want your team to hustle? Hustle first. Want the dugout clean? Clean it first.",
+      "Do the little things right, even when nobody's watching: listen the first time, help carry the equipment, and follow the team rules at practice, at games and in the dugout.",
+    ],
+    questions: [
+      { key: "q1", text: "What's something you want your team to do better? How can you show them first?" },
+      { key: "q2", text: "What's a little thing you could do right that nobody would even notice?" },
+    ],
+    steps: [
+      { key: "s1", text: "Help carry or clean up the team's gear after practice." },
+      { key: "s2", text: "Be the first one in when the coach calls the team together." },
+    ],
+  },
+  {
+    slug: "light-great-teammate",
+    part: "Lead your team",
+    title: "Be a Great Teammate",
+    bigIdea: "People follow teammates they trust, and trust starts with how you treat people.",
+    body: [
+      "Get to know every teammate, not just your best friend on the team. Learn something about each of them outside of softball. Warm up with someone new. Make sure nobody sits alone in the dugout.",
+      "Great teammates are happy for each other. When a teammate makes a great play or gets a big hit, be the first one out of the dugout to celebrate.",
+    ],
+    questions: [
+      { key: "q1", text: "Which teammate do you know the least? What's one thing you could learn about her?" },
+      { key: "q2", text: "How do you want a new player to feel on your team?" },
+    ],
+    steps: [
+      { key: "s1", text: "Learn one new thing about a teammate you don't know well." },
+      { key: "s2", text: "Ask a different teammate to be your throwing partner." },
+    ],
+  },
+  {
+    slug: "light-talk-like-a-leader",
+    part: "Lead your team",
+    title: "Talk Like a Leader",
+    bigIdea: "Leaders listen first, then use their words to lift people up.",
+    body: [
+      "Good leaders are good listeners. Look at your coach when she's talking. Let teammates finish what they're saying. Ask a question when you don't understand.",
+      "When you talk, make it loud, positive and useful. Call the ball on a pop-up. Remind the outfield how many outs there are. Cheer from the dugout. Say things that help, never things that hurt.",
+    ],
+    lists: [
+      {
+        title: "Leader talk",
+        points: [
+          "\"Two outs, play's at first!\"",
+          "\"Shake it off, next one's yours.\"",
+          "\"Great hustle!\"",
+          "\"I've got your back.\"",
+          "\"Let's go, we've got this.\"",
+        ],
+      },
+    ],
+    questions: [
+      { key: "q1", text: "What's something a teammate said to you that made you play better?" },
+      { key: "q2", text: "What could you say to a teammate who just struck out?" },
+    ],
+    steps: [
+      { key: "s1", text: "Call out the number of outs to your teammates before every pitch for a whole inning." },
+      { key: "s2", text: "Say something encouraging to three teammates at your next practice." },
+    ],
+  },
+  {
+    slug: "light-pick-them-up",
+    part: "Lead your team",
+    title: "Pick Your Teammates Up",
+    bigIdea: "Everybody makes errors. Leaders help their teammates bounce back.",
+    body: [
+      "Softball is a game of failure. Great hitters still make outs most of the time, and every fielder boots a ground ball sometimes. What matters is what happens next.",
+      "When a teammate makes an error or strikes out, don't sigh, roll your eyes or look away. Tell her to shake it off and get her ready for the next pitch. When you're the one who messed up, take a deep breath, reset and be ready.",
+    ],
+    questions: [
+      { key: "q1", text: "How do you feel after you make an error? What helps you reset?" },
+      { key: "q2", text: "What will you say or do the next time a teammate makes a mistake?" },
+    ],
+    steps: [
+      { key: "s1", text: "After a teammate's error, say something that helps her reset." },
+      { key: "s2", text: "Pick a reset move for yourself, like a deep breath or a tap of your glove, and use it after your next mistake." },
+    ],
+  },
+  {
+    slug: "light-protect-the-team",
+    part: "Lead your team",
+    title: "Protect Your Team",
+    bigIdea: "A team is only as strong as how its players treat each other when the coach isn't looking.",
+    body: [
+      "Your team has rules and standards: be on time, work hard, respect everyone. Leaders follow them all the time, not just when a coach is watching.",
+      "If teammates are being mean, leaving someone out or talking trash about the team, a leader speaks up. It takes courage, so keep it simple: \"Hey, that's not who we are.\" Then bring in the person who was left out. If it's serious, tell your coach or a parent.",
+    ],
+    questions: [
+      { key: "q1", text: "What's one rule or standard your team has? Why does it matter?" },
+      { key: "q2", text: "What would you do if you saw a teammate being left out?" },
+    ],
+    steps: [
+      { key: "s1", text: "Bring a teammate who's by herself into a drill, a game of catch or a conversation." },
+      { key: "s2", text: "Follow every team rule this week, even when no coach is around." },
+    ],
+  },
+]);
+
+/** The Leadership Light plan: why, one habit, one goal with two steps, two check-ins. */
+export const LIGHT_PLAN_SHOW = { habits: 1, goals: 1, checkIns: 2, reflection: false };
+export const LIGHT_COMMITMENT = [
+  "I choose to lead.",
+  "I'll bring my best effort and my best attitude.",
+  "I'll show my team the way with my actions.",
+  "I'll be a great teammate to everyone.",
+  "I'll pick my teammates up when they make mistakes.",
+];
+
+export const ALL_LESSONS: Lesson[] = [...LESSONS, ...BONUS, ...LIGHT_LESSONS];
+
+/** The lessons a program's course is made of (the sign-off needs all of them). */
+export const programLessons = (p: Program) => (p === "light" ? LIGHT_LESSONS : LESSONS);
+/** The program a lesson belongs to (Extra Reps are part of the Full program). */
+export const lessonProgram = (l: Lesson): Program => (l.kind === "light" ? "light" : "full");
 
 export function findLesson(slug: string) {
   return ALL_LESSONS.find((l) => l.slug === slug) ?? null;
@@ -1553,6 +1783,17 @@ export const CERTIFICATE = {
   detail: `${LESSONS.length} lessons on leading herself, leading others and leading the team, a personal leadership plan, and her coach's sign-off.`,
   creed: "She chose to lead. She owns her words and her actions, lifts every teammate, and guards the culture.",
 };
+export const CERTIFICATE_LIGHT: typeof CERTIFICATE = {
+  title: "Certificate of Leadership",
+  honor: "Team Leader",
+  presented: "This certifies that",
+  completed: `has completed ${LIGHT_TITLE}`,
+  detail: `${LIGHT_LESSONS.length} lessons on leading herself and leading her team, a leader plan, and her coach's sign-off.`,
+  creed: "She chose to lead. She brings her best, shows the way and lifts every teammate.",
+};
+/** The certificate's words and the list along its edge, by the program she finished. */
+export const certificateFor = (p: Program) =>
+  p === "light" ? { text: CERTIFICATE_LIGHT, rungs: LIGHT_KEYS as readonly string[] } : { text: CERTIFICATE, rungs: LADDER as readonly string[] };
 export const LEADER_BADGE = "Team Leader";
 
 // ---------------------------------------------------------------------------
@@ -1562,17 +1803,21 @@ export const LEADER_BADGE = "Team Leader";
 /** Her work on one lesson: answers (question keys, tool keys), steps done, finished. */
 export type LessonWork = { lesson: string; answers: Record<string, string>; steps: string[]; completedAt: string | null };
 
-/** Its number among the core lessons, or among the Extra Reps. */
+/** The list a lesson is numbered in: the Full course, the Extra Reps or Leadership Light. */
+export function lessonList(lesson: Lesson) {
+  return lesson.kind === "core" ? LESSONS : lesson.kind === "light" ? LIGHT_LESSONS : BONUS;
+}
+
+/** Its number among the core lessons, the Extra Reps or the Leadership Light lessons. */
 export function lessonNumber(slug: string) {
   const lesson = findLesson(slug);
   if (!lesson) return null;
-  const list = lesson.kind === "core" ? LESSONS : BONUS;
-  return list.indexOf(lesson) + 1;
+  return lessonList(lesson).indexOf(lesson) + 1;
 }
 
 /** The lesson's place for links: "Lesson 7" or "Extra Rep 3". */
 export function lessonLabel(lesson: Lesson) {
-  return `${lesson.kind === "core" ? "Lesson" : "Extra Rep"} ${lessonNumber(lesson.slug)}`;
+  return `${lesson.kind === "bonus" ? "Extra Rep" : "Lesson"} ${lessonNumber(lesson.slug)}`;
 }
 
 function progressOf(list: Lesson[], work: LessonWork[]) {
@@ -1580,19 +1825,24 @@ function progressOf(list: Lesson[], work: LessonWork[]) {
   return { done: list.filter(finished).length, total: list.length, next: list.find((l) => !finished(l)) ?? null };
 }
 
-/** The core course. */
-export function guideProgress(work: LessonWork[]) {
-  return progressOf(LESSONS, work);
+/** The program's course: the 25 core lessons, or the Leadership Light lessons. */
+export function guideProgress(work: LessonWork[], program: Program = "full") {
+  return progressOf(programLessons(program), work);
 }
 
 export function bonusProgress(work: LessonWork[]) {
   return progressOf(BONUS, work);
 }
 
-/** Ready for the coach's sign-off (and the certificate): every core lesson done and the plan committed. */
-export function courseReady(work: LessonWork[], committedAt: string | null) {
-  const p = guideProgress(work);
+/** Ready for the coach's sign-off (and the certificate): every lesson of her program done and the plan committed. */
+export function courseReady(work: LessonWork[], committedAt: string | null, program: Program = "full") {
+  const p = guideProgress(work, program);
   return p.done === p.total && Boolean(committedAt);
+}
+
+/** The certificate's program after a sign-off: a Full certificate is never traded down for a Light one. */
+export function certificateProgram(signedOff: Program, current: Program | null): Program {
+  return current === "full" ? "full" : signedOff;
 }
 
 /** The keys she can save answers under in a lesson: its questions, plus its tool's items. */

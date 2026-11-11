@@ -83,8 +83,8 @@ export function RegisterForm() {
         </Field>
       )}
       {headCoach && (
-        <Field label="Your team or organization (optional)" hint="Helps the admin approve you. You register the team itself after approval.">
-          <input name="org" maxLength={120} autoComplete="organization" defaultValue={state.values.org} className={inputClass} />
+        <Field label="Your team or organization" hint="Helps the admin approve you. You register the team itself after approval.">
+          <input name="org" required maxLength={120} autoComplete="organization" defaultValue={state.values.org} className={inputClass} />
         </Field>
       )}
       {mentor && (

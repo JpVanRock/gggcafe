@@ -14,6 +14,7 @@ import { parseSwings } from "@/lib/box-score";
 import { todayISO } from "@/lib/dates";
 import { PHASE_KINDS, SQUAD_MAX, SQUAD_MIN, TESTS, onTheClock, suggestRoadmap, testByKey, tierFor, validCutoffs } from "@/lib/training-plan";
 import { STALE, failed, must, runAction } from "@/lib/actions";
+import { BUILT_IN_KEYS, TEAM_EXTRA_MAX } from "@/lib/measurements";
 
 const category_is_pitching = (fd: FormData) => fd.get("category") === "pitching";
 
@@ -373,6 +374,26 @@ export async function removeBpRound(_prev: FormState, fd: FormData): Promise<For
     if (!isUuid(id)) return failed(STALE);
     const supabase = await createClient();
     must(await supabase.from("bp_rounds").delete().eq("id", id));
+    refresh();
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Measurements: the extras a team's coaches add to every player's POP Report
+// ---------------------------------------------------------------------------
+
+/** The team's extra measurements: checkboxes "metric" (metrics.key), in the order shown. */
+export async function saveTeamMeasurements(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await editorCheck();
+    if (denied) return failed(denied);
+    const teamId = text(fd, "team_id");
+    if (!isUuid(teamId)) return failed(STALE);
+    const keys = [...new Set(fd.getAll("metric").map(String))].filter((k) => /^[a-z0-9_]+$/.test(k) && !BUILT_IN_KEYS.includes(k));
+    if (keys.length > TEAM_EXTRA_MAX) return failed(`Pick up to ${TEAM_EXTRA_MAX}.`);
+    const supabase = await createClient();
+    must(await supabase.from("team_measurements").delete().eq("team_id", teamId));
+    if (keys.length) must(await supabase.from("team_measurements").insert(keys.map((metric_key, position) => ({ team_id: teamId, metric_key, position }))));
     refresh();
   });
 }

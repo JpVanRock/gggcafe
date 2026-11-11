@@ -11,8 +11,7 @@ export const SIZE_LABEL: Record<Size, string> = {
 export type Questionnaire = {
   top_size: Size | null;
   bottom_size: Size | null;
-  jacket_size: Size | null;
-  hat_size: string | null;
+  sock_size: Size | null;
   numbers: string[];
   positions: string[];
   experience: string | null;
@@ -35,8 +34,7 @@ export function cleanQuestionnaire(input: Record<string, unknown>): Questionnair
   return {
     top_size: size(input.top_size),
     bottom_size: size(input.bottom_size),
-    jacket_size: size(input.jacket_size),
-    hat_size: str(input.hat_size, 12),
+    sock_size: size(input.sock_size),
     numbers: numbers.slice(0, 3),
     positions: positions.slice(0, 4),
     experience: str(input.experience, 300),

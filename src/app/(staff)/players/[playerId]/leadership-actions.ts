@@ -9,23 +9,44 @@ import { createClient } from "@/lib/supabase/server";
 import { friendlyDbError } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import {
-  CHECKIN_SOURCE, checkInActivity, checkInChanges, cleanAnswer, cleanPlan, courseReady, findLesson, planReady, validCoachRating,
-  type LeadershipPlan,
+  CHECKIN_SOURCE, certificateProgram, checkInActivity, checkInChanges, cleanAnswer, cleanPlan, courseReady, findLesson, isProgram, planReady,
+  validCoachRating, type LeadershipPlan, type Program,
 } from "@/lib/leadership-guide";
 
 type Result = { error: string | null };
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
-/** Coaches and admins pick (or un-pick) a player to train as a leader. Her work is kept. */
-export async function setLeadershipAccess(input: { playerId: string; on: boolean }): Promise<Result> {
+/**
+ * Coaches and admins pick (or un-pick) a player to train as a leader, in the Full
+ * Leadership Program or Leadership Light. Her work is always kept. Switching programs
+ * puts her plan back to draft and clears the sign-off (each program is signed off on
+ * its own); her certificate stays until she earns the next one.
+ */
+export async function setLeadershipAccess(input: { playerId: string; on: boolean; program?: Program }): Promise<Result> {
   const denied = await editorCheck();
   if (denied) return { error: denied };
   if (!isUuid(input.playerId)) return { error: "Unknown player." };
+  const program = input.program ?? "full";
+  if (!isProgram(program)) return { error: "Pick the Full Leadership Program or Leadership Light." };
   const supabase = await createClient();
-  const { error } = input.on
-    ? await supabase.from("player_leadership_access").upsert({ player_id: input.playerId }, { onConflict: "player_id" })
-    : await supabase.from("player_leadership_access").delete().eq("player_id", input.playerId);
+  if (!input.on) {
+    const { error } = await supabase.from("player_leadership_access").delete().eq("player_id", input.playerId);
+    if (error) return { error: friendlyDbError(error) };
+    refresh();
+    return { error: null };
+  }
+  const { data: current } = await supabase.from("player_leadership_access").select("program").eq("player_id", input.playerId).maybeSingle();
+  const { error } = await supabase.from("player_leadership_access").upsert({ player_id: input.playerId, program }, { onConflict: "player_id" });
   if (error) return { error: friendlyDbError(error) };
+  if (current && current.program !== program) {
+    const now = new Date().toISOString();
+    const [plan, review] = await Promise.all([
+      supabase.from("player_leadership_plans").update({ committed_at: null, updated_at: now }).eq("player_id", input.playerId),
+      supabase.from("player_leadership_reviews").update({ signed_at: null, signed_by: null, updated_at: now }).eq("player_id", input.playerId),
+    ]);
+    const failed = plan.error ?? review.error;
+    if (failed) return { error: friendlyDbError(failed) };
+  }
   refresh();
   return { error: null };
 }
@@ -170,9 +191,9 @@ export async function saveCoachRating(input: { playerId: string; key: string; va
 }
 
 /**
- * Coaches sign off a finished course (every core lesson done, plan committed): that
- * awards her Certificate of Leadership and the Leader Badge. Taking the sign-off back
- * takes them back too.
+ * Coaches sign off a finished course (every lesson of her program done, plan committed):
+ * that awards her Certificate of Leadership and the Leader Badge. Taking the sign-off
+ * back takes them back too.
  */
 export async function signLeadershipPlan(input: { playerId: string; signed: boolean }): Promise<Result> {
   const denied = await editorCheck();
@@ -180,6 +201,11 @@ export async function signLeadershipPlan(input: { playerId: string; signed: bool
   if (!isUuid(input.playerId)) return { error: "Unknown player." };
   const supabase = await createClient();
   const { data: user } = await supabase.auth.getUser();
+  const [{ data: pick }, { data: held }] = await Promise.all([
+    supabase.from("player_leadership_access").select("program").eq("player_id", input.playerId).maybeSingle(),
+    supabase.from("player_leadership_certificates").select("program").eq("player_id", input.playerId).maybeSingle(),
+  ]);
+  const program: Program = isProgram(pick?.program) ? pick.program : "full";
   if (input.signed) {
     const [{ data: lessons }, { data: plan }] = await Promise.all([
       supabase.from("player_leadership_lessons").select("lesson, completed_at").eq("player_id", input.playerId),
@@ -191,7 +217,7 @@ export async function signLeadershipPlan(input: { playerId: string; signed: bool
       steps: [],
       completedAt: l.completed_at,
     }));
-    if (!courseReady(work, (plan?.committed_at as string | null | undefined) ?? null))
+    if (!courseReady(work, (plan?.committed_at as string | null | undefined) ?? null, program))
       return { error: "She needs every lesson complete and her plan committed before you sign off." };
   }
   const result = await saveReview(input.playerId, () => ({
@@ -208,6 +234,7 @@ export async function signLeadershipPlan(input: { playerId: string; signed: bool
     .upsert(
       {
         player_id: input.playerId,
+        program: certificateProgram(program, isProgram(held?.program) ? held.program : null),
         team_id: await currentOwnTeam(supabase, input.playerId),
         awarded_at: new Date().toISOString(),
         awarded_by: user.user?.id ?? null,

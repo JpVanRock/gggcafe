@@ -6,8 +6,8 @@ import { SpeedStripes } from "@/components/athletic";
 import { LeaderBadge } from "@/components/leader-badge";
 import { ScrollToHash } from "@/components/scroll-to-hash";
 import {
-  BONUS, BONUS_INTRO, BONUS_SHELVES, BONUS_TITLE, COACH_NOTES, CORE_PARTS, GUIDE_INTRO, GUIDE_TITLE, LADDER, LESSONS, bonusProgress, courseReady, guideProgress,
-  lessonNumber, type Lesson, type LessonWork,
+  BONUS, BONUS_INTRO, BONUS_SHELVES, BONUS_TITLE, COACH_NOTES, CORE_PARTS, GUIDE_INTRO, GUIDE_TITLE, LADDER, LESSONS, LIGHT_INTRO, LIGHT_KEYS, LIGHT_LESSONS,
+  LIGHT_PARTS, PROGRAM_NAME, bonusProgress, courseReady, guideProgress, lessonNumber, programLessons, programTitle, type Lesson, type LessonWork,
 } from "@/lib/leadership-guide";
 import { LeaderToggle } from "../../../leadership-client";
 import { LeadershipClosed, leadershipContext, leadershipHref } from "../../../leadership";
@@ -70,10 +70,17 @@ export default async function LeadershipPage({ params }: PageProps<"/players/[pl
     );
   }
 
-  const progress = guideProgress(lead.work);
+  const program = lead.program;
+  const light = program === "light";
+  const title = programTitle(program);
+  const lessons = programLessons(program);
+  const progress = guideProgress(lead.work, program);
   const extra = bonusProgress(lead.work);
-  const next = progress.next ?? LESSONS[0];
-  const ready = courseReady(lead.work, lead.committedAt);
+  const next = progress.next ?? lessons[0];
+  const ready = courseReady(lead.work, lead.committedAt, program);
+  const parts = light
+    ? LIGHT_PARTS.map((part) => ({ part, lessons: LIGHT_LESSONS.filter((l) => l.part === part) }))
+    : CORE_PARTS.map((part) => ({ part, lessons: LESSONS.filter((l) => l.part === part) }));
   const planStatus = lead.review.signedAt
     ? "Signed off by your coach ✓"
     : lead.committedAt
@@ -82,7 +89,7 @@ export default async function LeadershipPage({ params }: PageProps<"/players/[pl
         : "Committed · finish every lesson"
       : "Not written yet";
   return (
-    <SectionShell title={GUIDE_TITLE} subtitle={`G3 Advanced · ${name}'s leadership`}>
+    <SectionShell title={title} subtitle={`G3 Advanced · ${name}'s leadership`}>
       <div className="flex flex-col gap-8">
         <Link href={advancedHref(player.id)} className="-mt-2 self-start text-sm text-link hover:underline">
           ← {book.title}
@@ -109,7 +116,7 @@ export default async function LeadershipPage({ params }: PageProps<"/players/[pl
               Read this first
             </p>
             <div className="mt-3 flex flex-col gap-3 text-ink/90">
-              {GUIDE_INTRO.map((p, i) => (
+              {(light ? LIGHT_INTRO : GUIDE_INTRO).map((p, i) => (
                 <p key={i} className={i === 0 ? "text-lg font-semibold text-ink" : undefined}>
                   {p}
                 </p>
@@ -123,7 +130,20 @@ export default async function LeadershipPage({ params }: PageProps<"/players/[pl
             </Link>
           </div>
 
-          {/* the ladder: top rung first */}
+          {light ? (
+            <div className="rounded-2xl border-2 border-pink bg-linear-to-b from-navy-950 to-navy-900 p-5">
+              <p className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">What you&apos;ll build</p>
+              <ol className="mt-4 flex flex-col gap-2">
+                {LIGHT_KEYS.map((key, i) => (
+                  <li key={key} className="flex items-center gap-3 border-b border-navy-700 pb-2 last:border-0">
+                    <span className="w-7 font-display text-xl font-bold text-highlight tabular-nums">{i + 1}</span>
+                    <span className="text-sm">{key}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ) : (
+          /* the ladder: top rung first */
           <div className="rounded-2xl border-2 border-pink bg-linear-to-b from-navy-950 to-navy-900 p-5">
             <p className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">The leadership ladder</p>
             <ol className="mt-4 flex flex-col-reverse gap-2">
@@ -137,12 +157,13 @@ export default async function LeadershipPage({ params }: PageProps<"/players/[pl
               ))}
             </ol>
           </div>
+          )}
         </div>
 
-        {CORE_PARTS.map((part) => (
+        {parts.map(({ part, lessons: list }) => (
           <section key={part}>
             <h2 className={heading}>{part}</h2>
-            <LessonList playerId={player.id} lessons={LESSONS.filter((l) => l.part === part)} work={lead.work} prefix="" />
+            <LessonList playerId={player.id} lessons={list} work={lead.work} prefix="" />
           </section>
         ))}
 
@@ -151,12 +172,17 @@ export default async function LeadershipPage({ params }: PageProps<"/players/[pl
           className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-neon bg-neon/5 p-5 transition hover:bg-neon/10"
         >
           <span>
-            <span className="block font-display text-2xl font-bold tracking-wide text-highlight uppercase">My Leadership Plan</span>
-            <span className="block text-sm text-muted">Why you lead, your habits, your goals, your commitment, and your coach&apos;s sign-off.</span>
+            <span className="block font-display text-2xl font-bold tracking-wide text-highlight uppercase">{light ? "My Leader Plan" : "My Leadership Plan"}</span>
+            <span className="block text-sm text-muted">
+              {light
+                ? "Why you want to lead, your habit, your goal, your commitment, and your coach's sign-off."
+                : "Why you lead, your habits, your goals, your commitment, and your coach's sign-off."}
+            </span>
           </span>
           <span className="font-mono text-xs tracking-wider text-ink uppercase">{planStatus} →</span>
         </Link>
 
+        {!light && (
         <section id="extra-reps" className="scroll-mt-24 rounded-2xl border border-navy-700 p-5">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
@@ -176,6 +202,7 @@ export default async function LeadershipPage({ params }: PageProps<"/players/[pl
             ))}
           </div>
         </section>
+        )}
 
         {access.canManage && (
           <div className="flex flex-col gap-3 rounded-xl border border-navy-700 p-4">
@@ -185,7 +212,7 @@ export default async function LeadershipPage({ params }: PageProps<"/players/[pl
                 ? lead.review.signedAt
                   ? `${name} is signed off. Her certificate and Leader Badge are awarded.`
                   : `${name} finished every lesson and committed to her plan. Sign off on her plan page to award her certificate.`
-                : `Certificate and Leader Badge: all ${LESSONS.length} lessons complete, her plan committed, then your sign-off on her plan page. Extra Reps are optional.`}
+                : `Certificate and Leader Badge: all ${lessons.length} ${PROGRAM_NAME[program]} lessons complete, her plan committed, then your sign-off on her plan page.${light ? "" : " Extra Reps are optional."}`}
             </p>
             <Disclosure summary="What usually gets in the way of player leadership">
               <ul className="grid gap-1.5 text-sm sm:grid-cols-2">
@@ -201,7 +228,7 @@ export default async function LeadershipPage({ params }: PageProps<"/players/[pl
                 their plans at the dates they set.
               </p>
             </Disclosure>
-            <LeaderToggle playerId={player.id} name={name} on />
+            <LeaderToggle playerId={player.id} name={name} program={program} />
           </div>
         )}
         <ScrollToHash />

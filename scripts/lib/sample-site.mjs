@@ -43,7 +43,9 @@ export function samplePages() {
   const pages = walk(join(ROOT, "src/app"))
     .map((f) => relative(join(ROOT, "src/app"), f).split(sep).slice(0, -1).filter((s) => !/^\(.*\)$/.test(s)))
     .map((segs) => "/" + fill(segs).join("/"));
-  return [...new Set(pages)].sort();
+  // Leadership Light pages need a player in that program (Lila; Maya is in the Full program)
+  const light = ["", "/light-what-is-a-leader", "/plan"].map((p) => `/players/${ID.lightLeader}/advanced/leadership${p}`);
+  return [...new Set([...pages, ...light])].sort();
 }
 
 /** The PDF routes (not pages, so not found by samplePages). */

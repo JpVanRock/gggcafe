@@ -7,7 +7,7 @@ import { formatLongDateAt } from "@/lib/dates";
 import { playerName } from "@/lib/softball";
 import { createClient } from "@/lib/supabase/server";
 import { signedLogoUrl } from "@/lib/team-logos";
-import { CERTIFICATE, GUIDE_TITLE, LADDER } from "@/lib/leadership-guide";
+import { certificateFor, programTitle } from "@/lib/leadership-guide";
 import { PrintCertificateButton } from "../../../../leadership-client";
 import { leadershipContext, leadershipHref } from "../../../../leadership";
 import { SectionShell } from "../../../section-shell";
@@ -30,17 +30,18 @@ export default async function CertificatePage({ params }: PageProps<"/players/[p
       : Promise.resolve({ data: [] }),
     signedLogoUrl(supabase, certificate.team?.logo_path),
   ]);
+  const { text, rungs } = certificateFor(certificate.program);
   const number =
     ((spot ?? []) as { jersey_number: string | null; season: { start_date: string | null } | null }[])
       .sort((a, b) => (b.season?.start_date ?? "").localeCompare(a.season?.start_date ?? ""))
       .find((r) => r.jersey_number)?.jersey_number ?? null;
 
   return (
-    <SectionShell title={CERTIFICATE.title} subtitle={`${name} · ${GUIDE_TITLE}`}>
+    <SectionShell title={text.title} subtitle={`${name} · ${programTitle(certificate.program)}`}>
       <div className="flex flex-col gap-6">
         {lead.open && (
           <Link href={leadershipHref(player.id)} className="-mt-2 self-start text-sm text-link hover:underline">
-            ← Leadership Guide
+            ← {lead.program === "light" ? "Leadership Light" : "Leadership Guide"}
           </Link>
         )}
         <div className="flex flex-wrap items-center gap-4">
@@ -54,8 +55,8 @@ export default async function CertificatePage({ params }: PageProps<"/players/[p
           logoUrl={logoUrl}
           coachName={certificate.coachName}
           date={formatLongDateAt(certificate.awardedAt)}
-          text={CERTIFICATE}
-          rungs={LADDER}
+          text={text}
+          rungs={rungs}
         />
       </div>
     </SectionShell>

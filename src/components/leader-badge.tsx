@@ -6,7 +6,7 @@
 // herself (the certificate table's RLS decides; this just draws it).
 // Plain SVG, no gradients or ids, so any number can sit on one page.
 
-export const LEADER_BADGE_TITLE = "Team Leader · G3 Leadership Guide";
+export const LEADER_BADGE_TITLE = "Team Leader · G3 Leadership";
 
 export function LeaderBadge({
   size = 24,

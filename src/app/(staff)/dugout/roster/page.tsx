@@ -170,7 +170,7 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
                           <Link
                             href={`/players/${r.player.id}/advanced/leadership/certificate`}
                             className="ml-2 inline-block align-middle"
-                            title="Team Leader · completed the G3 Leadership Guide"
+                            title="Team Leader · completed G3 Leadership"
                           >
                             <LeaderBadge size={20} />
                           </Link>
@@ -235,10 +235,10 @@ async function QuestionnaireTable({ teamId, seasonId }: { teamId: string; season
   const supabase = await createClient();
   const { data } = await supabase
     .from("player_questionnaires")
-    .select("top_size, bottom_size, jacket_size, hat_size, numbers, positions, goals, player:players(first_name, preferred_name, last_name)")
+    .select("top_size, bottom_size, sock_size, numbers, positions, goals, player:players(first_name, preferred_name, last_name)")
     .eq("team_id", teamId)
     .eq("season_id", seasonId);
-  const rows = (data ?? []) as { top_size: string | null; bottom_size: string | null; jacket_size: string | null; hat_size: string | null; numbers: string[]; positions: string[]; goals: string | null; player: { first_name: string; preferred_name: string | null; last_name: string } | null }[];
+  const rows = (data ?? []) as { top_size: string | null; bottom_size: string | null; sock_size: string | null; numbers: string[]; positions: string[]; goals: string | null; player: { first_name: string; preferred_name: string | null; last_name: string } | null }[];
   if (rows.length === 0) return null;
   return (
     <Disclosure summary={`Preseason questionnaires (${rows.length})`}>
@@ -249,8 +249,7 @@ async function QuestionnaireTable({ teamId, seasonId }: { teamId: string; season
               <th className={thClass}>Player</th>
               <th className={thClass}>Top</th>
               <th className={thClass}>Pants</th>
-              <th className={thClass}>Jacket</th>
-              <th className={thClass}>Hat</th>
+              <th className={thClass}>Socks</th>
               <th className={thClass}>Numbers</th>
               <th className={thClass}>Wants to play</th>
             </tr>
@@ -264,8 +263,7 @@ async function QuestionnaireTable({ teamId, seasonId }: { teamId: string; season
                   <td className={tdClass}>{playerName(r.player!)}</td>
                   <td className={tdClass}>{r.top_size ?? "–"}</td>
                   <td className={tdClass}>{r.bottom_size ?? "–"}</td>
-                  <td className={tdClass}>{r.jacket_size ?? "–"}</td>
-                  <td className={tdClass}>{r.hat_size ?? "–"}</td>
+                  <td className={tdClass}>{r.sock_size ?? "–"}</td>
                   <td className={`${tdClass} font-display tabular-nums`}>{r.numbers.join(", ") || "–"}</td>
                   <td className={tdClass}>{r.positions.join(", ") || "–"}</td>
                 </tr>

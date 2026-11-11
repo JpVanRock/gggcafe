@@ -76,7 +76,7 @@ export default async function PlayerDashboardPage({ params, searchParams }: Page
       canWriteCulture={Boolean(access.user.staff && isHeadCoach(access.user.staff.role))}
       isSelf={access.isSelf}
       advanced={advanced}
-      leadership={leadership.open ? leadership.work : null}
+      leadership={leadership.open ? { work: leadership.work, program: leadership.program } : null}
       leader={Boolean(certificate)}
       mentorMessages={{ unread, total: messageCount ?? 0, photoUrls: messagePhotos }}
       isAdmin={access.user.staff?.role === "admin"}

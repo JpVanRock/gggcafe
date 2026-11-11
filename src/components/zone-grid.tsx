@@ -1,4 +1,4 @@
-// My Zone on the 1-9 strike-zone grid (catcher's view). Works in server and client
+// My Zone on the 1-9 strike-zone grid (catcher's view), outlined in pink so it stands out (user, 2026-11-10). Works in server and client
 // components. `onCell` makes the cells buttons (the editor).
 import { ZONE_CELLS, cellName, stateOf, type HittingZones, type ZoneState } from "@/lib/my-zone";
 
@@ -28,7 +28,7 @@ export function ZoneGrid({
   onCell?: (cell: number) => void;
 }) {
   return (
-    <div role="group" aria-label="Strike zone, catcher's view" className="grid grid-cols-3 gap-1 rounded-lg border-2 border-ink/70 p-1" style={{ width: size, height: size }}>
+    <div role="group" aria-label="Strike zone, catcher's view" className="grid grid-cols-3 gap-1 rounded-lg border-2 border-pink p-1" style={{ width: size, height: size }}>
       {ZONE_CELLS.map((cell) => {
         const state = only ? (only.includes(cell) ? (stateOf(zones, cell) === "none" ? "strong" : stateOf(zones, cell)) : "none") : stateOf(zones, cell);
         const fight = battle.includes(cell);

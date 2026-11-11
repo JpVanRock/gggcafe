@@ -3113,6 +3113,32 @@ export type Database = {
           },
         ]
       }
+      player_best_version: {
+        Row: {
+          player_id: string
+          answers: Json
+          updated_at: string
+        }
+        Insert: {
+          player_id: string
+          answers?: Json
+          updated_at?: string
+        }
+        Update: {
+          player_id?: string
+          answers?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_best_version_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: true
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       player_claims: {
         Row: {
           id: string
@@ -3285,16 +3311,19 @@ export type Database = {
           player_id: string
           granted_by: string | null
           granted_at: string
+          program: string
         }
         Insert: {
           player_id: string
           granted_by?: string | null
           granted_at?: string
+          program?: string
         }
         Update: {
           player_id?: string
           granted_by?: string | null
           granted_at?: string
+          program?: string
         }
         Relationships: [
           {
@@ -3313,6 +3342,7 @@ export type Database = {
           awarded_at: string
           awarded_by: string | null
           coach_name: string | null
+          program: string
         }
         Insert: {
           player_id: string
@@ -3320,6 +3350,7 @@ export type Database = {
           awarded_at?: string
           awarded_by?: string | null
           coach_name?: string | null
+          program?: string
         }
         Update: {
           player_id?: string
@@ -3327,6 +3358,7 @@ export type Database = {
           awarded_at?: string
           awarded_by?: string | null
           coach_name?: string | null
+          program?: string
         }
         Relationships: [
           {
@@ -3570,8 +3602,6 @@ export type Database = {
           season_id: string
           top_size: string | null
           bottom_size: string | null
-          jacket_size: string | null
-          hat_size: string | null
           numbers: string[]
           positions: string[]
           experience: string | null
@@ -3579,6 +3609,7 @@ export type Database = {
           notes: string | null
           updated_by: string | null
           updated_at: string
+          sock_size: string | null
         }
         Insert: {
           player_id: string
@@ -3586,8 +3617,6 @@ export type Database = {
           season_id: string
           top_size?: string | null
           bottom_size?: string | null
-          jacket_size?: string | null
-          hat_size?: string | null
           numbers?: string[]
           positions?: string[]
           experience?: string | null
@@ -3595,6 +3624,7 @@ export type Database = {
           notes?: string | null
           updated_by?: string | null
           updated_at?: string
+          sock_size?: string | null
         }
         Update: {
           player_id?: string
@@ -3602,8 +3632,6 @@ export type Database = {
           season_id?: string
           top_size?: string | null
           bottom_size?: string | null
-          jacket_size?: string | null
-          hat_size?: string | null
           numbers?: string[]
           positions?: string[]
           experience?: string | null
@@ -3611,6 +3639,7 @@ export type Database = {
           notes?: string | null
           updated_by?: string | null
           updated_at?: string
+          sock_size?: string | null
         }
         Relationships: [
           {
@@ -4602,6 +4631,39 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "team_goals_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_measurements: {
+        Row: {
+          team_id: string
+          metric_key: string
+          position: number
+        }
+        Insert: {
+          team_id: string
+          metric_key: string
+          position?: number
+        }
+        Update: {
+          team_id?: string
+          metric_key?: string
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_measurements_metric_key_fkey"
+            columns: ["metric_key"]
+            isOneToOne: false
+            referencedRelation: "metrics"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "team_measurements_team_id_fkey"
             columns: ["team_id"]
             isOneToOne: false
             referencedRelation: "teams"

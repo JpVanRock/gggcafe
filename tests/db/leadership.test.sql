@@ -126,6 +126,39 @@ exception when insufficient_privilege then null;
 end $$;
 reset role;
 
+-- Leadership Light: picks default to the Full program; a coach switches her to Light,
+-- she sees which program she's in but can't change it, and her Light lessons save the same way
+select pg_temp.expect('a pick is the Full program by default',
+  (select program from public.player_leadership_access where player_id = '00000000-0000-0000-0000-0000000000c1'), 'full');
+do $$ begin
+  update public.player_leadership_access set program = 'medium' where player_id = '00000000-0000-0000-0000-0000000000c1';
+  raise exception 'FAIL: a made-up program was saved';
+exception when check_violation then null;
+end $$;
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000002"}', false);
+update public.player_leadership_access set program = 'light' where player_id = '00000000-0000-0000-0000-0000000000c1';
+reset role;
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000001"}', false);
+select pg_temp.expect('she sees she''s in Leadership Light', (select program from public.player_leadership_access), 'light');
+do $$ begin
+  update public.player_leadership_access set program = 'full' where player_id = '00000000-0000-0000-0000-0000000000c1';
+exception when insufficient_privilege then null;
+end $$;
+select pg_temp.expect('she can''t switch her own program', (select program from public.player_leadership_access), 'light');
+insert into public.player_leadership_lessons (player_id, lesson, answers, completed_at)
+values ('00000000-0000-0000-0000-0000000000c1', 'light-what-is-a-leader', '{"q1":"My captain"}', now());
+select pg_temp.expect('her Light lesson saved', (select count(*) from public.player_leadership_lessons where lesson like 'light-%'), 1::bigint);
+select pg_temp.expect('her certificate is for the Full program', (select program from public.player_leadership_certificates), 'full');
+reset role;
+do $$ begin
+  update public.player_leadership_certificates set program = 'medium' where player_id = '00000000-0000-0000-0000-0000000000c1';
+  raise exception 'FAIL: a certificate for a made-up program';
+exception when check_violation then null;
+end $$;
+delete from public.player_leadership_lessons where player_id = '00000000-0000-0000-0000-0000000000c1' and lesson like 'light-%';
+
 -- Not a leader any more: closed again, work kept
 delete from public.player_leadership_access where player_id = '00000000-0000-0000-0000-0000000000c1';
 set role authenticated;

@@ -5,7 +5,7 @@
 // content stays on the server). Type-only imports are fine.
 import { useState, useTransition } from "react";
 import { buttonClass, inputClass, secondaryButtonClass, eyebrowClass } from "@/components/ui";
-import type { HabitItem, LeadershipPlan, RubricArea } from "@/lib/leadership-guide";
+import type { HabitItem, LeadershipPlan, Program, RubricArea } from "@/lib/leadership-guide";
 import {
   commitLeadershipPlan, saveCoachRating, saveLeadershipAnswer, saveLeadershipPlan, setLeadershipAccess, setLeadershipLessonDone,
   setLeadershipStep, signLeadershipPlan,
@@ -359,7 +359,10 @@ export function RubricTool({
   );
 }
 
-/** My Leadership Plan. */
+/**
+ * My Leadership Plan. Leadership Light (`light`) shows a shorter plan (`show`): the rest
+ * of the plan is kept as it is, so nothing is lost if she switches programs.
+ */
 export function PlanForm({
   playerId,
   plan: initial,
@@ -367,6 +370,8 @@ export function PlanForm({
   commitment,
   canEdit,
   limits,
+  light = false,
+  show = limits,
 }: {
   playerId: string;
   plan: LeadershipPlan;
@@ -374,6 +379,8 @@ export function PlanForm({
   commitment: string[];
   canEdit: boolean;
   limits: { text: number; habits: number; goals: number; steps: number; checkIns: number };
+  light?: boolean;
+  show?: { habits: number; goals: number; checkIns: number; reflection?: boolean };
 }) {
   const filled: Required<LeadershipPlan> = {
     why: initial.why ?? "",
@@ -411,45 +418,45 @@ export function PlanForm({
     >
       <fieldset disabled={!canEdit} className="flex flex-col gap-8">
         <section>
-          <h2 className={heading}>1 · Why I lead</h2>
+          <h2 className={heading}>{light ? "1 · Why I want to lead" : "1 · Why I lead"}</h2>
           <textarea
             value={plan.why}
             onChange={(e) => setPlan({ ...plan, why: e.target.value })}
             maxLength={limits.text}
             rows={3}
-            aria-label="Why I lead"
-            placeholder="Why do you want to lead, and why will you be good at it?"
+            aria-label={light ? "Why I want to lead" : "Why I lead"}
+            placeholder={light ? "What kind of leader do you want to be for your team?" : "Why do you want to lead, and why will you be good at it?"}
             className={field}
           />
         </section>
         <section>
-          <h2 className={heading}>2 · My three leadership habits</h2>
+          <h2 className={heading}>{light ? "2 · My leader habit" : "2 · My three leadership habits"}</h2>
           <div className="grid gap-2">
-            {plan.habits.map((h, i) => (
+            {plan.habits.slice(0, show.habits).map((h, i) => (
               <input
                 key={i}
                 value={h}
                 onChange={(e) => setPlan({ ...plan, habits: plan.habits.map((x, k) => (k === i ? e.target.value : x)) })}
                 maxLength={200}
-                aria-label={`Habit ${i + 1}`}
-                placeholder={`Habit ${i + 1}: something small I'll do every day`}
+                aria-label={light ? "My leader habit" : `Habit ${i + 1}`}
+                placeholder={light ? "Something I'll do at every practice" : `Habit ${i + 1}: something small I'll do every day`}
                 className={field}
               />
             ))}
           </div>
         </section>
         <section>
-          <h2 className={heading}>3 · My goals this season</h2>
+          <h2 className={heading}>{light ? "3 · My goal this season" : "3 · My goals this season"}</h2>
           <div className="grid gap-5 md:grid-cols-2">
-            {plan.goals.map((g, i) => (
+            {plan.goals.slice(0, show.goals).map((g, i) => (
               <div key={i} className="flex flex-col gap-2 rounded-xl border border-navy-700 p-4">
                 <textarea
                   value={g.goal}
                   onChange={(e) => setPlan({ ...plan, goals: plan.goals.map((x, k) => (k === i ? { ...x, goal: e.target.value } : x)) })}
                   maxLength={limits.text}
                   rows={2}
-                  aria-label={`Goal ${i + 1}`}
-                  placeholder={`Goal ${i + 1}: specific, measurable, done by a date`}
+                  aria-label={light ? "My goal" : `Goal ${i + 1}`}
+                  placeholder={light ? "One leadership goal for this season" : `Goal ${i + 1}: specific, measurable, done by a date`}
                   className={field}
                 />
                 {g.steps.map((s, k) => (
@@ -464,7 +471,7 @@ export function PlanForm({
                     }
                     maxLength={300}
                     aria-label={`Goal ${i + 1}, action step ${k + 1}`}
-                    placeholder={`Action step ${k + 1}`}
+                    placeholder={light ? `How I'll get there, step ${k + 1}` : `Action step ${k + 1}`}
                     className={field}
                   />
                 ))}
@@ -478,7 +485,7 @@ export function PlanForm({
             Save your plan and each date shows up in your This Week in Softball. Your coach gets a reminder too.
           </p>
           <div className="flex flex-wrap gap-3">
-            {plan.checkIns.map((d, i) => (
+            {plan.checkIns.slice(0, show.checkIns).map((d, i) => (
               <label key={i} className="flex flex-col gap-1 text-sm">
                 <span className="text-muted">Check-in {i + 1}</span>
                 <input
@@ -491,6 +498,7 @@ export function PlanForm({
             ))}
           </div>
         </section>
+        {show.reflection !== false && (
         <section>
           <h2 className={heading}>5 · How it&apos;s going</h2>
           <textarea
@@ -503,6 +511,7 @@ export function PlanForm({
             className={field}
           />
         </section>
+        )}
       </fieldset>
 
       {canEdit && (
@@ -589,24 +598,68 @@ export function CoachSignOff({
   );
 }
 
-/** Coaches and admins: pick a player to train as a leader. */
-export function LeaderToggle({ playerId, name, on }: { playerId: string; name: string; on: boolean }) {
+const PROGRAM_CHOICE: Record<Program, { name: string; note: string }> = {
+  full: { name: "Full Leadership Program", note: "25 lessons, Extra Reps and the leadership rubric." },
+  light: { name: "Leadership Light", note: "8 short lessons for players 11 and under." },
+};
+
+/**
+ * Coaches and admins: pick a player to train as a leader, in the Full Leadership Program
+ * or Leadership Light (`program` is null when she isn't picked), switch programs, or remove her.
+ */
+export function LeaderToggle({ playerId, name, program }: { playerId: string; name: string; program: Program | null }) {
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const set = (on: boolean, to?: Program) => {
+    setError(null);
+    startTransition(async () => setError((await setLeadershipAccess({ playerId, on, program: to })).error));
+  };
+  if (!program)
+    return (
+      <div className="flex flex-col gap-2">
+        <p className="text-sm text-muted">Train {name} as a leader in:</p>
+        <div className="flex flex-wrap gap-3">
+          {(["full", "light"] as const).map((p) => (
+            <button key={p} type="button" disabled={pending} onClick={() => set(true, p)} className={secondaryButtonClass}>
+              <span className="flex flex-col items-start py-0.5 text-left">
+                <span className="font-semibold">{PROGRAM_CHOICE[p].name}</span>
+                <span className="text-xs text-muted">{PROGRAM_CHOICE[p].note}</span>
+              </span>
+            </button>
+          ))}
+        </div>
+        {pending && <p className="text-xs text-muted">Saving…</p>}
+        <ErrorLine error={error} />
+      </div>
+    );
+  const other: Program = program === "full" ? "light" : "full";
   return (
     <div className="flex flex-wrap items-center gap-3">
-      {on && <span className="rounded-full border border-neon bg-neon/10 px-3 py-1 text-sm font-semibold text-highlight">Training as a leader ✓</span>}
+      <span className="rounded-full border border-neon bg-neon/10 px-3 py-1 text-sm font-semibold text-highlight">
+        Training as a leader · {PROGRAM_CHOICE[program].name} ✓
+      </span>
       <button
         type="button"
         disabled={pending}
         onClick={async () => {
-          if (on && !(await confirmAction(`Stop training ${name} as a leader? The Leadership Guide leaves her book (her work is kept).`))) return;
-          setError(null);
-          startTransition(async () => setError((await setLeadershipAccess({ playerId, on: !on })).error));
+          const ok = await confirmAction(
+            `Switch ${name} to ${PROGRAM_CHOICE[other].name}? Her lessons and plan are kept. Her plan goes back to draft and any sign-off is cleared; her certificate stays until she earns the next one.`,
+          );
+          if (ok) set(true, other);
         }}
-        className={on ? "text-xs text-muted underline hover:text-danger" : secondaryButtonClass}
+        className="text-xs text-link underline"
       >
-        {pending ? "Saving…" : on ? "Remove" : `Train ${name} as a leader`}
+        {pending ? "Saving…" : `Switch to ${PROGRAM_CHOICE[other].name}`}
+      </button>
+      <button
+        type="button"
+        disabled={pending}
+        onClick={async () => {
+          if (await confirmAction(`Stop training ${name} as a leader? Leadership leaves her book (her work is kept).`)) set(false);
+        }}
+        className="text-xs text-muted underline hover:text-danger"
+      >
+        Remove
       </button>
       <ErrorLine error={error} />
     </div>

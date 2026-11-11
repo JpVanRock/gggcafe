@@ -8,17 +8,15 @@ import { loadMovementAndHitting, loadPopReport, loadTeamDugout, possessive } fro
 import { PopDetail } from "../../pop-report";
 import { firstName, loadPlayer } from "../../section-data";
 import { SectionShell } from "../section-shell";
-import type { Questionnaire } from "@/lib/family";
 import { seasonOrCurrent } from "@/lib/roster";
-import { saveQuestionnaire } from "../../family-actions";
-import { QuestionnaireForm } from "@/components/family-forms";
-import { Disclosure } from "@/components/ui";
 import { StatsCard, loadPlayerStats } from "../../stats-card";
+import { MeasurementsBySeason, loadMeasurements } from "../../measurements";
 
 export const metadata: Metadata = { title: "Pop Report · GGG.Cafe" };
 
-export default async function PopPage({ params }: PageProps<"/players/[playerId]/pop">) {
+export default async function PopPage({ params, searchParams }: PageProps<"/players/[playerId]/pop">) {
   const { playerId } = await params;
+  const { year } = await searchParams;
   const supabase = await createClient();
   const access = await requirePlayerPage(playerId);
   const player = await loadPlayer(supabase, playerId);
@@ -36,18 +34,14 @@ export default async function PopPage({ params }: PageProps<"/players/[playerId]
     supabase.from("player_advanced_access").select("player_id").eq("player_id", player.id).maybeSingle(),
   ]);
   const movementAccess = g3 ? "open" : access.user.staff?.role === "admin" ? "locked" : "hidden";
-  // Phase 6: her preseason questionnaire (her current own team and season; she and coaches)
+  // her current own team and season, for her stats (the preseason questionnaire is on the parents' page)
   const ownTeam = (await loadTeamDugout(supabase, player.id))[0]?.team ?? null;
   const season = ownTeam ? await seasonOrCurrent(supabase, ownTeam.id, null) : null;
-  const [stats, seasonName] = await Promise.all([
+  const [stats, seasonName, measurements] = await Promise.all([
     loadPlayerStats(supabase, player.id, season),
     season ? supabase.from("seasons").select("name").eq("id", season).maybeSingle().then((r) => (r.data as { name: string } | null)?.name ?? null) : Promise.resolve(null),
+    loadMeasurements(supabase, player, ownTeam?.id ?? null),
   ]);
-  const questionnaire =
-    ownTeam && season && access.canAct
-      ? (((await supabase.from("player_questionnaires").select("*").eq("player_id", player.id).eq("team_id", ownTeam.id).eq("season_id", season).maybeSingle()).data ??
-          null) as Partial<Questionnaire> | null)
-      : null;
   return (
     <SectionShell title={`${possessive(firstName(player))} Pop Report`} subtitle={`Profile · ${movementAccess === "open" ? "movement · " : ""}hitting style · teams · measurements`}>
       <PopDetail
@@ -59,17 +53,17 @@ export default async function PopPage({ params }: PageProps<"/players/[playerId]
         move={move}
         styles={styles}
         movementAccess={movementAccess}
+        measurements={
+          <MeasurementsBySeason
+            playerId={player.id}
+            data={measurements}
+            year={typeof year === "string" && /^\d{4}$/.test(year) ? Number(year) : null}
+            basePath={`/players/${player.id}/pop`}
+            canEdit={access.canManage}
+          />
+        }
       />
       <StatsCard stats={stats} seasonLabel={seasonName} />
-      {ownTeam && season && access.canAct && (
-        <section className="mt-10 flex flex-col gap-3">
-          <h2 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Preseason questionnaire · {ownTeam.name}</h2>
-          <p className="text-sm text-muted">Sizes, jersey numbers and the positions she wants. Coaches see it; teammates don&apos;t.</p>
-          <Disclosure summary={questionnaire ? "Edit the questionnaire ✓" : "Fill in the questionnaire"} open={!questionnaire}>
-            <QuestionnaireForm action={saveQuestionnaire} hidden={{ player_id: player.id, team_id: ownTeam.id }} values={questionnaire} />
-          </Disclosure>
-        </section>
-      )}
     </SectionShell>
   );
 }

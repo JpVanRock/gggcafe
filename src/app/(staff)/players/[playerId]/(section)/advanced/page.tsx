@@ -12,7 +12,7 @@ import { loadAdvanced } from "../../advanced-data";
 import { loadLeadership } from "../../leadership-data";
 import { LeaderToggle } from "../../leadership-client";
 import { leadershipHref } from "../../leadership";
-import { GUIDE_TITLE, guideProgress } from "@/lib/leadership-guide";
+import { guideProgress, programTitle } from "@/lib/leadership-guide";
 import { AdvancedNotFoundForAdmin, LEVEL_LABEL, advancedHref } from "../../advanced";
 import { AdvancedAccessToggle, BookTitle, ConfirmPosition } from "../../advanced-client";
 import { firstName, loadPlayer } from "../../section-data";
@@ -37,7 +37,7 @@ export default async function AdvancedPage({ params }: PageProps<"/players/[play
   const progress = bookProgress(book.work, chapters);
   const next = progress.next ?? chapters[0];
   const lead = await loadLeadership(supabase, player.id, book.unlocked);
-  const leadProgress = lead.open ? guideProgress(lead.work) : null;
+  const leadProgress = lead.open ? guideProgress(lead.work, lead.program) : null;
   return (
     <SectionShell title={book.title} subtitle={`${LEVEL_LABEL} · ${BOOK_THEME}`}>
       {/* the cover */}
@@ -69,7 +69,7 @@ export default async function AdvancedPage({ params }: PageProps<"/players/[play
         >
           <span>
             <span className="block font-mono text-2xs tracking-[0.2em] text-pink-soft uppercase">Picked by your coach</span>
-            <span className="block font-display text-2xl font-bold tracking-wide text-highlight uppercase">{GUIDE_TITLE}</span>
+            <span className="block font-display text-2xl font-bold tracking-wide text-highlight uppercase">{programTitle(lead.program)}</span>
           </span>
           <span className="font-mono text-xs tracking-wider text-ink uppercase">
             {leadProgress.done} of {leadProgress.total} lessons →
@@ -122,8 +122,10 @@ export default async function AdvancedPage({ params }: PageProps<"/players/[play
           </p>
           <ConfirmPosition playerId={player.id} name={name} position="P" label="pitcher" confirmed={book.confirmed.includes("P")} />
           <p className={`${eyebrowClass} mt-3`}>Coaches · leadership</p>
-          <p className="text-sm text-muted">The G3 Leadership Guide is for the players you pick to train as leaders.</p>
-          <LeaderToggle playerId={player.id} name={name} on={lead.picked} />
+          <p className="text-sm text-muted">
+            G3 Leadership is for the players you pick to train as leaders: the Full Leadership Program, or Leadership Light for players 11 and under.
+          </p>
+          <LeaderToggle playerId={player.id} name={name} program={lead.picked ? lead.program : null} />
         </div>
       )}
 
