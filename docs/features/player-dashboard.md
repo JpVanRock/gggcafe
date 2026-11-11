@@ -36,7 +36,10 @@
   (`iq_questions.position`); the player picks her position from a list (defaults to her primary).
   80%+ earns that position's Golden Glove (`player_golden_gloves`).
 - Extra Credit Library (track `extra`): questions on what the playbooks teach that no test asks,
-  on shelves (`iq_questions.section`, e.g. "Defense · Vocabulary"). One run deals the whole
+  on shelves (`iq_questions.section`, e.g. "Defense · Vocabulary"). Questions with `playbook_page: null`
+  are written for GGG.Cafe: 13 added 2026-11-10 for game situations the bank lacked or barely had, the
+  user's picks from the situation checklist (Defense · Pickoffs and rundowns, Cutoffs and backups,
+  Situations, Reading the play; Baserunning · Reading the play, Batter-runner). One run deals the whole
   library; she answers in any order (shelf chips), with a hint on any question (`hint_used`), and
   progress saves. A run is graded only once every question is answered (`finish_iq_level` raises
   P0003 before that); 80%+ earns the GGG Champions Trophy (table `player_world_series_trophies`, named for its

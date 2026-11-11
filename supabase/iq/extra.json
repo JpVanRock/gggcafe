@@ -1513,5 +1513,380 @@
         "type": "ground"
       }
     }
+  },
+  {
+    "book": "defense",
+    "section": "Pickoffs and rundowns",
+    "topic": "Catcher's pickoff at third",
+    "scenario": "Runner on third, one out. She takes a long walking lead down the line after every pitch and jogs back. You're the catcher, and your third baseman is playing a few steps off the bag.",
+    "question": "When is it safe to throw behind the runner?",
+    "choices": [
+      "Any time she's more than two steps off",
+      "Right after a ball, never after a strike",
+      "Never: throws to third are too risky",
+      "Only when your third baseman has broken back to the bag on your sign"
+    ],
+    "correct_index": 3,
+    "explanation": "A throw to an empty base rolls into left field and the run scores. A pickoff at third is a set play: give the sign, your third baseman breaks to the bag as the pitch arrives, and you throw only when she's there.",
+    "hint": "Where does the ball end up if nobody is at the base?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 1,
+      "you": "C",
+      "arrows": [
+        {
+          "from": "C",
+          "to": "third",
+          "kind": "throw"
+        }
+      ]
+    }
+  },
+  {
+    "book": "defense",
+    "section": "Pickoffs and rundowns",
+    "topic": "Rundown between first and second",
+    "scenario": "Runner on first, one out. She's caught too far off the base and is trapped between first and second. You're the shortstop with the ball near second, and the first baseman is at her bag.",
+    "question": "What do you do?",
+    "choices": [
+      "Run hard at her and drive her back toward first",
+      "Stay on second and wait for her to come to you",
+      "Throw to first as soon as she moves",
+      "Let her go and hold the batter"
+    ],
+    "correct_index": 0,
+    "explanation": "Always run a trapped runner back toward the base she came from, so she's no better off if the play goes wrong. Sprint at her with the ball up where your partner can see it, make her commit, then make one firm throw for the tag.",
+    "hint": "If the rundown goes wrong, where would you rather she end up?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 1,
+      "you": "SS"
+    }
+  },
+  {
+    "book": "defense",
+    "section": "Pickoffs and rundowns",
+    "topic": "Rundown between third and home",
+    "scenario": "Runner on third, nobody out. A pitch bounces off your shin guards and stays close. The runner breaks for home, then stops, and she's trapped between third and home. You're the catcher with the ball.",
+    "question": "What do you do?",
+    "choices": [
+      "Run her back toward third, then throw to the third baseman for the tag",
+      "Throw to third right away",
+      "Stand on the plate and wait for her",
+      "Throw to first to get the batter"
+    ],
+    "correct_index": 0,
+    "explanation": "Run her back toward third, the base she came from, so the run can't score if something goes wrong. Run at her hard with the ball showing, make her commit, and give one throw to your third baseman.",
+    "hint": "Which mistake costs your team a run?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 0,
+      "you": "C"
+    }
+  },
+  {
+    "book": "defense",
+    "section": "Situations",
+    "topic": "Passed ball with two runners in scoring position",
+    "scenario": "Runners on second and third, nobody out. A pitch skips past the catcher to the backstop. The runner on third scores, and the runner from second rounds third. You're the pitcher covering home.",
+    "question": "What do you do?",
+    "choices": [
+      "Stay on the plate, call for the ball and be ready to tag the second runner",
+      "Leave home and back up third",
+      "Head back to the circle",
+      "Run toward the backstop to get the ball yourself"
+    ],
+    "correct_index": 0,
+    "explanation": "Covering home on a passed ball doesn't end when the first run scores. The trail runner may try to score too. Stay on the plate, give the catcher a target, and be ready for the tag.",
+    "hint": "Is anyone else still running?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "second",
+        "third"
+      ],
+      "outs": 0,
+      "you": "P",
+      "arrows": [
+        {
+          "from": "third",
+          "to": "home",
+          "kind": "run"
+        },
+        {
+          "from": "second",
+          "to": "third",
+          "kind": "run"
+        },
+        {
+          "from": "P",
+          "to": "home",
+          "kind": "run"
+        }
+      ]
+    }
+  },
+  {
+    "book": "defense",
+    "section": "Cutoffs and backups",
+    "topic": "Ball down the left-field line",
+    "scenario": "Runner on first, one out. A line drive lands fair down the left-field line and rolls into the corner. You're the shortstop.",
+    "question": "Where do you go?",
+    "choices": [
+      "Out toward the corner as the relay, lined up with the base the throw is going to",
+      "Cover second base",
+      "Cover third base",
+      "Back up home"
+    ],
+    "correct_index": 0,
+    "explanation": "On a ball down the left-field line, the shortstop is the relay. Get out toward the corner, line up between the left fielder and the target, and give her a big target with both arms up. The third baseman stays at third and the second baseman covers second.",
+    "hint": "Which infielder can leave her base and get closest to the left-field corner?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 1,
+      "you": "SS",
+      "ball": {
+        "at": "LF-line",
+        "type": "line"
+      }
+    }
+  },
+  {
+    "book": "defense",
+    "section": "Cutoffs and backups",
+    "topic": "Ball down the right-field line",
+    "scenario": "Nobody on, nobody out. A ground ball rolls into the right-field corner, and the batter is thinking two. The second baseman sprints out toward the corner as the relay. You're the shortstop.",
+    "question": "Where do you go?",
+    "choices": [
+      "Back up the relay in shallow right",
+      "Cover third base",
+      "Back up first base",
+      "Cover second base"
+    ],
+    "correct_index": 3,
+    "explanation": "When the second baseman goes out as the relay, second base is empty. The shortstop covers it for the play on the batter.",
+    "hint": "The second baseman just left her base. Who fills it?",
+    "playbook_page": null,
+    "diagram": {
+      "outs": 0,
+      "you": "SS",
+      "ball": {
+        "at": "RF-line",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "book": "defense",
+    "section": "Cutoffs and backups",
+    "topic": "Backing up a steal",
+    "scenario": "Runner on first, nobody out. The runner steals on the pitch, and the catcher throws to the shortstop covering second. You're the center fielder.",
+    "question": "Where should you be?",
+    "choices": [
+      "Stay in your spot in case the ball is hit",
+      "Behind first base",
+      "Behind second base, in line with the throw",
+      "Moving toward left field"
+    ],
+    "correct_index": 2,
+    "explanation": "Every throw needs a backup. On a steal of second, the center fielder charges in behind the bag in line with the throw, so a ball that gets past the shortstop doesn't roll into the outfield and send the runner to third.",
+    "hint": "If the throw gets past the shortstop, where does it roll?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 0,
+      "you": "CF",
+      "arrows": [
+        {
+          "from": "first",
+          "to": "second",
+          "kind": "steal"
+        },
+        {
+          "from": "C",
+          "to": "SS",
+          "kind": "throw"
+        }
+      ]
+    }
+  },
+  {
+    "book": "defense",
+    "section": "Reading the play",
+    "topic": "Fake bunt and slash",
+    "scenario": "Runner on first, nobody out. The batter squares early to bunt, and you charge in from third. As the pitcher releases, the batter pulls the bat back to swing away. You're the third baseman.",
+    "question": "What do you do?",
+    "choices": [
+      "Keep charging: the bunt is still coming",
+      "Stop your feet, get square to the hitter and be ready to react",
+      "Turn and sprint back to third",
+      "Wave the shortstop over to cover third"
+    ],
+    "correct_index": 1,
+    "explanation": "When the bat pulls back, the slash is on. Keep charging and you're too close to react to a full swing; sprint back and your back is to the ball. Stop, get square and low, and react to whatever comes off the bat.",
+    "hint": "What do the hitter's hands tell you, and how much time will you have to react up close?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 0,
+      "you": "3B"
+    }
+  },
+  {
+    "book": "defense",
+    "section": "Cutoffs and backups",
+    "topic": "Pitcher backs up third",
+    "scenario": "Runner on first, one out. Single to right field, and the runner from first is heading for third. You're the pitcher.",
+    "question": "Where do you go?",
+    "choices": [
+      "Stay in the circle",
+      "Cover home",
+      "Back up third, in line with the throw from right",
+      "Cover second base"
+    ],
+    "correct_index": 2,
+    "explanation": "When the throw is going to third, the pitcher backs it up. Get well behind third base, in line with the throw, so an overthrow doesn't roll away and send the runner home.",
+    "hint": "Which base is the throw going to, and who's free to get behind it?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 1,
+      "you": "P",
+      "ball": {
+        "at": "RF",
+        "type": "ground"
+      },
+      "arrows": [
+        {
+          "from": "first",
+          "to": "third",
+          "kind": "run"
+        },
+        {
+          "from": "RF",
+          "to": "third",
+          "kind": "throw"
+        }
+      ]
+    }
+  },
+  {
+    "book": "defense",
+    "section": "Pickoffs and rundowns",
+    "topic": "Rundown between second and third",
+    "scenario": "Runner on second, one out. On a ground ball to you at shortstop, the runner breaks for third, then stops, and she's trapped between second and third. You have the ball, and the batter is running to first.",
+    "question": "Which way do you chase her?",
+    "choices": [
+      "Back toward second, the base she came from",
+      "Toward third, so you can tag her at the bag",
+      "Toss it to the third baseman right away",
+      "Nowhere: hold the ball and wait for her to move"
+    ],
+    "correct_index": 0,
+    "explanation": "Run her back toward second. If the rundown goes wrong, she's back where she started instead of on third. Keep the ball up where your teammates can see it, and watch the batter: she'll try to sneak into second while everyone is busy.",
+    "hint": "Which base did she start from?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "second"
+      ],
+      "outs": 1,
+      "you": "SS",
+      "ball": {
+        "at": "SS",
+        "type": "ground"
+      }
+    }
+  },
+  {
+    "book": "baserunning",
+    "section": "Batter-runner",
+    "topic": "Dropped third strike with two outs",
+    "scenario": "Two outs, runner on first. You swing and miss at strike three, and the pitch bounces in the dirt past the catcher.",
+    "question": "What do you do?",
+    "choices": [
+      "Walk back to the dugout: first base is taken",
+      "Stay in the box until the umpire says something",
+      "Run only if the ball rolls all the way to the backstop",
+      "Run to first: with two outs, you can run even with first base taken"
+    ],
+    "correct_index": 3,
+    "explanation": "On a dropped third strike you can run when first base is open, or any time there are two outs. With two outs the runner on first is forced to second, so the catcher has to get one of you out. Never assume you're out: sprint until you are.",
+    "hint": "Does the number of outs change whether first base has to be empty?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "first"
+      ],
+      "outs": 2,
+      "you": "batter"
+    }
+  },
+  {
+    "book": "baserunning",
+    "section": "Reading the play",
+    "topic": "Ball in the dirt from third",
+    "scenario": "One out, you're on third. The pitch hits the dirt in front of the plate and bounces a few feet to the catcher's left, still close to her.",
+    "question": "Do you go?",
+    "choices": [
+      "Yes: any ball in the dirt means go",
+      "No: it stayed close, so take a hard step and get back",
+      "Yes, but only if the batter swung",
+      "No: a runner on third never goes on a ball in the dirt"
+    ],
+    "correct_index": 1,
+    "explanation": "Read where the ball ends up, not the bounce. A ball a step or two from the catcher is an easy out at the plate. Go when it kicks well away from her or gets past her; otherwise take a hard step and get back to the bag.",
+    "hint": "How far does the ball have to get from the catcher to give you time?",
+    "playbook_page": null,
+    "diagram": {
+      "runners": [
+        "third"
+      ],
+      "outs": 1,
+      "you": "runner-third"
+    }
+  },
+  {
+    "book": "baserunning",
+    "section": "Batter-runner",
+    "topic": "Running through first",
+    "scenario": "One out, nobody on. You hit a ground ball to the shortstop and beat the throw by running hard through first. You end up a few steps past the bag in foul territory, and the first baseman tags you.",
+    "question": "Are you out?",
+    "choices": [
+      "Yes: you have to stay on the base",
+      "Yes: you turned toward second",
+      "No: you can overrun first, as long as you come straight back and don't try for second",
+      "Only if she tagged you before you stopped running"
+    ],
+    "correct_index": 2,
+    "explanation": "Overrunning first is allowed, so run through the bag at full speed. You can't be tagged out while you come straight back. You're only in danger if you try to go to second; which way you turn doesn't decide it, trying to advance does.",
+    "hint": "What's the one thing that puts you in danger after you run through the bag?",
+    "playbook_page": null,
+    "diagram": {
+      "outs": 1,
+      "you": "batter",
+      "ball": {
+        "at": "SS",
+        "type": "ground"
+      }
+    }
   }
 ]
