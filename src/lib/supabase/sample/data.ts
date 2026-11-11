@@ -222,6 +222,27 @@ const player_activities: Row[] = [
   { id: id("abac00", 2), player_id: jordan, title: "Pitching lesson", details: "From Coach Sample", days: [2], starts_on: "2026-11-10", ends_on: "2027-01-26", pillar_id: null, created_by: U.admin, source: "mentor", created_at: "2026-11-09T00:00:00Z", updated_at: "2026-11-09T00:00:00Z" },
 ];
 
+// Team Budget: a fee, a few payments, income and expenses, tournament credit won and used, and the
+// coaches' out-of-pocket ledger (one item repaid from team money), so every budget card renders.
+const budget_fees: Row[] = [{ id: id("bdbd00", 1), team_id: T.us, season_id: S.fall, position: 1, name: "Registration", amount: 450 }];
+const budgetEntry = (n: number, kind: string, entry_date: string, amount: number, extra: Row = {}): Row => ({
+  id: id("bdbe00", n), team_id: T.us, season_id: S.fall, kind, entry_date, amount, player_id: null, category: null, method: null, description: null, ...extra,
+});
+const budget_entries: Row[] = [
+  budgetEntry(1, "payment", "2026-09-02", 450, { player_id: maya, method: "Venmo" }),
+  budgetEntry(2, "payment", "2026-09-03", 200, { player_id: kendall, method: "Check" }),
+  budgetEntry(3, "income", "2026-09-10", 300, { category: "Fundraiser", description: "Car wash" }),
+  budgetEntry(4, "expense", "2026-09-12", 650, { category: "Tournament fees", description: "Fall Classic entry" }),
+  budgetEntry(5, "income", "2026-09-28", 250, { category: "Tournament credit", description: "Fall Classic champions" }),
+  budgetEntry(6, "expense", "2026-10-05", 150, { category: "Tournament credit used", description: "Halloween Bash entry" }),
+  budgetEntry(7, "expense", "2026-10-08", 89.99, { category: "Coach reimbursement", description: "Coach reimbursement (1 item)" }),
+  budgetEntry(8, "income", "2026-10-12", 40, { category: "Reimbursement", description: "Refunded umpire deposit" }),
+];
+const budget_coach_expenses: Row[] = [
+  { id: id("bdbf00", 1), team_id: T.us, season_id: S.fall, entry_date: "2026-09-04", paid_by: "Coach Sample", category: "Equipment", description: "Practice balls", amount: 89.99, reimbursed_on: "2026-10-08", reimbursement_id: id("bdbe00", 7) },
+  { id: id("bdbf00", 2), team_id: T.us, season_id: S.fall, entry_date: "2026-10-01", paid_by: "Coach Sample", category: "Team events", description: "Team pizza after practice", amount: 64.5, reimbursed_on: null, reimbursement_id: null },
+];
+
 export const TABLES: Record<string, Row[]> = {
   players, teams, seasons, roster_entries, staff, games, batting_lines, pitching_lines, fielding_lines, pa_grades,
   batting_season, pitching_season, fielding_season, qab_season, gameday_profiles, gameday_lineups, depth_chart, staff_duties, staff_standards,
@@ -229,6 +250,7 @@ export const TABLES: Record<string, Row[]> = {
   install_items, install_item_plans, team_events, training_phases, team_offseason, bp_rounds, bullpen_scripts, player_spotlights,
   team_culture, team_standards, player_advanced_access, player_leadership_access, player_leadership_certificates, measurements,
   mentors, mentor_links, mentor_messages, mentor_focus, mentor_notes, player_activities,
+  budget_fees, budget_entries, budget_coach_expenses,
 };
 
 /** table -> the column other tables use to point at it (for embedded selects) */

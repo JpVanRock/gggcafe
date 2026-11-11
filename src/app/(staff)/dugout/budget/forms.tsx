@@ -1,10 +1,10 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Field, FormMessage, inputClass } from "@/components/ui";
-import { EXPENSE_CATEGORIES, INCOME_CATEGORIES, PAYMENT_METHODS, centsToDollars, money, parseMoney } from "@/lib/budget";
+import { Field, FormMessage, fieldClass, inputClass } from "@/components/ui";
+import { ENTRY_FORM_CATEGORIES, PAYMENT_METHODS, centsToDollars, money, parseMoney } from "@/lib/budget";
 import { initialFormState } from "@/lib/form";
-import { addEntry, recordPayment, saveAdjustment, saveFees } from "./actions";
+import { addCoachExpense, addCredit, addEntry, recordPayment, repayCoach, saveAdjustment, saveFees } from "./actions";
 import { SubmitButton } from "@/components/submit-button";
 
 export type Scope = { teamId: string; seasonId: string };
@@ -193,7 +193,7 @@ export function AdjustmentForm({ scope, players }: { scope: Scope; players: Budg
 export function EntryForm({ scope, today }: { scope: Scope; today: string }) {
   const [state, action] = useActionState(addEntry, initialFormState);
   const [kind, setKind] = useState<"expense" | "income">("expense");
-  const categories = kind === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+  const categories = ENTRY_FORM_CATEGORIES[kind];
   return (
     <form action={action} className="grid gap-4 sm:grid-cols-6">
       <Hidden scope={scope} />
@@ -242,6 +242,146 @@ export function EntryForm({ scope, today }: { scope: Scope; today: string }) {
       </div>
       <div className="flex flex-wrap items-center gap-3 sm:col-span-6">
         <SubmitButton>{kind === "income" ? "Add income" : "Add expense"}</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
+      </div>
+    </form>
+  );
+}
+
+/** Tournament credit the team won, or credit it used toward an entry fee (user, 2026-11-11). */
+export function CreditForm({ scope, today, balance }: { scope: Scope; today: string; balance: number }) {
+  const [state, action] = useActionState(addCredit, initialFormState);
+  const [direction, setDirection] = useState<"won" | "used">("won");
+  return (
+    <form action={action} className="grid gap-4 sm:grid-cols-6">
+      <Hidden scope={scope} />
+      <fieldset className="sm:col-span-6">
+        <legend className="sr-only">Credit won or used</legend>
+        <div role="radiogroup" className="inline-flex rounded-full border border-navy-600 p-0.5">
+          {(["won", "used"] as const).map((d) => (
+            <label
+              key={d}
+              className="cursor-pointer rounded-full px-4 py-1.5 text-sm font-semibold text-muted transition select-none has-checked:bg-pink has-checked:text-on-accent"
+            >
+              <input type="radio" name="direction" value={d} checked={direction === d} onChange={() => setDirection(d)} className="sr-only" />
+              {d === "won" ? "Credit won" : "Credit used"}
+            </label>
+          ))}
+        </div>
+        <p className="mt-2 text-xs text-muted">
+          {direction === "won"
+            ? "Adds income to the ledger and to the team's credit balance."
+            : `Adds an expense to the ledger and takes it off the credit balance (${money(balance)} available).`}
+        </p>
+      </fieldset>
+      <div className="sm:col-span-2">
+        <Field label="Date">
+          <input type="date" name="entry_date" required defaultValue={today} className={inputClass} />
+        </Field>
+      </div>
+      <div className="sm:col-span-2">
+        <Field label="Credit">
+          <input name="amount" required inputMode="decimal" placeholder="250.00" className={moneyInput} />
+        </Field>
+      </div>
+      <div className="sm:col-span-6">
+        <Field label={direction === "won" ? "Tournament won" : "Tournament it paid for"}>
+          <input
+            name="description"
+            required
+            maxLength={300}
+            placeholder={direction === "won" ? "Fall Classic champions" : "Spring Opener entry fee"}
+            className={inputClass}
+          />
+        </Field>
+      </div>
+      <div className="flex flex-wrap items-center gap-3 sm:col-span-6">
+        <SubmitButton>{direction === "won" ? "Add credit won" : "Use credit"}</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
+      </div>
+    </form>
+  );
+}
+
+/** Something a coach paid for with her own money (user, 2026-11-11). */
+export function CoachExpenseForm({ scope, today, names, defaultName }: { scope: Scope; today: string; names: string[]; defaultName: string }) {
+  const [state, action] = useActionState(addCoachExpense, initialFormState);
+  return (
+    <form action={action} className="grid gap-4 sm:grid-cols-6">
+      <Hidden scope={scope} />
+      <div className="sm:col-span-3">
+        <Field label="Paid by">
+          <input name="paid_by" required maxLength={80} defaultValue={defaultName} list="budget-coach-names" autoComplete="off" className={inputClass} />
+        </Field>
+        <datalist id="budget-coach-names">
+          {names.map((n) => (
+            <option key={n} value={n} />
+          ))}
+        </datalist>
+      </div>
+      <div className="sm:col-span-3">
+        <Field label="Amount">
+          <input name="amount" required inputMode="decimal" placeholder="89.99" className={moneyInput} />
+        </Field>
+      </div>
+      <div className="sm:col-span-2">
+        <Field label="Date">
+          <input type="date" name="entry_date" required defaultValue={today} className={inputClass} />
+        </Field>
+      </div>
+      <div className="sm:col-span-4">
+        <Field label="Category">
+          <select name="category" defaultValue="Equipment" className={inputClass}>
+            {ENTRY_FORM_CATEGORIES.expense.map((c) => (
+              <option key={c}>{c}</option>
+            ))}
+          </select>
+        </Field>
+      </div>
+      <div className="sm:col-span-6">
+        <Field label="What it was for">
+          <input name="description" required maxLength={300} placeholder="Two dozen practice balls" className={inputClass} />
+        </Field>
+      </div>
+      <div className="flex flex-wrap items-center gap-3 sm:col-span-6">
+        <SubmitButton>Add to coaches&apos; ledger</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
+      </div>
+    </form>
+  );
+}
+
+export type OwedItem = { id: string; label: string };
+
+/** Marks a coach's out-of-pocket items repaid; by default the repayment also goes in the team ledger. */
+export function RepayForm({ items, today }: { items: OwedItem[]; today: string }) {
+  const [state, action] = useActionState(repayCoach, initialFormState);
+  return (
+    <form action={action} className="flex flex-col gap-4">
+      <fieldset>
+        <legend className="mb-1.5 text-sm font-medium">Items repaid</legend>
+        <ul className="flex flex-col gap-1.5">
+          {items.map((it) => (
+            <li key={it.id}>
+              <label className="flex items-start gap-2 text-sm">
+                <input type="checkbox" name="expense_id" value={it.id} className="mt-1 accent-pink" />
+                <span>{it.label}</span>
+              </label>
+            </li>
+          ))}
+        </ul>
+      </fieldset>
+      <div className="flex flex-wrap items-end gap-4">
+        <Field label="Repaid on">
+          <input type="date" name="repaid_on" required defaultValue={today} className={`${fieldClass} w-44`} />
+        </Field>
+        <label className="flex items-center gap-2 pb-2 text-sm">
+          <input type="checkbox" name="from_team_funds" defaultChecked className="accent-pink" />
+          Paid from team money (adds a Coach reimbursement expense to the ledger)
+        </label>
+      </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <SubmitButton>Mark repaid</SubmitButton>
         <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>

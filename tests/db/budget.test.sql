@@ -8,6 +8,15 @@ begin
   end if;
 end $$;
 grant execute on function pg_temp.expect(text, anycompatible, anycompatible) to anon, authenticated;
+create function pg_temp.err(stmt text) returns text
+language plpgsql as $$
+begin
+  execute stmt;
+  return '';
+exception when others then
+  return sqlstate;
+end $$;
+grant execute on function pg_temp.err(text) to authenticated;
 
 insert into auth.users (id, email) values
   ('44444444-0000-0000-0000-000000000001', 'budget-coach@example.test'),
@@ -183,7 +192,56 @@ do $$ begin
   end if;
 end $$;
 
+-- ---------------------------------------------------------------------------
+-- Coaches' out-of-pocket ledger and repayments (user, 2026-11-11)
+-- ---------------------------------------------------------------------------
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"44444444-0000-0000-0000-000000000001"}', false);
+insert into public.budget_coach_expenses (team_id, season_id, entry_date, paid_by, category, description, amount) values
+  ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1', '2026-09-02', 'Budget Coach', 'Equipment', 'Practice balls', 89.99),
+  ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1', '2026-09-04', 'Budget Coach', 'Team events', 'Pizza', 60),
+  ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1', '2026-09-06', 'Volunteer Parent', 'Other', 'Ice', 15);
+select public.reimburse_coach_expenses(
+  array(select id from public.budget_coach_expenses where description in ('Practice balls', 'Pizza')), '2026-09-20', true);
+select pg_temp.expect('repaid items are marked and linked',
+  (select count(*) from public.budget_coach_expenses where reimbursed_on = '2026-09-20' and reimbursement_id is not null), 2::bigint);
+select pg_temp.expect('one team expense for their total',
+  (select amount::text || '/' || kind::text || '/' || description from public.budget_entries where category = 'Coach reimbursement'),
+  '149.99/expense/Coach reimbursement (2 items)');
+select pg_temp.expect('can''t repay an item twice',
+  pg_temp.err($$select public.reimburse_coach_expenses(array(select id from public.budget_coach_expenses where description = 'Pizza'), '2026-09-21', true)$$), '22023');
+select pg_temp.expect('a repaid date is needed',
+  pg_temp.err($$select public.reimburse_coach_expenses(array(select id from public.budget_coach_expenses where description = 'Ice'), null, true)$$), '22023');
+select public.reimburse_coach_expenses(array(select id from public.budget_coach_expenses where description = 'Ice'), '2026-09-21', false);
+select pg_temp.expect('repaid outside team money: no ledger expense',
+  (select reimbursed_on::text || '/' || coalesce(reimbursement_id::text, 'none') from public.budget_coach_expenses where description = 'Ice'), '2026-09-21/none');
+select pg_temp.expect('still one Coach reimbursement expense', (select count(*) from public.budget_entries where category = 'Coach reimbursement'), 1::bigint);
+delete from public.budget_entries where category = 'Coach reimbursement';
+select pg_temp.expect('removing the repayment makes its items owed again',
+  (select count(*) from public.budget_coach_expenses where reimbursed_on is null and reimbursement_id is null), 2::bigint);
+-- Tournament credits are ordinary ledger lines: won is income, used is an expense
+insert into public.budget_entries (team_id, season_id, kind, entry_date, amount, category, description) values
+  ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1', 'income', '2026-09-28', 250, 'Tournament credit', 'Fall Classic champions'),
+  ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1', 'expense', '2026-10-05', 200, 'Tournament credit used', 'Spring Opener entry');
+reset role;
+
+-- Assistants and viewers read the coaches' ledger but can't add to it or repay it
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"44444444-0000-0000-0000-000000000002"}', false);
+select pg_temp.expect('viewer reads the coaches'' ledger', (select count(*) from public.budget_coach_expenses), 3::bigint);
+select pg_temp.expect('viewer can''t add to it',
+  pg_temp.err($$insert into public.budget_coach_expenses (team_id, season_id, entry_date, paid_by, amount)
+                values ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1', '2026-09-30', 'Viewer', 5)$$), '42501');
+select pg_temp.expect('viewer can''t repay',
+  pg_temp.err($$select public.reimburse_coach_expenses(array(select id from public.budget_coach_expenses where description = 'Pizza'), '2026-09-30', true)$$), '42501');
+reset role;
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"44444444-0000-0000-0000-000000000005"}', false);
+select pg_temp.expect('a stranger reads none of it', (select count(*) from public.budget_coach_expenses), 0::bigint);
+reset role;
+
 -- Clean up
+delete from public.budget_coach_expenses;
 delete from public.budget_entries; delete from public.budget_adjustments; delete from public.budget_fees;
 update public.teams set team_code = null;
 delete from public.parent_accounts where user_id::text like '44444444-%';

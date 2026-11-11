@@ -4,9 +4,23 @@
 
 export const EXPENSE_CATEGORIES = [
   "Tournament fees", "League & insurance", "Field & facility", "Umpires", "Equipment", "Uniforms",
-  "Training & lessons", "Travel & lodging", "Team events", "Other",
+  "Training & lessons", "Travel & lodging", "Team events", "Coach reimbursement", "Tournament credit used", "Other",
 ] as const;
-export const INCOME_CATEGORIES = ["Fundraiser", "Sponsor", "Donation", "Other"] as const;
+export const INCOME_CATEGORIES = ["Fundraiser", "Sponsor", "Donation", "Reimbursement", "Tournament credit", "Other"] as const;
+
+// Tournament credits (user, 2026-11-11): credit the team wins toward future entry fees is income
+// in the team ledger, and credit spent on an entry fee is an expense. creditLedger() keeps their
+// own running balance across seasons. Coaches' out-of-pocket spending has its own ledger
+// (budget_coach_expenses); repaying a coach from team money is a "Coach reimbursement" expense.
+export const CREDIT_WON = "Tournament credit";
+export const CREDIT_USED = "Tournament credit used";
+export const COACH_REIMBURSEMENT = "Coach reimbursement";
+/** Categories with their own forms (credits, coach repayments), left out of the general expense/income form. */
+const OWN_FORM: readonly string[] = [CREDIT_WON, CREDIT_USED, COACH_REIMBURSEMENT];
+export const ENTRY_FORM_CATEGORIES = {
+  expense: EXPENSE_CATEGORIES.filter((c) => !OWN_FORM.includes(c)),
+  income: INCOME_CATEGORIES.filter((c) => !OWN_FORM.includes(c)),
+};
 export const PAYMENT_METHODS = ["Cash", "Check", "Venmo", "Zelle", "PayPal", "Card", "Other"] as const;
 
 export type EntryKind = "payment" | "income" | "expense";
@@ -73,4 +87,69 @@ export function runningLedger<T extends { date: string; kind: EntryKind; cents: 
       balance += e.kind === "expense" ? -e.cents : e.cents;
       return { ...e, balance };
     });
+}
+
+/** A tournament-credit line: credit won (income) or credit used (expense). */
+export function isCredit(e: { kind: EntryKind; category: string | null }) {
+  return (e.kind === "income" && e.category === CREDIT_WON) || (e.kind === "expense" && e.category === CREDIT_USED);
+}
+
+/** Tournament credit lines in date order with the running credit balance (won minus used). */
+export function creditLedger<T extends { date: string; kind: EntryKind; category: string | null; cents: number }>(entries: T[]) {
+  let balance = 0;
+  return entries
+    .filter(isCredit)
+    .sort((a, b) => a.date.localeCompare(b.date) || (a.kind === "expense" ? 1 : 0) - (b.kind === "expense" ? 1 : 0))
+    .map((e) => {
+      balance += e.kind === "income" ? e.cents : -e.cents;
+      return { ...e, balance };
+    });
+}
+
+/** The tournament credit the team still has. */
+export function creditBalance(entries: { date: string; kind: EntryKind; category: string | null; cents: number }[]) {
+  const rows = creditLedger(entries);
+  return rows.length ? rows[rows.length - 1].balance : 0;
+}
+
+export type CoachExpense = {
+  id: string;
+  date: string;
+  paidBy: string;
+  item: string;
+  cents: number;
+  /** the date it was repaid, or null while the team still owes it */
+  repaidOn: string | null;
+};
+
+/**
+ * The coaches' out-of-pocket ledger: each expense adds to what the team owes its coaches, each
+ * repayment takes it off again, in date order with a running "owed" balance.
+ */
+export function coachLedger(items: CoachExpense[]) {
+  const rows = items.flatMap((e) => [
+    { key: `${e.id}:spent`, type: "spent" as const, date: e.date, expense: e },
+    ...(e.repaidOn ? [{ key: `${e.id}:repaid`, type: "repaid" as const, date: e.repaidOn, expense: e }] : []),
+  ]);
+  let owed = 0;
+  return rows
+    .sort((a, b) => a.date.localeCompare(b.date) || (a.type === "repaid" ? 1 : 0) - (b.type === "repaid" ? 1 : 0))
+    .map((r) => {
+      owed += r.type === "spent" ? r.expense.cents : -r.expense.cents;
+      return { ...r, owed };
+    });
+}
+
+/** Totals for the coaches' ledger, and what's still owed to each person. */
+export function coachTotals(items: CoachExpense[]) {
+  const spent = items.reduce((sum, e) => sum + e.cents, 0);
+  const repaid = items.filter((e) => e.repaidOn).reduce((sum, e) => sum + e.cents, 0);
+  const byPerson = new Map<string, number>();
+  for (const e of items) if (!e.repaidOn) byPerson.set(e.paidBy, (byPerson.get(e.paidBy) ?? 0) + e.cents);
+  return {
+    spent,
+    repaid,
+    owed: spent - repaid,
+    owedTo: [...byPerson].map(([name, cents]) => ({ name, cents })).sort((a, b) => b.cents - a.cents || a.name.localeCompare(b.name)),
+  };
 }

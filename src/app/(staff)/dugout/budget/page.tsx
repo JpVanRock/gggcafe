@@ -7,12 +7,15 @@ import { Modal } from "@/components/modal";
 import { BudgetSummary, type BudgetSummaryData } from "@/components/budget-summary";
 import { Card, Disclosure, EmptyState, pillQuietClass, tableClass, tdClass, thClass, badgeClass, type BadgeTone, TableScroll } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
-import { money, playerBalances, runningLedger, toCents, type EntryKind, type PlayerStatus } from "@/lib/budget";
+import {
+  CREDIT_USED, CREDIT_WON, coachLedger, coachTotals, creditLedger, money, playerBalances, runningLedger, toCents,
+  type CoachExpense, type EntryKind, type PlayerStatus,
+} from "@/lib/budget";
 import { compareJersey, type Season, playerName } from "@/lib/softball";
 import { loadDugoutTeam } from "../data";
 import { NoOwnTeam, TeamPicker } from "../team-picker";
-import { deleteEntry } from "./actions";
-import { AdjustmentForm, EntryForm, FeesForm, PaymentForm, type BudgetPlayer } from "./forms";
+import { deleteCoachExpense, deleteEntry, undoCoachRepayment } from "./actions";
+import { AdjustmentForm, CoachExpenseForm, CreditForm, EntryForm, FeesForm, PaymentForm, RepayForm, type BudgetPlayer } from "./forms";
 import { ActionForm } from "@/components/action-form";
 
 export const metadata: Metadata = { title: "Team Budget · Coaches Dugout · GGG.Cafe" };
@@ -21,6 +24,17 @@ type RosterRow = {
   season_id: string;
   jersey_number: string | null;
   player: { id: string; first_name: string; last_name: string; preferred_name: string | null } | null;
+};
+type CoachRow = {
+  id: string;
+  season_id: string;
+  entry_date: string;
+  paid_by: string;
+  category: string | null;
+  description: string | null;
+  amount: number;
+  reimbursed_on: string | null;
+  reimbursement_id: string | null;
 };
 type EntryRow = {
   id: string;
@@ -75,7 +89,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
     );
   }
 
-  const [summaryResult, feesResult, adjustmentsResult, entriesResult] = await Promise.all([
+  const [summaryResult, feesResult, adjustmentsResult, entriesResult, creditsResult, coachResult, staffResult] = await Promise.all([
     supabase.rpc("team_budget_summary", { p_team_id: team.id, p_season_id: season.id }),
     supabase.from("budget_fees").select("name, amount").eq("team_id", team.id).eq("season_id", season.id).order("position"),
     supabase.from("budget_adjustments").select("player_id, amount, note").eq("team_id", team.id).eq("season_id", season.id),
@@ -84,6 +98,17 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
       .select("id, kind, entry_date, amount, player_id, category, method, description")
       .eq("team_id", team.id)
       .eq("season_id", season.id),
+    // tournament credits and the coaches' ledger run across seasons
+    supabase
+      .from("budget_entries")
+      .select("id, kind, entry_date, amount, category, description, season_id")
+      .eq("team_id", team.id)
+      .in("category", [CREDIT_WON, CREDIT_USED]),
+    supabase
+      .from("budget_coach_expenses")
+      .select("id, season_id, entry_date, paid_by, category, description, amount, reimbursed_on, reimbursement_id")
+      .eq("team_id", team.id),
+    supabase.from("staff").select("display_name").order("display_name"),
   ]);
   const summary = summaryResult.data as BudgetSummaryData | null;
   const fees = ((feesResult.data ?? []) as { name: string; amount: number }[]).map((f) => ({ name: f.name, cents: toCents(f.amount) }));
@@ -108,6 +133,28 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
     entries.filter((e) => e.kind === "payment").map((e) => ({ player_id: e.player_id, cents: toCents(e.amount) })),
   );
   const ledger = runningLedger(entries.map((e) => ({ ...e, date: e.entry_date, cents: toCents(e.amount) })));
+  const seasonName = new Map(seasons.map((s) => [s.id, s.name]));
+  const credits = creditLedger(
+    ((creditsResult.data ?? []) as (EntryRow & { season_id: string })[]).map((e) => ({ ...e, date: e.entry_date, cents: toCents(e.amount) })),
+  );
+  const creditLeft = credits.length ? credits[credits.length - 1].balance : 0;
+  const coachRows = (coachResult.data ?? []) as CoachRow[];
+  const coachItems: CoachExpense[] = coachRows.map((c) => ({
+    id: c.id,
+    date: c.entry_date,
+    paidBy: c.paid_by,
+    item: c.description || c.category || "Expense",
+    cents: toCents(c.amount),
+    repaidOn: c.reimbursed_on,
+  }));
+  const coachRowsById = new Map(coachRows.map((c) => [c.id, c]));
+  const coach = coachLedger(coachItems);
+  const coachSums = coachTotals(coachItems);
+  const owedItems = coachItems
+    .filter((c) => !c.repaidOn)
+    .sort((a, b) => a.paidBy.localeCompare(b.paidBy) || a.date.localeCompare(b.date))
+    .map((c) => ({ id: c.id, label: `${c.paidBy} · ${formatDay(c.date)} · ${c.item} · ${money(c.cents)}` }));
+  const staffNames = ((staffResult.data ?? []) as { display_name: string }[]).map((s) => s.display_name);
   const scope = { teamId: team.id, seasonId: season.id };
   const today = todayISO();
   const base = `/dugout/budget?team=${team.id}`;
@@ -150,6 +197,12 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
       </div>
 
       {summary && <BudgetSummary summary={summary} showLedger={false} />}
+      {creditLeft > 0 && (
+        <p className="-mt-4 text-sm text-muted">
+          The team has <span className="font-semibold text-ink tabular-nums">{money(creditLeft)}</span> in unused tournament credit. It
+          counts as income in the ledger but isn&apos;t cash.
+        </p>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card title="Registration costs">
@@ -180,6 +233,17 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
             <Disclosure summary="Discount or extra charge for a player">
               <AdjustmentForm scope={scope} players={options} />
             </Disclosure>
+            <Disclosure summary="Tournament credit won or used">
+              <CreditForm scope={scope} today={today} balance={creditLeft} />
+            </Disclosure>
+            <Disclosure summary="A coach paid out of pocket">
+              <CoachExpenseForm scope={scope} today={today} names={staffNames} defaultName={user.staff.displayName} />
+            </Disclosure>
+            {owedItems.length > 0 && (
+              <Disclosure summary={`Repay a coach (${money(coachSums.owed)} owed)`}>
+                <RepayForm key={owedItems.map((o) => o.id).join()} items={owedItems} today={today} />
+              </Disclosure>
+            )}
           </div>
         )}
       </div>
@@ -285,6 +349,174 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
             </table>
           </TableScroll>
         )}
+      </Card>
+
+      <Card title="Tournament credits">
+        <div className="flex flex-col gap-4">
+          <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <span className="font-display text-4xl font-bold text-highlight tabular-nums">{money(creditLeft)}</span>
+            <span className="text-sm text-muted">credit balance, all seasons</span>
+          </p>
+          {credits.length === 0 ? (
+            <EmptyState>
+              No tournament credit yet. When the team wins credit toward a future entry fee, add it as credit won; spending it on an
+              entry fee is credit used.
+            </EmptyState>
+          ) : (
+            <TableScroll label="Tournament credits">
+              <table className={tableClass}>
+                <thead>
+                  <tr>
+                    <th className={thClass}>Date</th>
+                    <th className={thClass}>Tournament</th>
+                    <th className={`${thClass} text-right`}>Won</th>
+                    <th className={`${thClass} text-right`}>Used</th>
+                    <th className={`${thClass} text-right`}>Balance</th>
+                    {editor && (
+                      <th className={thClass}>
+                        <span className="sr-only">Remove</span>
+                      </th>
+                    )}
+                  </tr>
+                </thead>
+                <tbody>
+                  {credits.map((c) => (
+                    <tr key={c.id}>
+                      <td className={`${tdClass} whitespace-nowrap`}>{formatDay(c.date)}</td>
+                      <td className={tdClass}>
+                        {c.description || (c.kind === "income" ? "Credit won" : "Credit used")}
+                        {c.season_id !== season.id && <span className="ml-2 text-xs text-muted">{seasonName.get(c.season_id)}</span>}
+                      </td>
+                      <td className={`${tdClass} text-right tabular-nums`}>{c.kind === "income" ? money(c.cents) : ""}</td>
+                      <td className={`${tdClass} text-right tabular-nums`}>{c.kind === "expense" ? money(c.cents) : ""}</td>
+                      <td className={`${tdClass} text-right font-semibold tabular-nums`}>{money(c.balance)}</td>
+                      {editor && (
+                        <td className={tdClass}>
+                          <ActionForm action={deleteEntry}>
+                            <input type="hidden" name="id" value={c.id} />
+                            <ConfirmSubmit
+                              message={`Remove this tournament credit (${money(c.cents)}) from the ledger and the credit balance?`}
+                              className="text-xs text-danger hover:underline"
+                            >
+                              Remove
+                            </ConfirmSubmit>
+                          </ActionForm>
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </TableScroll>
+          )}
+        </div>
+      </Card>
+
+      <Card title="Coaches' out-of-pocket">
+        <div className="flex flex-col gap-4">
+          <p className="text-sm text-muted">
+            What coaches paid for with their own money, kept apart from team money. The team owes it back until it&apos;s repaid.
+          </p>
+          <dl className="grid gap-3 sm:grid-cols-3">
+            {[
+              ["Spent", coachSums.spent],
+              ["Repaid", coachSums.repaid],
+              ["Still owed", coachSums.owed],
+            ].map(([label, cents]) => (
+              <div key={label as string} className="flex min-w-0 items-baseline justify-between gap-3 rounded-xl border border-navy-700 bg-navy-950/50 p-3 sm:block">
+                <dt className="text-2xs font-semibold tracking-[0.14em] text-muted uppercase">{label}</dt>
+                <dd className={`mt-1 font-display text-2xl font-bold tabular-nums ${label === "Still owed" && (cents as number) > 0 ? "text-highlight" : ""}`}>
+                  {money(cents as number)}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          {coachSums.owedTo.length > 0 && (
+            <p className="text-sm">
+              Owed to{" "}
+              {coachSums.owedTo.map((o, i) => (
+                <span key={o.name}>
+                  {i > 0 && (i === coachSums.owedTo.length - 1 ? " and " : ", ")}
+                  <span className="font-semibold">{o.name}</span> <span className="tabular-nums">{money(o.cents)}</span>
+                </span>
+              ))}
+              .
+            </p>
+          )}
+          {coach.length === 0 ? (
+            <EmptyState>Nothing yet. When a coach pays for something the team needs, add it here so the team can pay it back.</EmptyState>
+          ) : (
+            <TableScroll label="Coaches' out-of-pocket">
+              <table className={tableClass}>
+                <thead>
+                  <tr>
+                    <th className={thClass}>Date</th>
+                    <th className={thClass}>Paid by</th>
+                    <th className={thClass}>Item</th>
+                    <th className={`${thClass} text-right`}>Spent</th>
+                    <th className={`${thClass} text-right`}>Repaid</th>
+                    <th className={`${thClass} text-right`}>Owed</th>
+                    {editor && (
+                      <th className={thClass}>
+                        <span className="sr-only">Change</span>
+                      </th>
+                    )}
+                  </tr>
+                </thead>
+                <tbody>
+                  {coach.map((r) => {
+                    const row = coachRowsById.get(r.expense.id);
+                    return (
+                      <tr key={r.key}>
+                        <td className={`${tdClass} whitespace-nowrap`}>{formatDay(r.date)}</td>
+                        <td className={tdClass}>{r.expense.paidBy}</td>
+                        <td className={tdClass}>
+                          {r.type === "repaid" ? `Repaid: ${r.expense.item}` : r.expense.item}
+                          {r.type === "spent" && row?.category && <span className="ml-2 text-xs text-muted">{row.category}</span>}
+                          {r.type === "repaid" && !row?.reimbursement_id && <span className="ml-2 text-xs text-muted">not from team money</span>}
+                          {row && row.season_id !== season.id && <span className="ml-2 text-xs text-muted">{seasonName.get(row.season_id)}</span>}
+                        </td>
+                        <td className={`${tdClass} text-right tabular-nums`}>{r.type === "spent" ? money(r.expense.cents) : ""}</td>
+                        <td className={`${tdClass} text-right tabular-nums`}>{r.type === "repaid" ? money(r.expense.cents) : ""}</td>
+                        <td className={`${tdClass} text-right font-semibold tabular-nums`}>{money(r.owed)}</td>
+                        {editor && (
+                          <td className={tdClass}>
+                            {r.type === "spent" && !r.expense.repaidOn && (
+                              <ActionForm action={deleteCoachExpense}>
+                                <input type="hidden" name="id" value={r.expense.id} />
+                                <ConfirmSubmit
+                                  message={`Remove “${r.expense.item}” (${money(r.expense.cents)}) from the coaches' ledger?`}
+                                  className="text-xs text-danger hover:underline"
+                                >
+                                  Remove
+                                </ConfirmSubmit>
+                              </ActionForm>
+                            )}
+                            {r.type === "repaid" && (
+                              <ActionForm action={undoCoachRepayment}>
+                                <input type="hidden" name="id" value={r.expense.id} />
+                                <ConfirmSubmit
+                                  message={
+                                    row?.reimbursement_id
+                                      ? "Undo this repayment? Its Coach reimbursement expense comes out of the team ledger, and every item it covered is owed again."
+                                      : "Undo this repayment? The item is owed again."
+                                  }
+                                  className="text-xs text-danger hover:underline"
+                                >
+                                  Undo
+                                </ConfirmSubmit>
+                              </ActionForm>
+                            )}
+                          </td>
+                        )}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </TableScroll>
+          )}
+        </div>
       </Card>
     </div>
   );

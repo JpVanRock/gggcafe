@@ -15,7 +15,22 @@
   saved by `save_budget_fees`), per-player discount/extra charge (`budget_adjustments`), and the ledger
   `budget_entries` (kind payment/income/expense). Money math in `src/lib/budget.ts` (cents; no
   imports; unit-tested). Head coaches/admins edit (user 2026-11-08: assistants view only; migration 20261109100000),
-  other staff view.
+  other staff view. Income sources include Fundraiser, Sponsor, Donation and Reimbursement (money back to the team).
+  User, 2026-11-11 (migration 20261111234239):
+  - Tournament credits: credit the team wins toward future entry fees is income ("Tournament credit") and credit
+    spent on an entry fee is an expense ("Tournament credit used"), both in the team ledger, entered with their own
+    form ("Tournament credit won or used"). The Tournament credits card keeps their running balance across seasons
+    (`creditLedger`); using more than the balance is refused. The staff page notes unused credit under the
+    summary, since it counts as income but isn't cash.
+  - Coaches' out-of-pocket ledger (`budget_coach_expenses`, same access as the budget): what a coach (or a
+    volunteer) paid with their own money, kept apart from team money, with spent / repaid / still owed, who is
+    owed what, and a running "owed" column (`coachLedger`, `coachTotals`). "Repay a coach" marks checked items
+    repaid (`reimburse_coach_expenses`, one transaction) and, by default, records one "Coach reimbursement"
+    expense for their total in the team ledger; removing that expense (or Undo) makes the items owed again
+    (trigger `unmark_coach_reimbursement`).
+  - The general expense/income form leaves out those three categories (`ENTRY_FORM_CATEGORIES`): credits and
+    coach repayments have their own forms. Parents' totals (`team_budget_summary`) include credits and
+    reimbursements as ordinary income and expenses; the coaches' ledger isn't shown to parents.
 - Parents (user's choice: sign-in accounts, team totals only): parents sign up at `/register` (name,
   email, password, team code, daughter's name) and land on `/family`. A head coach turns on the team's
   6-character team code (`teams.team_code`, Dugout → Roster or Parents; players and assistant coaches use the

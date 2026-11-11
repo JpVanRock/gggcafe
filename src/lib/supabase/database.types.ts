@@ -195,6 +195,76 @@ export type Database = {
           },
         ]
       }
+      budget_coach_expenses: {
+        Row: {
+          id: string
+          team_id: string
+          season_id: string
+          entry_date: string
+          paid_by: string
+          category: string | null
+          description: string | null
+          amount: number
+          reimbursed_on: string | null
+          reimbursement_id: string | null
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          team_id: string
+          season_id: string
+          entry_date: string
+          paid_by: string
+          category?: string | null
+          description?: string | null
+          amount: number
+          reimbursed_on?: string | null
+          reimbursement_id?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          team_id?: string
+          season_id?: string
+          entry_date?: string
+          paid_by?: string
+          category?: string | null
+          description?: string | null
+          amount?: number
+          reimbursed_on?: string | null
+          reimbursement_id?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budget_coach_expenses_reimbursement_id_fkey"
+            columns: ["reimbursement_id"]
+            isOneToOne: false
+            referencedRelation: "budget_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_coach_expenses_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_coach_expenses_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       budget_entries: {
         Row: {
           id: string
@@ -5738,6 +5808,7 @@ export type Database = {
       parent_questionnaire: { Args: { p_player_id: string | null }; Returns: Json }
       pending_approvals: { Args: Record<PropertyKey, never>; Returns: { team_id: string; team_name: string; player_claims: number; parent_requests: number }[] }
       record_iq_answer: { Args: { p_player_id: string | null; p_question_id: string | null; p_chosen: number | null; p_attempt_id?: string | null; p_review_of?: string | null; p_hint_used?: boolean | null }; Returns: { correct: boolean; correct_index: number; explanation: string }[] }
+      reimburse_coach_expenses: { Args: { p_ids: string[] | null; p_paid_on: string | null; p_from_team_funds: boolean | null }; Returns: undefined }
       request_mentor: { Args: { p_code: string | null; p_player_name: string | null }; Returns: string }
       request_parent_link: { Args: { p_code: string | null; p_child_name: string | null }; Returns: string }
       request_player_claim: { Args: { p_team_id: string | null; p_name: string | null; p_jersey: string | null }; Returns: boolean }

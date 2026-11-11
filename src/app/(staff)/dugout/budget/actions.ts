@@ -3,9 +3,11 @@
 import { refresh } from "next/cache";
 import { headCoachCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { friendlyDbError, isoDate, oneOf, text, type FormState, invalid } from "@/lib/form";
+import { checkbox, friendlyDbError, isoDate, oneOf, text, type FormState, invalid } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
-import { EXPENSE_CATEGORIES, INCOME_CATEGORIES, PAYMENT_METHODS, centsToDollars, parseMoney } from "@/lib/budget";
+import {
+  CREDIT_USED, CREDIT_WON, ENTRY_FORM_CATEGORIES, PAYMENT_METHODS, centsToDollars, creditBalance, money, parseMoney, toCents,
+} from "@/lib/budget";
 import { STALE, failed, must, runAction } from "@/lib/actions";
 
 function scope(fd: FormData) {
@@ -106,7 +108,8 @@ export async function addEntry(_prev: FormState, fd: FormData): Promise<FormStat
   if (cents === null || cents === "invalid" || cents <= 0) return { error: "Enter the amount, like 650 or 89.99." };
   const entry_date = isoDate(fd, "entry_date");
   if (!entry_date) return invalid("entry_date", "Pick the date.");
-  const category = kind === "income" ? oneOf(fd, "category", INCOME_CATEGORIES) : oneOf(fd, "category", EXPENSE_CATEGORIES);
+  // tournament credits and coach repayments have their own forms
+  const category = oneOf(fd, "category", ENTRY_FORM_CATEGORIES[kind]);
   const description = text(fd, "description");
   if ((description ?? "").length > 300) return invalid("description", "Keep the description to 300 characters.");
 
@@ -127,6 +130,131 @@ export async function deleteEntry(_prev: FormState, fd: FormData): Promise<FormS
     if (!isUuid(id)) return failed(STALE);
     const supabase = await createClient();
     must(await supabase.from("budget_entries").delete().eq("id", id));
+    refresh();
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Tournament credits (user, 2026-11-11): won = income, used = expense, in the team
+// ledger; their running balance is kept across seasons.
+// ---------------------------------------------------------------------------
+
+/** Records tournament credit the team won, or credit it used toward an entry fee. */
+export async function addCredit(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    const where = scope(fd);
+    if (!where) return failed(STALE);
+    const used = fd.get("direction") === "used";
+    const cents = parseMoney(text(fd, "amount"));
+    if (cents === null || cents === "invalid" || cents <= 0) return invalid("amount", "Enter the credit amount, like 250 or 125.50.");
+    const entry_date = isoDate(fd, "entry_date");
+    if (!entry_date) return invalid("entry_date", "Pick the date.");
+    const description = text(fd, "description");
+    if (!description) return invalid("description", used ? "Name the tournament the credit paid for." : "Name the tournament the team won it at.");
+    if (description.length > 300) return invalid("description", "Keep it to 300 characters.");
+
+    const supabase = await createClient();
+    if (used) {
+      // credit can't go below zero: check the balance across every season
+      const { data } = must(
+        await supabase.from("budget_entries").select("kind, entry_date, category, amount").eq("team_id", where.team_id).in("category", [CREDIT_WON, CREDIT_USED]),
+      );
+      const balance = creditBalance((data ?? []).map((e) => ({ kind: e.kind, category: e.category, date: e.entry_date, cents: toCents(e.amount) })));
+      if (cents > balance) return invalid("amount", `That's more than the team's ${money(balance)} in tournament credit.`);
+    }
+    must(
+      await supabase.from("budget_entries").insert({
+        ...where,
+        kind: used ? "expense" : "income",
+        entry_date,
+        amount: Number(centsToDollars(cents)),
+        category: used ? CREDIT_USED : CREDIT_WON,
+        description,
+      }),
+    );
+    refresh();
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Coaches' out-of-pocket ledger (user, 2026-11-11): what a coach paid with her own
+// money, owed back until repaid.
+// ---------------------------------------------------------------------------
+
+/** Records something a coach paid for out of pocket. */
+export async function addCoachExpense(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    const where = scope(fd);
+    if (!where) return failed(STALE);
+    const paid_by = text(fd, "paid_by");
+    if (!paid_by) return invalid("paid_by", "Who paid for it?");
+    if (paid_by.length > 80) return invalid("paid_by", "Keep the name to 80 characters.");
+    const cents = parseMoney(text(fd, "amount"));
+    if (cents === null || cents === "invalid" || cents <= 0) return invalid("amount", "Enter the amount, like 89.99.");
+    const entry_date = isoDate(fd, "entry_date");
+    if (!entry_date) return invalid("entry_date", "Pick the date.");
+    const description = text(fd, "description");
+    if (!description) return invalid("description", "Say what it was for, like “Practice balls”.");
+    if (description.length > 300) return invalid("description", "Keep it to 300 characters.");
+    const category = oneOf(fd, "category", ENTRY_FORM_CATEGORIES.expense) ?? "Other";
+
+    const supabase = await createClient();
+    must(
+      await supabase
+        .from("budget_coach_expenses")
+        .insert({ ...where, paid_by, entry_date, category, description, amount: Number(centsToDollars(cents)) }),
+    );
+    refresh();
+  });
+}
+
+/** Marks a coach's items repaid, and records the repayment as a team expense when it came from team money. */
+export async function repayCoach(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    const ids = fd.getAll("expense_id").map(String).filter(isUuid);
+    if (ids.length === 0) return failed("Check the items you repaid.");
+    const paidOn = isoDate(fd, "repaid_on");
+    if (!paidOn) return invalid("repaid_on", "Pick the date it was repaid.");
+    const supabase = await createClient();
+    must(await supabase.rpc("reimburse_coach_expenses", { p_ids: ids, p_paid_on: paidOn, p_from_team_funds: checkbox(fd, "from_team_funds") }));
+    refresh();
+  });
+}
+
+/** Takes back a repayment: the item is owed again, and its team-ledger expense is removed. */
+export async function undoCoachRepayment(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    const { data } = must(await supabase.from("budget_coach_expenses").select("reimbursement_id").eq("id", id).maybeSingle());
+    if (!data) return failed(STALE);
+    if (data.reimbursement_id) {
+      // the database marks every item that repayment covered as owed again
+      must(await supabase.from("budget_entries").delete().eq("id", data.reimbursement_id));
+    } else {
+      must(await supabase.from("budget_coach_expenses").update({ reimbursed_on: null }).eq("id", id));
+    }
+    refresh();
+  });
+}
+
+export async function deleteCoachExpense(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("budget_coach_expenses").delete().eq("id", id).is("reimbursed_on", null));
     refresh();
   });
 }
