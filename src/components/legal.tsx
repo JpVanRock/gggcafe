@@ -38,8 +38,23 @@ function Block({ block, strong }: { block: LegalBlock; strong?: boolean }) {
   );
 }
 
-/** A full legal document: title, date, contents, numbered sections (anchors match each section's id). */
-export function LegalDocument({ title, intro, sections, other }: { title: string; intro: string[]; sections: LegalSection[]; other: { href: string; label: string } }) {
+/**
+ * A full legal document: title, date, an optional boxed notice (the Terms' arbitration notice), contents,
+ * numbered sections (anchors match each section's id).
+ */
+export function LegalDocument({
+  title,
+  intro,
+  sections,
+  other,
+  notice,
+}: {
+  title: string;
+  intro: string[];
+  sections: LegalSection[];
+  other: { href: string; label: string };
+  notice?: string;
+}) {
   return (
     <article className="flex flex-col gap-8 text-sm leading-relaxed text-ink">
       <header>
@@ -47,6 +62,7 @@ export function LegalDocument({ title, intro, sections, other }: { title: string
         <span aria-hidden className="mt-2 block h-0.5 w-12 rounded-full bg-pink" />
         <p className="mt-3 text-muted">Effective {EFFECTIVE_DATE}</p>
       </header>
+      {notice && <p className="rounded-xl border-2 border-pink bg-pink/5 p-4 font-semibold sm:p-5">{notice}</p>}
       <div className="flex flex-col gap-3">
         {intro.map((p) => (
           <p key={p}>{p}</p>

@@ -13,8 +13,9 @@ the release for minors, the under-13 consent and the dispute terms.
   disclaimer, the checkbox label, the short version on the agreement page, `TERMS_VERSION` and
   `LEGAL` (governing state, county, contact). Section ids are page anchors (`/terms#risk`).
 - The notes say "Terms, section 4" (risk) and "section 7" (rewards), the intro cites sections
-  4, 13, 14 and 17, and the release cites the indemnity (15): `tests/unit/legal.test.ts` fails if the
-  sections move.
+  4, 16, 17, 18 and 20, the boxed notice (`TERMS_NOTICE`) and the agreement page's summary cite the
+  arbitration section (20), and the release cites the indemnity (18): `tests/unit/legal.test.ts` fails if
+  the sections move.
 
 ## Pages and UI (standard patterns)
 - `/terms` and `/privacy`: public (people read them before signing up), effective date, contents
@@ -56,5 +57,41 @@ Drafting choices for Pennsylvania (for the attorney to confirm): the release exc
 recklessness and intentional misconduct; if a parent can't release a minor's own claims, the parent still
 releases their own (such as medical expenses) and the indemnity still applies.
 
-Open for the attorney: the children's privacy rule (COPPA) expects the notice to list the operator's
-mailing address and phone number; only the email is published now.
+## Audit and rewrite (user, 2026-11-11; version 2026-11-11, everyone agrees again)
+The user asked for an audit against four outside sports-site and app terms and privacy policies, used only as
+a checklist of topics (nothing copied; all wording is ours). Added to the Terms: electronic signature and
+organization authority; no screening of users and no promised results; one account per person; broader
+User Content promises, retained team records, de-identified data and feedback; adult-to-minor conduct
+rule and child-safety reporting (NCMEC); no scraping, reverse engineering or AI training; an express license
+to use the Service; paid features (auto-renewal, cancellation, 30 days' notice of price changes,
+non-refundable, app-store and organization purchases, failed payments); copyright notices, counter-notices and
+repeat infringers (DMCA); electronic communications and legal notices; stronger warranty disclaimer and
+liability limits (user/third-party conduct, unauthorized access, every legal theory, basis of the bargain);
+indemnity defense control; termination effects; and, by the user's choice, binding individual arbitration
+(FAA, AAA Consumer Rules, talk-first 60 days, small-claims and IP carve-outs, video hearings, fee relief,
+class and jury waiver, batching of 25+ coordinated filings, 30-day opt-out by email, court fallback,
+public-injunction carve-out, one-year limit), governing law and courts with a jury waiver, a right to reject
+later arbitration changes, force majeure, no agency or third-party beneficiaries, U.S.-only and export rules.
+A boxed notice at the top of the Terms points to the arbitration section (`LegalDocument`'s `notice`).
+Added to the Privacy notice: sources, purposes (no AI training, no automated decisions), sharing outside the
+team (legal, safety, NCMEC, consent, business transfer; no sale or sharing for ads), named providers
+(Supabase, Vercel, Resend, a payment processor), cookies with Do Not Track and Global Privacy Control, a COPPA
+notice to parents (what's collected from children, how it's used and shared, parent rights, consent method),
+a written retention schedule (annual review; inactive players deleted or de-identified after 24 months;
+children's information within 30 days of a parent's request; accounts within 30 days; backups ~30 days),
+a HIPAA note for medical cards, rights for everyone (access, correction, deletion, withdrawal; identity checks;
+45-day answers; appeals; non-discrimination; California direct-marketing disclosure), U.S. storage, other
+websites, and parent consent before materially different use of children's information.
+
+Operational promises this creates (keep them true): someone reviews accounts once a year and deletes or
+de-identifies inactive players (24 months, no active team); deletion requests are handled within 30 days;
+arbitration opt-out emails are kept with the account; copyright notices get a response.
+
+Open for the user and the attorney:
+- Mailing address and phone number (user, 2026-11-11: email only for now, with a daily reminder): COPPA's
+  notice and the copyright-notice process both expect them.
+- Register a DMCA designated agent with the U.S. Copyright Office (copyright.gov, small fee) for the
+  copyright safe harbor; the Terms name the contact email.
+- COPPA's 2025 rule changes also expect a written information security program; confirm the parental-consent
+  method (a head-coach-approved parent making the login).
+- Whether arbitration binds minors and how a minor's right to cancel a contract affects the Terms.

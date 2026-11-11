@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { LegalDocument, LegalPageShell } from "@/components/legal";
-import { TERMS_INTRO, TERMS_SECTIONS } from "@/lib/legal";
+import { TERMS_INTRO, TERMS_NOTICE, TERMS_SECTIONS } from "@/lib/legal";
 
 export const metadata: Metadata = { title: "Terms of Service · GGG.Cafe" };
 
@@ -11,6 +11,7 @@ export default function TermsPage() {
       <LegalDocument
         title="Terms of Service"
         intro={TERMS_INTRO}
+        notice={TERMS_NOTICE}
         sections={TERMS_SECTIONS}
         other={{ href: "/privacy", label: "Privacy & Security Notice" }}
       />

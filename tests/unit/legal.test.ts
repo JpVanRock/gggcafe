@@ -3,10 +3,13 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import {
+  AGREEMENT_LABEL,
   PRIVACY_INTRO,
   PRIVACY_SECTIONS,
   TERMS_INTRO,
+  TERMS_NOTICE,
   TERMS_SECTIONS,
+  TERMS_SUMMARY,
   TERMS_VERSION,
   needsTermsAgreement,
   safeNext,
@@ -40,7 +43,11 @@ test("the section numbers the notes and the intro point to", () => {
   assert.match(intro, new RegExp(`assumption of risk and a release of claims \\(section ${n("risk")}\\)`));
   assert.match(intro, new RegExp(`disclaimer of warranties \\(section ${n("warranties")}\\)`));
   assert.match(intro, new RegExp(`limits on our liability \\(section ${n("liability")}\\)`));
-  assert.match(intro, new RegExp(`waiver of class actions \\(section ${n("disputes")}\\)`));
+  assert.match(intro, new RegExp(`an indemnity \\(section ${n("indemnity")}\\)`));
+  assert.match(intro, new RegExp(`binding arbitration agreement with a waiver of class actions and jury trials \\(section ${n("disputes")}\\)`));
+  assert.match(TERMS_NOTICE, new RegExp(`SECTION ${n("disputes")} REQUIRES`));
+  assert.match(TERMS_NOTICE, new RegExp(`FOLLOWING SECTION ${n("disputes")}\\.`));
+  assert.match(TERMS_SUMMARY.join(" "), new RegExp(`\\(section ${n("disputes")}\\)`));
   const risk = JSON.stringify(TERMS_SECTIONS.find((s) => s.id === "risk"));
   assert.match(risk, new RegExp(`the indemnity in section ${n("indemnity")} `));
   const legal = readFileSync(new URL("../../src/components/legal.tsx", import.meta.url), "utf8");
@@ -59,6 +66,34 @@ test("no placeholders left in the documents", () => {
   const text = JSON.stringify([TERMS_INTRO, TERMS_SECTIONS, PRIVACY_INTRO, PRIVACY_SECTIONS]);
   assert.doesNotMatch(text, /\[[A-Z][A-Z ]+\]/, "a [BRACKETED] blank is still in the text");
   assert.match(text, /GMI Digital LLC/);
+});
+
+test("the protections an audit asked for are in the documents (2026-11-11)", () => {
+  const terms = (id: string) => JSON.stringify(TERMS_SECTIONS.find((s) => s.id === id) ?? null);
+  const privacy = (id: string) => JSON.stringify(PRIVACY_SECTIONS.find((s) => s.id === id) ?? null);
+  const disputes = terms("disputes");
+  assert.match(disputes, /Federal Arbitration Act/);
+  assert.match(disputes, /Consumer Arbitration Rules/);
+  assert.match(disputes, /within 30 days after you first agree/, "an opt-out window");
+  assert.match(disputes, /small-claims court/);
+  assert.match(disputes, /25 or more/, "mass filings are batched");
+  assert.match(disputes, /CLASS ACTION AND JURY TRIAL WAIVER/);
+  assert.match(terms("law"), /WAIVE A JURY TRIAL/);
+  assert.match(terms("changes-terms"), /reject that change/, "a later arbitration change can be rejected");
+  assert.match(terms("copyright"), /penalty of perjury/);
+  assert.match(terms("copyright"), /repeatedly infringe/);
+  assert.match(terms("fees"), /renew automatically/);
+  assert.match(terms("fees"), /non-refundable/);
+  assert.match(terms("communications"), /electronically/);
+  assert.match(terms("rules"), /National Center for Missing & Exploited Children/);
+  assert.match(terms("general"), /reasonable control/, "force majeure");
+  assert.match(AGREEMENT_LABEL, /arbitration/);
+  for (const id of ["sources", "sharing", "cookies", "children", "retention", "international"]) assert.notEqual(privacy(id), "null", id);
+  assert.match(privacy("children"), /COPPA/);
+  assert.match(privacy("retention"), /within 30 days after a parent asks/, "a written retention period for children's information");
+  assert.match(privacy("cookies"), /Global Privacy Control/);
+  assert.match(privacy("sharing"), /don't sell personal information/);
+  assert.match(privacy("rights"), /appeal/);
 });
 
 test("the version is a date (the database checks the same shape)", () => {
