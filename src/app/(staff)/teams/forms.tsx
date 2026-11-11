@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { Field, FormMessage, fieldClass, inputClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
+import { RepeatFields } from "@/components/repeat-fields";
 import {
   AGE_GROUPS, BATS, BATS_LABEL, FORMATS, FORMAT_LABEL, POSITIONS, POSITION_LABEL, THROWS, THROWS_LABEL,
   type Team,
@@ -243,6 +244,7 @@ const EVENT_KIND_OPTIONS = [
 
 export function TeamEventForm({ teamId }: { teamId: string }) {
   const [state, action] = useActionState(addTeamEvent, initialFormState);
+  const [date, setDate] = useState("");
   return (
     <form action={action} className="grid gap-4 sm:grid-cols-4">
       <input type="hidden" name="team_id" value={teamId} />
@@ -259,7 +261,7 @@ export function TeamEventForm({ teamId }: { teamId: string }) {
         </Field>
       </div>
       <Field label="Date">
-        <input type="date" name="event_date" required className={inputClass} />
+        <input type="date" name="event_date" required value={date} onChange={(e) => setDate(e.target.value)} className={inputClass} />
       </Field>
       <Field label="Starts">
         <input type="time" name="start_time" className={inputClass} />
@@ -267,9 +269,7 @@ export function TeamEventForm({ teamId }: { teamId: string }) {
       <Field label="Ends">
         <input type="time" name="end_time" className={inputClass} />
       </Field>
-      <Field label="Repeat weekly until" hint="Optional">
-        <input type="date" name="repeat_until" className={inputClass} />
-      </Field>
+      <RepeatFields first={date} className="sm:col-span-4" />
       <div className="sm:col-span-2">
         <Field label="Location">
           <input name="location" className={inputClass} />

@@ -101,7 +101,7 @@ export const SECTIONS: { title: string; rows: Row[] }[] = [
       row("Roster", "The season's roster, player accounts, approvals, moving a player to another team, the coaching staff, and staff duties & standards (the duty matrix, the staff commitment, the before-practice checklist).", ["yes", "part", "no", "no", "no"],
         "Assistants approve player claims and see the staff duties; parent requests, coach sign-ups and the duty matrix go to head coaches."),
       row("Culture", "Team Standards and Team Culture.", ["yes", "no", "view", "no", "no"], "Players read them in From the Dugout."),
-      row("Calendar", "Practices and events that show in TWIS; offseason dates.", ["yes", "yes", "view", "no", "no"], "Players see the dates in TWIS."),
+      row("Calendar", "Practices and events, one time or repeating, that show on every player's TWIS; offseason dates.", ["yes", "yes", "view", "no", "no"], "Players see the dates in TWIS."),
       row("Practice Plans", "Build, finalize, print and share practice plans; notes and a cue for each player; the install checklist.", ["yes", "part", "part", "no", "no"],
         "Assistants view and print every plan but change only the plans they write (the head coach's are view only); they work the install checklist. Players see a plan's notes and their own cue in TWIS."),
       row("Training", "The season roadmap, team routines, athletic testing, the team's measurement list, bullpens, BP rounds graded swing by swing, and the offseason draft.", ["yes", "part", "view", "no", "no"],

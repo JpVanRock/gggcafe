@@ -152,6 +152,11 @@ const install_items: Row[] = [
 const install_item_plans: Row[] = [{ item_id: install_items[0].id, plan_id: PL }];
 const team_events: Row[] = [
   { id: id("bebe00", 1), team_id: T.us, kind: "practice", title: "Team practice", event_date: "2026-11-10", start_time: "17:30:00", end_time: "19:30:00", location: "Westside Fieldhouse", series_id: null },
+  // a repeating event (one series), so the calendar's "only this one / this and later" choices render
+  ...["2026-11-12", "2026-11-19", "2026-11-26"].map((event_date, i) => ({
+    id: id("bebe00", 2 + i), team_id: T.us, kind: "workout", title: "Speed and agility", event_date, start_time: "16:00:00", end_time: "17:00:00",
+    location: "Westside Fieldhouse", series_id: id("bebf00", 1),
+  })),
 ];
 const training_phases: Row[] = [{ id: id("bfbf00", 1), team_id: T.us, kind: "build", name: "Build", starts_on: "2026-11-02", ends_on: "2026-12-20", focus: "Strength and speed." }];
 const team_offseason: Row[] = [{ team_id: T.us, starts_on: "2026-11-01", ends_on: "2027-02-26" }];

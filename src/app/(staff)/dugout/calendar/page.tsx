@@ -116,40 +116,6 @@ export default async function CalendarPage({ searchParams }: PageProps<"/dugout/
   return (
     <div className="flex flex-col gap-6">
       <TeamPicker teams={teams} current={team.id} basePath="/dugout/calendar" />
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-3xl leading-tight font-bold tracking-tight text-highlight uppercase">{monthLabel(month)}</h2>
-          <p className="mt-1 text-sm text-muted">
-            {team.name} · Everything here shows in each player&apos;s TWIS.
-            {!editor && " Only coaches and admins can change it."}
-          </p>
-        </div>
-        <nav aria-label="Month" className="flex items-center gap-2">
-          <Link href={link(shiftMonth(month, -1))} className={pillQuietClass} aria-label="Previous month">
-            ←
-          </Link>
-          {month !== today.slice(0, 7) && (
-            <Link href={link(today.slice(0, 7))} className={pillQuietClass}>
-              Today
-            </Link>
-          )}
-          <Link href={link(shiftMonth(month, 1))} className={pillQuietClass} aria-label="Next month">
-            →
-          </Link>
-        </nav>
-      </div>
-      <OffseasonPanel
-        status={
-          offseason
-            ? offseason.ends_on
-              ? `${formatLongDate(offseason.starts_on)} – ${formatLongDate(offseason.ends_on)}`
-              : `Started ${formatLongDate(offseason.starts_on)} · no end date yet`
-            : "Not set. The players' Leaderboard opens once you set a start date."
-        }
-      >
-        <p className="text-xs text-muted">Only sessions and unlocks between these dates count on the players&apos; Leaderboard and for Player of the Week.</p>
-        {editor && <OffseasonForm key={`${team.id}-${offseason?.starts_on}-${offseason?.ends_on}`} teamId={team.id} startsOn={offseason?.starts_on ?? null} endsOn={offseason?.ends_on ?? null} />}
-      </OffseasonPanel>
       <CalendarView
         key={`${team.id}-${month}`}
         teamId={team.id}
@@ -161,8 +127,49 @@ export default async function CalendarPage({ searchParams }: PageProps<"/dugout/
         canEdit={editor}
         offseason={offseason ? { startsOn: offseason.starts_on, endsOn: offseason.ends_on } : null}
         phases={phases}
-      />
-      {editor && <p className="text-xs text-muted">Tap + on a day to add a practice, workout, lesson or meeting. Tap an event to change or remove it.</p>}
+        heading={
+          <div>
+            <h2 className="text-3xl leading-tight font-bold tracking-tight text-highlight uppercase">{monthLabel(month)}</h2>
+            <p className="mt-1 text-sm text-muted">
+              {team.name} · Everything here shows on every player&apos;s calendar (TWIS).
+              {!editor && " Only coaches and admins can change it."}
+            </p>
+          </div>
+        }
+        monthNav={
+          <nav aria-label="Month" className="flex items-center gap-2">
+            <Link href={link(shiftMonth(month, -1))} className={pillQuietClass} aria-label="Previous month">
+              ←
+            </Link>
+            {month !== today.slice(0, 7) && (
+              <Link href={link(today.slice(0, 7))} className={pillQuietClass}>
+                Today
+              </Link>
+            )}
+            <Link href={link(shiftMonth(month, 1))} className={pillQuietClass} aria-label="Next month">
+              →
+            </Link>
+          </nav>
+        }
+      >
+        <OffseasonPanel
+          status={
+            offseason
+              ? offseason.ends_on
+                ? `${formatLongDate(offseason.starts_on)} – ${formatLongDate(offseason.ends_on)}`
+                : `Started ${formatLongDate(offseason.starts_on)} · no end date yet`
+              : "Not set. The players' Leaderboard opens once you set a start date."
+          }
+        >
+          <p className="text-xs text-muted">Only sessions and unlocks between these dates count on the players&apos; Leaderboard and for Player of the Week.</p>
+          {editor && <OffseasonForm key={`${team.id}-${offseason?.starts_on}-${offseason?.ends_on}`} teamId={team.id} startsOn={offseason?.starts_on ?? null} endsOn={offseason?.ends_on ?? null} />}
+        </OffseasonPanel>
+      </CalendarView>
+      {editor && (
+        <p className="text-xs text-muted">
+          + Event adds a practice, workout, lesson or meeting, one time or repeating (+ on a day starts it on that day). Tap an event to change or remove it.
+        </p>
+      )}
     </div>
   );
 }

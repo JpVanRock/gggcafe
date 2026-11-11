@@ -30,9 +30,15 @@
 - Calendar: month grid Monday–Sunday (`?month=2026-11`; day-by-day list on phones) of `team_events`
   plus games (read-only; games are managed on the team page). These are the same events TWIS shows,
   so anything entered here appears in each player's TWIS. Only coaches/admins add, change or remove
-  them (RLS on team_events; the UI is read-only for viewers). Weekly repeats share `series_id`
-  ("This and later weeks" removes the rest); `updated_by` is set by trigger and shown as "Changed by".
-  Event form parsing is shared with the team page in `src/lib/team-events.ts`.
+  them (RLS on team_events; the UI is read-only for viewers). "+ Event" sits just left of the month
+  arrows (user, 2026-11-11; + on a day starts the same form on that day). An event is one time or
+  repeats (`components/repeat-fields.tsx`, rules in `src/lib/recurrence.ts`, unit-tested): every day,
+  every week or every 2 weeks on chosen days, or every month (a month without that day is skipped),
+  through an "Ends on" date; at most `MAX_OCCURRENCES` (150) dates per save, and a live line says what
+  will be added. Each date is its own row sharing `series_id`. Changing one can cover "This and later
+  ones in the series" (they keep their own dates); removing can too. `updated_by` is set by trigger and
+  shown as "Changed by". Event form parsing (`readEventForm`, `readRepeat`) is shared with the team
+  page's "Add to schedule" form in `src/lib/team-events.ts`.
 - Team Standards (ordered list, title + optional detail) and Team Culture (optional headline +
   description, blank line = new paragraph) per team; saved together by the `save_team_dugout` RPC.
   Players see them in the "From the Dugout" strip above TWIS (`components/dugout-strip.tsx`): Team

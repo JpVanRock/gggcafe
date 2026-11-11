@@ -1,5 +1,6 @@
 import "server-only";
 import { isoDate, oneOf, text } from "@/lib/form";
+import { REPEATS, checkRecurrence, type Repeat } from "@/lib/recurrence";
 
 // Team events (practices, workouts, lessons, meetings): added on the team page
 // or in the Coaches Dugout calendar, shown in each player's TWIS. Only coaches
@@ -7,7 +8,6 @@ import { isoDate, oneOf, text } from "@/lib/form";
 
 export const EVENT_KINDS = ["practice", "workout", "lesson", "meeting", "other"] as const;
 const TIME = /^\d{2}:\d{2}(:\d{2})?$/;
-export const MAX_REPEATS = 30;
 
 /** "17:30" from a time input, or null. */
 export function timeOf(fd: FormData, name: string) {
@@ -15,17 +15,16 @@ export function timeOf(fd: FormData, name: string) {
   return value && TIME.test(value) ? value.slice(0, 5) : null;
 }
 
-/** Weekly dates from `first` through `until` (inclusive), capped so a typo can't flood the schedule. */
-export function weeklyDates(first: string, until: string | null) {
-  const dates = [first];
-  while (until && dates.length < MAX_REPEATS) {
-    const next = new Date(`${dates[dates.length - 1]}T00:00:00Z`);
-    next.setUTCDate(next.getUTCDate() + 7);
-    const iso = next.toISOString().slice(0, 10);
-    if (iso > until) break;
-    dates.push(iso);
-  }
-  return dates;
+/**
+ * The dates a new event goes on: just its date, or every date of its repeat rule (`repeat`,
+ * `repeat_days`, `repeat_until`; `lib/recurrence.ts`). A form with only "repeat_until" (older
+ * pages) repeats weekly. Each date becomes its own event sharing a series_id.
+ */
+export function readRepeat(fd: FormData, first: string) {
+  const until = isoDate(fd, "repeat_until");
+  const repeat: Repeat = (oneOf(fd, "repeat", REPEATS) ?? (until ? "weekly" : "none"));
+  const days = fd.getAll("repeat_days").map((d) => Number(d));
+  return checkRecurrence(first, { repeat, days, until });
 }
 
 /** The event fields from a form, or an error message. */

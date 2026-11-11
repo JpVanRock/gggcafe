@@ -3,44 +3,51 @@
 import { refresh } from "next/cache";
 import { editorCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { friendlyDbError, isoDate, text, type FormState, invalid } from "@/lib/form";
+import { friendlyDbError, text, type FormState, invalid } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
-import { readEventForm, weeklyDates } from "@/lib/team-events";
+import { STALE, failed, must, runAction } from "@/lib/actions";
+import { readEventForm, readRepeat } from "@/lib/team-events";
 
-/** Adds an event (optionally weekly, as one series) or saves changes to one. Coaches and admins only. */
+/**
+ * Adds an event, one time or repeating (each date its own row, sharing a series_id; lib/recurrence.ts),
+ * or saves changes to one. A change can cover this event and the later ones in its series ("following"):
+ * those keep their own dates and take the new type, title, times, place and notes. Coaches and admins only.
+ */
 export async function saveCalendarEvent(_prev: FormState, fd: FormData): Promise<FormState> {
-  const denied = await editorCheck();
-  if (denied) return { error: denied };
+  return runAction(async () => {
+    const denied = await editorCheck();
+    if (denied) return failed(denied);
+    const event = readEventForm(fd);
+    if (event.error !== null) return failed(event.error);
+    const supabase = await createClient();
+    const id = text(fd, "id");
 
-  const event = readEventForm(fd);
-  if (event.error !== null) return { error: event.error };
-  const supabase = await createClient();
-  const id = text(fd, "id");
-
-  if (id) {
-    if (!isUuid(id)) return { error: "Unknown event." };
-    const { data, error } = await supabase
-      .from("team_events")
-      .update({ ...event.values, event_date: event.event_date })
-      .eq("id", id)
-      .select("id");
-    if (error) return { error: friendlyDbError(error) };
-    if (!data?.length) return { error: "That event no longer exists, or you can't change it." };
-  } else {
-    const teamId = text(fd, "team_id");
-    if (!isUuid(teamId)) return { error: "Choose a team." };
-    const repeatUntil = isoDate(fd, "repeat_until");
-    if (repeatUntil && repeatUntil < event.event_date) return invalid("repeat_until", "“Repeat until” is before the first date.");
-    const dates = weeklyDates(event.event_date, repeatUntil);
-    const series_id = dates.length > 1 ? crypto.randomUUID() : null;
-    const { error } = await supabase
-      .from("team_events")
-      .insert(dates.map((event_date) => ({ ...event.values, team_id: teamId, event_date, series_id })));
-    if (error) return { error: friendlyDbError(error) };
-  }
-
-  refresh();
-  return { error: null, saved: true };
+    if (id) {
+      if (!isUuid(id)) return failed(STALE);
+      const { data: saved } = await supabase.from("team_events").select("series_id, event_date, team_id").eq("id", id).maybeSingle();
+      if (!saved) return failed("That event no longer exists, or you can't change it.");
+      const { data } = must(await supabase.from("team_events").update({ ...event.values, event_date: event.event_date }).eq("id", id).select("id"));
+      if (!data?.length) return failed("That event no longer exists, or you can't change it.");
+      if (fd.get("scope") === "following" && saved.series_id) {
+        must(
+          await supabase
+            .from("team_events")
+            .update(event.values)
+            .eq("series_id", saved.series_id)
+            .eq("team_id", saved.team_id)
+            .gt("event_date", saved.event_date),
+        );
+      }
+    } else {
+      const teamId = text(fd, "team_id");
+      if (!isUuid(teamId)) return failed(STALE);
+      const repeat = readRepeat(fd, event.event_date);
+      if (repeat.error !== null) return invalid(repeat.field, repeat.error);
+      const series_id = repeat.dates.length > 1 ? crypto.randomUUID() : null;
+      must(await supabase.from("team_events").insert(repeat.dates.map((event_date) => ({ ...event.values, team_id: teamId, event_date, series_id }))));
+    }
+    refresh();
+  });
 }
 
 /** Removes one event, or it and every later one in its weekly series. */

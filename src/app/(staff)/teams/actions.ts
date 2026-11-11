@@ -3,7 +3,7 @@
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { editorCheck } from "@/lib/auth";
-import { readEventForm, timeOf, weeklyDates } from "@/lib/team-events";
+import { readEventForm, readRepeat, timeOf } from "@/lib/team-events";
 import { createClient } from "@/lib/supabase/server";
 import { checkbox, friendlyDbError, isoDate, oneOf, text, wholeNumber, type FormState, invalid } from "@/lib/form";
 import { BATS, FORMATS, POSITIONS, THROWS, isUuid } from "@/lib/softball";
@@ -199,28 +199,23 @@ export async function removeFromRoster(_prev: FormState, fd: FormData): Promise<
 
 const GAME_TYPES = ["league", "tournament_pool", "tournament_bracket", "showcase", "scrimmage", "exhibition"] as const;
 
-/** Adds a practice or other team event, optionally repeating weekly (one series). */
+/** Adds a practice or other team event, one time or repeating (one series; lib/recurrence.ts). */
 export async function addTeamEvent(_prev: FormState, fd: FormData): Promise<FormState> {
-  const denied = await editorCheck();
-  if (denied) return { error: denied };
+  return runAction(async () => {
+    const denied = await editorCheck();
+    if (denied) return failed(denied);
+    const teamId = text(fd, "team_id");
+    if (!isUuid(teamId)) return failed(STALE);
+    const event = readEventForm(fd);
+    if (event.error !== null) return failed(event.error);
+    const repeat = readRepeat(fd, event.event_date);
+    if (repeat.error !== null) return invalid(repeat.field, repeat.error);
 
-  const teamId = text(fd, "team_id");
-  if (!isUuid(teamId)) return { error: "Unknown team." };
-  const event = readEventForm(fd);
-  if (event.error !== null) return { error: event.error };
-  const repeatUntil = isoDate(fd, "repeat_until");
-  if (repeatUntil && repeatUntil < event.event_date) return invalid("repeat_until", "“Repeat until” is before the first date.");
-
-  const dates = weeklyDates(event.event_date, repeatUntil);
-  const series_id = dates.length > 1 ? crypto.randomUUID() : null;
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from("team_events")
-    .insert(dates.map((event_date) => ({ ...event.values, team_id: teamId, event_date, series_id })));
-  if (error) return { error: friendlyDbError(error) };
-
-  refresh();
-  return { error: null, saved: true };
+    const series_id = repeat.dates.length > 1 ? crypto.randomUUID() : null;
+    const supabase = await createClient();
+    must(await supabase.from("team_events").insert(repeat.dates.map((event_date) => ({ ...event.values, team_id: teamId, event_date, series_id }))));
+    refresh();
+  });
 }
 
 export async function deleteTeamEvent(_prev: FormState, fd: FormData): Promise<FormState> {

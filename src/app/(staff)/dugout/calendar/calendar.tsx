@@ -2,8 +2,9 @@
 
 // The Coaches Dugout calendar: a month of team events (practices, workouts,
 // lessons, meetings) plus games, Monday to Sunday like TWIS. Coaches and admins
-// add, change and remove events; everyone else sees them read-only. Every event
-// shows in each player's TWIS for that week.
+// add events ("+ Event" by the month arrows, or + on a day), one time or repeating
+// (components/repeat-fields.tsx), and change or remove them; everyone else sees
+// them read-only. Every event shows in each player's TWIS for that week.
 import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { Field, FormMessage, inputClass, pillButtonClass, pillQuietClass, badgeClass, cardClass, EmptyState } from "@/components/ui";
@@ -11,6 +12,7 @@ import { EVENT_KINDS, EVENT_KIND_LABEL, clockLabel, parseClock, type EventKind }
 import { initialFormState, type FormState } from "@/lib/form";
 import { deleteCalendarEvent, saveCalendarEvent } from "./actions";
 import { SubmitButton } from "@/components/submit-button";
+import { RepeatFields } from "@/components/repeat-fields";
 
 export type CalEvent = {
   id: string;
@@ -81,6 +83,7 @@ function GameChip({ game, onOpen }: { game: CalGame; onOpen: () => void }) {
 
 function EventForm({ mode, teamId, onDone }: { mode: { type: "add"; date: string } | { type: "event"; event: CalEvent }; teamId: string; onDone: () => void }) {
   const event = mode.type === "event" ? mode.event : null;
+  const [date, setDate] = useState(event?.date ?? (mode.type === "add" ? mode.date : ""));
   const [state, action] = useActionState(async (prev: FormState, fd: FormData) => {
     const result = await saveCalendarEvent(prev, fd);
     if (result.saved) onDone();
@@ -109,7 +112,7 @@ function EventForm({ mode, teamId, onDone }: { mode: { type: "add"; date: string
           <input name="title" maxLength={120} defaultValue={event?.title ?? ""} className={inputClass} />
         </Field>
         <Field label="Date">
-          <input type="date" name="event_date" required defaultValue={event?.date ?? (mode.type === "add" ? mode.date : "")} className={inputClass} />
+          <input type="date" name="event_date" required value={date} onChange={(e) => setDate(e.target.value)} className={inputClass} />
         </Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Starts">
@@ -119,11 +122,7 @@ function EventForm({ mode, teamId, onDone }: { mode: { type: "add"; date: string
             <input type="time" name="end_time" step={300} defaultValue={event?.end ?? ""} className={inputClass} />
           </Field>
         </div>
-        {!event && (
-          <Field label="Repeat weekly until" hint="Optional: adds the same event every week">
-            <input type="date" name="repeat_until" className={inputClass} />
-          </Field>
-        )}
+        {!event && <RepeatFields first={date} className="sm:col-span-2" />}
         <Field label="Location">
           <input name="location" defaultValue={event?.location ?? ""} className={inputClass} />
         </Field>
@@ -132,6 +131,20 @@ function EventForm({ mode, teamId, onDone }: { mode: { type: "add"; date: string
             <textarea name="notes" rows={2} defaultValue={event?.notes ?? ""} className={inputClass} />
           </Field>
         </div>
+        {event?.seriesId && (
+          <fieldset className="sm:col-span-2">
+            <legend className="mb-1.5 text-sm font-medium">Save changes to</legend>
+            <div className="flex flex-wrap gap-4 text-sm">
+              <label className="flex items-center gap-1.5">
+                <input type="radio" name="scope" value="one" defaultChecked className="accent-pink" /> Only this one
+              </label>
+              <label className="flex items-center gap-1.5">
+                <input type="radio" name="scope" value="following" className="accent-pink" /> This and later ones in the series
+              </label>
+            </div>
+            <p className="mt-1.5 text-xs text-muted">Later ones keep their own dates.</p>
+          </fieldset>
+        )}
         <div className="flex flex-wrap items-center gap-3 sm:col-span-2">
           <SubmitButton variant="pill">{event ? "Save changes" : "Add to calendar"}</SubmitButton>
           <FormMessage error={state.error} fields={state.fields} />
@@ -148,7 +161,7 @@ function EventForm({ mode, teamId, onDone }: { mode: { type: "add"; date: string
                 <input type="radio" name="scope" value="one" defaultChecked className="accent-pink" /> Only this one
               </label>
               <label className="flex items-center gap-1.5">
-                <input type="radio" name="scope" value="following" className="accent-pink" /> This and later weeks
+                <input type="radio" name="scope" value="following" className="accent-pink" /> This and later ones
               </label>
             </fieldset>
           )}
@@ -187,7 +200,16 @@ export function CalendarView({
   canEdit,
   offseason = null,
   phases = [],
+  heading,
+  monthNav,
+  children,
 }: {
+  /** the month's title block, left of the buttons */
+  heading: React.ReactNode;
+  /** the previous / today / next month links; "+ Event" sits just left of them */
+  monthNav: React.ReactNode;
+  /** shown between the header and the month (the offseason panel) */
+  children?: React.ReactNode;
   teamId: string;
   month: string;
   days: string[];
@@ -216,7 +238,7 @@ export function CalendarView({
   let title = "";
   let body: React.ReactNode = null;
   if (mode?.type === "add") {
-    title = "Add to calendar";
+    title = "New event";
     body = <EventForm key={`add-${mode.date}`} mode={mode} teamId={teamId} onDone={() => setMode(null)} />;
   } else if (mode?.type === "event") {
     const e = mode.event;
@@ -271,6 +293,23 @@ export function CalendarView({
 
   return (
     <>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        {heading}
+        <div className="flex items-center gap-2">
+          {canEdit && (
+            <button
+              type="button"
+              onClick={() => setMode({ type: "add", date: today.slice(0, 7) === month ? today : `${month}-01` })}
+              className={pillButtonClass}
+            >
+              + Event
+            </button>
+          )}
+          {monthNav}
+        </div>
+      </div>
+      {children}
+
       {/* Month grid (tablet and up) */}
       <div className="hidden overflow-hidden rounded-xl border border-navy-700 sm:block">
         <div className="grid grid-cols-7 border-b border-navy-700 bg-navy-900">
@@ -338,11 +377,6 @@ export function CalendarView({
 
       {/* Day-by-day list (phones) */}
       <div className="flex flex-col gap-3 sm:hidden">
-        {canEdit && (
-          <button type="button" onClick={() => setMode({ type: "add", date: today.slice(0, 7) === month ? today : `${month}-01` })} className={`${pillButtonClass} self-start`}>
-            + Add to calendar
-          </button>
-        )}
         {agenda.length === 0 ? (
           <EmptyState>Nothing on the calendar this month.</EmptyState>
         ) : (
