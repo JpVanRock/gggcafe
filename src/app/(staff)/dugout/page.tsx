@@ -71,9 +71,10 @@ export default async function DugoutPage({ searchParams }: PageProps<"/dugout">)
         <h2 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">
           What players see above TWIS
         </h2>
-        <DugoutStrip teams={[{ team, culture, standards }]} canEdit={false} yearbookHref={`/dugout/yearbook?team=${team.id}`} />
+        <DugoutStrip teams={[{ team, culture, standards }]} canEdit={false} yearbookHref={`/dugout/yearbook?team=${team.id}`} coachResponsibilities />
         <p className="mt-2 text-xs text-muted">
-          The Yearbook pill shows for players with G3 Advanced. Coaches and parents of those players add photos.
+          Coach&apos;s Responsibilities is for coaches only; players don&apos;t see it. The Yearbook pill shows for players with G3 Advanced. Coaches and
+          parents of those players add photos.
         </p>
       </section>
     </div>

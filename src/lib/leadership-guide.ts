@@ -17,6 +17,8 @@ export const GUIDE_INTRO = [
   "Here's the truth from one competitor to another: leading is hard. You'll have to say things people don't want to hear, stand alone sometimes, and own it when you mess up. You'll also find out you're capable of a lot more than you think.",
   "Twenty-five short lessons, one rung at a time. Read it, answer honestly, do the work. Then write your plan, get your coach's sign-off, and earn your certificate.",
 ];
+/** The last line of "Read this first" on the Full program's first page (user, 2026-11-11). */
+export const GUIDE_CLOSER = "Player-led teams know how to win.";
 export const BONUS_TITLE = "Extra Reps";
 export const BONUS_INTRO =
   "Short lessons on leading, team culture, character and mental toughness. Optional. Take them in any order, as many times as you want.";

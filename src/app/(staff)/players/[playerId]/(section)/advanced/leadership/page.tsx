@@ -6,7 +6,7 @@ import { SpeedStripes } from "@/components/athletic";
 import { LeaderBadge } from "@/components/leader-badge";
 import { ScrollToHash } from "@/components/scroll-to-hash";
 import {
-  BONUS, BONUS_INTRO, BONUS_SHELVES, BONUS_TITLE, COACH_NOTES, CORE_PARTS, GUIDE_INTRO, GUIDE_TITLE, LADDER, LESSONS, LIGHT_INTRO, LIGHT_KEYS, LIGHT_LESSONS,
+  BONUS, BONUS_INTRO, BONUS_SHELVES, BONUS_TITLE, COACH_NOTES, CORE_PARTS, GUIDE_CLOSER, GUIDE_INTRO, GUIDE_TITLE, LADDER, LESSONS, LIGHT_INTRO, LIGHT_KEYS, LIGHT_LESSONS,
   LIGHT_PARTS, PROGRAM_NAME, bonusProgress, courseReady, guideProgress, lessonNumber, programLessons, programTitle, type Lesson, type LessonWork,
 } from "@/lib/leadership-guide";
 import { LeaderToggle } from "../../../leadership-client";
@@ -121,6 +121,7 @@ export default async function LeadershipPage({ params }: PageProps<"/players/[pl
                   {p}
                 </p>
               ))}
+              {!light && <p className="font-display text-xl font-bold tracking-wide text-highlight uppercase">{GUIDE_CLOSER}</p>}
             </div>
             <div className="mt-6 max-w-md">
               <ProgressBar value={progress.done} max={progress.total} label={`${progress.done} of ${progress.total} lessons complete`} />

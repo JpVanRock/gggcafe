@@ -64,3 +64,10 @@ test("no placeholders left in the documents", () => {
 test("the version is a date (the database checks the same shape)", () => {
   assert.match(TERMS_VERSION, /^\d{4}-\d{2}-\d{2}$/);
 });
+
+test("Coach's Responsibilities: the user's sixteen, three in bold", async () => {
+  const { COACH_RESPONSIBILITIES, COACH_RESPONSIBILITIES_MOTTO } = await import("../../src/lib/coach-responsibilities.ts");
+  assert.equal(COACH_RESPONSIBILITIES.length, 16);
+  assert.deepEqual(COACH_RESPONSIBILITIES.flatMap((r, i) => (r.key ? [i + 1] : [])), [3, 7, 14]);
+  assert.equal(COACH_RESPONSIBILITIES_MOTTO, "Teaching Creates Understanding");
+});

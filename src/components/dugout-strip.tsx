@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Modal } from "@/components/modal";
 import { EmptyState, eyebrowClass } from "@/components/ui";
 import { CultureStatement, StandardsList, hasCulture, type TeamCulture, type TeamStandard } from "@/components/team-standards";
+import { COACH_RESPONSIBILITIES, COACH_RESPONSIBILITIES_MOTTO, COACH_RESPONSIBILITIES_TITLE } from "@/lib/coach-responsibilities";
 
 export type DugoutTeam = {
   team: { id: string; name: string };
@@ -29,6 +30,7 @@ export function DugoutStrip({
   yearbookHref,
   leaderboardHref,
   activityHref,
+  coachResponsibilities = false,
 }: {
   teams: DugoutTeam[];
   canEdit: boolean;
@@ -41,6 +43,8 @@ export function DugoutStrip({
   leaderboardHref?: string;
   /** + Activity: log a session */
   activityHref?: string;
+  /** the Coaches Dugout only: Coach's Responsibilities, first (coaches see it; players don't) */
+  coachResponsibilities?: boolean;
 }) {
   if (teams.length === 0) return null;
   const names = teams.map((t) => t.team.name).join(" · ");
@@ -99,6 +103,26 @@ export function DugoutStrip({
         </div>
       ) : (
       <div className="flex flex-wrap gap-2">
+        {coachResponsibilities && (
+          <Modal
+            title={COACH_RESPONSIBILITIES_TITLE}
+            subtitle="Coaches only"
+            trigger={COACH_RESPONSIBILITIES_TITLE}
+            triggerClassName={`${pill} border border-neon text-highlight hover:bg-neon hover:text-on-accent`}
+          >
+            <div className="flex flex-col gap-6">
+              <p className="font-display text-2xl font-bold tracking-wide text-link italic">{COACH_RESPONSIBILITIES_MOTTO}</p>
+              <ol className="grid gap-2 sm:grid-cols-2">
+                {COACH_RESPONSIBILITIES.map((r, i) => (
+                  <li key={r.text} className="flex items-baseline gap-3 border-b border-navy-700 pb-2">
+                    <span className="w-7 shrink-0 font-display text-lg font-bold text-highlight tabular-nums">{String(i + 1).padStart(2, "0")}</span>
+                    <span className={r.key ? "font-bold text-ink italic" : "text-ink/90"}>{r.text}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </Modal>
+        )}
         <Modal
           title="Team Standards"
           subtitle={names}

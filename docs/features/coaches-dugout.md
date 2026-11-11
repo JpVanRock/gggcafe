@@ -37,6 +37,9 @@
   description, blank line = new paragraph) per team; saved together by the `save_team_dugout` RPC.
   Players see them in the "From the Dugout" strip above TWIS (`components/dugout-strip.tsx`): Team
   Standards / Team Culture pill buttons open pop-ups, one section per active own team.
+- Coach's Responsibilities (user, 2026-11-11, from the user's own sheet): the first pill on the strip at the bottom of
+  the Coaches Dugout (`coachResponsibilities` prop), coaches only. Sixteen responsibilities and "Teaching Creates
+  Understanding" in `src/lib/coach-responsibilities.ts` (`key: true` = the ones the user set in bold).
 - Drill library: `practice_drills` (shared by all teams), tags `drill_tag` (labels in `src/lib/dugout.ts`,
   user's list: infield, outfield, defense, catchers, pitchers, catchers & pitchers, warm-up routine,
   throwing routine), optional usual equipment and video link (`video_url`, https) copied into plans;
