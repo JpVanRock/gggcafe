@@ -17,8 +17,8 @@
   `decide_staff_request()` (admins any, head coaches assistants) add the `staff` row. Roster tab: "Coaches signing up"
   plus "Coaching staff" (admins change roles/remove, `roster/actions.ts`). Counts in `countWaiting()` (approvals.ts).
 - Assistants: `private.can_edit()` includes them, `private.is_head_coach()` doesn't. Head-coach-only writes
-  (`private.apply_head_coach_writes`): team_culture/standards, gameday_*, mentor_players, the Team Budget (budget_*); parent links, parent emails
-  (`team_parent_links`), the team code (trigger), mentor message removal. Practice plans: everyone reads; assistants
+  (`private.apply_head_coach_writes`): team_culture/standards, gameday_*, the Team Budget (budget_*); parent links, parent emails
+  (`team_parent_links`), the team code (trigger), approving whole-team mentors (`decide_mentor_link`; a player's parents approve one for her, see mentors.md). Practice plans: everyone reads; assistants
   change only plans they created (`private.can_edit_plan`, `canEditPlanRole`); others show "View only".
   App: `src/lib/roles.ts` (labels, `dugoutTabsFor` hides Culture/GameDay/Parents/Mentors from assistants),
   `requireHeadCoachPage()` (404 for assistants) and `headCoachCheck()` in auth.ts. Bell: head coaches/admins only.

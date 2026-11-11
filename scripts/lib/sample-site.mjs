@@ -29,6 +29,7 @@ function fill(segments) {
       case "planId": return ID.plan;
       case "scriptId": return ID.bullpenScript;
       case "spotlightId": return ID.spotlight;
+      case "mentorId": return ID.mentor;
       case "chapter": return path.includes("scorebook") ? "1" : "good-habits";
       case "lesson": return "why-leadership";
       case "n": return "1";

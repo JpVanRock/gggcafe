@@ -10,3 +10,5 @@
   `PACKET_STARTERS`; `parent_packet_reads` per parent): approved parents read it on /family and mark items read
   (`private.my_parent_team_ids()`). Shared forms: `src/components/family-forms.tsx` (take the saving action as a prop).
   Logic: `src/lib/family.ts` (unit-tested). DB tests: `tests/db/family.test.sql`.
+- Her mentors (user, 2026-11-11): a card per daughter on /family (approve or decline a mentor's request, remove one) and
+  `/family/mentors` (every message, focus area and note about her). See `mentors.md`.

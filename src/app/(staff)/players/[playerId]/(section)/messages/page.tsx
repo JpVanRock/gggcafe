@@ -34,7 +34,11 @@ export default async function MessagesPage({ params }: PageProps<"/players/[play
             <MessageCard key={m.id} message={m} photoUrl={m.photo_path ? (photos.get(m.photo_path) ?? null) : null} playerId={player.id} canDismiss={access.isSelf} />
           ))
         )}
-        {!access.isSelf && <p className="text-xs text-muted">Coaches and admins can read every message a mentor sends.</p>}
+        {!access.isSelf && (
+          <p className="text-xs text-muted">
+            Coaches see the messages a mentor shares with them. Her parents and the site admins see every message.
+          </p>
+        )}
       </div>
     </SectionShell>
   );

@@ -31,7 +31,7 @@ insert into public.player_claims (user_id, team_id, season_id, roster_entry_id, 
 select 'cdcdcdcd-0000-0000-0000-000000000002', r.team_id, r.season_id, r.id, 'Jordan Kim', '21', 'approved'
   from public.roster_entries r where r.player_id = '00000000-0000-0000-0000-0000000000c2';
 insert into public.mentors (user_id, display_name) values ('cdcdcdcd-0000-0000-0000-000000000003', 'P Mentor');
-insert into public.mentor_players (mentor_id, player_id) values ('cdcdcdcd-0000-0000-0000-000000000003', '00000000-0000-0000-0000-0000000000c2');
+insert into public.mentor_links (mentor_id, player_id, status) values ('cdcdcdcd-0000-0000-0000-000000000003', '00000000-0000-0000-0000-0000000000c2', 'approved');
 
 -- The coach writes a script and pushes it as a pitching routine
 set role authenticated;
@@ -76,7 +76,7 @@ delete from public.bullpen_sessions where player_id = '00000000-0000-0000-0000-0
 delete from public.player_activities where team_routine_id = 'cdcdcdcd-0000-0000-0000-0000000000b1';
 delete from public.team_routines where id = 'cdcdcdcd-0000-0000-0000-0000000000b1';
 delete from public.bullpen_scripts where id = 'cdcdcdcd-0000-0000-0000-0000000000a1';
-delete from public.mentor_players where mentor_id = 'cdcdcdcd-0000-0000-0000-000000000003';
+delete from public.mentor_links where mentor_id = 'cdcdcdcd-0000-0000-0000-000000000003';
 delete from public.mentors where user_id = 'cdcdcdcd-0000-0000-0000-000000000003';
 delete from public.player_claims where user_id::text like 'cdcdcdcd-%';
 delete from public.staff where user_id::text like 'cdcdcdcd-%';

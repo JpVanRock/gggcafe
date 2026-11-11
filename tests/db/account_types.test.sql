@@ -100,7 +100,7 @@ select pg_temp.expect('assistant reads players', (select count(*) > 0 from publi
 select pg_temp.expect('assistant reads the culture', (select headline from public.team_culture where team_id = '00000000-0000-0000-0000-0000000000b1'), 'Compete. Connect. Elevate.');
 select pg_temp.expect('assistant can''t save the culture', pg_temp.err($$select public.save_team_dugout('00000000-0000-0000-0000-0000000000b1', 'Mine', null, '[]'::jsonb)$$), '42501');
 select pg_temp.expect('assistant can''t add GameDay cards', pg_temp.err($$insert into public.gameday_profiles (team_id, season_id, player_id) values ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000c1')$$), '42501');
-select pg_temp.expect('assistant can''t assign mentors', pg_temp.err($$insert into public.mentor_players (mentor_id, player_id) values ('dddddddd-0000-0000-0000-000000000006', '00000000-0000-0000-0000-0000000000c1')$$), '42501');
+select pg_temp.expect('assistant can''t approve mentors', pg_temp.err($$insert into public.mentor_links (mentor_id, player_id, status) values ('dddddddd-0000-0000-0000-000000000006', '00000000-0000-0000-0000-0000000000c1', 'approved')$$), '42501');
 select pg_temp.expect('assistant can''t change the team code', pg_temp.err($$update public.teams set team_code = 'ZZZZ99' where id = '00000000-0000-0000-0000-0000000000b1'$$), '42501');
 select pg_temp.expect('assistant can''t remove a standard', pg_temp.err($$select public.save_team_dugout('00000000-0000-0000-0000-0000000000b1', 'Compete. Connect. Elevate.', null, '[]'::jsonb)$$), '42501');
 select pg_temp.expect('assistant reads the budget', pg_temp.err($$select count(*) from public.budget_entries$$), '');

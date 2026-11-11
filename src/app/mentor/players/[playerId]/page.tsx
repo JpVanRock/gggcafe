@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { getCurrentUser, getMenteeIds, getMentor } from "@/lib/auth";
-import { formatDay } from "@/lib/dates";
+import { getCurrentUser, getMentor, getMentorAccess } from "@/lib/auth";
+import { formatDay, todayISO } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
 import { signedPhotoUrls } from "@/lib/player-photos";
 import { MESSAGE_COLUMNS, signedMessagePhotoUrls, type MentorMessage } from "@/lib/message-photos";
@@ -18,7 +18,15 @@ import { MeasurementsBySeason, loadMeasurements } from "@/app/(staff)/players/[p
 import { BestVersion } from "@/app/(staff)/players/[playerId]/best-version";
 import type { BestVersionAnswers } from "@/lib/best-version";
 import { MentalDetail } from "@/app/(staff)/players/[playerId]/mental";
-import { DateForm, MessageForm, RemoveDate, RemoveMessage, type LibraryDrill } from "../../mentor-client";
+import { MentalTools } from "@/app/(staff)/players/[playerId]/mental-game";
+import { loadMentalTools } from "@/app/(staff)/players/[playerId]/mental-data";
+import { MessageForm, RemoveMessage, TrainingForm, type LibraryDrill } from "../../mentor-client";
+import { ActionForm } from "@/components/action-form";
+import { SubmitButton } from "@/components/submit-button";
+import { Badge } from "@/components/ui";
+import { FocusBoard, FocusControls, FocusForm, NoteForm, NotesThread, RemoveNote, type FocusItem, type MentorNote } from "@/components/mentor-work";
+import { addMentorFocus, addMentorNote, removeMentorFocus, removeMentorNote, setMentorFocus, setMessageSharing } from "../../actions";
+import { TrainingList, loadTraining } from "../../parts";
 
 export const metadata: Metadata = { title: "Player · Mentor · GGG.Cafe" };
 
@@ -40,7 +48,8 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
   const mentor = await getMentor();
   if (!mentor) redirect("/mentor");
   // her players only
-  if (!(await getMenteeIds()).includes(playerId)) notFound();
+  const access = await getMentorAccess();
+  if (!access.menteeIds.includes(playerId)) notFound();
 
   const supabase = await createClient();
   const { data } = await supabase.from("players").select("*").eq("id", playerId).maybeSingle();
@@ -49,7 +58,7 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
   const first = player.preferred_name || player.first_name;
   const method = player.goal_method ?? "harada";
 
-  const [chart, smartGoals, metricOptions, pop, mental, styles, { data: drillRows }, { data: sentRows }, { data: dateRows }, measurements, { data: best }] = await Promise.all([
+  const [chart, smartGoals, metricOptions, pop, mental, styles, { data: drillRows }, { data: sentRows }, training, measurements, { data: best }, { data: focusRows }, { data: noteRows }, mentalTools] = await Promise.all([
     loadHarada(supabase, player.id),
     loadSmartGoals(supabase, player.id),
     loadMetricOptions(supabase),
@@ -58,11 +67,22 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
     loadMovementAndHitting(supabase, player.id),
     supabase.from("practice_drills").select("id, name, video_url").order("name"),
     supabase.from("mentor_messages").select(MESSAGE_COLUMNS).eq("player_id", player.id).eq("sender_id", mentor.userId).order("created_at", { ascending: false }).limit(20),
-    supabase.from("player_activities").select("id, title, details, starts_on").eq("player_id", player.id).eq("source", "mentor").order("starts_on"),
+    loadTraining(supabase, mentor.userId, [player.id]),
     // mentors can't read team lists: her defaults plus whatever she has been measured on
     loadMeasurements(supabase, player, null),
     supabase.from("player_best_version").select("answers").eq("player_id", player.id).maybeSingle(),
+    supabase.from("mentor_focus").select("id, title, details, status, updated_at").eq("player_id", player.id).eq("mentor_id", mentor.userId).order("created_at"),
+    supabase
+      .from("mentor_notes")
+      .select("id, kind, discussed_on, body, author_id, author_name, author_role, created_at")
+      .eq("player_id", player.id)
+      .eq("mentor_id", mentor.userId)
+      .order("created_at"),
+    // her signals, intensity checks and self-scans (never the journal)
+    loadMentalTools(supabase, player.id, todayISO()),
   ]);
+  const focus = (focusRows ?? []) as FocusItem[];
+  const notes = (noteRows ?? []) as MentorNote[];
   const sent = (sentRows ?? []) as MentorMessage[];
   const [photos, messagePhotos] = await Promise.all([
     signedPhotoUrls(supabase, [player.photo_path]),
@@ -106,6 +126,14 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
                   )}
                 </span>
                 <span className="font-mono text-2xs tracking-wider text-muted uppercase">{m.read_at ? "Seen" : "Not seen yet"}</span>
+                <ActionForm action={setMessageSharing} className="flex flex-wrap items-center gap-2">
+                  <input type="hidden" name="message_id" value={m.id} />
+                  <input type="hidden" name="shared" value={m.shared_with_coaches ? "0" : "1"} />
+                  {m.shared_with_coaches && <Badge tone="pink">Shared with coaches</Badge>}
+                  <SubmitButton variant="link" pendingLabel="Saving…" className="text-xs">
+                    {m.shared_with_coaches ? "Stop sharing" : "Share with coaches"}
+                  </SubmitButton>
+                </ActionForm>
                 <RemoveMessage id={m.id} />
               </li>
             ))}
@@ -113,26 +141,31 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
         )}
       </Panel>
 
-      {mentor.canSchedule && (
-        <Panel title={`${first}'s week`}>
-          <p className="text-sm text-muted">Dates you add show up in her This Week in Softball on that day, marked as from you.</p>
-          <DateForm playerId={player.id} playerName={first} />
-          {(dateRows ?? []).length > 0 && (
-            <ul className="divide-y divide-navy-700 rounded-xl border border-navy-700">
-              {((dateRows ?? []) as { id: string; title: string; details: string | null; starts_on: string }[]).map((d) => (
-                <li key={d.id} className="flex flex-wrap items-baseline gap-x-4 gap-y-1 px-4 py-2.5 text-sm">
-                  <span className="w-24 shrink-0 font-display text-muted tabular-nums">{formatDay(d.starts_on)}</span>
-                  <span className="font-semibold">{d.title}</span>
-                  {d.details && <span className="min-w-0 flex-1 truncate text-muted">{d.details}</span>}
-                  <span className="ml-auto">
-                    <RemoveDate id={d.id} />
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Panel>
-      )}
+      <Panel title="Working with her coaches">
+        <p className="-mt-2 text-sm text-muted">
+          Keep her coaches on the same page: what you&apos;re working on, what&apos;s working, and what you talked about. Her coaches and parents read this; {first}{" "}
+          doesn&apos;t.
+        </p>
+        <FocusBoard
+          items={focus}
+          empty="No focus areas yet. Add what you're working on with her."
+          controls={(item) => <FocusControls item={item} move={setMentorFocus} remove={removeMentorFocus} />}
+        />
+        <FocusForm action={addMentorFocus} hidden={{ player_id: player.id }} />
+        <h3 className="mt-2 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Notes with her coaches</h3>
+        <NotesThread
+          notes={notes}
+          empty="No notes yet. After you talk with her coaches, add a discussion summary."
+          controls={(n) => (n.author_id === mentor.userId ? <RemoveNote id={n.id} action={removeMentorNote} /> : null)}
+        />
+        <NoteForm action={addMentorNote} hidden={{ player_id: player.id }} placeholder="Talked with Coach after practice: her drop ball is landing low. Next: same drill, add a target." />
+      </Panel>
+
+      <Panel title={`${first}'s week`}>
+        <p className="-mt-2 text-sm text-muted">Training you add shows up in her This Week in Softball on those days, marked as from you.</p>
+        <TrainingForm single={{ id: player.id, label: first }} />
+        <TrainingList rows={training} nameOf={() => first} />
+      </Panel>
 
       <Panel title={`${first}'s Goals`}>
         <BestVersion playerId={player.id} answers={(best?.answers ?? {}) as BestVersionAnswers} canEdit={false} safety={null} />
@@ -166,10 +199,12 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
 
       <Panel title="Mental GP">
         <MentalDetail playerId={player.id} plan={mental} canEdit={false} />
+        <MentalTools playerId={player.id} plan={mental} {...mentalTools} today={todayISO()} canEdit={false} />
       </Panel>
 
       <p className="text-xs text-muted">
-        You see {playerName(player)} because her coach assigned her to you. Coaches and admins can read the messages you send.
+        You see {playerName(player)} because {access.playerIds.includes(player.id) ? "her parents approved you" : "her head coach approved you for the team"}. Her
+        parents and the site admins can read every message you send her; her coaches read only the ones you share.
       </p>
     </div>
   );

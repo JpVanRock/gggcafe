@@ -1,87 +1,107 @@
 "use server";
 
-// Coaches Dugout → Mentors. Admins approve mentors, turn calendar dates on or
-// off, and remove mentors; coaches and admins assign players and can remove any
-// message (oversight). The database enforces the same rules.
+// Coaches Dugout → Mentors. Head coaches approve mentors for the whole team (a player's
+// parents approve one for her; admins can approve either), remove those approvals, reply to
+// a mentor's notes, and remove a message the mentor shared with them. Admins remove mentors.
+// The database enforces the same rules.
 import { refresh } from "next/cache";
 import { adminCheck, headCoachCheck } from "@/lib/auth";
-import { friendlyDbError } from "@/lib/form";
-import { MESSAGE_PHOTO_BUCKET } from "@/lib/mentors";
+import { STALE, failed, must, runAction } from "@/lib/actions";
+import { friendlyDbError, invalid, text, type FormState } from "@/lib/form";
+import { MESSAGE_PHOTO_BUCKET, cleanMentorNote } from "@/lib/mentors";
 import { isUuid } from "@/lib/softball";
 import { createClient } from "@/lib/supabase/server";
 
-type Result = { error: string | null };
-
-export async function approveMentor(input: { userId: string; displayName: string; specialty: string; canSchedule: boolean }): Promise<Result> {
-  const denied = await adminCheck();
-  if (denied) return { error: denied };
-  const name = input.displayName.trim();
-  if (!isUuid(input.userId)) return { error: "Unknown sign-up." };
-  if (!name || name.length > 80) return { error: "Enter the mentor's name." };
-  const supabase = await createClient();
-  const { error } = await supabase.from("mentors").insert({
-    user_id: input.userId,
-    display_name: name,
-    specialty: input.specialty.trim().slice(0, 60) || null,
-    can_schedule: Boolean(input.canSchedule),
+/** Approve or decline a mentor's request. */
+export async function decideMentorRequest(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "link_id");
+    const decision = text(fd, "decision");
+    if (!isUuid(id) || (decision !== "approve" && decision !== "decline")) return failed(STALE);
+    const supabase = await createClient();
+    const { error } = await supabase.rpc("decide_mentor_link", { p_link_id: id, p_approve: decision === "approve" });
+    if (error) {
+      if (error.code === "P0002") return failed("That request was already decided. Reload the page.");
+      if (error.code === "42501") return failed("A player's parents approve a mentor for her. Head coaches approve mentors for the whole team.");
+      return failed(friendlyDbError(error));
+    }
+    refresh();
   });
-  if (error) return { error: friendlyDbError(error, "She's already a mentor.") };
-  refresh();
-  return { error: null };
 }
 
-export async function setMentorCalendar(input: { userId: string; on: boolean }): Promise<Result> {
-  const denied = await adminCheck();
-  if (denied) return { error: denied };
-  const supabase = await createClient();
-  const { error } = await supabase.from("mentors").update({ can_schedule: input.on }).eq("user_id", input.userId);
-  if (error) return { error: friendlyDbError(error) };
-  refresh();
-  return { error: null };
+/** Ends a mentor's access to the whole team (head coach) or to one player (admins). */
+export async function removeMentorLink(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "link_id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    const { data } = must(await supabase.from("mentor_links").delete().eq("id", id).select("id"));
+    if (!data?.length) return failed("Only her parents or an admin can remove a mentor from one player.");
+    refresh();
+  });
 }
 
-/** Removes a mentor: she loses access to every player. Messages she sent stay for the players. */
-export async function removeMentor(input: { userId: string }): Promise<Result> {
-  const denied = await adminCheck();
-  if (denied) return { error: denied };
-  const supabase = await createClient();
-  const { error } = await supabase.from("mentors").delete().eq("user_id", input.userId);
-  if (error) return { error: friendlyDbError(error) };
-  refresh();
-  return { error: null };
+/** Admins: remove a mentor account's access everywhere. Messages she sent stay for the players. */
+export async function removeMentor(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await adminCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "mentor_id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("mentors").delete().eq("user_id", id));
+    refresh();
+  });
 }
 
-export async function assignMentorPlayer(input: { mentorId: string; playerId: string }): Promise<Result> {
-  const denied = await headCoachCheck();
-  if (denied) return { error: denied };
-  if (!isUuid(input.mentorId) || !isUuid(input.playerId)) return { error: "Pick a player." };
-  const supabase = await createClient();
-  const { error } = await supabase.from("mentor_players").insert({ mentor_id: input.mentorId, player_id: input.playerId });
-  if (error) return { error: friendlyDbError(error, "She's already one of this mentor's players.") };
-  refresh();
-  return { error: null };
+/** A head coach replies in a mentor's notes about a player or the team. */
+export async function addCoachNote(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    const mentorId = text(fd, "mentor_id");
+    const playerId = text(fd, "player_id");
+    const teamId = text(fd, "team_id");
+    if (!isUuid(mentorId) || (playerId ? !isUuid(playerId) : !isUuid(teamId))) return failed(STALE);
+    const note = cleanMentorNote({ kind: "note", body: fd.get("body") });
+    if ("error" in note) return invalid(note.field, note.error);
+    const supabase = await createClient();
+    must(
+      await supabase
+        .from("mentor_notes")
+        .insert({ mentor_id: mentorId, player_id: playerId, team_id: playerId ? null : teamId, kind: note.kind, body: note.body }),
+    );
+    refresh();
+  });
 }
 
-export async function unassignMentorPlayer(input: { mentorId: string; playerId: string }): Promise<Result> {
-  const denied = await headCoachCheck();
-  if (denied) return { error: denied };
-  const supabase = await createClient();
-  const { error } = await supabase.from("mentor_players").delete().eq("mentor_id", input.mentorId).eq("player_id", input.playerId);
-  if (error) return { error: friendlyDbError(error) };
-  refresh();
-  return { error: null };
+export async function removeCoachNote(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "note_id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("mentor_notes").delete().eq("id", id));
+    refresh();
+  });
 }
 
-/** Oversight: remove a message (and its photo). */
-export async function removeMentorMessage(input: { id: string }): Promise<Result> {
-  const denied = await headCoachCheck();
-  if (denied) return { error: denied };
-  if (!isUuid(input.id)) return { error: "Unknown message." };
-  const supabase = await createClient();
-  const { data } = await supabase.from("mentor_messages").select("photo_path").eq("id", input.id).maybeSingle();
-  const { error } = await supabase.from("mentor_messages").delete().eq("id", input.id);
-  if (error) return { error: friendlyDbError(error) };
-  if (data?.photo_path) await supabase.storage.from(MESSAGE_PHOTO_BUCKET).remove([data.photo_path as string]);
-  refresh();
-  return { error: null };
+/** Remove a message (and its photo): one a mentor shared with the coaches, or any message for admins. */
+export async function removeMentorMessage(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "message_id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    const { data } = await supabase.from("mentor_messages").select("photo_path").eq("id", id).maybeSingle();
+    must(await supabase.from("mentor_messages").delete().eq("id", id));
+    if (data?.photo_path) await supabase.storage.from(MESSAGE_PHOTO_BUCKET).remove([data.photo_path]);
+    refresh();
+  });
 }

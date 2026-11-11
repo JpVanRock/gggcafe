@@ -14,7 +14,7 @@ export type RegisterState = {
   checkEmail?: boolean;
   /** the team her code matched, for the confirmation message */
   team?: string;
-  values: { role: SignupType | ""; name: string; email: string; code: string; child: string; specialty: string; org: string };
+  values: { role: SignupType | ""; name: string; email: string; code: string; child: string; specialty: string; org: string; scope: string };
 };
 
 /**
@@ -28,7 +28,8 @@ export type RegisterState = {
  * asks her to claim her profile (a coach approves it).
  * Parent: /family sends the request to join the team with its code (a head coach approves
  * it); the form there is filled in with what she typed here.
- * Mentor: /mentor waits for an admin to approve her.
+ * Mentor: asks with the team code for one player (her parents approve) or the whole team (the
+ * head coach approves); /mentor sends the request if it couldn't go yet, filled in with what she typed.
  */
 export async function registerAccount(_prev: RegisterState, fd: FormData): Promise<RegisterState> {
   const role = SIGNUP_TYPES.find((t) => t === fd.get("role")) ?? null;
@@ -40,6 +41,7 @@ export async function registerAccount(_prev: RegisterState, fd: FormData): Promi
     child: String(fd.get("child") ?? "").trim(),
     specialty: String(fd.get("specialty") ?? "").trim().slice(0, 60),
     org: String(fd.get("org") ?? "").trim().slice(0, 120),
+    scope: fd.get("scope") === "team" ? "team" : fd.get("scope") === "player" ? "player" : "",
   };
   const fail = (error: string, field?: string): RegisterState => ({ error, values, ...(field ? { fields: { [field]: error } } : {}) });
   if (!role) return fail("Choose your account type.", "role");
@@ -57,6 +59,8 @@ export async function registerAccount(_prev: RegisterState, fd: FormData): Promi
   if ((player || mentor || coach) && !/\s/.test(values.name)) return fail("Enter your first and last name.", "name");
   if (parent && (!values.child || values.child.length > 80)) return fail("Enter your daughter's first and last name.", "child");
   if (headCoach && !values.org) return fail("Enter your team or organization.", "org");
+  if (mentor && !values.scope) return fail("Choose one player or the whole team.", "scope");
+  if (mentor && values.scope === "player" && (!/\s/.test(values.child) || values.child.length > 80)) return fail("Enter the player's first and last name.", "child");
   if (!/^\S+@\S+\.\S+$/.test(values.email)) return fail("Enter a valid email address.", "email");
   if (password.length < 8) return fail("Use a password of at least 8 characters.", "password");
   if (password !== String(fd.get("confirm") ?? "")) return fail("The two passwords don't match.", "confirm");
@@ -90,6 +94,7 @@ export async function registerAccount(_prev: RegisterState, fd: FormData): Promi
         // the Terms version she agreed to; a database trigger records the agreement (terms_acceptances)
         terms_version: TERMS_VERSION,
         ...(mentor && values.specialty ? { specialty: values.specialty } : {}),
+        ...(mentor ? { team_code: values.code, ...(values.scope === "player" ? { mentor_player: values.child } : {}) } : {}),
         ...(team ? { team: team.id } : {}),
         ...(parent ? { team_code: values.code, child: values.child } : {}),
         ...(headCoach && values.org ? { note: values.org } : {}),
@@ -119,8 +124,11 @@ export async function registerAccount(_prev: RegisterState, fd: FormData): Promi
 
   // Players: the welcome message and claim form are on /me.
   if (player) redirect(`/me?team=${team!.id}`);
-  // Mentors: an admin approves them; /mentor says so.
-  if (mentor) redirect("/mentor");
+  // Mentors: send the request now (a parent or the head coach approves it); /mentor shows it.
+  if (mentor) {
+    await supabase.rpc("request_mentor", { p_code: values.code, p_player_name: values.scope === "player" ? values.child : "" });
+    redirect("/mentor");
+  }
   // Coaches: /dashboard sends the request and says who approves it.
   if (coach) redirect("/dashboard");
 

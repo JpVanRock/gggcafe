@@ -7,7 +7,7 @@
 export const SIGNUP_TYPES = ["head-coach", "assistant-coach", "player", "parent", "mentor"] as const;
 export type SignupType = (typeof SIGNUP_TYPES)[number];
 /** The account types that sign up with their team's code (teams.team_code). */
-export const CODE_TYPES: readonly SignupType[] = ["player", "parent", "assistant-coach"];
+export const CODE_TYPES: readonly SignupType[] = ["player", "parent", "assistant-coach", "mentor"];
 
 export const SIGNUP_LABEL: Record<SignupType, string> = {
   "head-coach": "Head Coach",
@@ -54,8 +54,8 @@ export const ACCOUNT_TYPES: AccountType[] = [
   {
     key: "mentor",
     label: "Mentor",
-    signup: "Mentors and skill coaches sign up with an email and confirm it; an admin approves; a head coach assigns players.",
-    home: "Mentor page: assigned players",
+    signup: "Mentors and skill coaches sign up with the team code and confirm their email; a player's parents approve them for her, or the head coach for the whole team.",
+    home: "Mentor page: the team's roster or her approved players",
   },
 ];
 
@@ -90,9 +90,9 @@ export const SECTIONS: { title: string; rows: Row[] }[] = [
       row("Coaches dashboard", "Approvals waiting, Leadership check-ins, team and player counts, the Coaches Dugout.", ["yes", "part", "no", "no", "no"],
         "Assistants get their own view: this week's calendar, practice plans for the next two weeks, their drafts, and player claims to approve."),
       row("Player menu", "The cafe-menu dashboard: TWIS, Goals, Pop Report, Mental GP, Softball IQ, Trophy Room.", ["yes", "yes", "own", "no", "part"],
-        "Coaches open every player's menu. Mentors read Goals, the Pop Report and Mental GP of the players assigned to them."),
+        "Coaches open every player's menu. Mentors read Goals, the Pop Report and Mental GP of the players they're approved for."),
       row("Family page", "Their daughter's team, team budget totals (no names), her login, the Yearbook with G3 Advanced.", ["no", "no", "no", "yes", "no"]),
-      row("Mentor page", "Assigned players, messages with a photo or a drill, optional calendar dates.", ["no", "no", "no", "no", "yes"]),
+      row("Mentor page", "The team's roster or her approved players, messages with a photo or a drill (shared with coaches if she chooses), training for one player or a group, notes and focus areas with the coaches.", ["no", "no", "no", "no", "yes"]),
     ],
   },
   {
@@ -113,7 +113,8 @@ export const SECTIONS: { title: string; rows: Row[] }[] = [
       row("Team Budget", "Fees, payments, income and expenses.", ["yes", "view", "no", "view", "no"],
         "Assistants see the whole budget but can't change it. Parents see team totals only, with no names."),
       row("Parents", "The team code, parent requests and approved parents.", ["yes", "no", "no", "no", "no"]),
-      row("Mentors", "Assign players to mentors, read and remove messages.", ["yes", "no", "no", "no", "no"], "An admin approves new mentors."),
+      row("Mentors", "Approve mentors for the whole team, read their notes and focus areas and reply, read the messages they share.", ["yes", "no", "no", "part", "no"],
+        "Parents approve a mentor for their daughter and read every message, note and focus area about her (family page). Admins read every message."),
     ],
   },
   {
@@ -156,13 +157,13 @@ export const QUESTIONS: { q: string; a: string[] }[] = [
     q: "Why does every sign-up confirm an email first?",
     a: [
       "So only real people with a working inbox get in. The link in the email finishes the sign-up; until it's opened, the account can't sign in.",
-      "After confirming, every account still waits for a person to approve it: an admin for head coaches and mentors, a head coach for assistant coaches and parents, a coach for players.",
+      "After confirming, every account still waits for a person to approve it: an admin for head coaches, a head coach for assistant coaches and parents, a coach for players, and a player's parents (one player) or the head coach (the whole team) for mentors.",
     ],
   },
   {
     q: "What is the team code, and who gets it?",
     a: [
-      "Each team has one six-character code. Players, parents and assistant coaches choose their account type on the sign-up page and enter it; head coaches and mentors don't need one (an admin approves them).",
+      "Each team has one six-character code. Players, parents, assistant coaches and mentors choose their account type on the sign-up page and enter it; head coaches don't need one (an admin approves them).",
       "Coaches see the code in Coaches Dugout → Roster (and Parents). A head coach turns sign-up on, makes a new code (the old one stops working) or turns it off; everyone already approved keeps access.",
       "A code only lets someone ask to join: every sign-up still waits for approval. Signed-out visitors can't see the list of teams.",
     ],
@@ -184,7 +185,7 @@ export const QUESTIONS: { q: string; a: string[] }[] = [
   {
     q: "Where does the admin fit?",
     a: [
-      "The admin isn't a sign-up type. It has everything a head coach has, plus approving head coaches and mentors, changing roles, G3 Advanced and these FAQ pages.",
+      "The admin isn't a sign-up type. It has everything a head coach has, plus approving head coaches, approving any mentor request, reading every mentor message, changing roles, G3 Advanced and these FAQ pages.",
     ],
   },
   {

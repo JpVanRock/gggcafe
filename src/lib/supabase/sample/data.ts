@@ -5,7 +5,7 @@
 export type Row = Record<string, any>;
 
 const id = (prefix: string, n: number) => `${prefix}00-0000-4000-8000-${String(n).padStart(12, "0")}`;
-export const U = { admin: id("aaaaaa", 1), coach: id("aaaaaa", 2), assistant: id("aaaaaa", 3) };
+export const U = { admin: id("aaaaaa", 1), coach: id("aaaaaa", 2), assistant: id("aaaaaa", 3), mentor: id("aaaaaa", 4) };
 const T = { us: id("bbbbbb", 1), storm: id("bbbbbb", 2), venom: id("bbbbbb", 3), rebels: id("bbbbbb", 4) };
 const S = { fall: id("cccccc", 1) };
 const G = { g1: id("dddddd", 1), g2: id("dddddd", 2), g3: id("dddddd", 3), opener: id("dddddd", 4), scrim: id("dddddd", 5) };
@@ -191,12 +191,44 @@ const measurements: Row[] = [
   { id: id("dede00", 6), player_id: maya, metric_key: "home_to_first", value: 3.3, measured_on: "2026-04-12", created_at: "2026-04-12T20:00:00Z" },
 ];
 
+// Mentors: the sample admin is also a mentor for the whole team (so the mentor pages render
+// with her players, focus areas, notes and training); a second mentor waits for approval.
+const mentors: Row[] = [
+  { user_id: U.admin, display_name: "Coach Sample", specialty: "Pitching", created_at: "2026-11-01T00:00:00Z" },
+  { user_id: U.mentor, display_name: "Jess Moreno", specialty: "Hitting", created_at: "2026-11-09T00:00:00Z" },
+];
+const mentor_links: Row[] = [
+  { id: id("acac00", 1), mentor_id: U.admin, team_id: T.us, player_id: null, player_name: null, status: "approved", requested_at: "2026-11-01T00:00:00Z" },
+  { id: id("acac00", 2), mentor_id: U.admin, team_id: T.us, player_id: jordan, player_name: "Jordan Kim", status: "approved", requested_at: "2026-11-02T00:00:00Z" },
+  { id: id("acac00", 3), mentor_id: U.mentor, team_id: T.us, player_id: null, player_name: null, status: "pending", requested_at: "2026-11-09T00:00:00Z" },
+  { id: id("acac00", 4), mentor_id: U.mentor, team_id: T.us, player_id: emma, player_name: "Emma Nguyen", status: "pending", requested_at: "2026-11-09T00:00:00Z" },
+];
+const mentor_messages: Row[] = [
+  { id: id("adad00", 1), player_id: maya, sender_id: U.admin, sender_name: "Coach Sample", body: "Great pen today. Keep your front side closed on the drop.", photo_path: null, drill_id: null, drill_name: "Towel drill", drill_video_url: "https://example.com/towel", created_at: "2026-11-09T18:00:00Z", read_at: null, shared_with_coaches: true },
+  { id: id("adad00", 2), player_id: maya, sender_id: U.admin, sender_name: "Coach Sample", body: "Proud of how you bounced back after the second inning.", photo_path: null, drill_id: null, drill_name: null, drill_video_url: null, created_at: "2026-11-10T18:00:00Z", read_at: "2026-11-10T20:00:00Z", shared_with_coaches: false },
+];
+const mentor_focus: Row[] = [
+  { id: id("aeae00", 1), mentor_id: U.admin, player_id: maya, team_id: null, title: "Drive the drop ball down", details: "Towel drill, then 15 drops to a low target each pen.", status: "working_on", created_at: "2026-11-02T00:00:00Z", updated_at: "2026-11-09T00:00:00Z" },
+  { id: id("aeae00", 2), mentor_id: U.admin, player_id: maya, team_id: null, title: "Reset breath between pitches", details: null, status: "working", created_at: "2026-11-02T00:00:00Z", updated_at: "2026-11-10T00:00:00Z" },
+  { id: id("aeae00", 3), mentor_id: U.admin, player_id: null, team_id: T.us, title: "Two-strike approach", details: "Choke up, widen, battle.", status: "working_on", created_at: "2026-11-03T00:00:00Z", updated_at: "2026-11-03T00:00:00Z" },
+];
+const mentor_notes: Row[] = [
+  { id: id("afaf00", 1), mentor_id: U.admin, player_id: maya, team_id: null, kind: "summary", discussed_on: "2026-11-09", body: "Talked with Coach Ruiz after practice: her drop ball is landing low. Next: same drill, add a target.", author_id: U.admin, author_name: "Coach Sample", author_role: "mentor", created_at: "2026-11-09T19:00:00Z" },
+  { id: id("afaf00", 2), mentor_id: U.admin, player_id: maya, team_id: null, kind: "note", discussed_on: null, body: "Agreed. We'll chart her drops at the scrimmage.", author_id: U.coach, author_name: "Coach Dana Ruiz", author_role: "coach", created_at: "2026-11-10T08:00:00Z" },
+  { id: id("afaf00", 3), mentor_id: U.admin, player_id: null, team_id: T.us, kind: "note", discussed_on: null, body: "Two-strike approach is the team focus through December.", author_id: U.admin, author_name: "Coach Sample", author_role: "mentor", created_at: "2026-11-03T19:00:00Z" },
+];
+const player_activities: Row[] = [
+  { id: id("abac00", 1), player_id: maya, title: "Pitching lesson", details: "From Coach Sample", days: [2], starts_on: "2026-11-10", ends_on: "2027-01-26", pillar_id: null, created_by: U.admin, source: "mentor", created_at: "2026-11-09T00:00:00Z", updated_at: "2026-11-09T00:00:00Z" },
+  { id: id("abac00", 2), player_id: jordan, title: "Pitching lesson", details: "From Coach Sample", days: [2], starts_on: "2026-11-10", ends_on: "2027-01-26", pillar_id: null, created_by: U.admin, source: "mentor", created_at: "2026-11-09T00:00:00Z", updated_at: "2026-11-09T00:00:00Z" },
+];
+
 export const TABLES: Record<string, Row[]> = {
   players, teams, seasons, roster_entries, staff, games, batting_lines, pitching_lines, fielding_lines, pa_grades,
   batting_season, pitching_season, fielding_season, qab_season, gameday_profiles, gameday_lineups, depth_chart, staff_duties, staff_standards,
   playbook_plays, play_effectiveness, team_quizzes, team_quiz_questions, team_quiz_answers, scouting_reports, practice_plans, practice_plan_cues,
   install_items, install_item_plans, team_events, training_phases, team_offseason, bp_rounds, bullpen_scripts, player_spotlights,
   team_culture, team_standards, player_advanced_access, player_leadership_access, player_leadership_certificates, measurements,
+  mentors, mentor_links, mentor_messages, mentor_focus, mentor_notes, player_activities,
 };
 
 /** table -> the column other tables use to point at it (for embedded selects) */
@@ -220,6 +252,11 @@ const leaderboard = () => {
   };
 };
 
+const playerFull = (pid: string) => {
+  const i = P.indexOf(pid);
+  return `${PLAYERS[i][0]} ${PLAYERS[i][1]}`;
+};
+
 /** RPC results by function name (anything not listed returns null). */
 export function sampleRpc(name: string, args: Row = {}): unknown {
   switch (name) {
@@ -231,6 +268,16 @@ export function sampleRpc(name: string, args: Row = {}): unknown {
     case "unread_notifications": return 2;
     case "pending_approvals": return [];
     case "staff_requests_to_decide": return [];
+    // the sample admin is also a parent of Maya (a whole-team mentor) and Emma (a mentor asks), so the family page's mentor cards render
+    case "parent_home":
+      return [maya, emma].map((pid, i) => ({ link_id: id("agag00", i + 1), team_id: T.us, team_name: "GGG Sample 14U", child_name: playerFull(pid), player_name: playerFull(pid), status: "approved" }));
+    case "parent_player_logins":
+      return [maya, emma].map((pid) => ({ player_id: pid, player_name: playerFull(pid), team_name: "GGG Sample 14U", on_roster: true, username: null, has_account: true }));
+    case "mentor_requests_waiting": return mentor_links.filter((l) => l.status === "pending" && !l.player_id).length;
+    case "my_mentor_links":
+      return mentor_links
+        .filter((l) => l.mentor_id === U.admin)
+        .map((l) => ({ id: l.id, team_id: l.team_id, team_name: "GGG Sample 14U", player_id: l.player_id, player_name: l.player_name, status: l.status, requested_at: l.requested_at }));
     case "coaching_staff": return staff.map((s) => ({ user_id: s.user_id, display_name: s.display_name, email: "coach@sample.test" }));
     case "my_practice_notes":
       return practice_plans
@@ -247,5 +294,5 @@ export function sampleRpc(name: string, args: Row = {}): unknown {
 /** Ids the page smoke test uses for dynamic routes. */
 export const SAMPLE_IDS = {
   player: maya, lightLeader: lila, team: T.us, opponent: T.storm, lineup: id("abab00", 1), game: G.g1, quiz: QZ, plan: PL,
-  bullpenScript: bullpen_scripts[0].id, spotlight: player_spotlights[0].id,
+  bullpenScript: bullpen_scripts[0].id, spotlight: player_spotlights[0].id, mentor: U.admin,
 };

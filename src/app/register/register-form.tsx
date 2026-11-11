@@ -7,7 +7,7 @@ import { Field, FormMessage, inputClass } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
 import { AgreementCheckbox } from "@/components/agreement-checkbox";
 
-const initial: RegisterState = { error: null, values: { role: "", name: "", email: "", code: "", child: "", specialty: "", org: "" } };
+const initial: RegisterState = { error: null, values: { role: "", name: "", email: "", code: "", child: "", specialty: "", org: "", scope: "" } };
 
 // Players and parents first: most sign-ups are theirs.
 const MENU: SignupType[] = ["player", "parent", "assistant-coach", "head-coach", "mentor"];
@@ -20,6 +20,7 @@ export function RegisterForm() {
   const assistant = role === "assistant-coach";
   const headCoach = role === "head-coach";
   const mentor = role === "mentor";
+  const [scope, setScope] = useState(state.values.scope || "player");
 
   if (state.checkEmail) {
     return (
@@ -29,7 +30,9 @@ export function RegisterForm() {
         {player
           ? " claim your player profile."
           : mentor
-            ? " finish. An admin approves new mentors."
+            ? scope === "team"
+              ? " send your request. The head coach approves mentors for the whole team."
+              : " send your request. Her parents approve mentors for their daughter."
             : headCoach
               ? " finish. An admin approves new head coaches."
               : assistant
@@ -61,7 +64,10 @@ export function RegisterForm() {
       </Field>
 
       {role !== "" && CODE_TYPES.includes(role) && (
-        <Field label="Team code" hint={assistant ? "From your head coach, who approves you" : "Six letters and numbers from your coach"}>
+        <Field
+          label="Team code"
+          hint={assistant ? "From your head coach, who approves you" : mentor ? "From the head coach or the player's parents" : "Six letters and numbers from your coach"}
+        >
           <input
             name="code"
             required
@@ -85,6 +91,30 @@ export function RegisterForm() {
       {headCoach && (
         <Field label="Your team or organization" hint="Helps the admin approve you. You register the team itself after approval.">
           <input name="org" required maxLength={120} autoComplete="organization" defaultValue={state.values.org} className={inputClass} />
+        </Field>
+      )}
+      {mentor && (
+        <fieldset className="flex flex-col gap-2">
+          <legend className="mb-1.5 text-sm font-medium">Who you work with</legend>
+          {(
+            [
+              ["player", "One player", "Her parents approve you."],
+              ["team", "The whole team", "The head coach approves you."],
+            ] as const
+          ).map(([value, text, hint]) => (
+            <label key={value} className="flex items-start gap-2 text-sm">
+              <input type="radio" name="scope" value={value} checked={scope === value} onChange={() => setScope(value)} className="mt-0.5 size-4 accent-pink" />
+              <span>
+                {text}
+                <span className="block text-xs text-muted">{hint}</span>
+              </span>
+            </label>
+          ))}
+        </fieldset>
+      )}
+      {mentor && scope === "player" && (
+        <Field label="The player's first and last name" hint="As the team has her on the roster">
+          <input name="child" required autoComplete="off" maxLength={80} defaultValue={state.values.child} className={inputClass} />
         </Field>
       )}
       {mentor && (

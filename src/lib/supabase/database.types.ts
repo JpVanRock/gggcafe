@@ -1929,6 +1929,122 @@ export type Database = {
           },
         ]
       }
+      mentor_focus: {
+        Row: {
+          id: string
+          mentor_id: string
+          player_id: string | null
+          team_id: string | null
+          title: string
+          details: string | null
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          mentor_id?: string
+          player_id?: string | null
+          team_id?: string | null
+          title: string
+          details?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          mentor_id?: string
+          player_id?: string | null
+          team_id?: string | null
+          title?: string
+          details?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_focus_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "mentors"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "mentor_focus_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentor_focus_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mentor_links: {
+        Row: {
+          id: string
+          mentor_id: string
+          team_id: string | null
+          player_id: string | null
+          player_name: string | null
+          status: Database["public"]["Enums"]["mentor_link_status"]
+          requested_at: string
+          decided_by: string | null
+          decided_at: string | null
+        }
+        Insert: {
+          id?: string
+          mentor_id: string
+          team_id?: string | null
+          player_id?: string | null
+          player_name?: string | null
+          status?: Database["public"]["Enums"]["mentor_link_status"]
+          requested_at?: string
+          decided_by?: string | null
+          decided_at?: string | null
+        }
+        Update: {
+          id?: string
+          mentor_id?: string
+          team_id?: string | null
+          player_id?: string | null
+          player_name?: string | null
+          status?: Database["public"]["Enums"]["mentor_link_status"]
+          requested_at?: string
+          decided_by?: string | null
+          decided_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_links_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "mentors"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "mentor_links_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentor_links_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mentor_messages: {
         Row: {
           id: string
@@ -1942,6 +2058,7 @@ export type Database = {
           drill_video_url: string | null
           created_at: string
           read_at: string | null
+          shared_with_coaches: boolean
         }
         Insert: {
           id?: string
@@ -1955,6 +2072,7 @@ export type Database = {
           drill_video_url?: string | null
           created_at?: string
           read_at?: string | null
+          shared_with_coaches?: boolean
         }
         Update: {
           id?: string
@@ -1968,6 +2086,7 @@ export type Database = {
           drill_video_url?: string | null
           created_at?: string
           read_at?: string | null
+          shared_with_coaches?: boolean
         }
         Relationships: [
           {
@@ -1986,38 +2105,66 @@ export type Database = {
           },
         ]
       }
-      mentor_players: {
+      mentor_notes: {
         Row: {
+          id: string
           mentor_id: string
-          player_id: string
-          assigned_by: string | null
+          player_id: string | null
+          team_id: string | null
+          kind: string
+          discussed_on: string | null
+          body: string
+          author_id: string | null
+          author_name: string
+          author_role: string
           created_at: string
         }
         Insert: {
+          id?: string
           mentor_id: string
-          player_id: string
-          assigned_by?: string | null
+          player_id?: string | null
+          team_id?: string | null
+          kind?: string
+          discussed_on?: string | null
+          body: string
+          author_id?: string | null
+          author_name?: string
+          author_role?: string
           created_at?: string
         }
         Update: {
+          id?: string
           mentor_id?: string
-          player_id?: string
-          assigned_by?: string | null
+          player_id?: string | null
+          team_id?: string | null
+          kind?: string
+          discussed_on?: string | null
+          body?: string
+          author_id?: string | null
+          author_name?: string
+          author_role?: string
           created_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "mentor_players_mentor_id_fkey"
+            foreignKeyName: "mentor_notes_mentor_id_fkey"
             columns: ["mentor_id"]
             isOneToOne: false
             referencedRelation: "mentors"
             referencedColumns: ["user_id"]
           },
           {
-            foreignKeyName: "mentor_players_player_id_fkey"
+            foreignKeyName: "mentor_notes_player_id_fkey"
             columns: ["player_id"]
             isOneToOne: false
             referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentor_notes_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
             referencedColumns: ["id"]
           },
         ]
@@ -2027,7 +2174,6 @@ export type Database = {
           user_id: string
           display_name: string
           specialty: string | null
-          can_schedule: boolean
           approved_by: string | null
           created_at: string
         }
@@ -2035,7 +2181,6 @@ export type Database = {
           user_id: string
           display_name: string
           specialty?: string | null
-          can_schedule?: boolean
           approved_by?: string | null
           created_at?: string
         }
@@ -2043,7 +2188,6 @@ export type Database = {
           user_id?: string
           display_name?: string
           specialty?: string | null
-          can_schedule?: boolean
           approved_by?: string | null
           created_at?: string
         }
@@ -5573,12 +5717,15 @@ export type Database = {
       change_authors: { Args: { p_user_ids: string[] | null }; Returns: { user_id: string; name: string }[] }
       coaching_staff: { Args: Record<PropertyKey, never>; Returns: { user_id: string; display_name: string; email: string }[] }
       create_player_login: { Args: { p_player_id: string | null; p_username: string | null; p_password: string | null }; Returns: string }
+      decide_mentor_link: { Args: { p_link_id: string | null; p_approve: boolean | null }; Returns: undefined }
       decide_staff_request: { Args: { p_user_id: string | null; p_approve: boolean | null }; Returns: undefined }
       finish_iq_level: { Args: { p_attempt_id: string | null }; Returns: { correct: number; total: number; passed: boolean; award_earned: boolean }[] }
       finish_scorebook_game: { Args: { p_run_id: string | null; p_line: Json | null }; Returns: { line_ok: boolean; passed: boolean; first_try: number; award_earned: boolean; all_ten_earned: boolean }[] }
       iq_answer_key: { Args: { p_player_id: string | null }; Returns: { question_id: string; correct_index: number; explanation: string }[] }
       iq_review_status: { Args: { p_attempt_id: string | null }; Returns: { missed: number; reviewed: number; complete: boolean }[] }
+      mentor_requests_waiting: { Args: Record<PropertyKey, never>; Returns: number }
       my_claims: { Args: Record<PropertyKey, never>; Returns: { claim_id: string; team_id: string; team_name: string; season_name: string; typed_name: string; typed_jersey: string; status: Database["public"]["Enums"]["player_claim_status"]; is_current: boolean; player_id: string; welcome_message: string }[] }
+      my_mentor_links: { Args: Record<PropertyKey, never>; Returns: { id: string; team_id: string; team_name: string; player_id: string; player_name: string; status: Database["public"]["Enums"]["mentor_link_status"]; requested_at: string }[] }
       my_player_ids: { Args: Record<PropertyKey, never>; Returns: string[] }
       my_practice_notes: { Args: { p_player_id: string | null; p_from: string | null; p_to: string | null }; Returns: { practice_date: string; start_time: string; team_name: string; objective: string; rule_of_day: string; announcements: string; cue: string }[] }
       pa_is_at_bat: { Args: { r: Database["public"]["Enums"]["pa_result"] | null }; Returns: boolean }
@@ -5590,8 +5737,8 @@ export type Database = {
       parent_player_logins: { Args: Record<PropertyKey, never>; Returns: { player_id: string; player_name: string; team_name: string; on_roster: boolean; username: string; has_account: boolean }[] }
       parent_questionnaire: { Args: { p_player_id: string | null }; Returns: Json }
       pending_approvals: { Args: Record<PropertyKey, never>; Returns: { team_id: string; team_name: string; player_claims: number; parent_requests: number }[] }
-      pending_mentors: { Args: Record<PropertyKey, never>; Returns: { user_id: string; email: string; display_name: string; specialty: string; created_at: string }[] }
       record_iq_answer: { Args: { p_player_id: string | null; p_question_id: string | null; p_chosen: number | null; p_attempt_id?: string | null; p_review_of?: string | null; p_hint_used?: boolean | null }; Returns: { correct: boolean; correct_index: number; explanation: string }[] }
+      request_mentor: { Args: { p_code: string | null; p_player_name: string | null }; Returns: string }
       request_parent_link: { Args: { p_code: string | null; p_child_name: string | null }; Returns: string }
       request_player_claim: { Args: { p_team_id: string | null; p_name: string | null; p_jersey: string | null }; Returns: boolean }
       request_staff_access: { Args: { p_role: string | null; p_name: string | null; p_team_id?: string | null; p_note?: string | null }; Returns: string }
@@ -5639,6 +5786,7 @@ export type Database = {
       goal_status: "active" | "achieved" | "missed" | "dropped"
       iq_topic: "general" | "hitting" | "pitching" | "position"
       iq_track: "defense" | "baserunning" | "position" | "extra" | "scorebook" | "offense" | "battery"
+      mentor_link_status: "pending" | "approved" | "declined"
       pa_result: "single" | "double" | "triple" | "home_run" | "walk" | "intentional_walk" | "hit_by_pitch" | "strikeout_swinging" | "strikeout_looking" | "dropped_third_strike" | "groundout" | "flyout" | "lineout" | "popout" | "sacrifice_bunt" | "sacrifice_fly" | "fielders_choice" | "reached_on_error" | "double_play" | "triple_play" | "catcher_interference" | "other"
       parent_link_status: "pending" | "approved" | "declined"
       pitch_result: "ball" | "intentional_ball" | "called_strike" | "swinging_strike" | "foul" | "foul_tip" | "in_play" | "hit_by_pitch"

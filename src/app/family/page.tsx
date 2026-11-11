@@ -15,6 +15,7 @@ import { MedicalForm, QuestionnaireForm } from "@/components/family-forms";
 import { markPacketRead, saveMedicalAsParent, saveQuestionnaireAsParent } from "./actions";
 import { PACKET_KIND_LABEL, medicalOnFile, type PacketKind, type Questionnaire } from "@/lib/family";
 import { ActionForm } from "@/components/action-form";
+import { DaughterMentors, loadFamilyMentors } from "./mentors";
 
 export const metadata: Metadata = { title: "Family · GGG.Cafe" };
 
@@ -56,7 +57,7 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
   ]);
   const daughters = (daughtersResult.data ?? []) as Daughter[];
   // Phase 6: her questionnaire and medical card (through the database functions), and the welcome packet
-  const [forms, packetResult, readsResult] = await Promise.all([
+  const [forms, packetResult, readsResult, familyMentors] = await Promise.all([
     Promise.all(
       daughters.map(async (d) => ({
         id: d.player_id,
@@ -66,6 +67,7 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
     ),
     supabase.from("parent_packet_items").select("id, team_id, kind, title, body, position").order("position"),
     supabase.from("parent_packet_reads").select("item_id").eq("parent_id", user.id),
+    loadFamilyMentors(supabase),
   ]);
   const packet = (packetResult.data ?? []) as { id: string; team_id: string; kind: PacketKind; title: string; body: string }[];
   const readIds = new Set(((readsResult.data ?? []) as { item_id: string }[]).map((r) => r.item_id));
@@ -207,6 +209,16 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
           </Card>
         );
       })}
+
+      {daughters.map((d) => (
+        <DaughterMentors
+          key={`mentors-${d.player_id}`}
+          daughter={d}
+          teams={approvedTeams.filter((l) => l.team_name === d.team_name).map((l) => ({ id: l.team_id, name: l.team_name }))}
+          links={familyMentors.links}
+          mentors={familyMentors.mentors}
+        />
+      ))}
 
       {yearbooks.length > 0 && (
         <Link

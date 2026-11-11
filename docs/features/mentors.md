@@ -1,17 +1,42 @@
-# Mentors (user, 2026-11-08; migration 20261108170000)
-- Mentors and skill coaches (pitching, hitting...) are NOT staff. They sign up at /register ("Mentor", optional
-  specialty in user metadata); an admin approves them (`mentors`, `pending_mentors()`); coaches/admins assign
-  players (`mentor_players`). Coaches Dugout → Mentors (`dugout/mentors`): approve, calendar on/off and remove
-  (admins), assign/unassign players and read/remove every message (coaches/admins).
-- A mentor's home is `/mentor` (own layout); `/mentor/players/[id]` (her players only, else 404) shows Goals,
-  Pop Report (Movement Preferences only if the player has G3 Advanced) and Mental GP read-only, reusing the
-  player-page components with canEdit=false. RLS: `private.my_mentee_ids()` read policies on exactly those
-  tables (+ teams, seasons, metrics, measurements, evaluations, photos). `getMentor`/`mentorCheck` in auth.ts.
+# Mentors (user, 2026-11-08; approvals and coach notes 2026-11-11, migration 20261111222948)
+- Mentors and skill coaches (pitching, hitting...) are NOT staff. They sign up at /register ("Mentor", the team code,
+  optional specialty) and ask to work with ONE PLAYER (her name as on the roster) or THE WHOLE TEAM
+  (`request_mentor(code, name)`; makes her `mentors` profile the first time; a request that didn't go at sign-up is
+  sent from /mentor, filled in from her sign-up). User, 2026-11-11: the player's approved parents approve a one-player
+  request (family page); a head coach approves a whole-team request (Coaches Dugout → Mentors); admins can approve
+  either (`decide_mentor_link`). What she sees follows the approvals (`mentor_links`, status pending/approved/declined):
+  a whole-team link = that team's current active roster; a player link = that player. `private.my_mentee_ids()`
+  (used by every mentor read policy), `my_mentee_team_ids()`, `my_mentor_team_ids()` (whole-team links),
+  `is_mentor()` (at least one approval). Whole-team requests count in the head coach's waiting count
+  (`mentor_requests_waiting()`, also noted on the Roster tab). Her parents remove a one-player mentor; the head coach
+  removes a whole-team one; admins remove a mentor account (Dugout → Mentors, "All mentor accounts").
+- A mentor's home is `/mentor` (own layout): her requests (withdraw), each whole-team team with its roster
+  (→ `/mentor/teams/[id]`: team focus areas, team notes, team training), her one-player players, training on their
+  weeks, what she sent lately. `/mentor/players/[id]` (her players only, else 404): message her, working with her
+  coaches (focus board + notes), her week (training), Goals, Pop Report (Movement Preferences only with G3
+  Advanced) and Mental GP read-only, reusing the player-page components with canEdit=false. Helpers:
+  `getMentor`, `getMentorAccess` (player ids, team ids, rosters, all mentee ids), `mentorCheck` in auth.ts;
+  page pieces in `mentor/parts.tsx`.
 - Messages (`mentor_messages`): text, a photo (private bucket `message-photos`, `<mentor uid>/<timestamp>.jpg`,
   shrunk to 1600px in the browser) and/or a drill (Drill Library `practice_drills`; she can add one first).
   The trigger sets sender name and copies the drill's name and video (players can't read the library). They
-  show as "From your mentors" alerts at the top of the player's menu ("Got it" = read_at, the only column a
-  player may change) and on `/players/[id]/messages`. Staff read all (oversight); coaches/admins remove.
-- Calendar dates (only if `mentors.can_schedule`): one-day `player_activities` with `source = 'mentor'`,
-  tagged "Mentor" in TWIS. Helpers in `src/lib/mentors.ts` (no imports, unit-tested). DB tests:
-  `tests/db/mentors.test.sql`.
+  show as "From your mentors" alerts at the top of the player's menu ("Got it" = read_at, only the player may
+  change it) and on `/players/[id]/messages`. User, 2026-11-11: PRIVATE to the mentor, the player, her approved
+  parents and admins unless the mentor shares it (`shared_with_coaches`, a box when she sends it, "Share with
+  coaches" / "Stop sharing" after; only the sender changes it, guarded by a trigger). Coaches and view-only staff
+  read shared messages only; head coaches remove a shared one, admins any.
+- Working with the coaches (user, 2026-11-11), about one player or the whole team (whole-team mentors):
+  `mentor_focus` (focus areas: "Working on" / "What's working", the mentor adds, moves and removes her own) and
+  `mentor_notes` (a thread per mentor and player/team: discussion summaries with the day they talked, notes, and
+  head coaches' replies; author name and role from the database). Coaches read every thread (Coaches Dugout →
+  Mentors → a mentor's "Focus areas & notes", `/dugout/mentors/[mentorId]?team=`, with a reply box); her approved
+  parents read the ones about their daughter (not whole-team ones); players never see them. Shared UI:
+  `components/mentor-work.tsx` (FocusBoard, NotesThread, NoteForm, FocusForm).
+- Training on her players' weeks (user, 2026-11-11: every mentor, no admin switch; `mentors.can_schedule` is gone):
+  `player_activities` with `source = 'mentor'`, tagged "Mentor" in TWIS, for one player or every player she ticks
+  (a team's roster, her one-player players), once or every week on chosen days through an end date (a year at
+  most; `mentorTraining` in `src/lib/mentors.ts`, unit-tested). A session sent to a group comes off in one go.
+- Parents (`/family`): a card per daughter with mentor requests (approve/decline), her mentors (remove one-player
+  ones; whole-team ones are listed), and `/family/mentors?player=` with every message, focus area and note about her.
+- DB tests: `tests/db/mentors.test.sql`. Sample data: the sample admin is a whole-team mentor (and parent of Maya and
+  Emma) so the mentor, Dugout and family mentor pages render in the smoke test.

@@ -61,7 +61,7 @@ insert into public.player_claims (user_id, team_id, season_id, roster_entry_id, 
 select 'abababab-0000-0000-0000-000000000001', r.team_id, r.season_id, r.id, 'Jordan Kim', '21', 'approved'
   from public.roster_entries r where r.player_id = '00000000-0000-0000-0000-0000000000c2';
 insert into public.mentors (user_id, display_name) values ('abababab-0000-0000-0000-000000000002', 'Z Mentor');
-insert into public.mentor_players (mentor_id, player_id) values ('abababab-0000-0000-0000-000000000002', '00000000-0000-0000-0000-0000000000c2');
+insert into public.mentor_links (mentor_id, player_id, status) values ('abababab-0000-0000-0000-000000000002', '00000000-0000-0000-0000-0000000000c2', 'approved');
 
 set role authenticated;
 select set_config('request.jwt.claims', '{"sub":"abababab-0000-0000-0000-000000000001"}', false);
@@ -79,7 +79,7 @@ reset role;
 -- Clean up
 select set_config('request.jwt.claims', '', false);
 delete from public.hitting_zones where player_id = '00000000-0000-0000-0000-0000000000c2';
-delete from public.mentor_players where mentor_id = 'abababab-0000-0000-0000-000000000002';
+delete from public.mentor_links where mentor_id = 'abababab-0000-0000-0000-000000000002';
 delete from public.mentors where user_id = 'abababab-0000-0000-0000-000000000002';
 delete from public.player_claims where user_id::text like 'abababab-%';
 delete from public.staff where user_id::text like 'abababab-%';

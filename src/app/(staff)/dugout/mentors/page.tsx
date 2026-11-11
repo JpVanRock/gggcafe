@@ -1,114 +1,175 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { canEdit, requireHeadCoachPage } from "@/lib/auth";
+import { requireHeadCoachPage } from "@/lib/auth";
 import { formatDay } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
-import { playerName } from "@/lib/softball";
-import { Card, EmptyState } from "@/components/ui";
-import { ApproveMentor, AssignPlayer, CalendarToggle, RemoveMentor, RemoveMessage, UnassignPlayer } from "./mentors-client";
+import { loadRoster } from "@/lib/roster";
+import { ActionForm } from "@/components/action-form";
+import { ConfirmSubmit } from "@/components/confirm-submit";
+import { SubmitButton } from "@/components/submit-button";
+import { Badge, Card, Disclosure, EmptyState, buttonStyles } from "@/components/ui";
+import { loadDugoutTeam } from "../data";
+import { NoOwnTeam, TeamPicker } from "../team-picker";
+import { decideMentorRequest, removeMentor, removeMentorLink, removeMentorMessage } from "./actions";
 
 export const metadata: Metadata = { title: "Mentors · Coaches Dugout · GGG.Cafe" };
 
-type Mentor = { user_id: string; display_name: string; specialty: string | null; can_schedule: boolean };
-type Pending = { user_id: string; email: string; display_name: string; specialty: string | null; created_at: string };
-type Msg = { id: string; player_id: string; sender_name: string; body: string | null; photo_path: string | null; drill_name: string | null; created_at: string; read_at: string | null };
-type Spot = { jersey_number: string | null; player: { id: string; first_name: string; preferred_name: string | null; last_name: string } | null; team: { name: string; is_own_team: boolean } | null };
+type Link_ = { id: string; mentor_id: string; team_id: string | null; player_id: string | null; player_name: string | null; status: string; requested_at: string };
+type Mentor = { user_id: string; display_name: string; specialty: string | null };
+type Msg = { id: string; player_id: string; sender_id: string; sender_name: string; body: string | null; photo_path: string | null; drill_name: string | null; created_at: string; read_at: string | null; shared_with_coaches: boolean };
 
 const heading = "mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
 
-export default async function MentorsPage() {
+function Decide({ id, who }: { id: string; who: string }) {
+  return (
+    <span className="flex flex-wrap items-center gap-2">
+      <ActionForm action={decideMentorRequest} className="flex flex-wrap items-center gap-2">
+        <input type="hidden" name="link_id" value={id} />
+        <input type="hidden" name="decision" value="approve" />
+        <SubmitButton pendingLabel="Saving…">Approve</SubmitButton>
+      </ActionForm>
+      <ActionForm action={decideMentorRequest} className="flex flex-wrap items-center gap-2">
+        <input type="hidden" name="link_id" value={id} />
+        <input type="hidden" name="decision" value="decline" />
+        <ConfirmSubmit message={`Decline ${who}?`} confirmLabel="Decline" className={buttonStyles("secondary")}>
+          Decline
+        </ConfirmSubmit>
+      </ActionForm>
+    </span>
+  );
+}
+
+export default async function MentorsPage({ searchParams }: PageProps<"/dugout/mentors">) {
   const user = await requireHeadCoachPage();
-  const editor = canEdit(user.staff.role);
   const admin = user.staff.role === "admin";
+  const { team: teamParam } = await searchParams;
   const supabase = await createClient();
-  const [{ data: mentorRows }, { data: links }, pendingResult, { data: spotRows }, { data: msgRows }] = await Promise.all([
-    supabase.from("mentors").select("user_id, display_name, specialty, can_schedule").order("display_name"),
-    supabase.from("mentor_players").select("mentor_id, player_id"),
-    admin ? supabase.rpc("pending_mentors") : Promise.resolve({ data: [] }),
-    supabase.from("roster_entries").select("jersey_number, player:players(id, first_name, preferred_name, last_name), team:teams(name, is_own_team)").eq("active", true),
+  const dugout = await loadDugoutTeam(supabase, teamParam);
+  if (!dugout) return <NoOwnTeam />;
+  const { teams, team } = dugout;
+  const roster = await loadRoster(supabase, team.id, { order: "name" });
+  const ids = roster.map((p) => p.id);
+  const [{ data: linkRows }, { data: mentorRows }, { data: msgRows }] = await Promise.all([
     supabase
-      .from("mentor_messages")
-      .select("id, player_id, sender_name, body, photo_path, drill_name, created_at, read_at")
-      .order("created_at", { ascending: false })
-      .limit(30),
+      .from("mentor_links")
+      .select("id, mentor_id, team_id, player_id, player_name, status, requested_at")
+      .neq("status", "declined")
+      .order("requested_at"),
+    supabase.from("mentors").select("user_id, display_name, specialty").order("display_name"),
+    // RLS: coaches get the messages mentors shared with them; admins get every one
+    ids.length
+      ? supabase
+          .from("mentor_messages")
+          .select("id, player_id, sender_id, sender_name, body, photo_path, drill_name, created_at, read_at, shared_with_coaches")
+          .in("player_id", ids)
+          .order("created_at", { ascending: false })
+          .limit(30)
+      : Promise.resolve({ data: [] }),
   ]);
   const mentors = (mentorRows ?? []) as Mentor[];
-  const assigned = (links ?? []) as { mentor_id: string; player_id: string }[];
-  const pending = (pendingResult.data ?? []) as Pending[];
-  // players on our teams (active spots), for assigning
-  const players = new Map<string, { id: string; name: string; label: string }>();
-  for (const s of (spotRows ?? []) as Spot[]) {
-    if (!s.player || !s.team?.is_own_team || players.has(s.player.id)) continue;
-    const name = playerName(s.player as Parameters<typeof playerName>[0]);
-    players.set(s.player.id, { id: s.player.id, name, label: [name, s.jersey_number && `#${s.jersey_number}`, s.team.name].filter(Boolean).join(" · ") });
-  }
-  const sorted = [...players.values()].sort((a, b) => a.name.localeCompare(b.name));
+  // this team's: whole-team links for it, and one-player links for players on its roster
+  const links = ((linkRows ?? []) as Link_[]).filter((l) => (l.player_id ? ids.includes(l.player_id) : l.team_id === team.id));
   const messages = (msgRows ?? []) as Msg[];
-  const nameOf = (id: string) => players.get(id)?.name ?? "A player";
+  const mentorOf = (id: string) => mentors.find((m) => m.user_id === id);
+  const who = (id: string) => mentorOf(id)?.display_name ?? "A mentor";
+  const nameOf = (id: string) => roster.find((p) => p.id === id)?.name ?? "A player";
+  const pendingTeam = links.filter((l) => l.status === "pending" && !l.player_id);
+  const pendingPlayer = links.filter((l) => l.status === "pending" && l.player_id);
+  const approved = links.filter((l) => l.status === "approved");
+  const working = [...new Set(approved.map((l) => l.mentor_id))].sort((a, b) => who(a).localeCompare(who(b)));
 
   return (
     <div className="flex flex-col gap-8">
+      <TeamPicker teams={teams} current={team.id} basePath="/dugout/mentors" />
       <div>
         <h2 className="text-3xl leading-tight font-bold tracking-tight text-highlight uppercase">Mentors</h2>
         <p className="mt-1 max-w-3xl text-sm text-muted">
-          Mentors and skill coaches (pitching, hitting, catching…) see only the players you assign them: her Goals, Pop Report and Mental GP,
-          read-only. They can message her (with a photo or a drill to try), and add dates to her week if an admin turns that on. You can read
-          every message here.
+          Mentors and skill coaches (pitching, hitting, catching…) ask with the team code. You approve a mentor for the whole team; a player&apos;s parents approve
+          one for their daughter. Mentors read her Goals, Pop Report and Mental GP, message her, add training to her week, and keep notes here with you: what
+          they&apos;re working on, what&apos;s working, and what you talked about. Messages to players are private to the player, her parents and the admins unless
+          the mentor shares one with you.
         </p>
       </div>
 
-      {admin && (
-        <section className={`rounded-2xl border p-4 sm:p-5 ${pending.length ? "border-pink/60 bg-pink/5" : "border-navy-700"}`} aria-label="Mentor sign-ups">
-          <h3 className={heading}>Waiting for approval ({pending.length})</h3>
-          {pending.length === 0 ? (
-            <p className="text-sm text-muted">
-              Nobody waiting. Mentors sign up at <span className="font-mono">/register</span> and pick &quot;Mentor&quot;.
-            </p>
-          ) : (
-            <ul className="flex flex-col gap-4">
-              {pending.map((p) => (
-                <li key={p.user_id} className="flex flex-col gap-2 rounded-xl border border-navy-700 p-3">
-                  <p className="text-sm">
-                    <span className="font-semibold">{p.display_name || "No name"}</span> <span className="text-muted">· {p.email} · signed up {formatDay(p.created_at.slice(0, 10))}</span>
-                  </p>
-                  <ApproveMentor userId={p.user_id} name={p.display_name} specialty={p.specialty} />
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-      )}
+      <section aria-label="Waiting for approval" className={`rounded-2xl border p-4 sm:p-5 ${pendingTeam.length ? "border-pink/60 bg-pink/5" : "border-navy-700"}`}>
+        <h3 className={heading}>Waiting for approval ({pendingTeam.length})</h3>
+        {pendingTeam.length === 0 && pendingPlayer.length === 0 ? (
+          <p className="text-sm text-muted">
+            Nobody waiting. Mentors sign up at <span className="font-mono">/register</span>, pick &quot;Mentor&quot; and enter the team code.
+          </p>
+        ) : (
+          <ul className="flex flex-col gap-3">
+            {pendingTeam.map((l) => (
+              <li key={l.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-navy-700 p-3">
+                <span className="text-sm">
+                  <span className="font-semibold">{who(l.mentor_id)}</span>
+                  {mentorOf(l.mentor_id)?.specialty && <span className="text-muted"> · {mentorOf(l.mentor_id)?.specialty}</span>}
+                  <span className="text-muted"> · asks to work with the whole team · {formatDay(l.requested_at.slice(0, 10))}</span>
+                </span>
+                <Decide id={l.id} who={who(l.mentor_id)} />
+              </li>
+            ))}
+            {pendingPlayer.map((l) => (
+              <li key={l.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-navy-700 p-3">
+                <span className="text-sm">
+                  <span className="font-semibold">{who(l.mentor_id)}</span>
+                  <span className="text-muted"> · asks to mentor {nameOf(l.player_id!)}</span>
+                </span>
+                {admin ? <Decide id={l.id} who={who(l.mentor_id)} /> : <Badge tone="pink">Waiting for her parents</Badge>}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
-      {mentors.length === 0 ? (
-        <EmptyState>No mentors yet.{admin ? " Approve one above once she signs up." : " An admin approves them."}</EmptyState>
+      {working.length === 0 ? (
+        <EmptyState>No mentors work with this team yet.</EmptyState>
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
-          {mentors.map((m) => {
-            const mine = assigned.filter((a) => a.mentor_id === m.user_id).map((a) => a.player_id);
+          {working.map((mentorId) => {
+            const mine = approved.filter((l) => l.mentor_id === mentorId);
+            const whole = mine.find((l) => !l.player_id);
+            const players = mine.filter((l) => l.player_id);
             return (
-              <Card key={m.user_id} title={m.display_name}>
+              <Card key={mentorId} title={who(mentorId)}>
                 <div className="flex flex-col gap-3">
-                  <p className="flex flex-wrap items-center gap-3 text-sm">
-                    <span className="font-mono text-xs tracking-wider text-pink-soft uppercase">{m.specialty ?? "Mentor"}</span>
-                    {admin ? (
-                      <CalendarToggle userId={m.user_id} on={m.can_schedule} />
-                    ) : (
-                      <span className="text-xs text-muted">Calendar dates: {m.can_schedule ? "on" : "off"}</span>
-                    )}
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {mine.length === 0 ? (
-                      <span className="text-sm text-muted">No players assigned.</span>
-                    ) : (
-                      mine.map((id) => <UnassignPlayer key={id} mentorId={m.user_id} playerId={id} name={nameOf(id)} canEdit={editor} />)
-                    )}
-                  </div>
-                  {editor && <AssignPlayer mentorId={m.user_id} options={sorted.filter((p) => !mine.includes(p.id)).map((p) => ({ id: p.id, label: p.label }))} />}
-                  {admin && (
-                    <span className="self-start">
-                      <RemoveMentor userId={m.user_id} name={m.display_name} />
-                    </span>
+                  <p className="font-mono text-xs tracking-wider text-pink-soft uppercase">{mentorOf(mentorId)?.specialty ?? "Mentor"}</p>
+                  {whole && (
+                    <div className="flex flex-wrap items-center gap-3">
+                      <Badge tone="neon">Whole team · {roster.length} players</Badge>
+                      <ActionForm action={removeMentorLink} className="flex items-center gap-2">
+                        <input type="hidden" name="link_id" value={whole.id} />
+                        <ConfirmSubmit
+                          message={`Remove ${who(mentorId)} from the whole team? Players her parents approved stay.`}
+                          confirmLabel="Remove"
+                          tone="danger"
+                          className={buttonStyles("link", "text-muted")}
+                        >
+                          Remove from team
+                        </ConfirmSubmit>
+                      </ActionForm>
+                    </div>
                   )}
+                  {players.length > 0 && (
+                    <ul className="flex flex-wrap gap-1.5">
+                      {players.map((l) => (
+                        <li key={l.id} className="inline-flex items-center gap-2 rounded-full border border-navy-600 px-3 py-0.5 text-xs font-semibold">
+                          {nameOf(l.player_id!)} <span className="font-normal text-muted">· parents approved</span>
+                          {admin && (
+                            <ActionForm action={removeMentorLink} className="inline-flex items-center">
+                              <input type="hidden" name="link_id" value={l.id} />
+                              <ConfirmSubmit message={`Remove ${who(mentorId)} from ${nameOf(l.player_id!)}?`} confirmLabel="Remove" tone="danger" className={buttonStyles("link", "text-xs text-muted")}>
+                                Remove
+                              </ConfirmSubmit>
+                            </ActionForm>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  <Link href={`/dugout/mentors/${mentorId}?team=${team.id}`} className={buttonStyles("link", "self-start")}>
+                    Focus areas &amp; notes →
+                  </Link>
                 </div>
               </Card>
             );
@@ -117,27 +178,60 @@ export default async function MentorsPage() {
       )}
 
       <section>
-        <h3 className={heading}>Recent messages to players</h3>
+        <h3 className={heading}>{admin ? "Messages to this team's players" : "Messages mentors shared with you"}</h3>
         {messages.length === 0 ? (
-          <p className="text-sm text-muted">None yet.</p>
+          <p className="text-sm text-muted">{admin ? "None yet." : "None yet. Mentors choose which messages to share with the coaches."}</p>
         ) : (
           <ul className="divide-y divide-navy-700 rounded-xl border border-navy-700">
             {messages.map((msg) => (
               <li key={msg.id} className="flex flex-wrap items-baseline gap-x-4 gap-y-1 px-4 py-2.5 text-sm">
                 <span className="w-24 shrink-0 font-display text-muted tabular-nums">{formatDay(msg.created_at.slice(0, 10))}</span>
                 <span className="font-semibold">
-                  {msg.sender_name} → <Link href={`/players/${msg.player_id}/messages`} className="hover:underline">{nameOf(msg.player_id)}</Link>
+                  {msg.sender_name} →{" "}
+                  <Link href={`/players/${msg.player_id}/messages`} className="hover:underline">
+                    {nameOf(msg.player_id)}
+                  </Link>
                 </span>
                 <span className="min-w-0 flex-1 truncate text-muted">
                   {[msg.body, msg.drill_name && `Drill: ${msg.drill_name}`, msg.photo_path && "Photo"].filter(Boolean).join(" · ")}
                 </span>
+                {admin && <Badge tone={msg.shared_with_coaches ? "pink" : "neutral"}>{msg.shared_with_coaches ? "Shared" : "Private"}</Badge>}
                 <span className="font-mono text-2xs tracking-wider text-muted uppercase">{msg.read_at ? "Seen" : "New"}</span>
-                {editor && <RemoveMessage id={msg.id} />}
+                <ActionForm action={removeMentorMessage} className="flex items-center gap-2">
+                  <input type="hidden" name="message_id" value={msg.id} />
+                  <ConfirmSubmit message="Remove this message? The player won't see it any more." confirmLabel="Remove" tone="danger" className={buttonStyles("link", "text-xs text-muted")}>
+                    Remove
+                  </ConfirmSubmit>
+                </ActionForm>
               </li>
             ))}
           </ul>
         )}
       </section>
+
+      {admin && mentors.length > 0 && (
+        <Disclosure summary={`All mentor accounts (${mentors.length})`}>
+          <ul className="divide-y divide-navy-700 rounded-xl border border-navy-700">
+            {mentors.map((m) => (
+              <li key={m.user_id} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2.5 text-sm">
+                <span className="font-semibold">{m.display_name}</span>
+                <span className="text-muted">{m.specialty ?? "Mentor"}</span>
+                <ActionForm action={removeMentor} className="ml-auto flex items-center gap-2">
+                  <input type="hidden" name="mentor_id" value={m.user_id} />
+                  <ConfirmSubmit
+                    message={`Remove ${m.display_name} as a mentor? She loses access to every player and team. Messages she sent stay.`}
+                    confirmLabel="Remove"
+                    tone="danger"
+                    className={buttonStyles("link", "text-muted")}
+                  >
+                    Remove mentor
+                  </ConfirmSubmit>
+                </ActionForm>
+              </li>
+            ))}
+          </ul>
+        </Disclosure>
+      )}
     </div>
   );
 }

@@ -142,7 +142,7 @@ tests/unit/              node --test unit tests (npm run test:unit)
 | Hitting & Softball IQ | `docs/features/hitting-iq.md` | Offense IQ, My Zone, Hitting Approach chapter |
 | Legal | `docs/features/legal.md` | Terms of Service, Privacy & Security, footer disclaimer, sign-up agreement, safety and rewards notes |
 | Mental game | `docs/features/mental-game.md` | Mental GP tools: signals, intensity, self-scan, guided sessions, journal; G3 Mental Toughness |
-| Mentors | `docs/features/mentors.md` | Mentor sign-up, assignments, messages, calendar dates |
+| Mentors | `docs/features/mentors.md` | Mentor sign-up, approvals (parents / head coach), private messages, notes and focus with coaches, training |
 | Movement Preferences and Preferred Hitting Style | `docs/features/movement-hitting.md` | Movement Preferences (G3) and Preferred Hitting Style |
 | Offseason Training Leaderboard and + Activity | `docs/features/leaderboard.md` | Points, Player of the Week, the Leaderboard page, notifications |
 | Offseason training | `docs/features/offseason-training.md` | Dugout → Training: roadmap phases, team routines, testing, offseason draft |

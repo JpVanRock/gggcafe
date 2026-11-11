@@ -35,7 +35,7 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
   const dugout = await loadDugoutTeam(supabase, teamParam);
   if (!dugout) return <NoOwnTeam />;
   const { teams, team } = dugout;
-  const [seasonsResult, currentSeason, approvals, staffRequests, staffResult, codeResult, moveTeamsResult] = await Promise.all([
+  const [seasonsResult, currentSeason, approvals, staffRequests, staffResult, codeResult, moveTeamsResult, mentorWaiting] = await Promise.all([
     supabase.from("seasons").select("*").order("start_date", { ascending: false, nullsFirst: false }).order("created_at", { ascending: false }),
     seasonOrCurrent(supabase, team.id, null),
     editor ? loadTeamApprovals(supabase, team.id) : Promise.resolve(null),
@@ -46,6 +46,7 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
     editor
       ? supabase.from("teams").select("id, name, organization, age_group, is_own_team").order("is_own_team", { ascending: false }).order("name")
       : Promise.resolve({ data: null }),
+    head ? supabase.rpc("mentor_requests_waiting").then((r) => Number(r.data ?? 0)) : Promise.resolve(0),
   ]);
   // Coach sign-ups for this team, plus head-coach sign-ups (no team; admins only)
   const pendingStaff = staffRequests.filter((r) => r.team_id === team.id || r.team_id === null);
@@ -70,7 +71,7 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
   const pendingClaims = claims.filter((c) => c.status === "pending");
   const approvedClaims = claims.filter((c) => c.status === "approved");
   const pendingParents = (approvals?.parentLinks ?? []).filter((l) => l.status === "pending");
-  const waiting = pendingClaims.length + pendingParents.length + pendingStaff.length;
+  const waiting = pendingClaims.length + pendingParents.length + pendingStaff.length + mentorWaiting;
   const claimOf = new Map(claims.filter((c) => c.roster_entry_id && c.status !== "declined").map((c) => [c.roster_entry_id!, c.status]));
   const parentsOf = new Map<string, number>();
   for (const l of approvals?.parentLinks ?? []) if (l.status === "approved" && l.player_id) parentsOf.set(l.player_id, (parentsOf.get(l.player_id) ?? 0) + 1);
@@ -135,6 +136,14 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
                   <h3 className="mb-2 text-sm font-semibold">Parents asking to join ({pendingParents.length})</h3>
                   <PendingParentList links={pendingParents} players={approvals!.parentPlayers} />
                 </div>
+              )}
+              {mentorWaiting > 0 && (
+                <p className="text-sm">
+                  <span className="font-semibold">Mentors asking to work with the whole team ({mentorWaiting})</span>{" "}
+                  <Link href={`/dugout/mentors?team=${team.id}`} className="text-link hover:underline">
+                    Approve on the Mentors tab →
+                  </Link>
+                </p>
               )}
             </div>
           )}

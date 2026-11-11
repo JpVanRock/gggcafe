@@ -29,7 +29,7 @@ insert into public.player_claims (user_id, team_id, season_id, roster_entry_id, 
 select 'eeeeeeee-0000-0000-0000-000000000001', r.team_id, r.season_id, r.id, 'Avery Lopez', '7', 'approved'
   from public.roster_entries r where r.player_id = '00000000-0000-0000-0000-0000000000c1';
 insert into public.mentors (user_id, display_name) values ('eeeeeeee-0000-0000-0000-000000000002', 'Mo Mentor');
-insert into public.mentor_players (mentor_id, player_id) values ('eeeeeeee-0000-0000-0000-000000000002', '00000000-0000-0000-0000-0000000000c1');
+insert into public.mentor_links (mentor_id, player_id, status) values ('eeeeeeee-0000-0000-0000-000000000002', '00000000-0000-0000-0000-0000000000c1', 'approved');
 
 -- Guided sessions are mental drills in the training library
 select pg_temp.expect('six guided drills', (select count(*) from public.drills where category = 'mental' and guide is not null), 6::bigint);
@@ -97,7 +97,7 @@ delete from public.journal_weeks where player_id = '00000000-0000-0000-0000-0000
 delete from public.mental_scans where player_id = '00000000-0000-0000-0000-0000000000c1';
 delete from public.mental_intensity_checks where player_id = '00000000-0000-0000-0000-0000000000c1';
 delete from public.mental_game_plans where player_id = '00000000-0000-0000-0000-0000000000c1';
-delete from public.mentor_players where mentor_id = 'eeeeeeee-0000-0000-0000-000000000002';
+delete from public.mentor_links where mentor_id = 'eeeeeeee-0000-0000-0000-000000000002';
 delete from public.mentors where user_id = 'eeeeeeee-0000-0000-0000-000000000002';
 delete from public.player_claims where user_id::text like 'eeeeeeee-%';
 delete from public.staff where user_id::text like 'eeeeeeee-%';

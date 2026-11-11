@@ -134,3 +134,35 @@ export async function markPacketRead(_prev: FormState, fd: FormData): Promise<Fo
     refresh();
   });
 }
+
+// ---------------------------------------------------------------------------
+// Her mentors: a parent approves (or declines) a mentor for her daughter, and can remove one.
+// The database checks she's an approved parent of that player.
+// ---------------------------------------------------------------------------
+
+export async function decideMentorForDaughter(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const id = text(fd, "link_id");
+    const decision = text(fd, "decision");
+    if (!isUuid(id) || (decision !== "approve" && decision !== "decline")) return failed(STALE);
+    const supabase = await createClient();
+    const { error } = await supabase.rpc("decide_mentor_link", { p_link_id: id, p_approve: decision === "approve" });
+    if (error) {
+      if (error.code === "P0002") return failed("That request was already decided. Reload the page.");
+      if (error.code === "42501") return failed("Only her approved parents can decide this.");
+      return failed("Couldn't save that. Try again.");
+    }
+    refresh();
+  });
+}
+
+export async function removeMentorFromDaughter(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const id = text(fd, "link_id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    const { data } = must(await supabase.from("mentor_links").delete().eq("id", id).not("player_id", "is", null).select("id"));
+    if (!data?.length) return failed("That mentor works with the whole team. Ask the head coach.");
+    refresh();
+  });
+}

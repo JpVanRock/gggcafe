@@ -29,6 +29,8 @@ export type MentorMessage = {
   drill_video_url: string | null;
   created_at: string;
   read_at: string | null;
+  /** the mentor shared it with the coaches (parents and admins see every message) */
+  shared_with_coaches: boolean;
 };
 
-export const MESSAGE_COLUMNS = "id, player_id, sender_id, sender_name, body, photo_path, drill_name, drill_video_url, created_at, read_at";
+export const MESSAGE_COLUMNS = "id, player_id, sender_id, sender_name, body, photo_path, drill_name, drill_video_url, created_at, read_at, shared_with_coaches";

@@ -21,7 +21,7 @@ export const FEATURE_SECTIONS: { title: string; features: Feature[] }[] = [
       { name: "From the Dugout", detail: "Team Standards and Team Culture from her coaches, with the season motto.", standard: "yes", advanced: "yes" },
       { name: "Season goals and Player Spotlights", detail: "The team's goals with progress, and coach-written spotlights with a media-day graphic, on her Team page.", standard: "yes", advanced: "yes" },
       { name: "My commitment and the team pledge", detail: "An \"I will...\" line for each Team Standard, and her signature on the team pledge each season.", standard: "yes", advanced: "yes" },
-      { name: "Messages from her mentors", detail: "Alerts at the top of her menu: notes, photos and drills to try, from mentors her coach assigned.", standard: "yes", advanced: "yes" },
+      { name: "Messages from her mentors", detail: "Alerts at the top of her menu: notes, photos and drills to try, from mentors her parents or head coach approved.", standard: "yes", advanced: "yes" },
       { name: "This Week in Softball (TWIS)", detail: "Practices, games and her activities for the week, with check-offs.", standard: "yes", advanced: "yes" },
       { name: "Practice notes in TWIS", detail: "On practice days: the plan's objective, rule of the day, announcements and a cue her coach wrote just for her (never the coach-only notes).", standard: "yes", advanced: "yes" },
       { name: "Pop Report", detail: "Profile, teams, measurements by season (Fall, Winter Offseason, Spring, Summer) and her Preferred Hitting Style.", standard: "yes", advanced: "yes" },
@@ -153,9 +153,11 @@ export const FAQ: { q: string; a: string[] }[] = [
   {
     q: "What can a mentor see and do?",
     a: [
-      "Mentors (a mentor, a pitching or hitting coach…) sign up and pick \"Mentor\"; an admin approves them in Coaches Dugout → Mentors, and a head coach assigns their players.",
-      "A mentor sees only her players' Goals, Pop Report (Movement Preferences only with G3 Advanced) and Mental GP, read-only. She can message them with a photo or a drill (from the Drill Library, or one she adds to it). If an admin turns on calendar dates, she can add dates to their This Week in Softball.",
-      "Mentors aren't staff and see nothing else. Coaches and admins can read and remove every message.",
+      "Mentors (a mentor, a pitching or hitting coach…) sign up, pick \"Mentor\" and enter the team code, then ask to work with one player (by name) or the whole team. A player's approved parents approve a mentor for her on the family page; a head coach approves one for the whole team in Coaches Dugout → Mentors. Admins can approve either.",
+      "A mentor sees only the players she's approved for (the whole team's current roster, or that one player): their Goals, Pop Report (Movement Preferences only with G3 Advanced) and Mental GP, read-only. She can message them with a photo or a drill (from the Drill Library, or one she adds to it), and add training to their This Week in Softball for one player or a group, once or every week.",
+      "Messages to a player are private to the player, her parents and the admins unless the mentor shares one with the coaches. Head coaches can remove a shared message; admins any message.",
+      "Mentors keep notes with the coaches: discussion summaries, what they're working on and what's working, about a player or the whole team. Coaches read them and head coaches reply. The player's parents read the ones about her; players don't see them.",
+      "Mentors aren't staff and see nothing else.",
     ],
   },
   {

@@ -3,6 +3,7 @@ import { cache } from "react";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { canEditRole, isHeadCoachRole, type StaffRole } from "@/lib/roles";
+import { loadRoster, type RosterPlayer } from "@/lib/roster";
 
 export type { StaffRole };
 
@@ -150,41 +151,58 @@ export async function actorCheck(): Promise<string | null> {
 }
 
 // ---------------------------------------------------------------------------
-// Mentors (not staff): an admin approves them; coaches assign their players.
+// Mentors (not staff): a player's parents approve a mentor for her, the head coach
+// for the whole team (mentor_links). What she sees follows those approvals.
 // ---------------------------------------------------------------------------
 
-export type MentorRecord = { userId: string; displayName: string; specialty: string | null; canSchedule: boolean };
+export type MentorRecord = { userId: string; displayName: string; specialty: string | null };
 
-/** The signed-in user's mentor record, if an admin approved her. */
+/** The signed-in user's mentor profile (made with her first request), approved or not. */
 export const getMentor = cache(async (): Promise<MentorRecord | null> => {
   const user = await getCurrentUser();
   if (!user) return null;
   const supabase = await createClient();
-  const { data } = await supabase.from("mentors").select("user_id, display_name, specialty, can_schedule").eq("user_id", user.id).maybeSingle();
+  const { data } = await supabase.from("mentors").select("user_id, display_name, specialty").eq("user_id", user.id).maybeSingle();
   if (!data) return null;
-  return {
-    userId: data.user_id as string,
-    displayName: data.display_name as string,
-    specialty: (data.specialty as string | null) ?? null,
-    canSchedule: Boolean(data.can_schedule),
-  };
+  return { userId: data.user_id, displayName: data.display_name, specialty: data.specialty ?? null };
 });
 
-/** Player ids assigned to the signed-in mentor. */
-export const getMenteeIds = cache(async (): Promise<string[]> => {
+export type MentorAccess = {
+  /** players approved one by one (by their parents or an admin) */
+  playerIds: string[];
+  /** teams she works with as a whole (the head coach approved) */
+  teamIds: string[];
+  /** every player she works with: the ones above plus those teams' current rosters */
+  menteeIds: string[];
+  /** those teams' current rosters */
+  rosters: { teamId: string; players: RosterPlayer[] }[];
+};
+
+/** Who the signed-in mentor works with, from her approved links. */
+export const getMentorAccess = cache(async (): Promise<MentorAccess> => {
   const mentor = await getMentor();
-  if (!mentor) return [];
+  if (!mentor) return { playerIds: [], teamIds: [], menteeIds: [], rosters: [] };
   const supabase = await createClient();
-  const { data } = await supabase.from("mentor_players").select("player_id").eq("mentor_id", mentor.userId);
-  return ((data ?? []) as { player_id: string }[]).map((r) => r.player_id);
+  const { data } = await supabase.from("mentor_links").select("team_id, player_id").eq("mentor_id", mentor.userId).eq("status", "approved");
+  const links = data ?? [];
+  const playerIds = [...new Set(links.flatMap((l) => (l.player_id ? [l.player_id] : [])))];
+  const teamIds = [...new Set(links.flatMap((l) => (!l.player_id && l.team_id ? [l.team_id] : [])))];
+  const rosters = await Promise.all(teamIds.map((t) => loadRoster(supabase, t)));
+  const menteeIds = [...new Set([...playerIds, ...rosters.flat().map((p) => p.id)])];
+  return { playerIds, teamIds, menteeIds, rosters: teamIds.map((teamId, i) => ({ teamId, players: rosters[i] })) };
 });
 
-/** For mentor actions: an error message unless she's an approved mentor and (if given) the player is hers. */
-export async function mentorCheck(playerId?: string): Promise<string | null> {
+/** Player ids the signed-in mentor works with. */
+export const getMenteeIds = cache(async (): Promise<string[]> => (await getMentorAccess()).menteeIds);
+
+/** For mentor actions: an error message unless she's an approved mentor and (if given) the player or team is hers. */
+export async function mentorCheck(playerId?: string, teamId?: string): Promise<string | null> {
   const user = await getCurrentUser();
   if (!user) return "Your session has ended. Sign in again.";
   const mentor = await getMentor();
-  if (!mentor) return "Only approved mentors can do that.";
-  if (playerId && !(await getMenteeIds()).includes(playerId)) return "That player isn't one of yours.";
+  const access = await getMentorAccess();
+  if (!mentor || access.menteeIds.length + access.teamIds.length === 0) return "Only approved mentors can do that.";
+  if (playerId && !access.menteeIds.includes(playerId)) return "That player isn't one of yours.";
+  if (teamId && !access.teamIds.includes(teamId)) return "You don't work with that whole team.";
   return null;
 }

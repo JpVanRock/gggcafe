@@ -54,16 +54,20 @@ export type StaffRequestRow = {
 
 /**
  * How many approvals wait on the signed-in coach: player claims, parent requests
- * (head coaches) and coach sign-ups she may decide. The database decides what
- * each role sees; viewers get 0.
+ * (head coaches), coach sign-ups she may decide and mentors asking to work with a whole
+ * team (head coaches). The database decides what each role sees; viewers get 0.
  */
 export async function countWaiting(supabase: Supabase): Promise<number> {
-  const [{ data }, { data: staff }] = await Promise.all([supabase.rpc("pending_approvals"), supabase.rpc("staff_requests_to_decide")]);
+  const [{ data }, { data: staff }, { data: mentors }] = await Promise.all([
+    supabase.rpc("pending_approvals"),
+    supabase.rpc("staff_requests_to_decide"),
+    supabase.rpc("mentor_requests_waiting"),
+  ]);
   const teams = ((data ?? []) as { player_claims: number; parent_requests: number }[]).reduce(
     (sum, t) => sum + Number(t.player_claims) + Number(t.parent_requests),
     0,
   );
-  return teams + ((staff ?? []) as unknown[]).length;
+  return teams + ((staff ?? []) as unknown[]).length + Number(mentors ?? 0);
 }
 
 /**
