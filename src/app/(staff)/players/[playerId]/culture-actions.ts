@@ -1,14 +1,15 @@
 "use server";
 
-// Her commitment and the team pledge (Phase 5): an "I will..." line per Team Standard
-// and her signature, for her team's current season. She or a coach saves it.
+// Her commitment and the team pledge (Phase 5): one "I will..." that covers every Team
+// Standard (user, 2026-11-11) and her signature, for her team's current season. She or a
+// coach saves it.
 import { refresh } from "next/cache";
 import { actForCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { friendlyDbError, text, type FormState, invalid } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import { seasonOrCurrent } from "@/lib/roster";
-import { cleanLines } from "@/lib/culture";
+import { cleanPledge } from "@/lib/culture";
 
 export async function savePledge(_prev: FormState, fd: FormData): Promise<FormState> {
   const playerId = text(fd, "player_id");
@@ -17,15 +18,9 @@ export async function savePledge(_prev: FormState, fd: FormData): Promise<FormSt
   const denied = await actForCheck(playerId);
   if (denied) return { error: denied };
   const supabase = await createClient();
-  const [{ data: standards }, season] = await Promise.all([
-    supabase.from("team_standards").select("title").eq("team_id", teamId).order("position"),
-    seasonOrCurrent(supabase, teamId, null),
-  ]);
+  const season = await seasonOrCurrent(supabase, teamId, null);
   if (!season) return { error: "The team has no roster this season yet." };
-  const titles = ((standards ?? []) as { title: string }[]).map((s) => s.title);
-  const raw: Record<string, string> = {};
-  titles.forEach((t, i) => (raw[t] = String(fd.get(`line:${i}`) ?? "")));
-  const lines = cleanLines(raw, titles);
+  const lines = cleanPledge(fd.get("pledge"));
   const sign = fd.get("sign") === "on";
   const signedName = text(fd, "signed_name");
   if (sign && (!signedName || signedName.length > 80)) return invalid("signed_name", "Type your name to sign.");

@@ -1,8 +1,9 @@
 // How a team's Standards and Culture look to players: on the player dashboard
 // (pop-ups above TWIS) and as the preview in the Coaches Dugout. Server-safe.
 import { OutlineText, SpeedStripes } from "@/components/athletic";
+import { RichText } from "@/components/rich-text";
 
-export type TeamStandard = { title: string; detail: string | null };
+export type TeamStandard = { title: string; detail: string | null; /** its row, when saved: a save keeps it by id */ id?: string };
 export type TeamCulture = { headline: string | null; statement: string | null; /** the season motto (Phase 5) */ motto?: string | null };
 
 /** Numbered standards with outlined numerals, like a locker-room wall. */
@@ -43,7 +44,7 @@ export function CultureStatement({ culture }: { culture: TeamCulture }) {
       <div className="flex flex-col gap-4 text-base leading-relaxed text-ink">
         {paragraphs.map((p, i) => (
           <p key={i} className="whitespace-pre-line">
-            {p}
+            <RichText text={p} />
           </p>
         ))}
       </div>

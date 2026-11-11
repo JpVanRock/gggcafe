@@ -37,6 +37,13 @@
   description, blank line = new paragraph) per team; saved together by the `save_team_dugout` RPC.
   Players see them in the "From the Dugout" strip above TWIS (`components/dugout-strip.tsx`): Team
   Standards / Team Culture pill buttons open pop-ups, one section per active own team.
+  Saving never drops a saved standard (user's report, 2026-11-11: adding one from an old page wiped the others).
+  `save_team_dugout` (migration 20261111054114) keeps each standard by id: the form sends each row's id, its new ones,
+  and the ids the coach removed (`standard_removed`); only those are deleted. A row without an id but with a saved
+  title is that standard (no duplicates from an older form); saved standards the form didn't mention stay, after its
+  list. As a second guard the form carries the version it loaded (`standards-version.ts`: a hash of the standards,
+  headline and statement) and the save refuses an out-of-date form with "reload". The form is keyed by the version, so
+  after a save it starts over from what's saved. No history is kept of earlier lists.
 - Coach's Responsibilities (user, 2026-11-11, from the user's own sheet): the first pill on the strip at the bottom of
   the Coaches Dugout (`coachResponsibilities` prop), coaches only. Sixteen responsibilities and "Teaching Creates
   Understanding" in `src/lib/coach-responsibilities.ts` (`key: true` = the ones the user set in bold), then

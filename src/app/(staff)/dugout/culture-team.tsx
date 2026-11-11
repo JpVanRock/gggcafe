@@ -16,11 +16,15 @@ type Pledge = { player_id: string; lines: Record<string, string>; signed_at: str
 export function GoalsBoard({ goals, teamId, editor }: { goals: TeamGoal[]; teamId?: string; editor?: boolean }) {
   if (goals.length === 0) return <EmptyState>No season goals yet.</EmptyState>;
   return (
-    <ul className="grid gap-3 md:grid-cols-2">
-      {sortGoals(goals).map((g) => {
+    <ol className="grid gap-3 md:grid-cols-2">
+      {sortGoals(goals).map((g, i) => {
         const pct = goalProgress(g);
         return (
-          <li key={g.id} className={`rounded-xl border p-4 ${g.achieved_at ? "border-neon bg-neon/5" : "border-navy-700"}`}>
+          <li key={g.id} className={`flex gap-4 rounded-xl border p-4 ${g.achieved_at ? "border-neon bg-neon/5" : "border-navy-700"}`}>
+            <span className="font-display text-3xl leading-none font-bold text-highlight tabular-nums" aria-label={`Goal ${i + 1}`}>
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <div className="min-w-0 flex-1">
             <p className={eyebrowClass}>
               {GOAL_PHASE_LABEL[g.phase]}
               {g.achieved_at && " · Achieved ✓"}
@@ -58,10 +62,11 @@ export function GoalsBoard({ goals, teamId, editor }: { goals: TeamGoal[]; teamI
                 </div>
               </div>
             )}
+            </div>
           </li>
         );
       })}
-    </ul>
+    </ol>
   );
 }
 
@@ -70,7 +75,6 @@ export function CultureTeamSections({
   goals,
   roster,
   pledges,
-  standardTitles,
   spotlights,
   editor,
 }: {
@@ -78,11 +82,10 @@ export function CultureTeamSections({
   goals: TeamGoal[];
   roster: { id: string; name: string; number: string | null }[];
   pledges: Pledge[];
-  standardTitles: string[];
   spotlights: Spotlight[];
   editor: boolean;
 }) {
-  const signed = roster.filter((p) => pledgeStatus(pledges.find((x) => x.player_id === p.id) ?? null, standardTitles).signed).length;
+  const signed = roster.filter((p) => pledgeStatus(pledges.find((x) => x.player_id === p.id) ?? null).signed).length;
   return (
     <>
       <section className="flex flex-col gap-3">
@@ -99,16 +102,18 @@ export function CultureTeamSections({
         <h2 className={heading}>
           Team pledge · {signed} of {roster.length} signed
         </h2>
-        <p className="text-sm text-muted">Each player writes an &ldquo;I will…&rdquo; line for every Team Standard and signs the pledge on her Team page.</p>
+        <p className="text-sm text-muted">
+          Each player writes one &ldquo;I will…&rdquo; commitment that covers every Team Standard and signs the pledge on her Team page.
+        </p>
         {roster.length > 0 && (
           <ul className="grid gap-x-6 gap-y-1 text-sm sm:grid-cols-2 lg:grid-cols-3">
             {roster.map((p) => {
-              const st = pledgeStatus(pledges.find((x) => x.player_id === p.id) ?? null, standardTitles);
+              const st = pledgeStatus(pledges.find((x) => x.player_id === p.id) ?? null);
               return (
                 <li key={p.id} className="flex items-center justify-between gap-2 border-b border-navy-800 py-1">
                   <span>{p.name}</span>
                   <span className={`font-mono text-2xs ${st.complete ? "text-highlight" : "text-muted"}`}>
-                    {st.signed ? "Signed" : "Not signed"} · {st.written}/{st.total}
+                    {st.signed ? "Signed" : "Not signed"} · {st.written ? "written" : "not written"}
                   </span>
                 </li>
               );

@@ -6,6 +6,7 @@ import { DugoutStrip } from "@/components/dugout-strip";
 import { CultureStatement, StandardsList, hasCulture, type TeamCulture, type TeamStandard } from "@/components/team-standards";
 import { loadDugoutTeam } from "./data";
 import { StandardsForm } from "./standards-form";
+import { standardsVersion } from "./standards-version";
 import { NoOwnTeam, TeamPicker } from "./team-picker";
 import { CultureTeamSections, type Spotlight } from "./culture-team";
 import { MottoForm } from "./culture-forms";
@@ -28,14 +29,16 @@ export default async function DugoutPage({ searchParams }: PageProps<"/dugout">)
   const season = await seasonOrCurrent(supabase, team.id, null);
   const [cultureResult, standardsResult, goalsResult, roster, pledgesResult, spotlightsResult] = await Promise.all([
     supabase.from("team_culture").select("headline, statement, motto").eq("team_id", team.id).maybeSingle(),
-    supabase.from("team_standards").select("title, detail").eq("team_id", team.id).order("position"),
-    supabase.from("team_goals").select("id, phase, title, target, current, unit, achieved_at, position").eq("team_id", team.id),
+    supabase.from("team_standards").select("id, title, detail").eq("team_id", team.id).order("position"),
+    supabase.from("team_goals").select("id, phase, title, target, current, unit, achieved_at, position, created_at").eq("team_id", team.id),
     loadTeamRoster(supabase, team.id),
     season ? supabase.from("team_pledges").select("player_id, lines, signed_at").eq("team_id", team.id).eq("season_id", season) : Promise.resolve({ data: [] }),
     supabase.from("player_spotlights").select("id, player_name, jersey, headline, body, published_on").eq("team_id", team.id).order("published_on", { ascending: false }).limit(12),
   ]);
   const culture = (cultureResult.data ?? null) as TeamCulture | null;
   const standards = (standardsResult.data ?? []) as TeamStandard[];
+  // what the form was loaded with; a save from an older page is refused (standards-version.ts)
+  const version = standardsVersion(standards, culture);
   const goals = ((goalsResult.data ?? []) as TeamGoal[]).map((g) => ({ ...g, target: g.target === null ? null : Number(g.target), current: g.current === null ? null : Number(g.current) }));
 
   return (
@@ -43,7 +46,8 @@ export default async function DugoutPage({ searchParams }: PageProps<"/dugout">)
       <TeamPicker teams={teams} current={team.id} basePath="/dugout" />
 
       {editor ? (
-        <StandardsForm key={team.id} teamId={team.id} culture={culture} standards={standards} />
+        // keyed by the version too: after a save the form starts over from what's now saved
+        <StandardsForm key={`${team.id}:${version}`} teamId={team.id} culture={culture} standards={standards} version={version} />
       ) : (
         <div className="grid gap-6 lg:grid-cols-2">
           <Card title="Team Standards">
@@ -62,7 +66,6 @@ export default async function DugoutPage({ searchParams }: PageProps<"/dugout">)
         goals={goals}
         roster={roster}
         pledges={(pledgesResult.data ?? []) as { player_id: string; lines: Record<string, string>; signed_at: string | null }[]}
-        standardTitles={standards.map((st) => st.title)}
         spotlights={(spotlightsResult.data ?? []) as Spotlight[]}
         editor={editor}
       />

@@ -6,6 +6,7 @@ import type { TeamCulture, TeamStandard } from "@/components/team-standards";
 import { initialFormState } from "@/lib/form";
 import { saveTeamDugout } from "./actions";
 import { SubmitButton } from "@/components/submit-button";
+import { FormattedTextarea } from "@/components/format-toolbar";
 
 type Row = TeamStandard & { key: number };
 
@@ -16,16 +17,21 @@ export function StandardsForm({
   teamId,
   culture,
   standards,
+  version,
 }: {
   teamId: string;
   culture: TeamCulture | null;
   standards: TeamStandard[];
+  /** what was saved when the page loaded: the save refuses an out-of-date form */
+  version: string;
 }) {
   const [state, action] = useActionState(saveTeamDugout, initialFormState);
   const [rows, setRows] = useState<Row[]>(() =>
     (standards.length ? standards : [{ title: "", detail: null }]).map((s, i) => ({ ...s, key: i })),
   );
   const [nextKey, setNextKey] = useState(rows.length);
+  // saved standards the coach removed: only these are deleted on save
+  const [removed, setRemoved] = useState<string[]>([]);
 
   const move = (i: number, by: -1 | 1) =>
     setRows((list) => {
@@ -41,6 +47,10 @@ export function StandardsForm({
   return (
     <form action={action} className="flex flex-col gap-6">
       <input type="hidden" name="team_id" value={teamId} />
+      <input type="hidden" name="version" value={version} />
+      {removed.map((id) => (
+        <input key={id} type="hidden" name="standard_removed" value={id} />
+      ))}
       <div className="grid gap-6 lg:grid-cols-2">
         <Card title="Team Standards">
           <p className="mb-4 text-sm text-muted">What every player on this team does, every day. Short and clear.</p>
@@ -61,13 +71,17 @@ export function StandardsForm({
                     <button
                       type="button"
                       className={`${small} hover:text-danger`}
-                      onClick={() => setRows((list) => list.filter((r) => r.key !== row.key))}
+                      onClick={() => {
+                        if (row.id) setRemoved((ids) => [...ids, row.id!]);
+                        setRows((list) => list.filter((r) => r.key !== row.key));
+                      }}
                       aria-label={`Remove standard ${i + 1}`}
                     >
                       Remove
                     </button>
                   </div>
                 </div>
+                <input type="hidden" name="standard_id" value={row.id ?? ""} />
                 <input
                   name="standard_title"
                   defaultValue={row.title}
@@ -94,13 +108,21 @@ export function StandardsForm({
         </Card>
 
         <Card title="Team Culture">
-          <p className="mb-4 text-sm text-muted">Who this team is and how it plays. Leave a blank line between paragraphs.</p>
+          <p className="mb-4 text-sm text-muted">
+            Who this team is and how it plays. Leave a blank line between paragraphs. Select words and tap B, I or U to make them bold,
+            italic or underlined.
+          </p>
           <div className="flex flex-col gap-4">
             <Field label="Headline (optional)" hint="One line that sums it up">
               <input name="headline" defaultValue={culture?.headline ?? ""} maxLength={120} placeholder="Compete. Connect. Elevate." className={inputClass} />
             </Field>
-            <Field label="Our culture">
-              <textarea
+            {/* not a Field: the formatting buttons can't sit inside its <label> */}
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor={`culture-statement-${teamId}`} className="text-sm font-medium">
+                Our culture
+              </label>
+              <FormattedTextarea
+                id={`culture-statement-${teamId}`}
                 name="statement"
                 defaultValue={culture?.statement ?? ""}
                 maxLength={4000}
@@ -108,7 +130,7 @@ export function StandardsForm({
                 placeholder="We play fast and we play for each other…"
                 className={inputClass}
               />
-            </Field>
+            </div>
           </div>
         </Card>
       </div>

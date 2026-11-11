@@ -17,7 +17,7 @@ export async function loadTeamExtras(supabase: Supabase, playerId: string, teamI
   if (teamIds.length === 0) return { goals, pledges, spotlights };
   const seasons = await Promise.all(teamIds.map((t) => seasonOrCurrent(supabase, t, null)));
   const [goalRows, pledgeRows, spotRows] = await Promise.all([
-    supabase.from("team_goals").select("id, team_id, phase, title, target, current, unit, achieved_at, position").in("team_id", teamIds),
+    supabase.from("team_goals").select("id, team_id, phase, title, target, current, unit, achieved_at, position, created_at").in("team_id", teamIds),
     supabase.from("team_pledges").select("team_id, season_id, lines, signed_name, signed_at").eq("player_id", playerId).in("team_id", teamIds),
     supabase.from("player_spotlights").select("id, team_id, player_name, jersey, headline, body, published_on").in("team_id", teamIds).order("published_on", { ascending: false }).limit(12),
   ]);

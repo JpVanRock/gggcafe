@@ -30,18 +30,70 @@ select pg_temp.expect('seed standards', (select count(*) from public.team_standa
 set role authenticated;
 select set_config('request.jwt.claims', '{"sub":"22222222-0000-0000-0000-000000000001"}', false);
 
--- Standards: blank titles are skipped, order kept, list replaced on save
+-- Standards (user's report, 2026-11-11): a save never drops a saved standard it wasn't told to remove.
+-- Seed b1: 1 Be early, 2 Sprint on and off the field, 3 Next pitch.
+create temp table std_ids as select id, title from public.team_standards where team_id = '00000000-0000-0000-0000-0000000000b1';
+grant select on std_ids to authenticated;
+
+-- A form opened before "Sprint" and "Next pitch" were saved adds a standard: nothing is lost
 select public.save_team_dugout('00000000-0000-0000-0000-0000000000b1', '  One team  ', 'We win the day.',
-  '[{"title": "Hustle"}, {"title": "  "}, {"title": "Talk on defense", "detail": "Call every ball."}]'::jsonb);
-select pg_temp.expect('standards replaced and renumbered',
+  jsonb_build_array(
+    jsonb_build_object('id', (select id from std_ids where title = 'Be early'), 'title', 'Be early'),
+    jsonb_build_object('title', 'Talk on defense', 'detail', 'Call every ball.'),
+    jsonb_build_object('title', '  ')));
+select pg_temp.expect('adding one keeps every saved standard',
          (select string_agg(position || ':' || title, ',' order by position) from public.team_standards
-           where team_id = '00000000-0000-0000-0000-0000000000b1'), '1:Hustle,2:Talk on defense'),
+           where team_id = '00000000-0000-0000-0000-0000000000b1'),
+         '1:Be early,2:Talk on defense,3:Sprint on and off the field,4:Next pitch'),
+       pg_temp.expect('saved standards keep their ids',
+         (select count(*) from public.team_standards s join std_ids o on o.id = s.id), 3::bigint),
+       pg_temp.expect('a kept standard keeps its detail',
+         (select detail from public.team_standards where title = 'Next pitch' and team_id = '00000000-0000-0000-0000-0000000000b1'),
+         'Reset after every mistake. One deep breath, then the next pitch.'),
        pg_temp.expect('culture headline trimmed',
          (select headline from public.team_culture where team_id = '00000000-0000-0000-0000-0000000000b1'), 'One team'),
        pg_temp.expect('culture updated_by is the coach',
          (select updated_by from public.team_culture where team_id = '00000000-0000-0000-0000-0000000000b1'),
          '22222222-0000-0000-0000-000000000001'::uuid);
-select public.save_team_dugout('00000000-0000-0000-0000-0000000000b1', null, null, '[]'::jsonb);
+
+-- An older form that sends titles without ids: matched by title, no duplicates
+select public.save_team_dugout('00000000-0000-0000-0000-0000000000b1', 'One team', 'We win the day.',
+  '[{"title": "Be early"}, {"title": "Sprint on and off the field"}, {"title": "Next pitch"}, {"title": "Talk on defense"}]'::jsonb);
+select pg_temp.expect('same titles, no duplicates',
+         (select count(*) from public.team_standards where team_id = '00000000-0000-0000-0000-0000000000b1'), 4::bigint),
+       pg_temp.expect('reordered as sent',
+         (select string_agg(title, ',' order by position) from public.team_standards where team_id = '00000000-0000-0000-0000-0000000000b1'),
+         'Be early,Sprint on and off the field,Next pitch,Talk on defense');
+
+-- Edit by id (same row), and remove only what the coach removed
+select public.save_team_dugout('00000000-0000-0000-0000-0000000000b1', 'One team', 'We win the day.',
+  jsonb_build_array(
+    jsonb_build_object('id', (select id from std_ids where title = 'Be early'), 'title', 'Be early, always'),
+    jsonb_build_object('id', (select id from std_ids where title = 'Next pitch'), 'remove', true)));
+select pg_temp.expect('edited in place, removed one, kept the rest',
+         (select string_agg(title, ',' order by position) from public.team_standards where team_id = '00000000-0000-0000-0000-0000000000b1'),
+         'Be early, always,Sprint on and off the field,Talk on defense'),
+       pg_temp.expect('the edited standard is the same row',
+         (select title from public.team_standards where id = (select id from std_ids where title = 'Be early')), 'Be early, always');
+
+-- A saved standard with its title cleared is removed
+select public.save_team_dugout('00000000-0000-0000-0000-0000000000b1', 'One team', 'We win the day.',
+  jsonb_build_array(jsonb_build_object('id', (select id from std_ids where title = 'Sprint on and off the field'), 'title', '  ')));
+select pg_temp.expect('cleared title removes it',
+         (select string_agg(title, ',' order by position) from public.team_standards where team_id = '00000000-0000-0000-0000-0000000000b1'),
+         'Be early, always,Talk on defense');
+
+-- No more than 25
+do $$ begin
+  perform public.save_team_dugout('00000000-0000-0000-0000-0000000000b1', null, null,
+    (select jsonb_agg(jsonb_build_object('title', 'Standard ' || n)) from generate_series(1, 24) n));
+  raise exception 'FAIL: 26 standards were saved';
+exception when invalid_parameter_value then null;
+end $$;
+
+-- Removing every saved standard clears the list (only when each one is removed)
+select public.save_team_dugout('00000000-0000-0000-0000-0000000000b1', null, null,
+  (select jsonb_agg(jsonb_build_object('id', id, 'remove', true)) from public.team_standards where team_id = '00000000-0000-0000-0000-0000000000b1'));
 select pg_temp.expect('standards cleared',
          (select count(*) from public.team_standards where team_id = '00000000-0000-0000-0000-0000000000b1'), 0::bigint),
        pg_temp.expect('culture cleared',

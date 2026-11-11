@@ -7,6 +7,7 @@ import { friendlyDbError, oneOf, text, type FormState, invalid } from "@/lib/for
 import { isUuid, playerName } from "@/lib/softball";
 import { GOAL_PHASES, MOTTO_MAX, SPOTLIGHT } from "@/lib/culture";
 import { STALE, failed, must, runAction } from "@/lib/actions";
+import { currentStandardsVersion } from "./standards-version";
 
 export async function saveTeamDugout(_prev: FormState, fd: FormData): Promise<FormState> {
   const denied = await headCoachCheck();
@@ -15,11 +16,16 @@ export async function saveTeamDugout(_prev: FormState, fd: FormData): Promise<Fo
   const teamId = text(fd, "team_id");
   if (!isUuid(teamId)) return { error: "Choose a team." };
 
+  // Each row: its id when it's a saved standard (kept by id), its title and detail; plus the
+  // saved standards the coach removed. Only those are deleted (save_team_dugout keeps the rest).
   const details = fd.getAll("standard_detail");
-  const standards = fd
+  const ids = fd.getAll("standard_id").map((v) => String(v));
+  const rows = fd
     .getAll("standard_title")
-    .map((t, i) => ({ title: String(t).trim(), detail: String(details[i] ?? "").trim() }))
-    .filter((s) => s.title);
+    .map((t, i) => ({ id: isUuid(ids[i]) ? ids[i] : undefined, title: String(t).trim(), detail: String(details[i] ?? "").trim() }))
+    .filter((s) => s.title || s.id);
+  const removed = fd.getAll("standard_removed").map(String).filter(isUuid);
+  const standards = rows.filter((s) => s.title);
   if (standards.length > 25) return { error: "Keep it to 25 standards or fewer." };
   if (standards.some((s) => s.title.length > 140)) return { error: "Keep each standard to 140 characters; put the rest in its detail." };
   if (standards.some((s) => s.detail.length > 800)) return { error: "Keep each standard's detail to 800 characters." };
@@ -30,11 +36,20 @@ export async function saveTeamDugout(_prev: FormState, fd: FormData): Promise<Fo
   if ((statement ?? "").length > 4000) return invalid("statement", "Keep the team culture description to 4,000 characters.");
 
   const supabase = await createClient();
+  // The save replaces the whole list, so never save from an out-of-date page: if the standards
+  // or culture changed since this form was loaded (another tab, the phone app), stop.
+  const version = text(fd, "version");
+  if (!version) return { error: STALE };
+  if (version !== (await currentStandardsVersion(supabase, teamId)))
+    return {
+      error:
+        "These standards changed since you opened this page (maybe on another device or tab), so nothing was saved. Reload the page to see the latest, then make your change again.",
+    };
   const { error } = await supabase.rpc("save_team_dugout", {
     p_team_id: teamId,
     p_headline: headline,
     p_statement: statement,
-    p_standards: standards,
+    p_standards: [...rows, ...removed.map((id) => ({ id, remove: true }))],
   });
   if (error) return { error: friendlyDbError(error) };
 

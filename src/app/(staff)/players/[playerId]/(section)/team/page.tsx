@@ -9,7 +9,7 @@ import { loadTeamDugout } from "../../data";
 import { loadPlayer } from "../../section-data";
 import { SectionShell } from "../section-shell";
 import { formatDay } from "@/lib/dates";
-import { pledgeStatus } from "@/lib/culture";
+import { pledgeLine, pledgeStatus } from "@/lib/culture";
 import { GoalsBoard } from "@/app/(staff)/dugout/culture-team";
 import { loadTeamExtras } from "../../team-culture-data";
 import { PledgeForm } from "../../team-culture-client";
@@ -73,11 +73,11 @@ export default async function TeamPage({ params }: PageProps<"/players/[playerId
                   {(() => {
                     const pledge = extras.pledges.get(team.id) ?? null;
                     const titles = standards.map((st) => st.title);
-                    const status = pledgeStatus(pledge, titles);
+                    const status = pledgeStatus(pledge);
                     return (
                       <div className="flex flex-col gap-4">
                         <p className="text-sm text-muted">
-                          One &ldquo;I will…&rdquo; line for each Team Standard, then sign the team pledge.
+                          One &ldquo;I will…&rdquo; that covers every Team Standard, then sign the team pledge.
                           {status.signed && pledge?.signed_at ? ` Signed by ${pledge.signed_name} on ${formatDay(pledge.signed_at.slice(0, 10))}.` : ""}
                         </p>
                         {access.canAct ? (
@@ -85,19 +85,13 @@ export default async function TeamPage({ params }: PageProps<"/players/[playerId
                             playerId={player.id}
                             teamId={team.id}
                             standards={titles}
-                            lines={pledge?.lines ?? {}}
+                            line={pledgeLine(pledge?.lines)}
                             signedName={pledge?.signed_name ?? null}
                             signedAt={pledge?.signed_at ?? null}
                             defaultName={playerName(player)}
                           />
                         ) : (
-                          <ul className="flex flex-col gap-1 text-sm">
-                            {titles.map((t) => (
-                              <li key={t}>
-                                <span className="font-semibold">{t}:</span> {pledge?.lines[t] ?? "–"}
-                              </li>
-                            ))}
-                          </ul>
+                          <p className="text-sm whitespace-pre-line">{pledgeLine(pledge?.lines) || "–"}</p>
                         )}
                       </div>
                     );
