@@ -8,14 +8,14 @@ import { BudgetSummary, type BudgetSummaryData } from "@/components/budget-summa
 import { Card, Disclosure, EmptyState, pillQuietClass, tableClass, tdClass, thClass, badgeClass, type BadgeTone, TableScroll } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import {
-  CREDIT_USED, CREDIT_WON, coachLedger, coachTotals, creditLedger, money, playerBalances, runningLedger, toCents,
+  CREDIT_USED, CREDIT_WON, coachLedger, coachTotals, creditLedger, money, paymentCategory, playerBalances, runningLedger, toCents,
   type CoachExpense, type EntryKind, type PlayerStatus,
 } from "@/lib/budget";
 import { compareJersey, type Season, playerName } from "@/lib/softball";
 import { loadDugoutTeam } from "../data";
 import { NoOwnTeam, TeamPicker } from "../team-picker";
 import { deleteCoachExpense, deleteEntry, undoCoachRepayment } from "./actions";
-import { AdjustmentForm, CoachExpenseForm, CreditForm, EntryForm, FeesForm, PaymentForm, RepayForm, type BudgetPlayer } from "./forms";
+import { AdjustmentForm, CoachExpenseForm, CreditForm, EditPaymentForm, EntryForm, FeesForm, PaymentForm, RepayForm, type BudgetPlayer } from "./forms";
 import { ActionForm } from "@/components/action-form";
 
 export const metadata: Metadata = { title: "Team Budget · Coaches Dugout · GGG.Cafe" };
@@ -130,8 +130,9 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
     players.map((r) => r.player!.id),
     feeCents,
     new Map(adjustments.map((a) => [a.player_id, toCents(a.amount)])),
-    entries.filter((e) => e.kind === "payment").map((e) => ({ player_id: e.player_id, cents: toCents(e.amount) })),
+    entries.filter((e) => e.kind === "payment").map((e) => ({ player_id: e.player_id, cents: toCents(e.amount), category: e.category })),
   );
+  const anyOtherPayments = balances.some((b) => b.other > 0);
   const ledger = runningLedger(entries.map((e) => ({ ...e, date: e.entry_date, cents: toCents(e.amount) })));
   const seasonName = new Map(seasons.map((s) => [s.id, s.name]));
   const credits = creditLedger(
@@ -261,6 +262,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
                   <th className={`${thClass} text-right`}>Paid</th>
                   <th className={`${thClass} text-right`}>Balance</th>
                   <th className={thClass}>Status</th>
+                  {anyOtherPayments && <th className={`${thClass} text-right`}>Equipment &amp; other</th>}
                 </tr>
               </thead>
               <tbody>
@@ -286,6 +288,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
                           {STATUS[b.status].label}
                         </span>
                       </td>
+                      {anyOtherPayments && <td className={`${tdClass} text-right tabular-nums`}>{b.other ? money(b.other) : "–"}</td>}
                     </tr>
                   );
                 })}
@@ -309,7 +312,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
                   <th className={`${thClass} text-right`}>Out</th>
                   <th className={`${thClass} text-right`}>Balance</th>
                   {editor && <th className={thClass}>
-                    <span className="sr-only">Remove</span>
+                    <span className="sr-only">Edit or remove</span>
                   </th>}
                 </tr>
               </thead>
@@ -319,7 +322,11 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
                     e.kind === "payment"
                       ? `Payment · ${e.player_id ? (nameOf.get(e.player_id) ?? "Former player") : "Former player"}`
                       : e.description || e.category || (e.kind === "income" ? "Income" : "Expense");
-                  const detail = [e.kind === "payment" ? e.method : e.description ? e.category : null, e.kind === "payment" ? e.description : null]
+                  const detail = [
+                    e.kind === "payment" ? paymentCategory(e.category) : e.description ? e.category : null,
+                    e.kind === "payment" ? e.method : null,
+                    e.kind === "payment" ? e.description : null,
+                  ]
                     .filter(Boolean)
                     .join(" · ");
                   return (
@@ -334,12 +341,25 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
                       <td className={`${tdClass} text-right font-semibold tabular-nums ${e.balance < 0 ? "text-danger" : ""}`}>{money(e.balance)}</td>
                       {editor && (
                         <td className={tdClass}>
-                          <ActionForm action={deleteEntry}>
-                            <input type="hidden" name="id" value={e.id} />
-                            <ConfirmSubmit message={`Remove “${item}” (${money(e.cents)}) from the ledger?`} className="text-xs text-danger hover:underline">
-                              Remove
-                            </ConfirmSubmit>
-                          </ActionForm>
+                          <div className="flex items-center gap-3">
+                            {e.kind === "payment" && (
+                              <Modal
+                                title="Edit payment"
+                                subtitle={`${item} · ${money(e.cents)} · ${formatDay(e.date)}`}
+                                trigger="Edit"
+                                triggerLabel={`Edit ${item}, ${money(e.cents)}`}
+                                triggerClassName="text-xs text-link hover:underline"
+                              >
+                                <EditPaymentForm id={e.id} category={paymentCategory(e.category)} method={e.method} note={e.description} />
+                              </Modal>
+                            )}
+                            <ActionForm action={deleteEntry}>
+                              <input type="hidden" name="id" value={e.id} />
+                              <ConfirmSubmit message={`Remove “${item}” (${money(e.cents)}) from the ledger?`} className="text-xs text-danger hover:underline">
+                                Remove
+                              </ConfirmSubmit>
+                            </ActionForm>
+                          </div>
                         </td>
                       )}
                     </tr>

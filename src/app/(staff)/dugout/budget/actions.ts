@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { checkbox, friendlyDbError, isoDate, oneOf, text, type FormState, invalid } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import {
-  CREDIT_USED, CREDIT_WON, ENTRY_FORM_CATEGORIES, PAYMENT_METHODS, centsToDollars, creditBalance, money, parseMoney, toCents,
+  CREDIT_USED, CREDIT_WON, ENTRY_FORM_CATEGORIES, PAYMENT_CATEGORIES, PAYMENT_METHODS, centsToDollars, creditBalance, money, parseMoney, toCents,
 } from "@/lib/budget";
 import { STALE, failed, must, runAction } from "@/lib/actions";
 
@@ -43,7 +43,7 @@ export async function saveFees(_prev: FormState, fd: FormData): Promise<FormStat
   return { error: null, saved: true };
 }
 
-/** Records a player's payment. */
+/** Records a player's payment: what it's for (only Registration counts toward her fees) and a note. */
 export async function recordPayment(_prev: FormState, fd: FormData): Promise<FormState> {
   const denied = await headCoachCheck();
   if (denied) return { error: denied };
@@ -55,6 +55,8 @@ export async function recordPayment(_prev: FormState, fd: FormData): Promise<For
   if (cents === null || cents === "invalid" || cents <= 0) return { error: "Enter the amount paid, like 250 or 125.50." };
   const entry_date = isoDate(fd, "entry_date");
   if (!entry_date) return invalid("entry_date", "Pick the date it was paid.");
+  const description = text(fd, "description");
+  if ((description ?? "").length > 300) return invalid("description", "Keep the note to 300 characters.");
 
   const supabase = await createClient();
   const { error } = await supabase.from("budget_entries").insert({
@@ -63,12 +65,38 @@ export async function recordPayment(_prev: FormState, fd: FormData): Promise<For
     player_id,
     entry_date,
     amount: Number(centsToDollars(cents)),
+    category: oneOf(fd, "category", PAYMENT_CATEGORIES) ?? "Registration",
     method: oneOf(fd, "method", PAYMENT_METHODS),
-    description: text(fd, "description"),
+    description,
   });
   if (error) return { error: friendlyDbError(error) };
   refresh();
   return { error: null, saved: true };
+}
+
+/** Changes what a recorded payment is for, how it was paid and its note (user, 2026-11-12). */
+export async function updatePayment(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "id");
+    if (!isUuid(id)) return failed(STALE);
+    const category = oneOf(fd, "category", PAYMENT_CATEGORIES);
+    if (!category) return invalid("category", "Choose what the payment was for.");
+    const description = text(fd, "description");
+    if ((description ?? "").length > 300) return invalid("description", "Keep the note to 300 characters.");
+    const supabase = await createClient();
+    const { data } = must(
+      await supabase
+        .from("budget_entries")
+        .update({ category, method: oneOf(fd, "method", PAYMENT_METHODS), description })
+        .eq("id", id)
+        .eq("kind", "payment")
+        .select("id"),
+    );
+    if (!data?.length) return failed("That payment no longer exists, or you can't change it.");
+    refresh();
+  });
 }
 
 /** Sets a player's discount (negative) or extra charge, or clears it. */

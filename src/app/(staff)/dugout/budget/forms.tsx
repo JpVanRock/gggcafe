@@ -2,9 +2,9 @@
 
 import { useActionState, useState } from "react";
 import { Field, FormMessage, fieldClass, inputClass } from "@/components/ui";
-import { ENTRY_FORM_CATEGORIES, PAYMENT_METHODS, centsToDollars, money, parseMoney } from "@/lib/budget";
+import { ENTRY_FORM_CATEGORIES, PAYMENT_CATEGORIES, PAYMENT_METHODS, centsToDollars, money, parseMoney, type PaymentCategory } from "@/lib/budget";
 import { initialFormState } from "@/lib/form";
-import { addCoachExpense, addCredit, addEntry, recordPayment, repayCoach, saveAdjustment, saveFees } from "./actions";
+import { addCoachExpense, addCredit, addEntry, recordPayment, repayCoach, saveAdjustment, saveFees, updatePayment } from "./actions";
 import { SubmitButton } from "@/components/submit-button";
 
 export type Scope = { teamId: string; seasonId: string };
@@ -108,6 +108,38 @@ function PlayerSelect({ players, name = "player_id" }: { players: BudgetPlayer[]
   );
 }
 
+/** What a player payment is for: only Registration goes toward her registration fees (user, 2026-11-12). */
+function PaymentCategoryPicker({ value }: { value: PaymentCategory }) {
+  return (
+    <fieldset>
+      <legend className="mb-1.5 text-sm font-medium">For</legend>
+      <div className="inline-flex flex-wrap rounded-full border border-navy-600 p-0.5">
+        {PAYMENT_CATEGORIES.map((c) => (
+          <label
+            key={c}
+            className="cursor-pointer rounded-full px-4 py-1.5 text-sm font-semibold text-muted transition select-none has-checked:bg-pink has-checked:text-on-accent has-focus-visible:ring-2 has-focus-visible:ring-pink/40"
+          >
+            <input type="radio" name="category" value={c} defaultChecked={c === value} className="sr-only" />
+            {c}
+          </label>
+        ))}
+      </div>
+      <p className="mt-1.5 text-xs text-muted">Only Registration counts toward her registration fees.</p>
+    </fieldset>
+  );
+}
+
+function MethodSelect({ value = "" }: { value?: string }) {
+  return (
+    <select name="method" defaultValue={value} className={inputClass}>
+      <option value="">—</option>
+      {PAYMENT_METHODS.map((m) => (
+        <option key={m}>{m}</option>
+      ))}
+    </select>
+  );
+}
+
 export function PaymentForm({ scope, players, today }: { scope: Scope; players: BudgetPlayer[]; today: string }) {
   const [state, action] = useActionState(recordPayment, initialFormState);
   return (
@@ -123,24 +155,22 @@ export function PaymentForm({ scope, players, today }: { scope: Scope; players: 
           <input name="amount" required inputMode="decimal" placeholder="250.00" className={moneyInput} />
         </Field>
       </div>
-      <div className="sm:col-span-2">
+      <div className="sm:col-span-6">
+        <PaymentCategoryPicker value="Registration" />
+      </div>
+      <div className="sm:col-span-3">
         <Field label="Date paid">
           <input type="date" name="entry_date" required defaultValue={today} className={inputClass} />
         </Field>
       </div>
-      <div className="sm:col-span-2">
+      <div className="sm:col-span-3">
         <Field label="Paid by">
-          <select name="method" defaultValue="" className={inputClass}>
-            <option value="">—</option>
-            {PAYMENT_METHODS.map((m) => (
-              <option key={m}>{m}</option>
-            ))}
-          </select>
+          <MethodSelect />
         </Field>
       </div>
-      <div className="sm:col-span-2">
-        <Field label="Note (optional)">
-          <input name="description" maxLength={300} placeholder="Check #1042" className={inputClass} />
+      <div className="sm:col-span-6">
+        <Field label="Note (optional)" hint="Saved with the payment and shown in the ledger">
+          <textarea name="description" rows={2} maxLength={300} placeholder="Check #1042, covers the fall tournament fee" className={inputClass} />
         </Field>
       </div>
       <div className="flex flex-wrap items-center gap-3 sm:col-span-6">
@@ -382,6 +412,37 @@ export function RepayForm({ items, today }: { items: OwedItem[]; today: string }
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <SubmitButton>Mark repaid</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
+      </div>
+    </form>
+  );
+}
+
+/** Changes a recorded payment's category, method and note (the ledger's Edit). */
+export function EditPaymentForm({
+  id,
+  category,
+  method,
+  note,
+}: {
+  id: string;
+  category: PaymentCategory;
+  method: string | null;
+  note: string | null;
+}) {
+  const [state, action] = useActionState(updatePayment, initialFormState);
+  return (
+    <form action={action} className="flex flex-col gap-4">
+      <input type="hidden" name="id" value={id} />
+      <PaymentCategoryPicker value={category} />
+      <Field label="Paid by">
+        <MethodSelect value={method ?? ""} />
+      </Field>
+      <Field label="Note (optional)">
+        <textarea name="description" rows={3} maxLength={300} defaultValue={note ?? ""} className={inputClass} />
+      </Field>
+      <div className="flex flex-wrap items-center gap-3">
+        <SubmitButton>Save changes</SubmitButton>
         <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>

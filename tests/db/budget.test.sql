@@ -60,6 +60,22 @@ select pg_temp.expect('summary totals',
           || ' ' || (s ->> 'other_income') || ' ' || (s ->> 'expenses')
      from (select public.team_budget_summary('00000000-0000-0000-0000-0000000000b1') as s) q),
   '4 525.50 2002.00 825.50 300.00 650.00');
+-- Payment categories (user, 2026-11-12): only Registration counts toward fees; an equipment
+-- payment is other income, so collected stays and the balance still adds up
+insert into public.budget_entries (team_id, season_id, kind, entry_date, amount, player_id, category, description) values
+  ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1', 'payment', '2026-09-04', 45, '00000000-0000-0000-0000-0000000000c1', 'Equipment', 'Batting gloves');
+select pg_temp.expect('an equipment payment is other income, not collected',
+  (select (s ->> 'collected') || ' ' || (s ->> 'other_income')
+     from (select public.team_budget_summary('00000000-0000-0000-0000-0000000000b1') as s) q),
+  '825.50 345.00');
+update public.budget_entries set category = 'Registration' where description = 'Batting gloves';
+select pg_temp.expect('re-categorized as Registration, it counts as collected',
+  (select (s ->> 'collected') || ' ' || (s ->> 'other_income')
+     from (select public.team_budget_summary('00000000-0000-0000-0000-0000000000b1') as s) q),
+  '870.50 300.00');
+select pg_temp.expect('only Registration, Equipment or Other on a payment',
+  pg_temp.err($$update public.budget_entries set category = 'Uniform' where description = 'Batting gloves'$$), '23514');
+delete from public.budget_entries where description = 'Batting gloves';
 -- Coach generates the parent code
 update public.teams set team_code = 'ABC234' where id = '00000000-0000-0000-0000-0000000000b1';
 reset role;

@@ -23,6 +23,17 @@ export const ENTRY_FORM_CATEGORIES = {
 };
 export const PAYMENT_METHODS = ["Cash", "Check", "Venmo", "Zelle", "PayPal", "Card", "Other"] as const;
 
+/**
+ * What a player payment is for (user, 2026-11-12). Only Registration goes toward the registration
+ * fees she owes; Equipment and Other are money in that doesn't change her balance. Payments saved
+ * before categories have none and count as Registration (the database's summary agrees).
+ */
+export const PAYMENT_CATEGORIES = ["Registration", "Equipment", "Other"] as const;
+export type PaymentCategory = (typeof PAYMENT_CATEGORIES)[number];
+export function paymentCategory(category: string | null | undefined): PaymentCategory {
+  return (PAYMENT_CATEGORIES as readonly string[]).includes(category ?? "") ? (category as PaymentCategory) : "Registration";
+}
+
 export type EntryKind = "payment" | "income" | "expense";
 
 /** Dollars (number or numeric string from the database) to whole cents. */
@@ -61,20 +72,25 @@ export function money(cents: number) {
 
 export type PlayerStatus = "paid" | "partial" | "unpaid" | "over" | "none";
 
-/** Each player's due (fees + her adjustment), paid and owed, in cents. */
+/**
+ * Each player's due (fees + her adjustment), paid toward it and owed, in cents. Only registration
+ * payments count toward what she owes; her equipment and other payments are in `other`.
+ */
 export function playerBalances(
   playerIds: string[],
   feeCents: number,
   adjustments: Map<string, number>,
-  payments: { player_id: string | null; cents: number }[],
+  payments: { player_id: string | null; cents: number; category?: string | null }[],
 ) {
   return playerIds.map((id) => {
     const due = Math.max(0, feeCents + (adjustments.get(id) ?? 0));
-    const paid = payments.filter((p) => p.player_id === id).reduce((sum, p) => sum + p.cents, 0);
+    const hers = payments.filter((p) => p.player_id === id);
+    const paid = hers.filter((p) => paymentCategory(p.category) === "Registration").reduce((sum, p) => sum + p.cents, 0);
+    const other = hers.filter((p) => paymentCategory(p.category) !== "Registration").reduce((sum, p) => sum + p.cents, 0);
     const owed = due - paid;
     const status: PlayerStatus =
       due === 0 && paid === 0 ? "none" : owed === 0 ? "paid" : owed < 0 ? "over" : paid > 0 ? "partial" : "unpaid";
-    return { id, due, paid, owed, status };
+    return { id, due, paid, other, owed, status };
   });
 }
 

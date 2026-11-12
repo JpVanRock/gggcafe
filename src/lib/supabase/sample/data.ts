@@ -229,8 +229,9 @@ const budgetEntry = (n: number, kind: string, entry_date: string, amount: number
   id: id("bdbe00", n), team_id: T.us, season_id: S.fall, kind, entry_date, amount, player_id: null, category: null, method: null, description: null, ...extra,
 });
 const budget_entries: Row[] = [
-  budgetEntry(1, "payment", "2026-09-02", 450, { player_id: maya, method: "Venmo" }),
-  budgetEntry(2, "payment", "2026-09-03", 200, { player_id: kendall, method: "Check" }),
+  budgetEntry(1, "payment", "2026-09-02", 450, { player_id: maya, method: "Venmo", category: "Registration" }),
+  budgetEntry(2, "payment", "2026-09-03", 200, { player_id: kendall, method: "Check", category: "Registration", description: "Check #1042" }),
+  budgetEntry(9, "payment", "2026-09-15", 45, { player_id: avery, method: "Cash", category: "Equipment", description: "Batting gloves" }),
   budgetEntry(3, "income", "2026-09-10", 300, { category: "Fundraiser", description: "Car wash" }),
   budgetEntry(4, "expense", "2026-09-12", 650, { category: "Tournament fees", description: "Fall Classic entry" }),
   budgetEntry(5, "income", "2026-09-28", 250, { category: "Tournament credit", description: "Fall Classic champions" }),

@@ -16,6 +16,12 @@
   `budget_entries` (kind payment/income/expense). Money math in `src/lib/budget.ts` (cents; no
   imports; unit-tested). Head coaches/admins edit (user 2026-11-08: assistants view only; migration 20261109100000),
   other staff view. Income sources include Fundraiser, Sponsor, Donation and Reimbursement (money back to the team).
+  Player payments have a category (user, 2026-11-12; migration 20261112001052): Registration, Equipment or Other
+  (`PAYMENT_CATEGORIES`; older payments without one count as Registration, `paymentCategory`). Only Registration
+  counts toward the registration fees a player owes (`playerBalances`; the player table shows equipment and other
+  payments in their own column); the summary's "collected" is registration payments, and equipment/other player
+  payments count as other income. "Record a player payment" has the category and a full-width note; each
+  payment in the ledger has Edit (category, how it was paid, note; `updatePayment`) as well as Remove.
   User, 2026-11-11 (migration 20261111234239):
   - Tournament credits: credit the team wins toward future entry fees is income ("Tournament credit") and credit
     spent on an entry fee is an expense ("Tournament credit used"), both in the team ledger, entered with their own

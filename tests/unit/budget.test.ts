@@ -2,8 +2,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  CREDIT_USED, CREDIT_WON, ENTRY_FORM_CATEGORIES, INCOME_CATEGORIES, centsToDollars, coachLedger, coachTotals, creditBalance, creditLedger, money,
-  parseMoney, playerBalances, runningLedger, toCents,
+  CREDIT_USED, CREDIT_WON, ENTRY_FORM_CATEGORIES, INCOME_CATEGORIES, PAYMENT_CATEGORIES, centsToDollars, coachLedger, coachTotals, creditBalance,
+  creditLedger, money, parseMoney, paymentCategory, playerBalances, runningLedger, toCents,
 } from "../../src/lib/budget.ts";
 
 test("typed amounts become cents", () => {
@@ -38,6 +38,19 @@ test("each player's balance includes her discount", () => {
     ["c", 42550, 50000, -7450, "over"],
     ["d", 52550, 0, 52550, "unpaid"],
   ]);
+});
+
+test("only registration payments count toward what she owes", () => {
+  const [row] = playerBalances(["a"], 40000, new Map(), [
+    { player_id: "a", cents: 30000, category: "Registration" },
+    { player_id: "a", cents: 5000, category: null },
+    { player_id: "a", cents: 4500, category: "Equipment" },
+    { player_id: "a", cents: 1000, category: "Other" },
+  ]);
+  assert.deepEqual([row.paid, row.other, row.owed, row.status], [35000, 5500, 5000, "partial"]);
+  assert.equal(paymentCategory(null), "Registration", "payments saved before categories count as registration");
+  assert.equal(paymentCategory("Equipment"), "Equipment");
+  assert.deepEqual([...PAYMENT_CATEGORIES], ["Registration", "Equipment", "Other"]);
 });
 
 test("ledger runs in date order with a running balance", () => {
