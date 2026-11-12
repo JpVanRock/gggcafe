@@ -8,8 +8,8 @@ import { BudgetSummary, CreditsSummary, type BudgetSummaryData } from "@/compone
 import { Card, Disclosure, EmptyState, pillQuietClass, tableClass, tdClass, thClass, badgeClass, type BadgeTone, TableScroll } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import {
-  coachLedger, coachTotals, creditLedger, money, paymentCategory, playerBalances, runningLedger, toCents,
-  type CoachExpense, type EntryKind, type PlayerStatus,
+  PAYER_ROLE_LABEL, coachLedger, coachTotals, creditLedger, money, paymentCategory, playerBalances, runningLedger, toCents,
+  type CoachExpense, type EntryKind, type PayerRole, type PlayerStatus,
 } from "@/lib/budget";
 import { compareJersey, type Season, playerName } from "@/lib/softball";
 import { loadDugoutTeam } from "../data";
@@ -31,6 +31,7 @@ type CoachRow = {
   season_id: string;
   entry_date: string;
   paid_by: string;
+  paid_by_role: PayerRole;
   category: string | null;
   description: string | null;
   amount: number;
@@ -90,7 +91,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
     );
   }
 
-  const [summaryResult, feesResult, adjustmentsResult, entriesResult, creditsResult, coachResult, staffResult] = await Promise.all([
+  const [summaryResult, feesResult, adjustmentsResult, entriesResult, creditsResult, coachResult, staffResult, parentsResult] = await Promise.all([
     supabase.rpc("team_budget_summary", { p_team_id: team.id, p_season_id: season.id }),
     supabase.from("budget_fees").select("name, amount").eq("team_id", team.id).eq("season_id", season.id).order("position"),
     supabase.from("budget_adjustments").select("player_id, amount, note").eq("team_id", team.id).eq("season_id", season.id),
@@ -99,13 +100,15 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
       .select("id, kind, entry_date, amount, player_id, category, method, description")
       .eq("team_id", team.id)
       .eq("season_id", season.id),
-    // tournament credits and the coaches' ledger run across seasons
+    // tournament credits and out-of-pocket expenses run across seasons
     supabase.from("budget_credits").select("id, season_id, entry_date, kind, amount, description").eq("team_id", team.id),
     supabase
       .from("budget_coach_expenses")
-      .select("id, season_id, entry_date, paid_by, category, description, amount, reimbursed_on, reimbursement_id")
+      .select("id, season_id, entry_date, paid_by, paid_by_role, category, description, amount, reimbursed_on, reimbursement_id")
       .eq("team_id", team.id),
     supabase.from("staff").select("display_name").order("display_name"),
+    // this team's approved parents, suggested when a parent paid out of pocket
+    supabase.from("parent_links").select("parent:parent_accounts(display_name)").eq("team_id", team.id).eq("status", "approved"),
   ]);
   const summary = summaryResult.data as BudgetSummaryData | null;
   const fees = ((feesResult.data ?? []) as { name: string; amount: number }[]).map((f) => ({ name: f.name, cents: toCents(f.amount) }));
@@ -139,6 +142,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
     id: c.id,
     date: c.entry_date,
     paidBy: c.paid_by,
+    role: c.paid_by_role,
     item: c.description || c.category || "Expense",
     cents: toCents(c.amount),
     repaidOn: c.reimbursed_on,
@@ -149,8 +153,11 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
   const owedItems = coachItems
     .filter((c) => !c.repaidOn)
     .sort((a, b) => a.paidBy.localeCompare(b.paidBy) || a.date.localeCompare(b.date))
-    .map((c) => ({ id: c.id, label: `${c.paidBy} · ${formatDay(c.date)} · ${c.item} · ${money(c.cents)}` }));
+    .map((c) => ({ id: c.id, label: `${c.paidBy} (${PAYER_ROLE_LABEL[c.role ?? "coach"].toLowerCase()}) · ${formatDay(c.date)} · ${c.item} · ${money(c.cents)}` }));
   const staffNames = ((staffResult.data ?? []) as { display_name: string }[]).map((s) => s.display_name);
+  const parentNames = [
+    ...new Set(((parentsResult.data ?? []) as { parent: { display_name: string } | null }[]).flatMap((l) => (l.parent ? [l.parent.display_name] : []))),
+  ].sort();
   const scope = { teamId: team.id, seasonId: season.id };
   const today = todayISO();
   const base = `/dugout/budget?team=${team.id}`;
@@ -204,11 +211,13 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
         </p>
       )}
 
-      {/* Left: registration costs and everything that's an expense or changes what a player owes.
-          Right: money coming in, then tournament credit and the coaches' ledger (user, 2026-11-12). */}
+      {/* Left: registration costs, then everything that's an expense or changes what a player owes, and
+          outstanding reimbursements. Right: money coming in, then tournament credit and out-of-pocket
+          expenses (user, 2026-11-12). */}
       <div className="grid items-start gap-6 lg:grid-cols-2">
         <div className="flex flex-col gap-3">
-          <Card title="Registration costs">
+          {/* collapsible like the other sections (user, 2026-11-12); open until costs are set */}
+          <Disclosure summary={`Registration costs${fees.length ? ` · ${money(feeCents)} per player` : ""}`} open={fees.length === 0}>
             {editor ? (
               <FeesForm key={season.id} scope={scope} fees={fees} />
             ) : fees.length ? (
@@ -223,7 +232,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
             ) : (
               <EmptyState>Not set yet.</EmptyState>
             )}
-          </Card>
+          </Disclosure>
           {editor && (
             <>
               <Disclosure summary="Add an expense">
@@ -231,6 +240,9 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
               </Disclosure>
               <Disclosure summary="Discount or extra charge for a player">
                 <AdjustmentForm scope={scope} players={options} />
+              </Disclosure>
+              <Disclosure summary={`Outstanding Reimbursements${coachSums.owed ? ` · ${money(coachSums.owed)} owed` : ""}`}>
+                <RepayForm key={owedItems.map((o) => o.id).join()} items={owedItems} today={today} />
               </Disclosure>
             </>
           )}
@@ -247,14 +259,9 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
             <Disclosure summary="Tournament credit won or used">
               <CreditForm scope={scope} today={today} balance={creditLeft} />
             </Disclosure>
-            <Disclosure summary="A coach paid out of pocket">
-              <CoachExpenseForm scope={scope} today={today} names={staffNames} defaultName={user.staff.displayName} />
+            <Disclosure summary="Out of Pocket Expenses">
+              <CoachExpenseForm scope={scope} today={today} coachNames={staffNames} parentNames={parentNames} defaultName={user.staff.displayName} />
             </Disclosure>
-            {owedItems.length > 0 && (
-              <Disclosure summary={`Repay a coach (${money(coachSums.owed)} owed)`}>
-                <RepayForm key={owedItems.map((o) => o.id).join()} items={owedItems} today={today} />
-              </Disclosure>
-            )}
           </div>
         )}
       </div>
@@ -442,11 +449,11 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
         </div>
       </Card>
 
-      <Card title="Coaches' out-of-pocket">
+      <Card title="Out of Pocket Expenses">
         <div className="flex flex-col gap-4">
           <p className="text-sm text-muted">
-            What coaches paid for with their own money, kept apart from the team balance. The team owes it back until it&apos;s repaid;
-            only a repayment from team money comes out of the team balance, because that money leaves the team.
+            What coaches and parents paid for with their own money, kept apart from the team balance. The team owes it back until
+            it&apos;s repaid; only a repayment from team money comes out of the team balance, because that money leaves the team.
           </p>
           <dl className="grid gap-3 sm:grid-cols-3">
             {[
@@ -475,9 +482,9 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
             </p>
           )}
           {coach.length === 0 ? (
-            <EmptyState>Nothing yet. When a coach pays for something the team needs, add it here so the team can pay it back.</EmptyState>
+            <EmptyState>Nothing yet. When a coach or a parent pays for something the team needs, add it here so the team can pay it back.</EmptyState>
           ) : (
-            <TableScroll label="Coaches' out-of-pocket">
+            <TableScroll label="Out of Pocket Expenses">
               <table className={tableClass}>
                 <thead>
                   <tr>
@@ -500,7 +507,10 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
                     return (
                       <tr key={r.key}>
                         <td className={`${tdClass} whitespace-nowrap`}>{formatDay(r.date)}</td>
-                        <td className={tdClass}>{r.expense.paidBy}</td>
+                        <td className={tdClass}>
+                          {r.expense.paidBy}
+                          <span className="ml-2 text-xs text-muted">{PAYER_ROLE_LABEL[r.expense.role ?? "coach"]}</span>
+                        </td>
                         <td className={tdClass}>
                           {r.type === "repaid" ? `Repaid: ${r.expense.item}` : r.expense.item}
                           {r.type === "spent" && row?.category && <span className="ml-2 text-xs text-muted">{row.category}</span>}
@@ -516,7 +526,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
                               <ActionForm action={deleteCoachExpense}>
                                 <input type="hidden" name="id" value={r.expense.id} />
                                 <ConfirmSubmit
-                                  message={`Remove “${r.expense.item}” (${money(r.expense.cents)}) from the coaches' ledger?`}
+                                  message={`Remove “${r.expense.item}” (${money(r.expense.cents)}) from Out of Pocket Expenses?`}
                                   className="text-xs text-danger hover:underline"
                                 >
                                   Remove
@@ -529,7 +539,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
                                 <ConfirmSubmit
                                   message={
                                     row?.reimbursement_id
-                                      ? "Undo this repayment? Its Coach reimbursement expense comes out of the team ledger, and every item it covered is owed again."
+                                      ? "Undo this repayment? Its Out-of-pocket reimbursement expense comes out of the team ledger, and every item it covered is owed again."
                                       : "Undo this repayment? The item is owed again."
                                   }
                                   className="text-xs text-danger hover:underline"

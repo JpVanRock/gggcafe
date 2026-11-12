@@ -316,18 +316,64 @@ export function CreditForm({ scope, today, balance }: { scope: Scope; today: str
   );
 }
 
-/** Something a coach paid for with her own money (user, 2026-11-11). */
-export function CoachExpenseForm({ scope, today, names, defaultName }: { scope: Scope; today: string; names: string[]; defaultName: string }) {
+/** Something a coach or a parent paid for with their own money (user, 2026-11-11; parents too, 2026-11-12). */
+export function CoachExpenseForm({
+  scope,
+  today,
+  coachNames,
+  parentNames,
+  defaultName,
+}: {
+  scope: Scope;
+  today: string;
+  coachNames: string[];
+  parentNames: string[];
+  defaultName: string;
+}) {
   const [state, action] = useActionState(addCoachExpense, initialFormState);
+  const [role, setRole] = useState<"coach" | "parent">("coach");
+  const [name, setName] = useState(defaultName);
+  const pick = (r: "coach" | "parent") => {
+    setRole(r);
+    setName(r === "coach" ? defaultName : "");
+  };
   return (
     <form action={action} className="grid gap-4 sm:grid-cols-6">
       <Hidden scope={scope} />
+      <fieldset className="sm:col-span-6">
+        <legend className="mb-1.5 text-sm font-medium">Paid by a</legend>
+        <div role="radiogroup" className="inline-flex rounded-full border border-navy-600 p-0.5">
+          {(["coach", "parent"] as const).map((r) => (
+            <label
+              key={r}
+              className="cursor-pointer rounded-full px-4 py-1.5 text-sm font-semibold text-muted transition select-none has-checked:bg-pink has-checked:text-on-accent has-focus-visible:ring-2 has-focus-visible:ring-pink/40"
+            >
+              <input type="radio" name="paid_by_role" value={r} checked={role === r} onChange={() => pick(r)} className="sr-only" />
+              {r === "coach" ? "Coach" : "Parent"}
+            </label>
+          ))}
+        </div>
+      </fieldset>
       <div className="sm:col-span-3">
-        <Field label="Paid by">
-          <input name="paid_by" required maxLength={80} defaultValue={defaultName} list="budget-coach-names" autoComplete="off" className={inputClass} />
+        <Field label={role === "coach" ? "Coach's name" : "Parent's name"}>
+          <input
+            name="paid_by"
+            required
+            maxLength={80}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            list={`budget-${role}-names`}
+            autoComplete="off"
+            className={inputClass}
+          />
         </Field>
         <datalist id="budget-coach-names">
-          {names.map((n) => (
+          {coachNames.map((n) => (
+            <option key={n} value={n} />
+          ))}
+        </datalist>
+        <datalist id="budget-parent-names">
+          {parentNames.map((n) => (
             <option key={n} value={n} />
           ))}
         </datalist>
@@ -357,7 +403,7 @@ export function CoachExpenseForm({ scope, today, names, defaultName }: { scope: 
         </Field>
       </div>
       <div className="flex flex-wrap items-center gap-3 sm:col-span-6">
-        <SubmitButton>Add to coaches&apos; ledger</SubmitButton>
+        <SubmitButton>Add out-of-pocket expense</SubmitButton>
         <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>
@@ -369,6 +415,7 @@ export type OwedItem = { id: string; label: string };
 /** Marks a coach's out-of-pocket items repaid; by default the repayment also goes in the team ledger. */
 export function RepayForm({ items, today }: { items: OwedItem[]; today: string }) {
   const [state, action] = useActionState(repayCoach, initialFormState);
+  if (items.length === 0) return <p className="text-sm text-muted">Nothing is owed right now. Out-of-pocket expenses waiting to be repaid show here.</p>;
   return (
     <form action={action} className="flex flex-col gap-4">
       <fieldset>
@@ -390,7 +437,7 @@ export function RepayForm({ items, today }: { items: OwedItem[]; today: string }
         </Field>
         <label className="flex items-center gap-2 pb-2 text-sm">
           <input type="checkbox" name="from_team_funds" defaultChecked className="accent-pink" />
-          Paid from team money (adds a Coach reimbursement expense to the ledger)
+          Paid from team money (adds an Out-of-pocket reimbursement expense to the ledger)
         </label>
       </div>
       <div className="flex flex-wrap items-center gap-3">

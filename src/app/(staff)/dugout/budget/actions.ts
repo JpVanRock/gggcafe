@@ -219,15 +219,16 @@ export async function deleteCredit(_prev: FormState, fd: FormData): Promise<Form
 // money, owed back until repaid.
 // ---------------------------------------------------------------------------
 
-/** Records something a coach paid for out of pocket. */
+/** Records something a coach or a parent paid for out of pocket (user, 2026-11-12: either can). */
 export async function addCoachExpense(_prev: FormState, fd: FormData): Promise<FormState> {
   return runAction(async () => {
     const denied = await headCoachCheck();
     if (denied) return failed(denied);
     const where = scope(fd);
     if (!where) return failed(STALE);
+    const paid_by_role = fd.get("paid_by_role") === "parent" ? "parent" : "coach";
     const paid_by = text(fd, "paid_by");
-    if (!paid_by) return invalid("paid_by", "Who paid for it?");
+    if (!paid_by) return invalid("paid_by", paid_by_role === "parent" ? "Which parent paid for it?" : "Which coach paid for it?");
     if (paid_by.length > 80) return invalid("paid_by", "Keep the name to 80 characters.");
     const cents = parseMoney(text(fd, "amount"));
     if (cents === null || cents === "invalid" || cents <= 0) return invalid("amount", "Enter the amount, like 89.99.");
@@ -242,7 +243,7 @@ export async function addCoachExpense(_prev: FormState, fd: FormData): Promise<F
     must(
       await supabase
         .from("budget_coach_expenses")
-        .insert({ ...where, paid_by, entry_date, category, description, amount: Number(centsToDollars(cents)) }),
+        .insert({ ...where, paid_by, paid_by_role, entry_date, category, description, amount: Number(centsToDollars(cents)) }),
     );
     refresh();
   });

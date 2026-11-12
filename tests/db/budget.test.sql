@@ -222,13 +222,19 @@ insert into public.budget_coach_expenses (team_id, season_id, entry_date, paid_b
   ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1', '2026-09-02', 'Budget Coach', 'Equipment', 'Practice balls', 89.99),
   ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1', '2026-09-04', 'Budget Coach', 'Team events', 'Pizza', 60),
   ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1', '2026-09-06', 'Volunteer Parent', 'Other', 'Ice', 15);
+select pg_temp.expect('items say who paid: a coach unless set (user, 2026-11-12)',
+  (select string_agg(paid_by || ':' || paid_by_role, ',' order by entry_date) from public.budget_coach_expenses),
+  'Budget Coach:coach,Budget Coach:coach,Volunteer Parent:coach');
+update public.budget_coach_expenses set paid_by_role = 'parent' where paid_by = 'Volunteer Parent';
+select pg_temp.expect('only a coach or a parent pays',
+  pg_temp.err($$update public.budget_coach_expenses set paid_by_role = 'sponsor' where paid_by = 'Volunteer Parent'$$), '23514');
 select public.reimburse_coach_expenses(
   array(select id from public.budget_coach_expenses where description in ('Practice balls', 'Pizza')), '2026-09-20', true);
 select pg_temp.expect('repaid items are marked and linked',
   (select count(*) from public.budget_coach_expenses where reimbursed_on = '2026-09-20' and reimbursement_id is not null), 2::bigint);
 select pg_temp.expect('one team expense for their total',
-  (select amount::text || '/' || kind::text || '/' || description from public.budget_entries where category = 'Coach reimbursement'),
-  '149.99/expense/Coach reimbursement (2 items)');
+  (select amount::text || '/' || kind::text || '/' || description from public.budget_entries where category = 'Out-of-pocket reimbursement'),
+  '149.99/expense/Out-of-pocket reimbursement (2 items)');
 select pg_temp.expect('can''t repay an item twice',
   pg_temp.err($$select public.reimburse_coach_expenses(array(select id from public.budget_coach_expenses where description = 'Pizza'), '2026-09-21', true)$$), '22023');
 select pg_temp.expect('a repaid date is needed',
@@ -236,8 +242,8 @@ select pg_temp.expect('a repaid date is needed',
 select public.reimburse_coach_expenses(array(select id from public.budget_coach_expenses where description = 'Ice'), '2026-09-21', false);
 select pg_temp.expect('repaid outside team money: no ledger expense',
   (select reimbursed_on::text || '/' || coalesce(reimbursement_id::text, 'none') from public.budget_coach_expenses where description = 'Ice'), '2026-09-21/none');
-select pg_temp.expect('still one Coach reimbursement expense', (select count(*) from public.budget_entries where category = 'Coach reimbursement'), 1::bigint);
-delete from public.budget_entries where category = 'Coach reimbursement';
+select pg_temp.expect('still one Out-of-pocket reimbursement expense', (select count(*) from public.budget_entries where category = 'Out-of-pocket reimbursement'), 1::bigint);
+delete from public.budget_entries where category = 'Out-of-pocket reimbursement';
 select pg_temp.expect('removing the repayment makes its items owed again',
   (select count(*) from public.budget_coach_expenses where reimbursed_on is null and reimbursement_id is null), 2::bigint);
 -- Tournament credits live apart from the team ledger (user, 2026-11-12): they don't change its totals

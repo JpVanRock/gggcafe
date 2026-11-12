@@ -11,10 +11,11 @@
   (`/dugout/gameday/[id]/pdf`, `src/lib/pdf/lineup-pdf.tsx`, landscape lineup card) / Finalize & Share
   (`shareLineup`, same email/mailto flow; `ShareButton` takes the action and return path). Helpers in
   `src/lib/gameday.ts` (no imports; unit-tested). Team pills (`?team=`) appear when there is more than one own team.
-- Team Budget layout (user, 2026-11-12): left column = Registration costs (sized to its content), "Add an expense"
-  and "Discount or extra charge for a player"; right column = money coming in ("Record a player payment", "Add
-  fundraisers or other income"), then the tournament credit and coaches' ledger forms. The income total is labeled
-  "Fundraisers or other income".
+- Team Budget layout (user, 2026-11-12): left column = Registration costs (collapsible like the other sections; its
+  summary shows the per-player total, and it opens until costs are set), "Add an expense", "Discount or extra charge
+  for a player" and "Outstanding Reimbursements" (repaying out-of-pocket items); right column = money coming in
+  ("Record a player payment", "Add fundraisers or other income"), then "Tournament credit won or used" and "Out of
+  Pocket Expenses". The income total is labeled "Fundraisers or other income".
 - Team Budget, per team and season (`?season=`): registration costs every player owes (`budget_fees`,
   saved by `save_budget_fees`), per-player discount/extra charge (`budget_adjustments`), and the ledger
   `budget_entries` (kind payment/income/expense). Money math in `src/lib/budget.ts` (cents; no
@@ -40,10 +41,13 @@
     volunteer) paid with their own money, kept apart from the team balance (only a repayment from team money is a
     team expense, because that money leaves the team), with spent / repaid / still owed, who is
     owed what, and a running "owed" column (`coachLedger`, `coachTotals`). "Repay a coach" marks checked items
-    repaid (`reimburse_coach_expenses`, one transaction) and, by default, records one "Coach reimbursement"
+    repaid (`reimburse_coach_expenses`, one transaction) and, by default, records one "Out-of-pocket reimbursement"
     expense for their total in the team ledger; removing that expense (or Undo) makes the items owed again
     (trigger `unmark_coach_reimbursement`).
-  - The general expense/income form leaves out "Coach reimbursement" (`ENTRY_FORM_CATEGORIES`): repayments come
+  - User, 2026-11-12 (migration 20261112004649): out-of-pocket expenses can be a coach's or a parent's (`paid_by_role`,
+    chosen in "Out of Pocket Expenses"; this team's approved parents are suggested); the repayment expense is
+    "Out-of-pocket reimbursement" (was "Coach reimbursement"), with no names because parents see expenses.
+  - The general expense/income form leaves out "Out-of-pocket reimbursement" (`ENTRY_FORM_CATEGORIES`): repayments come
     from the coaches' ledger. Parents' totals (`team_budget_summary`) include reimbursements as ordinary income and
     expenses; tournament credits and the coaches' ledger aren't shown to parents.
   - Last updated (user, 2026-11-12): `budget_changes` keeps, per team and season, when anything in the budget last

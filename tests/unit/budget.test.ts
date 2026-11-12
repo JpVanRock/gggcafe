@@ -81,7 +81,7 @@ test("tournament credits: won adds, used takes off, across seasons", () => {
 test("credits stay out of the team ledger; the general form leaves out coach repayments", () => {
   assert.ok(INCOME_CATEGORIES.includes("Reimbursement") && INCOME_CATEGORIES.includes("Fundraiser"));
   assert.ok(![...INCOME_CATEGORIES, ...EXPENSE_CATEGORIES].some((c) => /credit/i.test(c)), "no tournament-credit categories in the team ledger");
-  assert.ok(!ENTRY_FORM_CATEGORIES.expense.includes("Coach reimbursement"));
+  assert.ok(!ENTRY_FORM_CATEGORIES.expense.includes("Out-of-pocket reimbursement"));
   assert.ok(ENTRY_FORM_CATEGORIES.income.includes("Reimbursement"));
 });
 

@@ -4,7 +4,7 @@
 
 export const EXPENSE_CATEGORIES = [
   "Tournament fees", "League & insurance", "Field & facility", "Umpires", "Equipment", "Uniforms",
-  "Training & lessons", "Travel & lodging", "Team events", "Coach reimbursement", "Other",
+  "Training & lessons", "Travel & lodging", "Team events", "Out-of-pocket reimbursement", "Other",
 ] as const;
 export const INCOME_CATEGORIES = ["Fundraiser", "Sponsor", "Donation", "Reimbursement", "Other"] as const;
 
@@ -12,10 +12,11 @@ export const INCOME_CATEGORIES = ["Fundraiser", "Sponsor", "Donation", "Reimburs
 // team wins toward future entry fees, and credit it uses, live in their own table (budget_credits)
 // with their own running balance across seasons (creditLedger), not in the team ledger. Coaches'
 // out-of-pocket spending has its own ledger too (budget_coach_expenses); only a repayment made from
-// team money is a team expense ("Coach reimbursement"), because that money leaves the team.
-export const COACH_REIMBURSEMENT = "Coach reimbursement";
-/** Categories with their own forms (coach repayments), left out of the general expense/income form. */
-const OWN_FORM: readonly string[] = [COACH_REIMBURSEMENT];
+// team money is a team expense ("Out-of-pocket reimbursement"), because that money leaves the team.
+// Coaches or parents can pay out of pocket (user, 2026-11-12).
+export const OUT_OF_POCKET_REIMBURSEMENT = "Out-of-pocket reimbursement";
+/** Categories with their own forms (out-of-pocket repayments), left out of the general expense/income form. */
+const OWN_FORM: readonly string[] = [OUT_OF_POCKET_REIMBURSEMENT];
 export const ENTRY_FORM_CATEGORIES = {
   expense: EXPENSE_CATEGORIES.filter((c) => !OWN_FORM.includes(c)),
   income: INCOME_CATEGORIES.filter((c) => !OWN_FORM.includes(c)),
@@ -123,10 +124,15 @@ export function creditBalance(entries: { date: string; kind: CreditKind; cents: 
   return rows.length ? rows[rows.length - 1].balance : 0;
 }
 
+export type PayerRole = "coach" | "parent";
+export const PAYER_ROLE_LABEL: Record<PayerRole, string> = { coach: "Coach", parent: "Parent" };
+
 export type CoachExpense = {
   id: string;
   date: string;
   paidBy: string;
+  /** a coach or a parent paid it */
+  role?: PayerRole;
   item: string;
   cents: number;
   /** the date it was repaid, or null while the team still owes it */

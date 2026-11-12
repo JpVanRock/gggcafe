@@ -234,7 +234,7 @@ const budget_entries: Row[] = [
   budgetEntry(9, "payment", "2026-09-15", 45, { player_id: avery, method: "Cash", category: "Equipment", description: "Batting gloves" }),
   budgetEntry(3, "income", "2026-09-10", 300, { category: "Fundraiser", description: "Car wash" }),
   budgetEntry(4, "expense", "2026-09-12", 650, { category: "Tournament fees", description: "Fall Classic entry" }),
-  budgetEntry(7, "expense", "2026-10-08", 89.99, { category: "Coach reimbursement", description: "Coach reimbursement (1 item)" }),
+  budgetEntry(7, "expense", "2026-10-08", 89.99, { category: "Out-of-pocket reimbursement", description: "Out-of-pocket reimbursement (1 item)" }),
   budgetEntry(8, "income", "2026-10-12", 40, { category: "Reimbursement", description: "Refunded umpire deposit" }),
 ];
 // tournament credit lives apart from the team ledger (user, 2026-11-12)
@@ -271,8 +271,9 @@ const budgetSummary = () => {
   };
 };
 const budget_coach_expenses: Row[] = [
-  { id: id("bdbf00", 1), team_id: T.us, season_id: S.fall, entry_date: "2026-09-04", paid_by: "Coach Sample", category: "Equipment", description: "Practice balls", amount: 89.99, reimbursed_on: "2026-10-08", reimbursement_id: id("bdbe00", 7) },
-  { id: id("bdbf00", 2), team_id: T.us, season_id: S.fall, entry_date: "2026-10-01", paid_by: "Coach Sample", category: "Team events", description: "Team pizza after practice", amount: 64.5, reimbursed_on: null, reimbursement_id: null },
+  { id: id("bdbf00", 1), team_id: T.us, season_id: S.fall, entry_date: "2026-09-04", paid_by: "Coach Sample", paid_by_role: "coach", category: "Equipment", description: "Practice balls", amount: 89.99, reimbursed_on: "2026-10-08", reimbursement_id: id("bdbe00", 7) },
+  { id: id("bdbf00", 2), team_id: T.us, season_id: S.fall, entry_date: "2026-10-01", paid_by: "Coach Sample", paid_by_role: "coach", category: "Team events", description: "Team pizza after practice", amount: 64.5, reimbursed_on: null, reimbursement_id: null },
+  { id: id("bdbf00", 3), team_id: T.us, season_id: S.fall, entry_date: "2026-10-03", paid_by: "Pat Torres", paid_by_role: "parent", category: "Other", description: "Ice and sports drinks", amount: 32, reimbursed_on: null, reimbursement_id: null },
 ];
 
 export const TABLES: Record<string, Row[]> = {
