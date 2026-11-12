@@ -20,4 +20,6 @@
   - Offseason draft (`/dugout/training/draft`, head coach/admin; user: the head coach names captains): `offseason_squads`
     + `offseason_squad_members` (captain = pick 0, snake order `onTheClock`), head-coach writes; players see squads via
     `team_squads()`; squad points = sum of members' Leaderboard points (`squadStandings`), shown on the Leaderboard.
+  - Coach training (`/dugout/training/coach`, every staff member; user, 2026-11-12): the coaches' Mental Game course.
+    See docs/features/mental-game.md.
 - DB tests: `tests/db/training.test.sql`.

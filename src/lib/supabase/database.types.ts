@@ -550,6 +550,30 @@ export type Database = {
           },
         ]
       }
+      coach_mental_lessons: {
+        Row: {
+          user_id: string
+          lesson: string
+          notes: string | null
+          completed_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          user_id?: string
+          lesson: string
+          notes?: string | null
+          completed_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          lesson?: string
+          notes?: string | null
+          completed_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       coach_notes: {
         Row: {
           id: string
@@ -3900,6 +3924,38 @@ export type Database = {
           },
           {
             foreignKeyName: "player_manager_awards_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_mental_lessons: {
+        Row: {
+          player_id: string
+          lesson: string
+          answer: string | null
+          completed_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          player_id: string
+          lesson: string
+          answer?: string | null
+          completed_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          player_id?: string
+          lesson?: string
+          answer?: string | null
+          completed_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_mental_lessons_player_id_fkey"
             columns: ["player_id"]
             isOneToOne: false
             referencedRelation: "players"

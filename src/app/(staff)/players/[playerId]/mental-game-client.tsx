@@ -8,7 +8,8 @@ import {
   ADJUSTMENT_MAX, CONTEXT_LABEL, DEFAULT_ZONE, INTENSITY_CONTEXTS, INTENSITY_LEVELS, JOURNAL_LIMITS, JOURNAL_PROMPTS, SCAN_LABELS,
   SCAN_NOTE_MAX, SCAN_SKILLS, SIGNALS, SIGNAL_MAX, ZONE_TIP, zoneStatus,
 } from "@/lib/mental";
-import { logIntensity, saveJournalEntry, saveJournalWeek, saveScan, saveSignals } from "./mental-actions";
+import { LESSON_ANSWER_MAX } from "@/lib/mental-lessons";
+import { logIntensity, saveJournalEntry, saveJournalWeek, saveMentalLesson, saveScan, saveSignals } from "./mental-actions";
 import { SubmitButton } from "@/components/submit-button";
 
 const pill =
@@ -227,6 +228,41 @@ export function JournalWeekForm({ playerId, monday, lookBack }: { playerId: stri
       </Field>
       <div className="flex items-center gap-4">
         <SubmitButton>Save my look-back</SubmitButton>
+        <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
+      </div>
+    </form>
+  );
+}
+
+/** A Mental GP lesson's question: her answer finishes the lesson. */
+export function LessonAnswerForm({
+  playerId,
+  lesson,
+  prompt,
+  hint,
+  answer,
+  done,
+  planLabel,
+}: {
+  playerId: string;
+  lesson: string;
+  prompt: string;
+  hint: string;
+  answer: string | null;
+  done: boolean;
+  /** the Mental Game Plan field the answer saves to, when it has one */
+  planLabel?: string;
+}) {
+  const [state, action] = useActionState(saveMentalLesson, initialFormState);
+  return (
+    <form action={action} className="flex flex-col gap-3">
+      <input type="hidden" name="player_id" value={playerId} />
+      <input type="hidden" name="lesson" value={lesson} />
+      <Field label={prompt} hint={planLabel ? `${hint} Saves to your Mental Game Plan as "${planLabel}."` : hint}>
+        <textarea name="answer" rows={5} maxLength={LESSON_ANSWER_MAX} defaultValue={answer ?? ""} className={inputClass} />
+      </Field>
+      <div className="flex flex-wrap items-center gap-4">
+        <SubmitButton>{done ? "Update my answer" : "Save and finish the lesson"}</SubmitButton>
         <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>

@@ -33,6 +33,7 @@ export const FEATURE_SECTIONS: { title: string; features: Feature[] }[] = [
       { name: "Monthly self-scan", detail: "Ten mental skills rated 1 to 5 once a month, with the trend.", standard: "yes", advanced: "yes" },
       { name: "Guided sessions", detail: "Breathing and imagery, a few minutes each; as a mental routine they show in TWIS and count toward achievements.", standard: "yes", advanced: "yes" },
       { name: "Practice journal", detail: "A purpose before practice, what worked and what to fix after, and a weekly look-back.", standard: "yes", advanced: "yes" },
+      { name: "Mental GP lessons", detail: "Eight short lessons for game moments (between pitches, big at-bats, nerves, errors, slumps, bad calls, her role, game day); her answer finishes each one, four of them build her Mental Game Plan, and an Up next pick follows her self-scan. With G3 Advanced, each links to the chapters that go deeper.", standard: "yes", advanced: "yes" },
     ],
   },
   {

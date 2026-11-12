@@ -34,7 +34,7 @@ function fill(segments) {
       case "chapter": return path.includes("scorebook") ? "1" : "good-habits";
       case "lesson": return "why-leadership";
       case "n": return "1";
-      case "slug": return "reset-breath";
+      case "slug": return path.includes("lessons") ? "between-pitches" : path.includes("coach") ? "your-words" : "reset-breath";
       default: throw new Error(`No sample value for [${name}] in ${path}`);
     }
   });

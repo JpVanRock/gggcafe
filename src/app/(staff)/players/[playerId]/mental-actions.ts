@@ -7,6 +7,7 @@ import { refresh } from "next/cache";
 import { actForCheck, actorCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { friendlyDbError, text, type FormState, invalid } from "@/lib/form";
+import { LESSON_ANSWER_MAX, lessonBySlug, type LessonPlanField } from "@/lib/mental-lessons";
 import { isUuid } from "@/lib/softball";
 import { MENTAL_FIELDS } from "./shared";
 import { isISODate, isoWeekday, todayISO, weekStart } from "@/lib/dates";
@@ -195,3 +196,50 @@ export async function saveMentalPlan(_prev: FormState, fd: FormData): Promise<Fo
 }
 
 // ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Mental GP lessons
+// ---------------------------------------------------------------------------
+
+/**
+ * A lesson: her answer to its question. The first save marks the lesson done (and keeps that date).
+ * A lesson with a plan field saves the answer into her Mental Game Plan instead, so there's one copy.
+ */
+export async function saveMentalLesson(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const who = await playerFrom(fd);
+    if ("error" in who) return failed(who.error);
+    const lesson = lessonBySlug(text(fd, "lesson") ?? "");
+    if (!lesson) return failed(STALE);
+    const answer = text(fd, "answer");
+    if (!answer) return invalid("answer", "Write your answer to finish the lesson.");
+    if (answer.length > LESSON_ANSWER_MAX) return invalid("answer", `Keep it under ${LESSON_ANSWER_MAX} characters.`);
+    const supabase = await createClient();
+    const { data: before } = must(
+      await supabase.from("player_mental_lessons").select("completed_at").eq("player_id", who.playerId).eq("lesson", lesson.slug).maybeSingle(),
+    );
+    if (lesson.planField) {
+      const { data: auth } = await supabase.auth.getClaims();
+      const field = { [lesson.planField]: answer } as Partial<Record<LessonPlanField, string>>;
+      must(
+        await supabase
+          .from("mental_game_plans")
+          .upsert({ player_id: who.playerId, ...field, updated_by: auth?.claims?.sub ?? null }, { onConflict: "player_id" }),
+      );
+    }
+    const now = new Date().toISOString();
+    must(
+      await supabase.from("player_mental_lessons").upsert(
+        {
+          player_id: who.playerId,
+          lesson: lesson.slug,
+          answer: lesson.planField ? null : answer,
+          completed_at: before?.completed_at ?? now,
+          updated_at: now,
+        },
+        { onConflict: "player_id,lesson" },
+      ),
+    );
+    refresh();
+  });
+}

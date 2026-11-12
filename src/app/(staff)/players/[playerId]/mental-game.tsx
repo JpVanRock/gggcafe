@@ -1,6 +1,7 @@
 // The mental-game tools on her Mental GP page (Standard, Phase 1): My signals,
 // intensity checks, the monthly self-scan, guided sessions and the practice
-// journal. Server component; the forms are in mental-game-client.tsx.
+// journal, with the Mental GP lessons first. Server component; the forms are in
+// mental-game-client.tsx.
 import Link from "next/link";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { Disclosure, eyebrowClass, cardClass } from "@/components/ui";
@@ -14,14 +15,16 @@ import type { IntensityCheck, MentalScan } from "./mental-data";
 import type { MentalPlan } from "./shared";
 import { DetailHeading } from "./menu";
 import { ActionForm } from "@/components/action-form";
+import { OutlineText } from "@/components/athletic";
+import { MENTAL_LESSONS, lessonNumber, lessonsDone as countDone, nextLesson, twoDigits } from "@/lib/mental-lessons";
 
 // Cards stay in brand colors; only the small signal light uses traffic colors (red is the brand pink).
 const DOT: Record<"green" | "yellow" | "red", string> = { green: "bg-[#2bd576]", yellow: "bg-[#ffc93c]", red: "bg-pink" };
 const monthName = new Intl.DateTimeFormat("en-US", { timeZone: "UTC", month: "short" });
 
-function Section({ title, note, children }: { title: string; note?: string; children: React.ReactNode }) {
+function Section({ id, title, note, children }: { id?: string; title: string; note?: string; children: React.ReactNode }) {
   return (
-    <section className="flex flex-col gap-4 border-t border-navy-700 pt-8">
+    <section id={id} className="flex scroll-mt-24 flex-col gap-4 border-t border-navy-700 pt-8">
       <div>
         <DetailHeading>{title}</DetailHeading>
         {note && <p className="-mt-1 text-sm text-muted">{note}</p>}
@@ -37,6 +40,7 @@ export function MentalTools({
   checks,
   scans,
   guides,
+  lessonsDone,
   today,
   canEdit,
 }: {
@@ -45,6 +49,7 @@ export function MentalTools({
   checks: IntensityCheck[];
   scans: MentalScan[];
   guides: string[];
+  lessonsDone: string[];
   today: string;
   canEdit: boolean;
 }) {
@@ -54,11 +59,89 @@ export function MentalTools({
   const latest = scans[0] ?? null;
   const previous = scans[1] ?? null;
   const base = `/players/${playerId}/mental`;
+  const finished = new Set(lessonsDone);
+  const doneCount = countDone(finished);
+  // Up next: a lesson for her weakest self-scan skills (weakest first; her top scores and a flat scan don't count)
+  const top = latest ? Math.max(...latest.scores) : 0;
+  const weakSkills = latest
+    ? SCAN_SKILLS.map((s, i) => ({ key: s.key, score: latest.scores[i] }))
+        .filter((s) => s.score < top)
+        .sort((a, b) => a.score - b.score)
+        .map((s) => s.key)
+    : [];
+  const upNext = nextLesson(finished, weakSkills);
+  const upNextSkill = upNext?.skill ? SCAN_SKILLS.find((s) => s.key === upNext.skill)?.name : null;
 
   return (
     <div className="flex flex-col gap-10">
+      {/* Lessons ------------------------------------------------------------------ */}
+      <Section
+        id="lessons"
+        title="Lessons"
+        note="Eight short lessons for the moments that test you. Read one, rep it at practice, answer its question to finish it."
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className="h-2 max-w-64 flex-1 overflow-hidden rounded-full bg-navy-700"
+            role="progressbar"
+            aria-label="Lessons finished"
+            aria-valuemin={0}
+            aria-valuemax={MENTAL_LESSONS.length}
+            aria-valuenow={doneCount}
+          >
+            <span className="block h-full bg-neon" style={{ width: `${(doneCount / MENTAL_LESSONS.length) * 100}%` }} />
+          </div>
+          <span className="font-display text-sm font-bold tabular-nums">
+            {doneCount} of {MENTAL_LESSONS.length} done
+          </span>
+        </div>
+        {upNext && (
+          <Link
+            href={`${base}/lessons/${upNext.lesson.slug}`}
+            className="flex flex-col gap-2 rounded-2xl border border-neon/40 bg-neon/5 p-4 transition hover:border-pink sm:flex-row sm:items-center sm:justify-between"
+          >
+            <span>
+              <span className={`${eyebrowClass} block`}>Up next</span>
+              <span className="mt-1 block font-display text-lg leading-tight font-bold tracking-wide text-highlight uppercase">
+                Lesson {lessonNumber(upNext.lesson.slug)} · {upNext.lesson.title}
+              </span>
+              <span className="mt-1 block text-sm text-muted">
+                {upNextSkill
+                  ? `It builds ${upNextSkill}, one of the lowest scores on the latest self-scan.`
+                  : latest
+                    ? "Next in order."
+                    : "Next in order. After a monthly self-scan, this points to the skill to work on most."}
+              </span>
+            </span>
+            <span className="shrink-0 text-sm font-semibold text-link">
+              {finished.size ? "Keep going" : "Start"} <span aria-hidden="true">→</span>
+            </span>
+          </Link>
+        )}
+        <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {MENTAL_LESSONS.map((l, i) => (
+            <li key={l.slug}>
+              <Link
+                href={`${base}/lessons/${l.slug}`}
+                className="relative flex h-full flex-col gap-1.5 overflow-hidden rounded-2xl border border-navy-600 bg-navy-900/70 p-4 transition hover:border-pink hover:bg-navy-800"
+              >
+                <OutlineText className="absolute -top-1 right-2 text-5xl">{twoDigits(i + 1)}</OutlineText>
+                <span className={`${eyebrowClass} relative flex flex-wrap items-center gap-2 pr-12`}>
+                  <span>
+                    Lesson {i + 1} · {l.minutes} min
+                  </span>
+                  {finished.has(l.slug) && <span className="rounded bg-neon px-1.5 py-px font-bold text-on-accent">Done</span>}
+                </span>
+                <span className="relative pr-10 font-display text-lg leading-tight font-bold tracking-wide text-highlight uppercase">{l.title}</span>
+                <span className="text-sm text-muted">{l.summary}</span>
+              </Link>
+            </li>
+          ))}
+        </ol>
+      </Section>
+
       {/* My signals ------------------------------------------------------------ */}
-      <Section title="My signals" note="Green, yellow, red: catch yellow early and use your release before it gets to red.">
+      <Section id="signals" title="My signals" note="Green, yellow, red: catch yellow early and use your release before it gets to red.">
         {hasSignals ? (
           <div className="grid gap-3 md:grid-cols-3">
             {SIGNALS.map((s) => (
@@ -94,7 +177,7 @@ export function MentalTools({
       </Section>
 
       {/* Intensity -------------------------------------------------------------- */}
-      <Section title="Intensity check" note="Before games and practices: rate yourself 1 to 10 and compare it with your zone.">
+      <Section id="intensity" title="Intensity check" note="Before games and practices: rate yourself 1 to 10 and compare it with your zone.">
         {canEdit && <IntensityForm playerId={playerId} zone={zone} />}
         {checks.length > 0 ? (
           <div className="flex flex-col gap-3">
@@ -146,7 +229,7 @@ export function MentalTools({
       </Section>
 
       {/* Self-scan ---------------------------------------------------------------- */}
-      <Section title="Monthly self-scan" note="Once a month, one honest score per skill. Watch the trend, not one month.">
+      <Section id="scan" title="Monthly self-scan" note="Once a month, one honest score per skill. Watch the trend, not one month.">
         {latest && (
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_16rem]">
             <ul className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
@@ -197,7 +280,7 @@ export function MentalTools({
       </Section>
 
       {/* Guided sessions ------------------------------------------------------------ */}
-      <Section title="Guided sessions" note="Breathing and imagery, a few minutes each. Make one a routine and it shows up in TWIS.">
+      <Section id="sessions" title="Guided sessions" note="Breathing and imagery, a few minutes each. Make one a routine and it shows up in TWIS.">
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {GUIDED_SESSIONS.map((s) => (
             <li key={s.slug}>

@@ -276,6 +276,35 @@ const budget_coach_expenses: Row[] = [
   { id: id("bdbf00", 3), team_id: T.us, season_id: S.fall, entry_date: "2026-10-03", paid_by: "Pat Torres", paid_by_role: "parent", category: "Other", description: "Ice and sports drinks", amount: 32, reimbursed_on: null, reimbursement_id: null },
 ];
 
+// Mental GP lessons and the coaches' Mental Game course (user, 2026-11-12)
+// Lessons 1, 2, 4 and 8 keep their answers in her Mental Game Plan (the plan-field lessons).
+const player_mental_lessons: Row[] = [
+  { player_id: P[0], lesson: "between-pitches", answer: null, completed_at: "2026-11-02T18:00:00Z", updated_at: "2026-11-02T18:00:00Z" },
+  { player_id: P[0], lesson: "nerves", answer: "Shaky legs and I rush. I tell myself: I'm ready, this is my body getting going.", completed_at: "2026-11-05T18:00:00Z", updated_at: "2026-11-05T18:00:00Z" },
+  { player_id: P[0], lesson: "after-the-error", answer: null, completed_at: "2026-11-08T18:00:00Z", updated_at: "2026-11-08T18:00:00Z" },
+  { player_id: P[1], lesson: "between-pitches", answer: null, completed_at: "2026-11-03T18:00:00Z", updated_at: "2026-11-03T18:00:00Z" },
+];
+const mental_game_plans: Row[] = [
+  {
+    id: id("abcd00", 1), player_id: P[0], focus_words: "See it early. Drive.", pre_game_routine: null,
+    pre_pitch_routine: "Front foot in, back foot out. Re-strap my gloves, look at Coach for the sign, one long breath, \"see it early,\" back in.",
+    reset_routine: "Errors that score a run. Smooth the dirt with my cleat, \"hit it to me,\" call the outs.",
+    confidence_statements: null, pressure_plan: null, notes: null, green_signs: "Loose hands, clear head.", yellow_signs: "Gripping tight, rushing.",
+    red_signs: null, yellow_release: "Long breath out, \"see it early.\"", red_release: null, zone_low: 6, zone_high: 8,
+    updated_by: null, created_at: "2026-11-02T18:00:00Z", updated_at: "2026-11-08T18:00:00Z",
+  },
+  {
+    id: id("abcd00", 2), player_id: P[1], focus_words: null, pre_game_routine: null, pre_pitch_routine: "Ball in the glove, breathe, onto the plate, sign, see the mitt.",
+    reset_routine: null, confidence_statements: null, pressure_plan: null, notes: null, green_signs: null, yellow_signs: null, red_signs: null,
+    yellow_release: null, red_release: null, zone_low: null, zone_high: null, updated_by: null, created_at: "2026-11-03T18:00:00Z", updated_at: "2026-11-03T18:00:00Z",
+  },
+];
+const coach_mental_lessons: Row[] = [
+  { user_id: U.admin, lesson: "your-words", notes: "Cue words: \"see it early,\" \"glove down,\" \"hit the mitt.\"", completed_at: "2026-11-06T18:00:00Z", updated_at: "2026-11-06T18:00:00Z" },
+  { user_id: U.admin, lesson: "after-mistakes", notes: "Team reset: catcher calls \"next one,\" gloves up.", completed_at: "2026-11-09T18:00:00Z", updated_at: "2026-11-09T18:00:00Z" },
+  { user_id: U.coach, lesson: "your-words", notes: null, completed_at: "2026-11-07T18:00:00Z", updated_at: "2026-11-07T18:00:00Z" },
+];
+
 export const TABLES: Record<string, Row[]> = {
   players, teams, seasons, roster_entries, staff, games, batting_lines, pitching_lines, fielding_lines, pa_grades,
   batting_season, pitching_season, fielding_season, qab_season, gameday_profiles, gameday_lineups, depth_chart, staff_duties, staff_standards,
@@ -283,7 +312,7 @@ export const TABLES: Record<string, Row[]> = {
   install_items, install_item_plans, team_events, training_phases, team_offseason, bp_rounds, bullpen_scripts, player_spotlights,
   team_culture, team_standards, player_advanced_access, player_leadership_access, player_leadership_certificates, measurements,
   mentors, mentor_links, mentor_messages, mentor_focus, mentor_notes, player_activities,
-  budget_fees, budget_entries, budget_credits, budget_coach_expenses,
+  budget_fees, budget_entries, budget_credits, budget_coach_expenses, player_mental_lessons, coach_mental_lessons, mental_game_plans,
 };
 
 /** table -> the column other tables use to point at it (for embedded selects) */

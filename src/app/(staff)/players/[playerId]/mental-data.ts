@@ -11,9 +11,10 @@ type Supabase = Awaited<ReturnType<typeof createClient>>;
 export type IntensityCheck = { id: string; checked_on: string; context: IntensityContext; level: number; adjustment: string | null };
 export type MentalScan = { month: string; scores: number[]; note: string | null };
 export type JournalEntry = { entry_date: string; purpose: string | null; worked: string | null; fix: string | null };
+export type LessonWork = { lesson: string; answer: string | null; completed_at: string | null };
 
 export async function loadMentalTools(supabase: Supabase, playerId: string, today: string) {
-  const [checks, scans, routines] = await Promise.all([
+  const [checks, scans, routines, lessons] = await Promise.all([
     supabase
       .from("mental_intensity_checks")
       .select("id, checked_on, context, level, adjustment")
@@ -28,6 +29,7 @@ export async function loadMentalTools(supabase: Supabase, playerId: string, toda
       .eq("player_id", playerId)
       .eq("category", "mental")
       .or(`ends_on.is.null,ends_on.gte.${today}`),
+    supabase.from("player_mental_lessons").select("lesson").eq("player_id", playerId).not("completed_at", "is", null),
   ]);
   const guides = new Set(
     ((routines.data ?? []) as { drill: { guide: string | null } | null }[]).map((r) => r.drill?.guide).filter((g): g is string => Boolean(g)),
@@ -36,7 +38,19 @@ export async function loadMentalTools(supabase: Supabase, playerId: string, toda
     checks: (checks.data ?? []) as IntensityCheck[],
     scans: (scans.data ?? []) as MentalScan[],
     guides: [...guides],
+    lessonsDone: ((lessons.data ?? []) as { lesson: string }[]).map((l) => l.lesson),
   };
+}
+
+/** Her work on one Mental GP lesson (null until she saves an answer). */
+export async function loadMentalLesson(supabase: Supabase, playerId: string, lesson: string): Promise<LessonWork | null> {
+  const { data } = await supabase
+    .from("player_mental_lessons")
+    .select("lesson, answer, completed_at")
+    .eq("player_id", playerId)
+    .eq("lesson", lesson)
+    .maybeSingle();
+  return (data as LessonWork | null) ?? null;
 }
 
 /** Her journal for one week (Monday..Sunday), the week's look-back and which days have a team practice. */
