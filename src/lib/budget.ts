@@ -4,19 +4,18 @@
 
 export const EXPENSE_CATEGORIES = [
   "Tournament fees", "League & insurance", "Field & facility", "Umpires", "Equipment", "Uniforms",
-  "Training & lessons", "Travel & lodging", "Team events", "Coach reimbursement", "Tournament credit used", "Other",
+  "Training & lessons", "Travel & lodging", "Team events", "Coach reimbursement", "Other",
 ] as const;
-export const INCOME_CATEGORIES = ["Fundraiser", "Sponsor", "Donation", "Reimbursement", "Tournament credit", "Other"] as const;
+export const INCOME_CATEGORIES = ["Fundraiser", "Sponsor", "Donation", "Reimbursement", "Other"] as const;
 
-// Tournament credits (user, 2026-11-11): credit the team wins toward future entry fees is income
-// in the team ledger, and credit spent on an entry fee is an expense. creditLedger() keeps their
-// own running balance across seasons. Coaches' out-of-pocket spending has its own ledger
-// (budget_coach_expenses); repaying a coach from team money is a "Coach reimbursement" expense.
-export const CREDIT_WON = "Tournament credit";
-export const CREDIT_USED = "Tournament credit used";
+// Tournament credits (user, 2026-11-11; kept apart from the team balance, 2026-11-12): credit the
+// team wins toward future entry fees, and credit it uses, live in their own table (budget_credits)
+// with their own running balance across seasons (creditLedger), not in the team ledger. Coaches'
+// out-of-pocket spending has its own ledger too (budget_coach_expenses); only a repayment made from
+// team money is a team expense ("Coach reimbursement"), because that money leaves the team.
 export const COACH_REIMBURSEMENT = "Coach reimbursement";
-/** Categories with their own forms (credits, coach repayments), left out of the general expense/income form. */
-const OWN_FORM: readonly string[] = [CREDIT_WON, CREDIT_USED, COACH_REIMBURSEMENT];
+/** Categories with their own forms (coach repayments), left out of the general expense/income form. */
+const OWN_FORM: readonly string[] = [COACH_REIMBURSEMENT];
 export const ENTRY_FORM_CATEGORIES = {
   expense: EXPENSE_CATEGORIES.filter((c) => !OWN_FORM.includes(c)),
   income: INCOME_CATEGORIES.filter((c) => !OWN_FORM.includes(c)),
@@ -105,25 +104,21 @@ export function runningLedger<T extends { date: string; kind: EntryKind; cents: 
     });
 }
 
-/** A tournament-credit line: credit won (income) or credit used (expense). */
-export function isCredit(e: { kind: EntryKind; category: string | null }) {
-  return (e.kind === "income" && e.category === CREDIT_WON) || (e.kind === "expense" && e.category === CREDIT_USED);
-}
+export type CreditKind = "won" | "used";
 
 /** Tournament credit lines in date order with the running credit balance (won minus used). */
-export function creditLedger<T extends { date: string; kind: EntryKind; category: string | null; cents: number }>(entries: T[]) {
+export function creditLedger<T extends { date: string; kind: CreditKind; cents: number }>(entries: T[]) {
   let balance = 0;
-  return entries
-    .filter(isCredit)
-    .sort((a, b) => a.date.localeCompare(b.date) || (a.kind === "expense" ? 1 : 0) - (b.kind === "expense" ? 1 : 0))
+  return [...entries]
+    .sort((a, b) => a.date.localeCompare(b.date) || (a.kind === "used" ? 1 : 0) - (b.kind === "used" ? 1 : 0))
     .map((e) => {
-      balance += e.kind === "income" ? e.cents : -e.cents;
+      balance += e.kind === "won" ? e.cents : -e.cents;
       return { ...e, balance };
     });
 }
 
 /** The tournament credit the team still has. */
-export function creditBalance(entries: { date: string; kind: EntryKind; category: string | null; cents: number }[]) {
+export function creditBalance(entries: { date: string; kind: CreditKind; cents: number }[]) {
   const rows = creditLedger(entries);
   return rows.length ? rows[rows.length - 1].balance : 0;
 }

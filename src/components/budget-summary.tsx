@@ -5,7 +5,7 @@
 // Server-safe. Data comes from the team_budget_summary() database function.
 import type { ReactNode } from "react";
 import { Modal } from "@/components/modal";
-import { formatDay } from "@/lib/dates";
+import { formatDay, formatLongDateAt } from "@/lib/dates";
 import { money, runningLedger, toCents, type EntryKind } from "@/lib/budget";
 import { TableScroll, cardClass, EmptyState } from "@/components/ui";
 
@@ -13,6 +13,8 @@ export type BudgetSummaryData = {
   team: string;
   season: string;
   season_id: string;
+  /** when anything in this season's budget last changed (null before the first change) */
+  updated_at?: string | null;
   players: number;
   fees: { name: string; amount: number }[];
   fee_per_player: number;
@@ -118,6 +120,11 @@ export function BudgetSummary({ summary, showLedger = true }: { summary: BudgetS
 
   return (
     <div className="flex flex-col gap-6">
+      {summary.updated_at && (
+        <p className="-mb-2 text-sm text-muted">
+          Last updated <span className="font-semibold text-ink">{formatLongDateAt(summary.updated_at)}</span>
+        </p>
+      )}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <Stat
           label="Registration"

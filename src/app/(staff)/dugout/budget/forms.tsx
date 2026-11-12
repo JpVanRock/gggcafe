@@ -300,8 +300,8 @@ export function CreditForm({ scope, today, balance }: { scope: Scope; today: str
         </div>
         <p className="mt-2 text-xs text-muted">
           {direction === "won"
-            ? "Adds income to the ledger and to the team's credit balance."
-            : `Adds an expense to the ledger and takes it off the credit balance (${money(balance)} available).`}
+            ? "Adds to the team's tournament credit. Credit is kept apart from the team balance."
+            : `Takes it off the team's tournament credit (${money(balance)} available). It isn't a team expense: no team money is spent.`}
         </p>
       </fieldset>
       <div className="sm:col-span-2">

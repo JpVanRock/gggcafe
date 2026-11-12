@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { checkbox, friendlyDbError, isoDate, oneOf, text, type FormState, invalid } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import {
-  CREDIT_USED, CREDIT_WON, ENTRY_FORM_CATEGORIES, PAYMENT_CATEGORIES, PAYMENT_METHODS, centsToDollars, creditBalance, money, parseMoney, toCents,
+  ENTRY_FORM_CATEGORIES, PAYMENT_CATEGORIES, PAYMENT_METHODS, centsToDollars, creditBalance, money, parseMoney, toCents,
 } from "@/lib/budget";
 import { STALE, failed, must, runAction } from "@/lib/actions";
 
@@ -163,8 +163,9 @@ export async function deleteEntry(_prev: FormState, fd: FormData): Promise<FormS
 }
 
 // ---------------------------------------------------------------------------
-// Tournament credits (user, 2026-11-11): won = income, used = expense, in the team
-// ledger; their running balance is kept across seasons.
+// Tournament credits (user, 2026-11-11): credit won and used, in their own table
+// (budget_credits) apart from the team ledger and balance (user, 2026-11-12); their
+// running balance is kept across seasons.
 // ---------------------------------------------------------------------------
 
 /** Records tournament credit the team won, or credit it used toward an entry fee. */
@@ -186,22 +187,29 @@ export async function addCredit(_prev: FormState, fd: FormData): Promise<FormSta
     const supabase = await createClient();
     if (used) {
       // credit can't go below zero: check the balance across every season
-      const { data } = must(
-        await supabase.from("budget_entries").select("kind, entry_date, category, amount").eq("team_id", where.team_id).in("category", [CREDIT_WON, CREDIT_USED]),
+      const { data } = must(await supabase.from("budget_credits").select("kind, entry_date, amount").eq("team_id", where.team_id));
+      const balance = creditBalance(
+        (data ?? []).map((e) => ({ kind: e.kind === "used" ? ("used" as const) : ("won" as const), date: e.entry_date, cents: toCents(e.amount) })),
       );
-      const balance = creditBalance((data ?? []).map((e) => ({ kind: e.kind, category: e.category, date: e.entry_date, cents: toCents(e.amount) })));
       if (cents > balance) return invalid("amount", `That's more than the team's ${money(balance)} in tournament credit.`);
     }
     must(
-      await supabase.from("budget_entries").insert({
-        ...where,
-        kind: used ? "expense" : "income",
-        entry_date,
-        amount: Number(centsToDollars(cents)),
-        category: used ? CREDIT_USED : CREDIT_WON,
-        description,
-      }),
+      await supabase
+        .from("budget_credits")
+        .insert({ ...where, kind: used ? "used" : "won", entry_date, amount: Number(centsToDollars(cents)), description }),
     );
+    refresh();
+  });
+}
+
+export async function deleteCredit(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    const id = text(fd, "id");
+    if (!isUuid(id)) return failed(STALE);
+    const supabase = await createClient();
+    must(await supabase.from("budget_credits").delete().eq("id", id));
     refresh();
   });
 }

@@ -8,13 +8,13 @@ import { BudgetSummary, type BudgetSummaryData } from "@/components/budget-summa
 import { Card, Disclosure, EmptyState, pillQuietClass, tableClass, tdClass, thClass, badgeClass, type BadgeTone, TableScroll } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import {
-  CREDIT_USED, CREDIT_WON, coachLedger, coachTotals, creditLedger, money, paymentCategory, playerBalances, runningLedger, toCents,
+  coachLedger, coachTotals, creditLedger, money, paymentCategory, playerBalances, runningLedger, toCents,
   type CoachExpense, type EntryKind, type PlayerStatus,
 } from "@/lib/budget";
 import { compareJersey, type Season, playerName } from "@/lib/softball";
 import { loadDugoutTeam } from "../data";
 import { NoOwnTeam, TeamPicker } from "../team-picker";
-import { deleteCoachExpense, deleteEntry, undoCoachRepayment } from "./actions";
+import { deleteCoachExpense, deleteCredit, deleteEntry, undoCoachRepayment } from "./actions";
 import { AdjustmentForm, CoachExpenseForm, CreditForm, EditPaymentForm, EntryForm, FeesForm, PaymentForm, RepayForm, type BudgetPlayer } from "./forms";
 import { ActionForm } from "@/components/action-form";
 
@@ -25,6 +25,7 @@ type RosterRow = {
   jersey_number: string | null;
   player: { id: string; first_name: string; last_name: string; preferred_name: string | null } | null;
 };
+type CreditRow = { id: string; season_id: string; entry_date: string; kind: "won" | "used"; amount: number; description: string };
 type CoachRow = {
   id: string;
   season_id: string;
@@ -99,11 +100,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
       .eq("team_id", team.id)
       .eq("season_id", season.id),
     // tournament credits and the coaches' ledger run across seasons
-    supabase
-      .from("budget_entries")
-      .select("id, kind, entry_date, amount, category, description, season_id")
-      .eq("team_id", team.id)
-      .in("category", [CREDIT_WON, CREDIT_USED]),
+    supabase.from("budget_credits").select("id, season_id, entry_date, kind, amount, description").eq("team_id", team.id),
     supabase
       .from("budget_coach_expenses")
       .select("id, season_id, entry_date, paid_by, category, description, amount, reimbursed_on, reimbursement_id")
@@ -135,9 +132,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
   const anyOtherPayments = balances.some((b) => b.other > 0);
   const ledger = runningLedger(entries.map((e) => ({ ...e, date: e.entry_date, cents: toCents(e.amount) })));
   const seasonName = new Map(seasons.map((s) => [s.id, s.name]));
-  const credits = creditLedger(
-    ((creditsResult.data ?? []) as (EntryRow & { season_id: string })[]).map((e) => ({ ...e, date: e.entry_date, cents: toCents(e.amount) })),
-  );
+  const credits = creditLedger(((creditsResult.data ?? []) as CreditRow[]).map((c) => ({ ...c, date: c.entry_date, cents: toCents(c.amount) })));
   const creditLeft = credits.length ? credits[credits.length - 1].balance : 0;
   const coachRows = (coachResult.data ?? []) as CoachRow[];
   const coachItems: CoachExpense[] = coachRows.map((c) => ({
@@ -200,8 +195,8 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
       {summary && <BudgetSummary summary={summary} showLedger={false} />}
       {creditLeft > 0 && (
         <p className="-mt-4 text-sm text-muted">
-          The team has <span className="font-semibold text-ink tabular-nums">{money(creditLeft)}</span> in unused tournament credit. It
-          counts as income in the ledger but isn&apos;t cash.
+          The team also has <span className="font-semibold text-ink tabular-nums">{money(creditLeft)}</span> in tournament credit, kept
+          apart from the team balance.
         </p>
       )}
 
@@ -375,12 +370,12 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
         <div className="flex flex-col gap-4">
           <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <span className="font-display text-4xl font-bold text-highlight tabular-nums">{money(creditLeft)}</span>
-            <span className="text-sm text-muted">credit balance, all seasons</span>
+            <span className="text-sm text-muted">credit balance, all seasons · not part of the team balance</span>
           </p>
           {credits.length === 0 ? (
             <EmptyState>
               No tournament credit yet. When the team wins credit toward a future entry fee, add it as credit won; spending it on an
-              entry fee is credit used.
+              entry fee is credit used. Credit is kept apart from the team balance.
             </EmptyState>
           ) : (
             <TableScroll label="Tournament credits">
@@ -404,18 +399,18 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
                     <tr key={c.id}>
                       <td className={`${tdClass} whitespace-nowrap`}>{formatDay(c.date)}</td>
                       <td className={tdClass}>
-                        {c.description || (c.kind === "income" ? "Credit won" : "Credit used")}
+                        {c.description}
                         {c.season_id !== season.id && <span className="ml-2 text-xs text-muted">{seasonName.get(c.season_id)}</span>}
                       </td>
-                      <td className={`${tdClass} text-right tabular-nums`}>{c.kind === "income" ? money(c.cents) : ""}</td>
-                      <td className={`${tdClass} text-right tabular-nums`}>{c.kind === "expense" ? money(c.cents) : ""}</td>
+                      <td className={`${tdClass} text-right tabular-nums`}>{c.kind === "won" ? money(c.cents) : ""}</td>
+                      <td className={`${tdClass} text-right tabular-nums`}>{c.kind === "used" ? money(c.cents) : ""}</td>
                       <td className={`${tdClass} text-right font-semibold tabular-nums`}>{money(c.balance)}</td>
                       {editor && (
                         <td className={tdClass}>
-                          <ActionForm action={deleteEntry}>
+                          <ActionForm action={deleteCredit}>
                             <input type="hidden" name="id" value={c.id} />
                             <ConfirmSubmit
-                              message={`Remove this tournament credit (${money(c.cents)}) from the ledger and the credit balance?`}
+                              message={`Remove this tournament credit (${money(c.cents)}) from the credit balance?`}
                               className="text-xs text-danger hover:underline"
                             >
                               Remove
@@ -435,7 +430,8 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
       <Card title="Coaches' out-of-pocket">
         <div className="flex flex-col gap-4">
           <p className="text-sm text-muted">
-            What coaches paid for with their own money, kept apart from team money. The team owes it back until it&apos;s repaid.
+            What coaches paid for with their own money, kept apart from the team balance. The team owes it back until it&apos;s repaid;
+            only a repayment from team money comes out of the team balance, because that money leaves the team.
           </p>
           <dl className="grid gap-3 sm:grid-cols-3">
             {[

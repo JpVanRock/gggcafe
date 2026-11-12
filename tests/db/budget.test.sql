@@ -235,10 +235,23 @@ select pg_temp.expect('still one Coach reimbursement expense', (select count(*) 
 delete from public.budget_entries where category = 'Coach reimbursement';
 select pg_temp.expect('removing the repayment makes its items owed again',
   (select count(*) from public.budget_coach_expenses where reimbursed_on is null and reimbursement_id is null), 2::bigint);
--- Tournament credits are ordinary ledger lines: won is income, used is an expense
-insert into public.budget_entries (team_id, season_id, kind, entry_date, amount, category, description) values
-  ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1', 'income', '2026-09-28', 250, 'Tournament credit', 'Fall Classic champions'),
-  ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1', 'expense', '2026-10-05', 200, 'Tournament credit used', 'Spring Opener entry');
+-- Tournament credits live apart from the team ledger (user, 2026-11-12): they don't change its totals
+select pg_temp.expect('the budget remembers when it last changed',
+  (select (public.team_budget_summary('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1') ->> 'updated_at') is not null), true);
+create temp table totals_before as
+  select public.team_budget_summary('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1') ->> 'other_income' as other, public.team_budget_summary('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1') ->> 'expenses' as spent;
+insert into public.budget_credits (team_id, season_id, entry_date, kind, amount, description) values
+  ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1', '2026-09-28', 'won', 250, 'Fall Classic champions'),
+  ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1', '2026-10-05', 'used', 200, 'Spring Opener entry');
+select pg_temp.expect('credits don''t change the team''s income or expenses',
+  (select (public.team_budget_summary('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1') ->> 'other_income') || '/' || (public.team_budget_summary('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1') ->> 'expenses')),
+  (select other || '/' || spent from totals_before));
+select pg_temp.expect('a credit is won or used, with a tournament',
+  pg_temp.err($$insert into public.budget_credits (team_id, season_id, entry_date, kind, amount, description)
+                values ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1', '2026-10-06', 'spent', 5, 'x')$$), '23514');
+select pg_temp.expect('nobody sets the last-updated date by hand',
+  pg_temp.err($$update public.budget_changes set changed_at = '2020-01-01'$$) || (select count(*) from public.budget_changes where changed_at < '2021-01-01')::text,
+  '0');
 reset role;
 
 -- Assistants and viewers read the coaches' ledger but can't add to it or repay it
@@ -248,6 +261,10 @@ select pg_temp.expect('viewer reads the coaches'' ledger', (select count(*) from
 select pg_temp.expect('viewer can''t add to it',
   pg_temp.err($$insert into public.budget_coach_expenses (team_id, season_id, entry_date, paid_by, amount)
                 values ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1', '2026-09-30', 'Viewer', 5)$$), '42501');
+select pg_temp.expect('viewer reads the credits', (select count(*) from public.budget_credits), 2::bigint);
+select pg_temp.expect('viewer can''t add credit',
+  pg_temp.err($$insert into public.budget_credits (team_id, season_id, entry_date, kind, amount, description)
+                values ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1', '2026-09-30', 'won', 5, 'Viewer')$$), '42501');
 select pg_temp.expect('viewer can''t repay',
   pg_temp.err($$select public.reimburse_coach_expenses(array(select id from public.budget_coach_expenses where description = 'Pizza'), '2026-09-30', true)$$), '42501');
 reset role;
@@ -257,6 +274,8 @@ select pg_temp.expect('a stranger reads none of it', (select count(*) from publi
 reset role;
 
 -- Clean up
+delete from public.budget_credits;
+delete from public.budget_changes;
 delete from public.budget_coach_expenses;
 delete from public.budget_entries; delete from public.budget_adjustments; delete from public.budget_fees;
 update public.teams set team_code = null;

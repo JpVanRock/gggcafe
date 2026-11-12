@@ -195,6 +195,39 @@ export type Database = {
           },
         ]
       }
+      budget_changes: {
+        Row: {
+          team_id: string
+          season_id: string
+          changed_at: string
+        }
+        Insert: {
+          team_id: string
+          season_id: string
+          changed_at?: string
+        }
+        Update: {
+          team_id?: string
+          season_id?: string
+          changed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budget_changes_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_changes_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       budget_coach_expenses: {
         Row: {
           id: string
@@ -258,6 +291,57 @@ export type Database = {
           },
           {
             foreignKeyName: "budget_coach_expenses_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      budget_credits: {
+        Row: {
+          id: string
+          team_id: string
+          season_id: string
+          entry_date: string
+          kind: string
+          amount: number
+          description: string
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          team_id: string
+          season_id: string
+          entry_date: string
+          kind: string
+          amount: number
+          description: string
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          team_id?: string
+          season_id?: string
+          entry_date?: string
+          kind?: string
+          amount?: number
+          description?: string
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budget_credits_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_credits_team_id_fkey"
             columns: ["team_id"]
             isOneToOne: false
             referencedRelation: "teams"

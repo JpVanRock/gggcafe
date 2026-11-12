@@ -2,7 +2,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  CREDIT_USED, CREDIT_WON, ENTRY_FORM_CATEGORIES, INCOME_CATEGORIES, PAYMENT_CATEGORIES, centsToDollars, coachLedger, coachTotals, creditBalance,
+  EXPENSE_CATEGORIES, ENTRY_FORM_CATEGORIES, INCOME_CATEGORIES, PAYMENT_CATEGORIES, centsToDollars, coachLedger, coachTotals, creditBalance,
   creditLedger, money, parseMoney, paymentCategory, playerBalances, runningLedger, toCents,
 } from "../../src/lib/budget.ts";
 
@@ -66,13 +66,11 @@ test("ledger runs in date order with a running balance", () => {
   ]);
 });
 
-test("tournament credits: won adds, used takes off, across seasons; other lines don't count", () => {
+test("tournament credits: won adds, used takes off, across seasons", () => {
   const entries = [
-    { date: "2026-10-05", kind: "expense" as const, category: CREDIT_USED, cents: 20000 },
-    { date: "2026-09-28", kind: "income" as const, category: CREDIT_WON, cents: 25000 },
-    { date: "2026-09-29", kind: "income" as const, category: "Sponsor", cents: 99999 },
-    { date: "2026-10-05", kind: "income" as const, category: CREDIT_WON, cents: 10000 },
-    { date: "2027-03-01", kind: "expense" as const, category: "Tournament fees", cents: 50000 },
+    { date: "2026-10-05", kind: "used" as const, cents: 20000 },
+    { date: "2026-09-28", kind: "won" as const, cents: 25000 },
+    { date: "2026-10-05", kind: "won" as const, cents: 10000 },
   ];
   const rows = creditLedger(entries);
   assert.deepEqual(rows.map((r) => r.balance), [25000, 35000, 15000], "same day: credit won before credit used");
@@ -80,10 +78,9 @@ test("tournament credits: won adds, used takes off, across seasons; other lines 
   assert.equal(creditBalance([]), 0);
 });
 
-test("the general expense/income form leaves out credits and coach repayments", () => {
+test("credits stay out of the team ledger; the general form leaves out coach repayments", () => {
   assert.ok(INCOME_CATEGORIES.includes("Reimbursement") && INCOME_CATEGORIES.includes("Fundraiser"));
-  assert.ok(!ENTRY_FORM_CATEGORIES.income.includes(CREDIT_WON));
-  assert.ok(!ENTRY_FORM_CATEGORIES.expense.includes(CREDIT_USED));
+  assert.ok(![...INCOME_CATEGORIES, ...EXPENSE_CATEGORIES].some((c) => /credit/i.test(c)), "no tournament-credit categories in the team ledger");
   assert.ok(!ENTRY_FORM_CATEGORIES.expense.includes("Coach reimbursement"));
   assert.ok(ENTRY_FORM_CATEGORIES.income.includes("Reimbursement"));
 });

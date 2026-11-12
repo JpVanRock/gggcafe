@@ -234,11 +234,33 @@ const budget_entries: Row[] = [
   budgetEntry(9, "payment", "2026-09-15", 45, { player_id: avery, method: "Cash", category: "Equipment", description: "Batting gloves" }),
   budgetEntry(3, "income", "2026-09-10", 300, { category: "Fundraiser", description: "Car wash" }),
   budgetEntry(4, "expense", "2026-09-12", 650, { category: "Tournament fees", description: "Fall Classic entry" }),
-  budgetEntry(5, "income", "2026-09-28", 250, { category: "Tournament credit", description: "Fall Classic champions" }),
-  budgetEntry(6, "expense", "2026-10-05", 150, { category: "Tournament credit used", description: "Halloween Bash entry" }),
   budgetEntry(7, "expense", "2026-10-08", 89.99, { category: "Coach reimbursement", description: "Coach reimbursement (1 item)" }),
   budgetEntry(8, "income", "2026-10-12", 40, { category: "Reimbursement", description: "Refunded umpire deposit" }),
 ];
+// tournament credit lives apart from the team ledger (user, 2026-11-12)
+const budget_credits: Row[] = [
+  { id: id("bdbc00", 1), team_id: T.us, season_id: S.fall, entry_date: "2026-09-28", kind: "won", amount: 250, description: "Fall Classic champions" },
+  { id: id("bdbc00", 2), team_id: T.us, season_id: S.fall, entry_date: "2026-10-05", kind: "used", amount: 150, description: "Halloween Bash entry" },
+];
+/** What team_budget_summary() returns for the sample team: the parents' view and the coaches' summary. */
+const budgetSummary = () => {
+  const sum = (rows: Row[]) => rows.reduce((t, e) => t + Number(e.amount), 0);
+  const pays = budget_entries.filter((e) => e.kind === "payment");
+  const players = new Set(roster_entries.filter((r) => r.team_id === T.us && r.season_id === S.fall && r.active).map((r) => r.player_id)).size;
+  const byDay = new Map<string, Row[]>();
+  for (const p of pays) byDay.set(String(p.entry_date), [...(byDay.get(String(p.entry_date)) ?? []), p]);
+  return {
+    team: "GGG Sample 14U", season: "Fall 2026", season_id: S.fall, updated_at: "2026-11-10T21:30:00Z", players,
+    fees: [{ name: "Registration", amount: 450 }], fee_per_player: 450, expected: players * 450,
+    collected: sum(pays.filter((e) => (e.category ?? "Registration") === "Registration")),
+    other_income: sum(budget_entries.filter((e) => e.kind === "income" || (e.kind === "payment" && (e.category ?? "Registration") !== "Registration"))),
+    expenses: sum(budget_entries.filter((e) => e.kind === "expense")),
+    entries: [
+      ...budget_entries.filter((e) => e.kind !== "payment").map((e) => ({ date: e.entry_date, kind: e.kind, category: e.category, description: e.description, amount: e.amount })),
+      ...[...byDay].map(([date, rows]) => ({ date, kind: "payment", category: null, description: `${rows.length} player payment${rows.length === 1 ? "" : "s"}`, amount: sum(rows) })),
+    ],
+  };
+};
 const budget_coach_expenses: Row[] = [
   { id: id("bdbf00", 1), team_id: T.us, season_id: S.fall, entry_date: "2026-09-04", paid_by: "Coach Sample", category: "Equipment", description: "Practice balls", amount: 89.99, reimbursed_on: "2026-10-08", reimbursement_id: id("bdbe00", 7) },
   { id: id("bdbf00", 2), team_id: T.us, season_id: S.fall, entry_date: "2026-10-01", paid_by: "Coach Sample", category: "Team events", description: "Team pizza after practice", amount: 64.5, reimbursed_on: null, reimbursement_id: null },
@@ -251,7 +273,7 @@ export const TABLES: Record<string, Row[]> = {
   install_items, install_item_plans, team_events, training_phases, team_offseason, bp_rounds, bullpen_scripts, player_spotlights,
   team_culture, team_standards, player_advanced_access, player_leadership_access, player_leadership_certificates, measurements,
   mentors, mentor_links, mentor_messages, mentor_focus, mentor_notes, player_activities,
-  budget_fees, budget_entries, budget_coach_expenses,
+  budget_fees, budget_entries, budget_credits, budget_coach_expenses,
 };
 
 /** table -> the column other tables use to point at it (for embedded selects) */
@@ -284,6 +306,7 @@ const playerFull = (pid: string) => {
 export function sampleRpc(name: string, args: Row = {}): unknown {
   switch (name) {
     case "team_current_season": return S.fall;
+    case "team_budget_summary": return budgetSummary();
     case "signup_team": return String(args.p_code ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "") === "GGG234" ? [{ id: T.us, name: "GGG Sample 14U" }] : [];
     case "team_bp_leaders": return [{ player_id: maya, first_name: "Maya", last_name: "Torres", jersey_number: "2", swings: 21, production: 3.95 }];
     case "team_leaderboard": return leaderboard();
