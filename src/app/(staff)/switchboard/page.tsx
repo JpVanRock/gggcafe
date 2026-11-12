@@ -69,7 +69,7 @@ export default async function SwitchboardPage({ searchParams }: PageProps<"/swit
         </span>
         <span className="text-muted">
           New players, parents, assistant coaches and mentors join with it.{" "}
-          <Link href={`/dugout/roster?team=${team.id}`} className="text-link hover:underline">
+          <Link href={`/dugout/roster?team=${team.id}`} className="text-link underline underline-offset-2">
             Change it on the Roster tab →
           </Link>
         </span>
