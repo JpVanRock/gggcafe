@@ -14,7 +14,7 @@ export default async function DrillLibraryPage() {
   const { data } = await supabase.from("practice_drills").select("id, name, description, tags, equipment, video_url").order("name");
   return (
     <div className="flex flex-col gap-6">
-      <SafetyNote audience="coach" />
+      <SafetyNote audience="coach" termsLink={false} />
       <DrillLibrary drills={(data ?? []) as LibraryDrill[]} canEdit={canEdit(user.staff.role)} />
     </div>
   );

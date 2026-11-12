@@ -29,7 +29,8 @@ the release for minors, the under-13 consent and the dispute terms.
   account's metadata.
 - Contextual notes (`components/legal.tsx`): `SafetyNote` ("Train smart.") on Performance Training
   (player), Dugout Drills, Practice plans (list and each plan) and Training (coach); a line in the
-  new-routine form; the printed practice plan's footer. `RewardsNote` on the Leaderboard and the
+  new-routine form; the printed practice plan's footer. The Drill Library shows it without the "Terms, section 4" link
+  (user, 2026-11-12; `termsLink={false}`). `RewardsNote` on the Leaderboard and the
   Trophy Room (`SectionShell` takes a `notice`). New workout or reward pages get the same notes.
 
 ## Agreeing, and asking again

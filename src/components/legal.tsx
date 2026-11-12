@@ -102,16 +102,30 @@ export function LegalDocument({
 }
 
 /** The short notice next to workouts, drills, routines and practice plans. */
-export function SafetyNote({ audience, className = "" }: { audience: "player" | "coach"; className?: string }) {
+export function SafetyNote({
+  audience,
+  className = "",
+  termsLink = true,
+}: {
+  audience: "player" | "coach";
+  className?: string;
+  /** the link to the Terms' assumption of risk (the Drill Library leaves it out: user, 2026-11-12) */
+  termsLink?: boolean;
+}) {
   return (
     <p role="note" className={`rounded-xl border border-navy-700 bg-navy-950/40 px-4 py-3 text-sm text-muted ${className}`}>
       <strong className="font-semibold text-highlight">Train smart.</strong>{" "}
       {audience === "player"
         ? "Warm up, use good form and stop if anything hurts. Workouts and drills here, including ones you or your coaches add, are done at your own risk and aren't medical advice. Check with a doctor before starting a new program."
-        : "Drills, workouts and routines are done at your own risk and aren't medical advice. Check that each one suits your players' age, health and ability, and supervise them."}{" "}
-      <Link href="/terms#risk" className={linkClass}>
-        Terms, section 4
-      </Link>
+        : "Drills, workouts and routines are done at your own risk and aren't medical advice. Check that each one suits your players' age, health and ability, and supervise them."}
+      {termsLink && (
+        <>
+          {" "}
+          <Link href="/terms#risk" className={linkClass}>
+            Terms, section 4
+          </Link>
+        </>
+      )}
     </p>
   );
 }
