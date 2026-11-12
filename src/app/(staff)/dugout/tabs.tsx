@@ -18,7 +18,8 @@ export function DugoutTabs({ badges, role }: { badges?: Record<string, number>; 
 export function TabList({ path = "", badges = {}, role }: { path?: string; badges?: Record<string, number>; role?: StaffRole }) {
   return (
     <TabRow label="Coaches Dugout" current={path}>
-      <ul className="flex min-w-max gap-6 border-b border-navy-700">
+      {/* sized so all eleven tabs fit the page width (user, 2026-11-12) */}
+      <ul className="flex min-w-max gap-4 border-b border-navy-700">
         {dugoutTabsFor(role).map((tab) => {
           const active = isCurrent(tab.href, path);
           return (
@@ -26,7 +27,7 @@ export function TabList({ path = "", badges = {}, role }: { path?: string; badge
               <Link
                 href={tab.href}
                 aria-current={active ? "page" : undefined}
-                className={`-mb-px block border-b-2 pb-2.5 text-sm font-semibold tracking-wider uppercase transition ${
+                className={`-mb-px block border-b-2 pb-2.5 text-xs font-semibold tracking-wide uppercase transition ${
                   active ? "border-pink text-highlight" : "border-transparent text-muted hover:text-ink"
                 }`}
               >

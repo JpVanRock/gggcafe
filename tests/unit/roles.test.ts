@@ -13,7 +13,7 @@ test("who edits, who is a head coach", () => {
 test("assistants lose four Dugout tabs; everyone else keeps all ten", () => {
   assert.equal(DUGOUT_TABS.length, 11);
   assert.equal(DUGOUT_TABS[0].label, "Roster");
-  assert.deepEqual(dugoutTabsFor("assistant").map((t) => t.label), ["Roster", "Calendar", "Practice Plans", "Training", "Playbook", "Drill Library", "Team Budget"]);
+  assert.deepEqual(dugoutTabsFor("assistant").map((t) => t.label), ["Roster", "Calendar", "Practice Plans", "Training", "Playbook", "Drill Library", "Budget"]);
   for (const role of ["coach", "admin", "viewer"] as const) assert.equal(dugoutTabsFor(role).length, 11, role);
 });
 

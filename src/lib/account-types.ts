@@ -110,7 +110,7 @@ export const SECTIONS: { title: string; rows: Row[] }[] = [
       row("Playbook", "The team call sheet and organization playbook, team quizzes, and the scouting checklist on opponents.", ["yes", "yes", "part", "no", "no"],
         "Players see only the calls on their team's sheet (as flashcards) and published team quizzes; scouting stays with the staff."),
       row("Drill Library", "Every drill, tagged, with video links.", ["yes", "yes", "no", "no", "part"], "Mentors pick drills to suggest and can add new ones."),
-      row("Team Budget", "Fees, payments, income and expenses, tournament credits, and out-of-pocket spending by coaches or parents and its repayment.", ["yes", "view", "no", "view", "no"],
+      row("Budget", "Fees, payments, income and expenses, tournament credits, and out-of-pocket spending by coaches or parents and its repayment.", ["yes", "view", "no", "view", "no"],
         "Assistants see the whole budget but can't change it. Parents see team totals only, with no names."),
       row("Parents", "The team code, parent requests and approved parents.", ["yes", "no", "no", "no", "no"]),
       row("Mentors", "Approve mentors for the whole team, read their notes and focus areas and reply, read the messages they share.", ["yes", "no", "no", "part", "no"],

@@ -42,7 +42,7 @@ export const DUGOUT_TABS = [
   { href: "/dugout/gameday", label: "GameDay", headOnly: true },
   { href: "/dugout/playbook", label: "Playbook", headOnly: false },
   { href: "/dugout/drills", label: "Drill Library", headOnly: false },
-  { href: "/dugout/budget", label: "Team Budget", headOnly: false },
+  { href: "/dugout/budget", label: "Budget", headOnly: false },
   { href: "/dugout/parents", label: "Parents", headOnly: true },
   { href: "/dugout/mentors", label: "Mentors", headOnly: true },
 ] as const;

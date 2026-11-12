@@ -1,7 +1,7 @@
 # Coaches Dugout (`/dugout`, nav "Coaches Dugout")
 - Header tabs (`dugout/tabs.tsx`): Roster (`/dugout/roster`, first: user 2026-11-08), Culture (`/dugout`; Team Standards + Team Culture), Calendar (`/dugout/calendar`),
   Practice Plans (`/dugout/plans`), Training, GameDay (`/dugout/gameday`), Playbook (`/dugout/playbook`), Drill Library (`/dugout/drills`),
-  Team Budget (`/dugout/budget`), Parents (`/dugout/parents`).
+  Budget (`/dugout/budget`; the tab says just "Budget" so the row fits, user 2026-11-12), Parents (`/dugout/parents`).
 - GameDay (tab renamed from "GameDay Prep"; from the user's Lineup + Defensive Rotations tabs): season player cards
   (`gameday_profiles`: hitting type power/contact/gap, base running pure/intelligent/average, typed
   AVG/OBP/K% used only until box scores exist, `batting_season` wins) and game lineups
