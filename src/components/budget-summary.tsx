@@ -71,7 +71,8 @@ function LineItems({ title, kind, entries, team }: { title: string; kind: "expen
       title={title}
       subtitle={`${team} · ${items.length} item${items.length === 1 ? "" : "s"} · ${money(total)}`}
       trigger="Details"
-      triggerLabel={`${title}: see each line item`}
+      // the name must contain the visible "Details" (WCAG label in name)
+      triggerLabel={`${title} details`}
       triggerClassName="rounded-full border border-navy-600 px-2.5 py-0.5 text-xs font-semibold text-muted transition hover:border-pink hover:text-ink"
     >
       <div className="flex flex-col gap-6">
