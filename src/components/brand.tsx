@@ -32,14 +32,19 @@ export function Wordmark({ className = "" }: { className?: string }) {
 }
 
 /**
- * Site-wide footer on every page: the short legal disclaimer and links on the left (small and quiet,
- * but full-contrast text), the type logo in the bottom-right corner.
+ * Site-wide footer on every page: the type logo at the right, and under it the short legal disclaimer
+ * and links across the full page width (user, 2026-11-12: one even band, small and quiet but
+ * full-contrast text).
  */
 export function SiteFooter() {
   const legalLink = "underline underline-offset-2 hover:text-ink";
   return (
-    <footer className="mx-auto flex w-full max-w-5xl flex-col gap-5 px-4 pt-10 pb-6 sm:flex-row sm:items-end sm:justify-between sm:gap-10">
-      <div className="max-w-2xl text-xs leading-relaxed text-muted">
+    <footer className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-4 pt-10 pb-6">
+      {/* keep-night: in Day Game the wordmark sits on a navy chip (brand kit: artwork over navy) */}
+      <Link href="/" aria-label="GGG.Cafe home" className="keep-night shrink-0 self-end rounded-xl bg-navy-950 px-3 py-2 opacity-90 transition hover:opacity-100">
+        <Wordmark className="w-36 sm:w-44" />
+      </Link>
+      <div className="border-t border-navy-700 pt-4 text-xs leading-relaxed text-muted">
         <p>{FOOTER_DISCLAIMER}</p>
         <nav aria-label="Legal" className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
           <Link href="/terms" className={legalLink}>
@@ -51,10 +56,6 @@ export function SiteFooter() {
           <span>{COPYRIGHT}</span>
         </nav>
       </div>
-      {/* keep-night: in Day Game the wordmark sits on a navy chip (brand kit: artwork over navy) */}
-      <Link href="/" aria-label="GGG.Cafe home" className="keep-night shrink-0 self-end rounded-xl bg-navy-950 px-3 py-2 opacity-90 transition hover:opacity-100">
-        <Wordmark className="w-36 sm:w-44" />
-      </Link>
     </footer>
   );
 }

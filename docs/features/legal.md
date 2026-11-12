@@ -21,8 +21,8 @@ the release for minors, the under-13 consent and the dispute terms.
 - `/terms` and `/privacy`: public (people read them before signing up), effective date, contents
   list, numbered sections. The release, warranty disclaimer and liability limits are bold with a
   pink rule (conspicuous). "← Back to GGG.Cafe": the installed app has no back button.
-- Footer on every page (`SiteFooter` in `components/brand.tsx`): the short disclaimer, links to
-  both documents, © line. Small (`text-xs`) and quiet but full-contrast `text-muted`.
+- Footer on every page (`SiteFooter` in `components/brand.tsx`): the GGG.CAFE wordmark at the right, then
+  the short disclaimer, links to both documents and the © line across the full page width (user, 2026-11-12). Small (`text-xs`) and quiet but full-contrast `text-muted`.
 - Clickwrap at sign-up (`/register`): an unchecked, required box (`AgreementCheckbox`) with both
   documents one tap away in a new tab; players also confirm they're 13 or older (younger players
   get a parent-made login). The action refuses without them and puts `terms_version` in the new

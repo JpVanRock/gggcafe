@@ -178,8 +178,9 @@ like a sports brand or media-day graphics. Never childish or preschool.
 ## Brand
 - Logo: `public/brand/ggg-cafe-logo.webp` (use `<Logo>` from `src/components/brand.tsx`);
   favicon/icons in `src/app/` are generated from it.
-- Type logo "GGG.CAFE": `public/brand/ggg-cafe-wordmark.png` (transparent, `<Wordmark>`). It sits
-  bottom-right on every page via `<SiteFooter>` in the root layout; keep pages from covering it. The logo lettering is Montecatini Pro
+- Type logo "GGG.CAFE": `public/brand/ggg-cafe-wordmark.png` (transparent, `<Wordmark>`). It sits at
+  the bottom right of every page, above the full-width footer disclaimer, via `<SiteFooter>` in the root layout;
+  keep pages from covering it. The logo lettering is Montecatini Pro
   (Louise Fili, commercial) and only appears as the image.
 - Fonts (next/font/google, user's choice after a side-by-side test, 2026-11-07): DM Sans (`font-sans`,
   brand kit) for body and interface (text, buttons, navigation, forms, captions). Jost
