@@ -111,3 +111,5 @@
   Final plans are read-only (`sheet.tsx`) until "Reopen to edit".
 - Practice-plan math (clock times, totals, equipment checklist, finalize checks) lives in
   `src/lib/dugout.ts` (no imports; unit-tested). Field layout `FIELD_SPOT` is shared by web and PDF.
+- Team admins (user, 2026-11-12): a parent the head coach names gets only Calendar, GameDay and Measurements
+  (`/dugout/measurements`, the team measurement grid, also linked from Training → Measurements). See account-types.md.

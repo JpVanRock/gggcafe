@@ -15,7 +15,7 @@ export const metadata: Metadata = { title: "Mental GP · GGG.Cafe" };
 export default async function MentalPage({ params }: PageProps<"/players/[playerId]/mental">) {
   const { playerId } = await params;
   const supabase = await createClient();
-  const access = await requirePlayerPage(playerId);
+  const access = await requirePlayerPage(playerId, "player.mental");
   const player = await loadPlayer(supabase, playerId);
   const today = todayISO();
   const [plan, tools] = await Promise.all([loadMentalPlan(supabase, player.id), loadMentalTools(supabase, player.id, today)]);

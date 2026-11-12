@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { canEdit, requireHeadCoachPage } from "@/lib/auth";
+import { dugoutCanEdit, requireDugoutPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { EmptyState, buttonClass, inputClass } from "@/components/ui";
 import { loadGamedayRoster } from "@/lib/gameday-data";
@@ -16,16 +16,16 @@ export const metadata: Metadata = { title: "Depth Chart · GameDay · GGG.Cafe" 
 const iconButton = "inline-grid min-h-6 min-w-6 place-items-center rounded px-1.5 text-muted hover:text-ink disabled:opacity-30";
 
 export default async function DepthChartPage({ searchParams }: PageProps<"/dugout/gameday/depth">) {
-  const user = await requireHeadCoachPage();
-  const editor = canEdit(user.staff.role);
+  const access = await requireDugoutPage("gameday");
+  const editor = dugoutCanEdit(access, "gameday");
   const { team: teamParam } = await searchParams;
   const supabase = await createClient();
-  const dugout = await loadDugoutTeam(supabase, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam, access.adminTeamIds);
   if (!dugout) return <NoOwnTeam />;
   const { teams, team } = dugout;
   const seasonId = await seasonOrCurrent(supabase, team.id, null);
   const [roster, depthResult] = await Promise.all([
-    seasonId ? loadGamedayRoster(supabase, team.id, seasonId) : Promise.resolve([]),
+    seasonId ? loadGamedayRoster(supabase, team.id, seasonId, { teamAdmin: access.role === null }) : Promise.resolve([]),
     supabase.from("depth_chart").select("position, player_id, rank").eq("team_id", team.id).order("rank"),
   ]);
   const byId = new Map(roster.map((p) => [p.id, p]));

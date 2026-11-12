@@ -17,7 +17,7 @@ export const metadata: Metadata = { title: "Performance Training · GGG.Cafe" };
 export default async function TrainingPage({ params }: PageProps<"/players/[playerId]/training">) {
   const { playerId } = await params;
   const supabase = await createClient();
-  const access = await requirePlayerPage(playerId);
+  const access = await requirePlayerPage(playerId, "player.training");
   const player = await loadPlayer(supabase, playerId);
   const today = todayISO();
   const positions = positionsOf(player);

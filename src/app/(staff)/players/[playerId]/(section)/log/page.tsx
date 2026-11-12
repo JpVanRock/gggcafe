@@ -18,7 +18,7 @@ const heading = "mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-so
 export default async function LogPage({ params }: PageProps<"/players/[playerId]/log">) {
   const { playerId } = await params;
   const supabase = await createClient();
-  const access = await requirePlayerPage(playerId);
+  const access = await requirePlayerPage(playerId, "player.activity");
   const player = await loadPlayer(supabase, playerId);
   const name = firstName(player);
   const today = todayISO();

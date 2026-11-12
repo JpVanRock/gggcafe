@@ -1,7 +1,7 @@
 "use server";
 
 import { refresh } from "next/cache";
-import { editorCheck } from "@/lib/auth";
+import { dugoutCheck, editorCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { friendlyDbError, text, type FormState, invalid } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
@@ -15,7 +15,8 @@ import { readEventForm, readRepeat } from "@/lib/team-events";
  */
 export async function saveCalendarEvent(_prev: FormState, fd: FormData): Promise<FormState> {
   return runAction(async () => {
-    const denied = await editorCheck();
+    // coaches, or the team's team admin (the database keeps a team admin to their own team)
+    const denied = await dugoutCheck("calendar", text(fd, "id") ? undefined : text(fd, "team_id"));
     if (denied) return failed(denied);
     const event = readEventForm(fd);
     if (event.error !== null) return failed(event.error);
@@ -52,7 +53,7 @@ export async function saveCalendarEvent(_prev: FormState, fd: FormData): Promise
 
 /** Removes one event, or it and every later one in its weekly series. */
 export async function deleteCalendarEvent(_prev: FormState, fd: FormData): Promise<FormState> {
-  const denied = await editorCheck();
+  const denied = await dugoutCheck("calendar");
   if (denied) return { error: denied };
   const id = text(fd, "id");
   if (!isUuid(id)) return { error: "Unknown event." };

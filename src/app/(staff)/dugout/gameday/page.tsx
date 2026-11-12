@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { canEdit, requireHeadCoachPage } from "@/lib/auth";
+import { dugoutCanEdit, requireDugoutPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Card, Disclosure, EmptyState, RECENT_LIMIT, ShowAllLink, tableClass, tdClass, thClass, badgeClass, TableScroll, cardClass } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
@@ -18,17 +18,19 @@ export const metadata: Metadata = { title: "GameDay · Coaches Dugout · GGG.Caf
 type LineupRow = { id: string; game_date: string; opponent: string | null; title: string | null; status: "draft" | "final"; shared_at: string | null; batting_order: string[] };
 
 export default async function GamedayPage({ searchParams }: PageProps<"/dugout/gameday">) {
-  const user = await requireHeadCoachPage();
-  const editor = canEdit(user.staff.role);
+  // head coaches (assistants don't get GameDay), or a team admin for their teams (user, 2026-11-12)
+  const access = await requireDugoutPage("gameday");
+  const editor = dugoutCanEdit(access, "gameday");
+  const teamAdmin = access.role === null;
   const { team: teamParam, lineups: lineupsParam } = await searchParams;
   const supabase = await createClient();
-  const dugout = await loadDugoutTeam(supabase, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam, access.adminTeamIds);
   if (!dugout) return <NoOwnTeam />;
   const { teams, team } = dugout;
   const today = todayISO();
   const seasonId = await seasonOrCurrent(supabase, team.id, null);
   const [roster, lineupsResult, gamesResult, seasonResult] = await Promise.all([
-    seasonId ? loadGamedayRoster(supabase, team.id, seasonId) : Promise.resolve([]),
+    seasonId ? loadGamedayRoster(supabase, team.id, seasonId, { teamAdmin }) : Promise.resolve([]),
     supabase
       .from("gameday_lineups")
       .select("id, game_date, opponent, title, status, shared_at, batting_order", { count: "exact" })

@@ -37,3 +37,19 @@
   `request.jwt.claims` to that person for the rest of the call, so their own access rules and functions answer,
   then puts the setting back. Nobody signs in as anyone and nothing can be changed. `admin_account(user)` (definer,
   admins only) adds email, sign-up type, account and confirmation dates and last sign-in. `tests/db/admin_view_as.test.sql`.
+- Coaches who are parents (user, 2026-11-12; migration 20261112133311): coach sign-ups can tick "I'm also a parent" and
+  name their daughter (metadata `coach_child`). The dashboard's "Also a parent on the team?" claims her from our current
+  rosters (`claim_my_daughter`: makes the parent profile and a parent link per team; a head coach's or admin's is approved
+  at once, an assistant's waits for the head coach). A coach with any parent link gets the Coach / Parent switch
+  (`components/role-switch.tsx`) in the header: Coach = /dashboard, Parent = /family with the parents' menu. DB tests:
+  `tests/db/coach_parents.test.sql`.
+- Team admins (user, 2026-11-12; migration 20261112133709): the head coach makes an approved parent the team admin
+  (Coaches Dugout → Parents, `set_team_admin`; table `team_admins`; `private.my_admin_team_ids()` needs the parent link
+  still approved). They stay parents: a Coaches Dugout with three tabs (`TEAM_ADMIN_TABS`): Calendar, GameDay (all but
+  sharing a lineup with the staff) and Measurements (`/dugout/measurements`, one measurement for the whole roster; staff
+  use it too). Pages use `requireDugoutPage(area)` / `dugoutCanEdit`, actions `dugoutCheck(area, teamId)`; rosters come from
+  `team_admin_roster()` (names, numbers, positions only: `loadRoster(..., { teamAdmin: true })`), never the players table.
+  Team-admin policies cover team_events, gameday_*, depth_chart, the box-score lines and the game's score
+  (`save_box_score` lets them), measurements for the team's current roster, and reads of the team, its roster, seasons,
+  metrics and staff duties. The family page has a Team admin card; their menus get "Coaches Dugout". DB tests:
+  `tests/db/team_admins.test.sql`.

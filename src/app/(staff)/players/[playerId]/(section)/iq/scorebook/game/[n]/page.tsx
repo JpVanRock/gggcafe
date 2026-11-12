@@ -17,7 +17,7 @@ export default async function ScorebookGamePage({ params }: PageProps<"/players/
   const n = Number(raw);
   if (!Number.isInteger(n) || n < 1 || n > GAME_COUNT) notFound();
   const supabase = await createClient();
-  const access = await requirePlayerPage(playerId);
+  const access = await requirePlayerPage(playerId, "player.iq");
   const player = await loadPlayer(supabase, playerId);
   const [iq, { data: open }] = await Promise.all([
     loadIq(supabase, player.id),

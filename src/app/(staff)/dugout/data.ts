@@ -14,7 +14,12 @@ export async function loadOwnTeams(supabase: Supabase): Promise<OwnTeam[]> {
  * The Dugout page's teams and the one it shows (`?team=`, else the first), or null when we
  * don't coach a team yet (show <NoOwnTeam />).
  */
-export async function loadDugoutTeam(supabase: Supabase, teamParam: string | string[] | undefined): Promise<{ teams: OwnTeam[]; team: OwnTeam } | null> {
-  const teams = await loadOwnTeams(supabase);
+export async function loadDugoutTeam(
+  supabase: Supabase,
+  teamParam: string | string[] | undefined,
+  /** a team admin's teams (user, 2026-11-12): only these */
+  only?: string[],
+): Promise<{ teams: OwnTeam[]; team: OwnTeam } | null> {
+  const teams = (await loadOwnTeams(supabase)).filter((t) => !only?.length || only.includes(t.id));
   return teams.length ? { teams, team: pickTeam(teams, teamParam) } : null;
 }

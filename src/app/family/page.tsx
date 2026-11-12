@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { getCurrentUser } from "@/lib/auth";
+import { getAdminTeamIds, getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { BudgetSummary, CreditsSummary, type BudgetSummaryData } from "@/components/budget-summary";
 import { Card, Disclosure, Loading, PageHeader, secondaryButtonClass, eyebrowClass, badgeClass } from "@/components/ui";
@@ -19,6 +19,8 @@ import { DaughterMentors, loadFamilyMentors } from "./mentors";
 import { ConsentOnFile, ConsentSteps } from "./consent";
 import { consentStep } from "@/lib/consent";
 import { formatLongDateAt } from "@/lib/dates";
+import { isStaffParent } from "@/components/role-switch";
+import type { SwitchKey } from "@/lib/switchboard";
 
 export const metadata: Metadata = { title: "Family · GGG.Cafe" };
 
@@ -75,26 +77,40 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
     supabase.from("parent_packet_reads").select("item_id").eq("parent_id", user.id),
     loadFamilyMentors(supabase),
   ]);
-  const packet = (packetResult.data ?? []) as { id: string; team_id: string; kind: PacketKind; title: string; body: string }[];
+  const packetRows = (packetResult.data ?? []) as { id: string; team_id: string; kind: PacketKind; title: string; body: string }[];
   const readIds = new Set(((readsResult.data ?? []) as { item_id: string }[]).map((r) => r.item_id));
+  const packet = packetRows.filter((i) => !offOn(i.team_id, "parent.packet"));
   const links = (linksResult.data ?? []) as Link_[];
   // what she typed on the sign-up page fills in the join form
   const meta = (claims?.claims?.user_metadata ?? {}) as { display_name?: string; team_code?: string; child?: string };
   const metaName = (meta.display_name ?? "").trim();
   const approvedTeams = [...new Map(links.filter((l) => l.status === "approved").map((l) => [l.team_id, l])).values()];
+  const [adminTeamIds, { data: offRows }] = await Promise.all([
+    getAdminTeamIds(),
+    // the Switchboard: parent features each team's head coach turned off
+    approvedTeams.length
+      ? supabase.from("team_features_off").select("team_id, feature").in("team_id", approvedTeams.map((l) => l.team_id))
+      : Promise.resolve({ data: [] as { team_id: string; feature: string }[] }),
+  ]);
+  const offOn = (teamId: string, feature: SwitchKey) => (offRows ?? []).some((r) => r.team_id === teamId && r.feature === feature);
+  // a daughter's feature is off when her team turned it off
+  const offForDaughter = (d: Daughter, feature: SwitchKey) => approvedTeams.some((l) => l.team_name === d.team_name && offOn(l.team_id, feature));
   const budgets = await Promise.all(
-    approvedTeams.map(async (l) => ({
+    approvedTeams.filter((l) => !offOn(l.team_id, "parent.budget")).map(async (l) => ({
       link: l,
       summary: (await supabase.rpc("team_budget_summary", { p_team_id: l.team_id })).data as BudgetSummaryData | null,
     })),
   );
   const firstName = (account?.display_name ?? metaName).split(" ")[0];
-  const yearbooks = await yearbookTeams(supabase, approvedTeams.map((l) => l.team_id));
+  // team admin (user, 2026-11-12): the head coach let them run the calendar, GameDay and measurements
+  const adminTeams = approvedTeams.filter((l) => adminTeamIds.includes(l.team_id));
+  const yearbooks = await yearbookTeams(supabase, approvedTeams.filter((l) => !offOn(l.team_id, "parent.yearbook")).map((l) => l.team_id));
 
   return (
     <div className="flex flex-col gap-8">
       <PageHeader title={firstName ? `Welcome, ${firstName}` : "Welcome"} description={user.email ?? undefined}>
-        {user.staff && (
+        {/* a coach who is a parent here has the header's Coach / Parent switch instead */}
+        {user.staff && !(await isStaffParent()) && (
           <Link href="/dashboard" className={secondaryButtonClass}>
             Coach dashboard →
           </Link>
@@ -133,6 +149,33 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
         </Card>
       )}
 
+      {adminTeams.length > 0 && (
+        <Card title="Team admin">
+          <p className="mb-4 text-sm text-muted">
+            Your head coach made you a team admin for {adminTeams.map((t) => t.team_name).join(" and ")}: you can change the calendar, GameDay
+            (lineups, depth chart, box scores) and players&apos; measurements.
+          </p>
+          <ul className="flex flex-col gap-3">
+            {adminTeams.map((t) => (
+              <li key={t.team_id} className="flex flex-wrap items-center gap-x-5 gap-y-2">
+                {adminTeams.length > 1 && <span className="font-semibold">{t.team_name}</span>}
+                {(
+                  [
+                    ["/dugout/calendar", "Calendar"],
+                    ["/dugout/gameday", "GameDay"],
+                    ["/dugout/measurements", "Measurements"],
+                  ] as const
+                ).map(([href, label]) => (
+                  <Link key={href} href={`${href}?team=${t.team_id}`} className="text-sm font-semibold text-link hover:underline">
+                    {label} <span aria-hidden="true">→</span>
+                  </Link>
+                ))}
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
+
       {daughters.length > 0 && (
         <Card title={daughters.length === 1 ? "Her login" : "Their logins"}>
           <ul className="flex flex-col gap-5">
@@ -147,7 +190,7 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
                       {d.player_name} <span className="font-normal text-muted">· {d.team_name}</span>
                     </span>
                     {/* her pages as she sees them, read only (user, 2026-11-12) */}
-                    {d.on_roster && (
+                    {d.on_roster && !offForDaughter(d, "parent.view_as") && (
                       <Link href={`/players/${d.player_id}`} className="text-sm font-semibold text-link hover:underline">
                         View as {first} <span aria-hidden="true">→</span>
                       </Link>
@@ -235,9 +278,11 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
         return (
           <Card key={`forms-${d.player_id}`} title={`${first}'s season forms`}>
             <div className="flex flex-col gap-3">
-              <Disclosure summary={`Preseason questionnaire: sizes, numbers, positions${f?.questionnaire ? " ✓" : ""}`}>
-                <QuestionnaireForm action={saveQuestionnaireAsParent} hidden={{ player_id: d.player_id }} values={f?.questionnaire ?? null} />
-              </Disclosure>
+              {!offForDaughter(d, "parent.questionnaire") && (
+                <Disclosure summary={`Preseason questionnaire: sizes, numbers, positions${f?.questionnaire ? " ✓" : ""}`}>
+                  <QuestionnaireForm action={saveQuestionnaireAsParent} hidden={{ player_id: d.player_id }} values={f?.questionnaire ?? null} />
+                </Disclosure>
+              )}
               <Disclosure summary={`Medical & emergency card${medicalOnFile(f?.medical ?? null) ? " ✓ on file" : " · not on file yet"}`}>
                 <MedicalForm action={saveMedicalAsParent} hidden={{ player_id: d.player_id }} values={f?.medical ?? null} />
               </Disclosure>

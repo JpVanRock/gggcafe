@@ -9,10 +9,10 @@
  */
 
 /** The version people agree to: the date it took effect (YYYY-MM-DD). */
-export const TERMS_VERSION = "2026-11-11";
+export const TERMS_VERSION = "2026-11-12";
 
 /** Shown at the top of both documents. */
-export const EFFECTIVE_DATE = "November 11, 2026";
+export const EFFECTIVE_DATE = "November 12, 2026";
 
 /** Who runs GGG.Cafe, whose law applies, and where to reach us (user, 2026-11-09). */
 export const LEGAL = {
@@ -324,7 +324,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     blocks: [
       [
         "Account information: name, email address (or the username a parent made for a player), account type, team and the team code used to join. Passwords are stored by our sign-in provider as secure hashes; nobody at GGG.Cafe can see them.",
-        "Player information: profile details (for example birth date, graduation year, positions, jersey number, bats and throws), photos, walk-up songs, training and test results, measurements, stats, goals, check-offs, journal entries, mental-game entries, quiz and test results, notes and messages.",
+        "Player information: profile details (for example birth date, graduation year, positions, jersey number, bats and throws), photos, walk-up songs, training and test results, measurements, stats, goals, check-offs, journal entries (typed, or voice memos she records), mental-game entries, quiz and test results, notes and messages.",
         "Family and medical information that parents and coaches choose to add: emergency contacts, allergies, conditions, medications, physician and insurance details, and preseason questionnaire answers (such as uniform sizes).",
         "Coach, mentor and parent information: name, role, specialty, team and the content you add.",
         "Payment information, if you buy a paid feature: what you bought and when. Card details are handled by the payment processor, not stored by us.",
@@ -374,7 +374,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
         "An approved mentor sees what's needed to work with the players assigned to them. Messages between mentors and players can be reviewed for safety by the adults responsible for the team and the Service.",
         "GGG.Cafe admins can see information to run, secure and support the Service.",
       ],
-      "Player photos and team logos are stored privately and shown only to signed-in users, through links that expire. Nothing about a player is shown publicly on the internet.",
+      "Player photos, voice memos and team logos are stored privately and shown only to signed-in users allowed to see them, through links that expire. Nothing about a player is shown publicly on the internet.",
     ],
   },
   {
@@ -418,7 +418,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     blocks: [
       "GGG.Cafe is built for youth athletes, with parents involved. This section is our notice to parents under the Children's Online Privacy Protection Act (COPPA).",
       "Children under 13 can't sign themselves up. Before a child under 13 can sign in, a parent or guardian (approved for that player by the team's head coach) gives verified consent in one of two ways: by signing our consent form by hand and uploading a photo or scan of it, or by a short video call with our staff. Our staff check the consent before the parent can create the child's login, and no coach can approve a profile claim for a child under 13 until it's checked. We keep the signed form, or a note of the call, as the record of consent while we keep the child's information, and afterward only as long as needed to show that consent was given. Coaches may also add a child's profile and stats to a team roster.",
-      "What we collect from or about a child: the profile, training, goals, mental-game, quiz, stats, photo and message information listed above, and the medical card and questionnaire a parent adds. We use it only to provide the Service to the child and their team. We don't show it publicly, we don't use it for advertising, and we don't share it with third parties except our service providers and as the law requires. We don't ask a child for more information than a feature needs, and a child doesn't have to give more than that to take part.",
+      "What we collect from or about a child: the profile, training, goals, mental-game, journal (including voice memos she records), quiz, stats, photo and message information listed above, and the medical card and questionnaire a parent adds. We use it only to provide the Service to the child and their team. We don't show it publicly, we don't use it for advertising, and we don't share it with third parties except our service providers and as the law requires. We don't ask a child for more information than a feature needs, and a child doesn't have to give more than that to take part.",
       "Parents can review their child's information, have it corrected or deleted, and refuse to let us collect or use any more of it, at any time, by contacting us or the head coach. A parent can also withdraw consent on the family page: that deletes the child's login right away, so she can't sign in. Deleting the information ends the child's access. We'll confirm a parent's identity and connection to the child before acting on a request.",
       "If we learn we collected information from a child under 13 without a parent's consent, we'll delete it.",
     ],
@@ -448,7 +448,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
         "Passwords hashed by our sign-in provider: nobody at GGG.Cafe can read them.",
         "Row-level security on every table: the database checks who is asking before it returns anything.",
         "Invite-only sign-up: a team code plus approval by a coach or admin.",
-        "Private file storage with links that expire, for photos and team logos.",
+        "Private file storage with links that expire, for photos, voice memos and team logos.",
         "Limits on password-reset emails, and other protections against abuse.",
         "Admin access only where it's needed to run the Service.",
       ],
@@ -513,7 +513,7 @@ export const CONSENT_NOTICE: { heading: string; text: string }[] = [
   },
   {
     heading: "What she adds when she signs in",
-    text: "Her goals, training check-offs and workouts, journal and mental-game entries, quiz and test answers, messages with her coaches and the mentors you approve, and a profile photo if one is added. Her coaches also add her roster details, stats and evaluations.",
+    text: "Her goals, training check-offs and workouts, journal and mental-game entries (her journal can include voice memos she records), quiz and test answers, messages with her coaches and the mentors you approve, and a profile photo if one is added. Her coaches also add her roster details, stats and evaluations.",
   },
   {
     heading: "How it's used and who sees it",

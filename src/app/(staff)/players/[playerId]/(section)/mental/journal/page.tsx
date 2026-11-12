@@ -20,7 +20,7 @@ export default async function JournalPage({ params, searchParams }: PageProps<"/
   const { playerId } = await params;
   const { week } = await searchParams;
   const supabase = await createClient();
-  const access = await requirePlayerPage(playerId);
+  const access = await requirePlayerPage(playerId, "player.mental");
   const player = await loadPlayer(supabase, playerId);
   const today = todayISO();
   const thisMonday = weekStart(today);

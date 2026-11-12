@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { canEdit, requireStaffPage } from "@/lib/auth";
+import { dugoutCanEdit, requireDugoutPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { pillQuietClass } from "@/components/ui";
 import { formatLongDate, todayISO } from "@/lib/dates";
@@ -37,11 +37,13 @@ type GameRow = {
 };
 
 export default async function CalendarPage({ searchParams }: PageProps<"/dugout/calendar">) {
-  const user = await requireStaffPage();
-  const editor = canEdit(user.staff.role);
+  // staff, or a team admin (a parent the head coach named; user, 2026-11-12) for their teams
+  const access = await requireDugoutPage("calendar");
+  const editor = dugoutCanEdit(access, "calendar");
+  const coach = access.role !== null;
   const { team: teamParam, month: monthParam } = await searchParams;
   const supabase = await createClient();
-  const dugout = await loadDugoutTeam(supabase, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam, access.adminTeamIds);
   if (!dugout) return <NoOwnTeam />;
   const { teams, team } = dugout;
   const today = todayISO();
@@ -65,7 +67,7 @@ export default async function CalendarPage({ searchParams }: PageProps<"/dugout/
       .gte("game_date", from)
       .lte("game_date", to),
     supabase.from("practice_plans").select("id, practice_date").eq("team_id", team.id).gte("practice_date", from).lte("practice_date", to),
-    supabase.from("staff").select("user_id, display_name"),
+    coach ? supabase.from("staff").select("user_id, display_name") : Promise.resolve({ data: [] }),
     supabase.from("team_offseason").select("starts_on, ends_on").eq("team_id", team.id).maybeSingle(),
     supabase.from("training_phases").select("name, kind, starts_on, ends_on").eq("team_id", team.id).lte("starts_on", to).gte("ends_on", from),
   ]);
@@ -79,6 +81,11 @@ export default async function CalendarPage({ searchParams }: PageProps<"/dugout/
   const offseason = (offseasonResult.data as { starts_on: string; ends_on: string | null } | null) ?? null;
 
   const names = new Map(((staffResult.data ?? []) as { user_id: string; display_name: string }[]).map((s) => [s.user_id, s.display_name]));
+  // events a team admin added or changed (they aren't on the staff list)
+  if (coach) {
+    const { data: admins } = await supabase.from("team_admins").select("user_id").eq("team_id", team.id);
+    for (const a of admins ?? []) if (!names.has(a.user_id)) names.set(a.user_id, "the team admin");
+  }
   const planByDate = new Map(((plansResult.data ?? []) as { id: string; practice_date: string }[]).map((p) => [p.practice_date, p.id]));
   const hhmm = (t: string | null) => (t ? t.slice(0, 5) : null);
 
@@ -162,7 +169,7 @@ export default async function CalendarPage({ searchParams }: PageProps<"/dugout/
           }
         >
           <p className="text-xs text-muted">Only sessions and unlocks between these dates count on the players&apos; Leaderboard and for Player of the Week.</p>
-          {editor && <OffseasonForm key={`${team.id}-${offseason?.starts_on}-${offseason?.ends_on}`} teamId={team.id} startsOn={offseason?.starts_on ?? null} endsOn={offseason?.ends_on ?? null} />}
+          {editor && coach && <OffseasonForm key={`${team.id}-${offseason?.starts_on}-${offseason?.ends_on}`} teamId={team.id} startsOn={offseason?.starts_on ?? null} endsOn={offseason?.ends_on ?? null} />}
         </OffseasonPanel>
       </CalendarView>
       {editor && (

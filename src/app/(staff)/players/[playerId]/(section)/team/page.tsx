@@ -14,6 +14,9 @@ import { GoalsBoard } from "@/app/(staff)/dugout/culture-team";
 import { loadTeamExtras } from "../../team-culture-data";
 import { PledgeForm } from "../../team-culture-client";
 import { playerName } from "@/lib/softball";
+import { PhilosophyView, ThrowingView } from "@/components/team-programs";
+import { SafetyNote } from "@/components/legal";
+import { throwGroup, throwGroupFor, type PhilosophySection, type ThrowStep } from "@/lib/team-programs";
 
 export const metadata: Metadata = { title: "Team Standards & Culture · GGG.Cafe" };
 
@@ -28,7 +31,7 @@ function Heading({ id, children }: { id: string; children: React.ReactNode }) {
 export default async function TeamPage({ params }: PageProps<"/players/[playerId]/team">) {
   const { playerId } = await params;
   const supabase = await createClient();
-  const access = await requirePlayerPage(playerId);
+  const access = await requirePlayerPage(playerId, "player.team");
   const player = await loadPlayer(supabase, playerId);
   const teams = await loadTeamDugout(supabase, player.id);
   const write = (teamId: string) =>
@@ -41,8 +44,21 @@ export default async function TeamPage({ params }: PageProps<"/players/[playerId
       </>
     );
 
-  // Phase 5: season goals, her pledge (current season) and spotlights, per team
-  const extras = await loadTeamExtras(supabase, player.id, teams.map((t) => t.team.id));
+  // Phase 5: season goals, her pledge (current season) and spotlights, per team; the team's
+  // hitting philosophy and her group's throwing program (user, 2026-11-12)
+  const teamIds = teams.map((t) => t.team.id);
+  const grp = throwGroupFor([player.primary_position, ...player.secondary_positions]);
+  const [extras, { data: philosophies }, { data: programs }] = await Promise.all([
+    loadTeamExtras(supabase, player.id, teamIds),
+    teamIds.length
+      ? supabase.from("team_hitting_philosophy").select("team_id, statement, sections").in("team_id", teamIds)
+      : Promise.resolve({ data: [] as { team_id: string; statement: string | null; sections: PhilosophySection[] }[] }),
+    teamIds.length && grp
+      ? supabase.from("team_throwing_programs").select("team_id, intro, steps").in("team_id", teamIds).eq("grp", grp)
+      : Promise.resolve({ data: [] as { team_id: string; intro: string | null; steps: ThrowStep[] }[] }),
+  ]);
+  const philosophy = new Map((philosophies ?? []).filter((p) => p.statement || p.sections.length).map((p) => [p.team_id, p]));
+  const program = new Map((programs ?? []).filter((p) => p.intro || p.steps.length).map((p) => [p.team_id, p]));
 
   return (
     <SectionShell title="Team Standards & Culture" subtitle={teams.map((t) => t.team.name).join(" · ") || undefined}>
@@ -61,6 +77,23 @@ export default async function TeamPage({ params }: PageProps<"/players/[playerId
                 <Heading id={i === 0 ? "culture" : `culture-${team.id}`}>Team Culture</Heading>
                 {hasCulture(culture) ? <CultureStatement culture={culture} /> : <EmptyState>No team culture posted yet.{write(team.id)}</EmptyState>}
               </section>
+              {philosophy.has(team.id) && (
+                <section>
+                  <Heading id={i === 0 ? "hitting" : `hitting-${team.id}`}>Team Hitting Philosophy</Heading>
+                  <PhilosophyView statement={philosophy.get(team.id)!.statement} sections={philosophy.get(team.id)!.sections} />
+                </section>
+              )}
+              {program.has(team.id) && grp && (
+                <section>
+                  <Heading id={i === 0 ? "throwing" : `throwing-${team.id}`}>
+                    Throwing Program · {throwGroup(grp).label} ({throwGroup(grp).full.toLowerCase()})
+                  </Heading>
+                  <div className="flex flex-col gap-4">
+                    <ThrowingView intro={program.get(team.id)!.intro} steps={program.get(team.id)!.steps} />
+                    <SafetyNote audience="player" />
+                  </div>
+                </section>
+              )}
               {(extras.goals.get(team.id)?.length ?? 0) > 0 && (
                 <section>
                   <Heading id={i === 0 ? "goals" : `goals-${team.id}`}>Season goals</Heading>

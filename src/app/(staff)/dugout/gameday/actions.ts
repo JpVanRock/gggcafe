@@ -3,7 +3,7 @@
 import { refresh } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { headCoachCheck, getCurrentUser } from "@/lib/auth";
+import { dugoutCheck, getCurrentUser, headCoachCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { friendlyDbError, isoDate, text, wholeNumber, type FormState, invalid } from "@/lib/form";
 import { formatDay, formatLongDate } from "@/lib/dates";
@@ -38,7 +38,7 @@ function rateInput(v: FormDataEntryValue | undefined, max: number) {
 }
 
 export async function saveGamedayCards(_prev: FormState, fd: FormData): Promise<FormState> {
-  const denied = await headCoachCheck();
+  const denied = await dugoutCheck("gameday", text(fd, "team_id"));
   if (denied) return { error: denied };
   const teamId = text(fd, "team_id");
   const seasonId = text(fd, "season_id");
@@ -78,7 +78,7 @@ export async function saveGamedayCards(_prev: FormState, fd: FormData): Promise<
 // ---------------------------------------------------------------------------
 
 export async function createLineup(_prev: FormState, fd: FormData): Promise<FormState> {
-  const denied = await headCoachCheck();
+  const denied = await dugoutCheck("gameday", text(fd, "team_id"));
   if (denied) return { error: denied };
   const teamId = text(fd, "team_id");
   const seasonId = text(fd, "season_id");
@@ -164,7 +164,7 @@ function cleanLineup(body: string) {
 
 /** The in-game substitution log (any time, final lineups too). */
 export async function saveSubLog(lineupId: string, log: SubEntry[]): Promise<{ error: string | null }> {
-  const denied = await headCoachCheck();
+  const denied = await dugoutCheck("gameday");
   if (denied) return { error: denied };
   if (!isUuid(lineupId)) return { error: "Unknown lineup." };
   const clean = (Array.isArray(log) ? log : [])
@@ -179,7 +179,7 @@ export async function saveSubLog(lineupId: string, log: SubEntry[]): Promise<{ e
 }
 
 export async function saveLineup(lineupId: string, body: string): Promise<{ error: string | null; savedAt?: string }> {
-  const denied = await headCoachCheck();
+  const denied = await dugoutCheck("gameday");
   if (denied) return { error: denied };
   if (!isUuid(lineupId)) return { error: "Unknown lineup." };
   const lineup = cleanLineup(body);
@@ -197,7 +197,7 @@ export async function saveLineup(lineupId: string, body: string): Promise<{ erro
 }
 
 export async function finalizeLineup(lineupId: string): Promise<{ error: string | null }> {
-  const denied = await headCoachCheck();
+  const denied = await dugoutCheck("gameday");
   if (denied) return { error: denied };
   if (!isUuid(lineupId)) return { error: "Unknown lineup." };
   const supabase = await createClient();
@@ -213,7 +213,7 @@ export async function finalizeLineup(lineupId: string): Promise<{ error: string 
 
 export async function reopenLineup(_prev: FormState, fd: FormData): Promise<FormState> {
   return runAction(async () => {
-    const denied = await headCoachCheck();
+    const denied = await dugoutCheck("gameday");
     if (denied) return failed(denied);
     const id = text(fd, "id");
     if (!isUuid(id)) return failed(STALE);
@@ -225,7 +225,7 @@ export async function reopenLineup(_prev: FormState, fd: FormData): Promise<Form
 
 export async function deleteLineup(_prev: FormState, fd: FormData): Promise<FormState> {
   return runAction(async () => {
-    const denied = await headCoachCheck();
+    const denied = await dugoutCheck("gameday");
     if (denied) return failed(denied);
     const id = text(fd, "id");
     const teamId = text(fd, "team_id");
@@ -333,7 +333,7 @@ export async function addToDepth(_prev: FormState, fd: FormData): Promise<FormSt
     const teamId = text(fd, "team_id");
     const position = text(fd, "position");
     const playerId = text(fd, "player_id");
-    const denied = await headCoachCheck();
+    const denied = await dugoutCheck("gameday", teamId);
     if (denied) return failed(denied);
     if (!isUuid(teamId) || !isUuid(playerId) || !DEPTH_POSITIONS.includes(position as DepthPosition)) return failed(STALE);
     const supabase = await createClient();
@@ -351,7 +351,7 @@ export async function moveInDepth(_prev: FormState, fd: FormData): Promise<FormS
     const position = text(fd, "position");
     const playerId = text(fd, "player_id");
     const dir = text(fd, "dir") === "up" ? -1 : 1;
-    const denied = await headCoachCheck();
+    const denied = await dugoutCheck("gameday", teamId);
     if (denied) return failed(denied);
     if (!isUuid(teamId) || !isUuid(playerId) || !position) return failed(STALE);
     const supabase = await createClient();
@@ -370,7 +370,7 @@ export async function removeFromDepth(_prev: FormState, fd: FormData): Promise<F
     const teamId = text(fd, "team_id");
     const position = text(fd, "position");
     const playerId = text(fd, "player_id");
-    const denied = await headCoachCheck();
+    const denied = await dugoutCheck("gameday", teamId);
     if (denied) return failed(denied);
     if (!isUuid(teamId) || !isUuid(playerId) || !position) return failed(STALE);
     const supabase = await createClient();
@@ -383,13 +383,14 @@ export async function removeFromDepth(_prev: FormState, fd: FormData): Promise<F
 export async function fillDepthFromPositions(_prev: FormState, fd: FormData): Promise<FormState> {
   return runAction(async () => {
     const teamId = text(fd, "team_id");
-    const denied = await headCoachCheck();
+    const denied = await dugoutCheck("gameday", teamId);
     if (denied) return failed(denied);
     if (!isUuid(teamId)) return failed(STALE);
     const supabase = await createClient();
     const seasonId = await seasonOrCurrent(supabase, teamId, null);
     if (!seasonId) return failed("There's no roster for this season yet.");
-    const [roster, existing] = await Promise.all([loadGamedayRoster(supabase, teamId, seasonId), depthRows(supabase, teamId)]);
+    const teamAdmin = !(await getCurrentUser())?.staff;
+    const [roster, existing] = await Promise.all([loadGamedayRoster(supabase, teamId, seasonId, { teamAdmin }), depthRows(supabase, teamId)]);
     const have = new Set(existing.map((r) => `${r.position}|${r.player_id}`));
     const next = new Map<string, number>();
     for (const r of existing) next.set(r.position, Math.max(next.get(r.position) ?? 0, r.rank));
@@ -419,7 +420,7 @@ export async function fillDepthFromPositions(_prev: FormState, fd: FormData): Pr
 const count = (v: unknown, max = 99) => (Number.isInteger(v) && (v as number) >= 0 && (v as number) <= max ? (v as number) : 0);
 
 export async function saveBoxScore(gameId: string, teamId: string, body: string): Promise<{ error: string | null }> {
-  const denied = await headCoachCheck();
+  const denied = await dugoutCheck("gameday", teamId);
   if (denied) return { error: denied };
   if (!isUuid(gameId) || !isUuid(teamId)) return { error: "Unknown game." };
   let raw: BoxScore;

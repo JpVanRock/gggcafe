@@ -28,7 +28,7 @@ function statusLine(g: GameStatus) {
 export default async function ScorebookGamesPage({ params }: PageProps<"/players/[playerId]/iq/scorebook/game">) {
   const { playerId } = await params;
   const supabase = await createClient();
-  await requirePlayerPage(playerId);
+  await requirePlayerPage(playerId, "player.iq");
   const player = await loadPlayer(supabase, playerId);
   const iq = await loadIq(supabase, player.id);
   const done = iq.managerAwards.length;

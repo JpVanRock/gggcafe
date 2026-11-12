@@ -1,4 +1,15 @@
 {
   "_about": "Types for jsonb columns the app knows the shape of. scripts/gen-types.py uses them in place of Json. Key: table.column; value: the TypeScript type and the module that exports it.",
-  "players.walk_up_songs": { "type": "WalkUpSong[]", "from": "@/lib/softball" }
+  "players.walk_up_songs": {
+    "type": "WalkUpSong[]",
+    "from": "@/lib/softball"
+  },
+  "team_hitting_philosophy.sections": {
+    "type": "PhilosophySection[]",
+    "from": "@/lib/team-programs"
+  },
+  "team_throwing_programs.steps": {
+    "type": "ThrowStep[]",
+    "from": "@/lib/team-programs"
+  }
 }

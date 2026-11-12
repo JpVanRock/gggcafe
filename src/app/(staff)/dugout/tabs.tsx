@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { dugoutTabsFor, type StaffRole } from "@/lib/roles";
+import { TEAM_ADMIN_TABS, dugoutTabsFor, type StaffRole } from "@/lib/roles";
 import { CountBadge } from "@/components/ui";
 import { TabRow } from "@/components/tab-row";
 
@@ -10,18 +10,29 @@ import { TabRow } from "@/components/tab-row";
 const isCurrent = (href: string, path: string) => (href === "/dugout" ? path === "/dugout" : path.startsWith(href));
 
 /** Header tabs across the Coaches Dugout (the current tab is underlined). Assistants get fewer tabs. */
-export function DugoutTabs({ badges, role }: { badges?: Record<string, number>; role?: StaffRole }) {
-  return <TabList path={usePathname()} badges={badges} role={role} />;
+export function DugoutTabs({ badges, role, teamAdmin = false }: { badges?: Record<string, number>; role?: StaffRole; teamAdmin?: boolean }) {
+  return <TabList path={usePathname()} badges={badges} role={role} teamAdmin={teamAdmin} />;
 }
 
 /** The tabs for a given path; with no path (while the URL streams in) none is current. */
-export function TabList({ path = "", badges = {}, role }: { path?: string; badges?: Record<string, number>; role?: StaffRole }) {
+export function TabList({
+  path = "",
+  badges = {},
+  role,
+  teamAdmin = false,
+}: {
+  path?: string;
+  badges?: Record<string, number>;
+  role?: StaffRole;
+  /** a team admin (a parent): Calendar, GameDay and Measurements */
+  teamAdmin?: boolean;
+}) {
   return (
     <TabRow label="Coaches Dugout" current={path}>
       {/* sized so all eleven tabs fit the page width, and spread evenly across it with no empty space at
           the right (user, 2026-11-12); narrower screens scroll the row sideways as before */}
-      <ul className="flex min-w-max justify-between gap-4 border-b border-navy-700">
-        {dugoutTabsFor(role).map((tab) => {
+      <ul className={`flex min-w-max gap-4 border-b border-navy-700 ${teamAdmin ? "" : "justify-between"}`}>
+        {(teamAdmin ? TEAM_ADMIN_TABS : dugoutTabsFor(role)).map((tab) => {
           const active = isCurrent(tab.href, path);
           return (
             <li key={tab.href}>

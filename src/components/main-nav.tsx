@@ -5,7 +5,7 @@
 // On phones the menu sits behind the header's Menu button; MenuCount puts the same
 // counts on that button.
 import { cache, type ReactNode } from "react";
-import { canEdit, getCurrentUser, getMyPlayerIds, isHeadCoach } from "@/lib/auth";
+import { canEdit, getAdminTeamIds, getCurrentUser, getMyPlayerIds, isHeadCoach } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getWaitingCount } from "@/lib/approvals";
 import { CountBadge } from "@/components/ui";
@@ -80,11 +80,18 @@ export async function MenuCount() {
  */
 export async function NonStaffNav() {
   if ((await getMyPlayerIds()).length) return <PlayerNav />;
+  const teamAdmin = (await getAdminTeamIds()).length > 0;
   return (
     <nav aria-label="Main" className={navClass}>
       <NavLink href="/family" exact className={navItemClass}>
         Family home
       </NavLink>
+      {/* a team admin's Dugout: Calendar, GameDay, Measurements (user, 2026-11-12) */}
+      {teamAdmin && (
+        <NavLink href="/dugout/calendar" section="/dugout" className={navItemClass}>
+          Coaches Dugout
+        </NavLink>
+      )}
     </nav>
   );
 }

@@ -73,11 +73,14 @@ export function LineupBuilder({
   emailReady,
   depth = {},
   dutyJobs = [],
+  canShare = true,
 }: {
   lineup: Lineup;
   roster: GamedayPlayer[];
   staff: StaffContact[];
   emailReady: boolean;
+  /** a team admin prints the card; sharing with the coaching staff is the head coach's */
+  canShare?: boolean;
   /** the team's depth chart (GameDay → Depth chart), to fill a rotation from */
   depth?: DepthChart;
   /** "during the game" jobs from the staff duty matrix, to fill the jobs from */
@@ -519,18 +522,20 @@ export function LineupBuilder({
           <button type="button" onClick={finalizeAndPrint} disabled={busy || problems.length > 0} className={pillButtonClass}>
             {busy ? "Finalizing…" : "Finalize & Print"}
           </button>
-          <ShareButton
-            planId={lineup.id}
-            action={shareLineup}
-            returnPath={`/dugout/gameday/${lineup.id}`}
-            staff={staff}
-            label="Finalize & Share"
-            className={pillOutlineClass}
-            disabled={busy || problems.length > 0}
-            emailReady={emailReady}
-            beforeSend={flush}
-          />
-          <span className="text-xs text-muted">Print opens the lineup card PDF. Share emails it to the coaching staff.</span>
+          {canShare && (
+            <ShareButton
+              planId={lineup.id}
+              action={shareLineup}
+              returnPath={`/dugout/gameday/${lineup.id}`}
+              staff={staff}
+              label="Finalize & Share"
+              className={pillOutlineClass}
+              disabled={busy || problems.length > 0}
+              emailReady={emailReady}
+              beforeSend={flush}
+            />
+          )}
+          <span className="text-xs text-muted">Print opens the lineup card PDF.{canShare ? " Share emails it to the coaching staff." : ""}</span>
           <ActionForm action={deleteLineup} className="ml-auto">
             <input type="hidden" name="id" value={lineup.id} />
             <input type="hidden" name="team_id" value={lineup.team.id} />

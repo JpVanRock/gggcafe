@@ -18,7 +18,7 @@ export default async function SpotlightPage({ params }: PageProps<"/players/[pla
   const { playerId, spotlightId } = await params;
   if (!isUuid(spotlightId)) notFound();
   const supabase = await createClient();
-  await requirePlayerPage(playerId);
+  await requirePlayerPage(playerId, "player.team");
   const { data } = await supabase
     .from("player_spotlights")
     .select("player_name, jersey, headline, body, published_on, team:teams(name)")

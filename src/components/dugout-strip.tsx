@@ -34,6 +34,7 @@ export function DugoutStrip({
   leaderboardHref,
   activityHref,
   coachResponsibilities = false,
+  standards = true,
 }: {
   teams: DugoutTeam[];
   canEdit: boolean;
@@ -48,6 +49,8 @@ export function DugoutStrip({
   activityHref?: string;
   /** the Coaches Dugout only: Coach's Responsibilities, first (coaches see it; players don't) */
   coachResponsibilities?: boolean;
+  /** false when her head coach turned the Team page off (the Switchboard): no standards or culture buttons */
+  standards?: boolean;
 }) {
   if (teams.length === 0) return null;
   const names = teams.map((t) => t.team.name).join(" · ");
@@ -94,7 +97,9 @@ export function DugoutStrip({
         ))}
         <p className="mt-0.5 truncate text-sm font-semibold text-ink">{names}</p>
       </div>
-      {teamHref ? (
+      {!standards ? (
+        <div className="flex flex-wrap gap-2">{extraPills}</div>
+      ) : teamHref ? (
         <div className="flex flex-wrap gap-2">
           <Link href={`${teamHref}#standards`} className={`${pill} bg-neon text-on-accent hover:bg-neon-bright`}>
             Team Standards

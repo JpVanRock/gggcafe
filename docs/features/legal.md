@@ -98,3 +98,11 @@ Open for the user and the attorney:
   photo or scan, or a video call with our staff, both checked by a GGG.Cafe admin before an under-13 player can sign in
   (details in player-accounts.md). For the attorney: confirm both methods and the form's notice (`CONSENT_NOTICE`).
 - Whether arbitration binds minors and how a minor's right to cancel a contract affects the Terms.
+
+## Voice memos (user, 2026-11-12; version 2026-11-12, everyone agrees again)
+My Journal lets players record voice memos (docs/features/player-dashboard.md). The Privacy notice now lists
+journal entries "typed, or voice memos she records" under player information and in the children's section,
+and voice memos with photos and logos under private storage. A recording of a child's voice is personal
+information under COPPA, so the user chose to have everyone agree again. Existing signed parental consents
+stay on file with the version they were given under; whether parents of players under 13 should sign a new
+consent form for this change is for the attorney to confirm.

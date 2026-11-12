@@ -1,12 +1,14 @@
 import { Suspense, type ReactNode } from "react";
 import { PageHeader } from "@/components/ui";
 import { DugoutTabs, TabList } from "./tabs";
-import { canEdit, getCurrentUser } from "@/lib/auth";
+import { canEdit, getAdminTeamIds, getCurrentUser } from "@/lib/auth";
 import { getWaitingCount } from "@/lib/approvals";
 
 /** The tabs for her role, with how many approvals are waiting on the Roster tab (coaches). */
 async function TabsWithCounts() {
   const user = await getCurrentUser();
+  // a team admin (a parent the head coach named; user, 2026-11-12) gets their three tabs
+  if (user && !user.staff && (await getAdminTeamIds()).length) return <DugoutTabs teamAdmin />;
   const waiting = user?.staff && canEdit(user.staff.role) ? await getWaitingCount() : 0;
   return <DugoutTabs badges={{ "/dugout/roster": waiting }} role={user?.staff?.role} />;
 }

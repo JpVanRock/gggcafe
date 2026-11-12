@@ -16,7 +16,7 @@ export default async function TeamQuizPage({ params }: PageProps<"/players/[play
   const { playerId, quizId } = await params;
   if (!isUuid(quizId)) notFound();
   const supabase = await createClient();
-  const access = await requirePlayerPage(playerId);
+  const access = await requirePlayerPage(playerId, "player.iq");
   const player = await loadPlayer(supabase, playerId);
   const quiz = await loadTeamQuiz(supabase, player.id, quizId);
   if (!quiz || quiz.questions.length === 0) notFound();

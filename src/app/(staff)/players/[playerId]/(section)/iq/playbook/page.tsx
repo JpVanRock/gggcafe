@@ -13,7 +13,7 @@ export const metadata: Metadata = { title: "Team Playbook · Softball IQ · GGG.
 export default async function TeamPlaybookPage({ params }: PageProps<"/players/[playerId]/iq/playbook">) {
   const { playerId } = await params;
   const supabase = await createClient();
-  await requirePlayerPage(playerId);
+  await requirePlayerPage(playerId, "player.iq");
   const player = await loadPlayer(supabase, playerId);
   const { cards, quizzes } = await loadTeamPlaybook(supabase, player.id);
   return (

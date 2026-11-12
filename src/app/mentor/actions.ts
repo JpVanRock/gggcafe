@@ -5,7 +5,7 @@
 // players' weeks (one player or a group), and notes and focus areas for the coaches. The
 // database checks all of it again (her players only; names and authors from the database).
 import { refresh } from "next/cache";
-import { getMentor, mentorCheck } from "@/lib/auth";
+import { getMentor, mentorCheck, switchedOff } from "@/lib/auth";
 import { STALE, failed, must, runAction } from "@/lib/actions";
 import { friendlyDbError, invalid, text, type FormState } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
@@ -61,7 +61,7 @@ export async function sendMentorMessage(input: {
   newDrill?: { name?: string; videoUrl?: string; description?: string } | null;
   share?: boolean;
 }): Promise<Result> {
-  const denied = await mentorCheck(input.playerId);
+  const denied = (await mentorCheck(input.playerId)) ?? (await switchedOff("mentor.messages", { playerId: input.playerId }));
   if (denied) return { error: denied };
   const mentor = (await getMentor())!;
   const supabase = await createClient();
@@ -125,7 +125,7 @@ export async function addMentorTraining(_prev: FormState, fd: FormData): Promise
     const players = [...new Set(fd.getAll("player_id").filter((v): v is string => typeof v === "string" && isUuid(v)))];
     if (players.length === 0) return invalid("player_id", "Pick at least one player.");
     for (const id of players) {
-      const denied = await mentorCheck(id);
+      const denied = (await mentorCheck(id)) ?? (await switchedOff("mentor.training", { playerId: id }));
       if (denied) return failed(denied);
     }
     const mentor = (await getMentor())!;
@@ -162,7 +162,9 @@ async function scopeOf(fd: FormData): Promise<{ player_id: string | null; team_i
   const playerId = text(fd, "player_id");
   const teamId = text(fd, "team_id");
   if (playerId ? !isUuid(playerId) || teamId : !isUuid(teamId)) return failed(STALE);
-  const denied = await mentorCheck(playerId ?? undefined, teamId ?? undefined);
+  const denied =
+    (await mentorCheck(playerId ?? undefined, teamId ?? undefined)) ??
+    (await switchedOff("mentor.notes", playerId ? { playerId } : { teamId }));
   if (denied) return failed(denied);
   return { player_id: playerId, team_id: playerId ? null : teamId };
 }

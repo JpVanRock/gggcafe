@@ -2,6 +2,7 @@
 // Do not edit by hand: change a migration and run it again.
 
 import type { WalkUpSong } from "@/lib/softball"
+import type { PhilosophySection, ThrowStep } from "@/lib/team-programs"
 
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
@@ -3690,6 +3691,66 @@ export type Database = {
           },
         ]
       }
+      player_journal_entries: {
+        Row: {
+          id: string
+          player_id: string
+          mentor_id: string | null
+          mentor_name: string | null
+          session_date: string
+          topic: string | null
+          notes: string | null
+          audio_path: string | null
+          audio_seconds: number | null
+          shared_with_mentor: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          player_id: string
+          mentor_id?: string | null
+          mentor_name?: string | null
+          session_date?: string
+          topic?: string | null
+          notes?: string | null
+          audio_path?: string | null
+          audio_seconds?: number | null
+          shared_with_mentor?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          player_id?: string
+          mentor_id?: string | null
+          mentor_name?: string | null
+          session_date?: string
+          topic?: string | null
+          notes?: string | null
+          audio_path?: string | null
+          audio_seconds?: number | null
+          shared_with_mentor?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_journal_entries_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "mentors"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "player_journal_entries_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       player_leadership_access: {
         Row: {
           player_id: string
@@ -4910,6 +4971,35 @@ export type Database = {
           },
         ]
       }
+      team_admins: {
+        Row: {
+          team_id: string
+          user_id: string
+          granted_by: string | null
+          granted_at: string
+        }
+        Insert: {
+          team_id: string
+          user_id: string
+          granted_by?: string | null
+          granted_at?: string
+        }
+        Update: {
+          team_id?: string
+          user_id?: string
+          granted_by?: string | null
+          granted_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_admins_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       team_culture: {
         Row: {
           team_id: string
@@ -5004,6 +5094,35 @@ export type Database = {
           },
         ]
       }
+      team_features_off: {
+        Row: {
+          team_id: string
+          feature: string
+          turned_off_by: string | null
+          turned_off_at: string
+        }
+        Insert: {
+          team_id: string
+          feature: string
+          turned_off_by?: string | null
+          turned_off_at?: string
+        }
+        Update: {
+          team_id?: string
+          feature?: string
+          turned_off_by?: string | null
+          turned_off_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_features_off_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       team_goals: {
         Row: {
           id: string
@@ -5049,6 +5168,38 @@ export type Database = {
             foreignKeyName: "team_goals_team_id_fkey"
             columns: ["team_id"]
             isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_hitting_philosophy: {
+        Row: {
+          team_id: string
+          statement: string | null
+          sections: PhilosophySection[]
+          updated_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          team_id: string
+          statement?: string | null
+          sections?: PhilosophySection[]
+          updated_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          team_id?: string
+          statement?: string | null
+          sections?: PhilosophySection[]
+          updated_by?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_hitting_philosophy_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: true
             referencedRelation: "teams"
             referencedColumns: ["id"]
           },
@@ -5446,6 +5597,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "team_standards_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_throwing_programs: {
+        Row: {
+          team_id: string
+          grp: string
+          intro: string | null
+          steps: ThrowStep[]
+          updated_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          team_id: string
+          grp: string
+          intro?: string | null
+          steps?: ThrowStep[]
+          updated_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          team_id?: string
+          grp?: string
+          intro?: string | null
+          steps?: ThrowStep[]
+          updated_by?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_throwing_programs_team_id_fkey"
             columns: ["team_id"]
             isOneToOne: false
             referencedRelation: "teams"
@@ -5990,6 +6176,7 @@ export type Database = {
       allow_password_reset: { Args: { p_email: string | null }; Returns: boolean }
       answer_team_quiz: { Args: { p_player_id: string | null; p_question_id: string | null; p_chosen: number | null }; Returns: { is_correct: boolean; correct_index: number; explanation: string }[] }
       change_authors: { Args: { p_user_ids: string[] | null }; Returns: { user_id: string; name: string }[] }
+      claim_my_daughter: { Args: { p_player_id: string | null }; Returns: string }
       coaching_staff: { Args: Record<PropertyKey, never>; Returns: { user_id: string; display_name: string; email: string }[] }
       create_player_login: { Args: { p_player_id: string | null; p_username: string | null; p_password: string | null }; Returns: string }
       decide_mentor_link: { Args: { p_link_id: string | null; p_approve: boolean | null }; Returns: undefined }
@@ -5999,6 +6186,7 @@ export type Database = {
       iq_answer_key: { Args: { p_player_id: string | null }; Returns: { question_id: string; correct_index: number; explanation: string }[] }
       iq_review_status: { Args: { p_attempt_id: string | null }; Returns: { missed: number; reviewed: number; complete: boolean }[] }
       mentor_requests_waiting: { Args: Record<PropertyKey, never>; Returns: number }
+      my_admin_team_ids: { Args: Record<PropertyKey, never>; Returns: string[] }
       my_child_ids: { Args: Record<PropertyKey, never>; Returns: string[] }
       my_claims: { Args: Record<PropertyKey, never>; Returns: { claim_id: string; team_id: string; team_name: string; season_name: string; typed_name: string; typed_jersey: string; status: Database["public"]["Enums"]["player_claim_status"]; is_current: boolean; player_id: string; welcome_message: string }[] }
       my_mentor_links: { Args: Record<PropertyKey, never>; Returns: { id: string; team_id: string; team_name: string; player_id: string; player_name: string; status: Database["public"]["Enums"]["mentor_link_status"]; requested_at: string }[] }
@@ -6016,6 +6204,8 @@ export type Database = {
       parent_team_logos: { Args: Record<PropertyKey, never>; Returns: { team_id: string; team_name: string; logo_path: string }[] }
       pending_approvals: { Args: Record<PropertyKey, never>; Returns: { team_id: string; team_name: string; player_claims: number; parent_requests: number }[] }
       pending_parental_consents: { Args: Record<PropertyKey, never>; Returns: { id: string; player_id: string; player_name: string; birth_date: string; team_name: string; parent_name: string; parent_account: string; parent_email: string; relationship: string; method: string; form_path: string; submitted_at: string }[] }
+      player_features_off: { Args: { p_player_id: string | null }; Returns: string[] }
+      player_mentors: { Args: { p_player_id: string | null }; Returns: { mentor_id: string; display_name: string; specialty: string }[] }
       record_iq_answer: { Args: { p_player_id: string | null; p_question_id: string | null; p_chosen: number | null; p_attempt_id?: string | null; p_review_of?: string | null; p_hint_used?: boolean | null }; Returns: { correct: boolean; correct_index: number; explanation: string }[] }
       reimburse_coach_expenses: { Args: { p_ids: string[] | null; p_paid_on: string | null; p_from_team_funds: boolean | null }; Returns: undefined }
       request_mentor: { Args: { p_code: string | null; p_player_name: string | null }; Returns: string }
@@ -6033,12 +6223,14 @@ export type Database = {
       save_team_dugout: { Args: { p_team_id: string | null; p_headline: string | null; p_statement: string | null; p_standards: Json | null }; Returns: undefined }
       score_game_play: { Args: { p_run_id: string | null; p_play: number | null; p_boxes: Json | null }; Returns: { correct: boolean; wrong: string[]; answer: Json; next_play: number; first_try: number }[] }
       set_goal_method: { Args: { p_player_id: string | null; p_method: string | null }; Returns: undefined }
+      set_team_admin: { Args: { p_team_id: string | null; p_user_id: string | null; p_on: boolean | null }; Returns: undefined }
       signup_team: { Args: { p_code: string | null }; Returns: { id: string; name: string }[] }
       staff_requests_to_decide: { Args: Record<PropertyKey, never>; Returns: { user_id: string; display_name: string; email: string; role: string; team_id: string; team_name: string; note: string; requested_at: string }[] }
       start_iq_level: { Args: { p_player_id: string | null; p_track: Database["public"]["Enums"]["iq_track"] | null; p_level: number | null; p_restart?: boolean | null; p_position?: Database["public"]["Enums"]["field_position"] | null }; Returns: string }
       start_scorebook_game: { Args: { p_player_id: string | null; p_game?: number | null; p_restart?: boolean | null }; Returns: Database["public"]["Tables"]["scorebook_game_runs"]["Row"][] }
       submit_parental_consent: { Args: { p_player_id: string | null; p_method: string | null; p_parent_name: string | null; p_relationship: string | null; p_form_path: string | null; p_notice_version: string | null }; Returns: string }
       sync_team_routine: { Args: { p_routine_id: string | null }; Returns: number }
+      team_admin_roster: { Args: { p_team_id: string | null; p_season_id: string | null }; Returns: { id: string; first_name: string; last_name: string; preferred_name: string; primary_position: Database["public"]["Enums"]["field_position"]; secondary_positions: Database["public"]["Enums"]["field_position"][]; jersey_number: string }[] }
       team_bp_leaders: { Args: { p_team_id: string | null }; Returns: { player_id: string; first_name: string; last_name: string; jersey_number: string; swings: number; production: number }[] }
       team_budget_summary: { Args: { p_team_id: string | null; p_season_id?: string | null }; Returns: Json }
       team_current_season: { Args: { p_team_id: string | null }; Returns: string }

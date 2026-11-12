@@ -47,7 +47,7 @@ export default async function MentalLessonPage({ params }: PageProps<"/players/[
   const lesson = lessonBySlug(slug);
   if (!lesson) notFound();
   const supabase = await createClient();
-  const access = await requirePlayerPage(playerId);
+  const access = await requirePlayerPage(playerId, "player.mental");
   const player = await loadPlayer(supabase, playerId);
   const [work, plan, g3] = await Promise.all([
     loadMentalLesson(supabase, player.id, lesson.slug),

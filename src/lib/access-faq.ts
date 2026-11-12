@@ -19,6 +19,7 @@ export const FEATURE_SECTIONS: { title: string; features: Feature[] }[] = [
     features: [
       { name: "Player menu dashboard", detail: "Her cafe-menu home: photo, walk-up songs, every menu board.", standard: "yes", advanced: "yes" },
       { name: "From the Dugout", detail: "Team Standards and Team Culture from her coaches, with the season motto.", standard: "yes", advanced: "yes" },
+      { name: "Team Hitting Philosophy and Throwing Program", detail: "On her Team page: how her team hits, and her group's throwing program (Outies, Innies or Catchers; pitchers have their own).", standard: "yes", advanced: "yes" },
       { name: "Season goals and Player Spotlights", detail: "The team's goals with progress, and coach-written spotlights with a media-day graphic, on her Team page.", standard: "yes", advanced: "yes" },
       { name: "My commitment and the team pledge", detail: "An \"I will...\" line for each Team Standard, and her signature on the team pledge each season.", standard: "yes", advanced: "yes" },
       { name: "Messages from her mentors", detail: "Alerts at the top of her menu: notes, photos and drills to try, from mentors her parents or head coach approved.", standard: "yes", advanced: "yes" },
@@ -33,6 +34,7 @@ export const FEATURE_SECTIONS: { title: string; features: Feature[] }[] = [
       { name: "Monthly self-scan", detail: "Ten mental skills rated 1 to 5 once a month, with the trend.", standard: "yes", advanced: "yes" },
       { name: "Guided sessions", detail: "Breathing and imagery, a few minutes each; as a mental routine they show in TWIS and count toward achievements.", standard: "yes", advanced: "yes" },
       { name: "Practice journal", detail: "A purpose before practice, what worked and what to fix after, and a weekly look-back.", standard: "yes", advanced: "yes" },
+      { name: "My Journal", detail: "Her notes and voice memos from sessions with her mentors. Hers and her parents'; she can share an entry with that mentor; coaches don't read it.", standard: "yes", advanced: "yes" },
       { name: "Mental GP lessons", detail: "Eight short lessons for game moments (between pitches, big at-bats, nerves, errors, slumps, bad calls, her role, game day); her answer finishes each one, four of them build her Mental Game Plan, and an Up next pick follows her self-scan. With G3 Advanced, each links to the chapters that go deeper.", standard: "yes", advanced: "yes" },
     ],
   },

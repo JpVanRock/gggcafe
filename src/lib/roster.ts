@@ -61,17 +61,32 @@ export async function seasonOrCurrent(supabase: Supabase, teamId: string, season
 export async function loadRoster(
   supabase: Supabase,
   teamId: string,
-  { seasonId, order = "jersey" }: { seasonId?: string | null; order?: "jersey" | "name" } = {},
+  {
+    seasonId,
+    order = "jersey",
+    teamAdmin = false,
+  }: {
+    seasonId?: string | null;
+    order?: "jersey" | "name";
+    /** a team admin (a parent, user 2026-11-12) reads names, numbers and positions only, through team_admin_roster() */
+    teamAdmin?: boolean;
+  } = {},
 ): Promise<RosterPlayer[]> {
   const season = await seasonOrCurrent(supabase, teamId, seasonId);
   if (!season) return [];
-  const { data } = await supabase
-    .from("roster_entries")
-    .select("jersey_number, player:players(id, first_name, last_name, preferred_name, primary_position, secondary_positions)")
-    .eq("team_id", teamId)
-    .eq("season_id", season)
-    .eq("active", true);
-  const rows = (data ?? []).filter((r): r is typeof r & { player: PlayerBits } => Boolean(r.player));
+  let rows: { jersey_number: string | null; player: PlayerBits }[];
+  if (teamAdmin) {
+    const { data } = await supabase.rpc("team_admin_roster", { p_team_id: teamId, p_season_id: season });
+    rows = (data ?? []).map((r) => ({ jersey_number: r.jersey_number, player: r }));
+  } else {
+    const { data } = await supabase
+      .from("roster_entries")
+      .select("jersey_number, player:players(id, first_name, last_name, preferred_name, primary_position, secondary_positions)")
+      .eq("team_id", teamId)
+      .eq("season_id", season)
+      .eq("active", true);
+    rows = (data ?? []).filter((r): r is typeof r & { player: PlayerBits } => Boolean(r.player));
+  }
   const players = rows.map((r) => ({ last: r.player.last_name, p: toRosterPlayer(r.player, r.jersey_number) }));
   players.sort((a, b) =>
     order === "name" ? a.p.name.localeCompare(b.p.name) : compareJersey(a.p.number, b.p.number) || a.last.localeCompare(b.last),

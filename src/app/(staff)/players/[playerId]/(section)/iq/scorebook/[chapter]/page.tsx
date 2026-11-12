@@ -17,7 +17,7 @@ export default async function ScorebookChapterPage({ params }: PageProps<"/playe
   const n = Number(raw);
   if (!CHAPTERS.some((c) => c.n === n)) notFound();
   const supabase = await createClient();
-  const access = await requirePlayerPage(playerId);
+  const access = await requirePlayerPage(playerId, "player.iq");
   const player = await loadPlayer(supabase, playerId);
   const [iq, pop] = await Promise.all([loadIq(supabase, player.id), loadPopReport(supabase, player.id)]);
   const course = buildCourse(iq);

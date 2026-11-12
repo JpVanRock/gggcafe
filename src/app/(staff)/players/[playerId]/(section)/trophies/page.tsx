@@ -16,7 +16,7 @@ export const metadata: Metadata = { title: "Trophy Room · GGG.Cafe" };
 export default async function TrophiesPage({ params }: PageProps<"/players/[playerId]/trophies">) {
   const { playerId } = await params;
   const supabase = await createClient();
-  await requirePlayerPage(playerId);
+  await requirePlayerPage(playerId, "player.trophies");
   const player = await loadPlayer(supabase, playerId);
   const [iq, performance, pop] = await Promise.all([loadIq(supabase, player.id), loadPerformance(supabase, player.id), loadPopReport(supabase, player.id)]);
   const positions = positionsOf(player);

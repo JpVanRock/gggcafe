@@ -36,7 +36,7 @@ export default async function MentorTeamPage({ params }: PageProps<"/mentor/team
   const ids = roster.map((p) => p.id);
 
   const supabase = await createClient();
-  const [{ data: team }, cards, training, { data: focusRows }, { data: noteRows }] = await Promise.all([
+  const [{ data: team }, cards, training, { data: focusRows }, { data: noteRows }, { data: offRows }] = await Promise.all([
     supabase.from("teams").select("id, name").eq("id", teamId).maybeSingle(),
     loadMentees(supabase, ids),
     loadTraining(supabase, mentor.userId, ids),
@@ -47,8 +47,11 @@ export default async function MentorTeamPage({ params }: PageProps<"/mentor/team
       .eq("team_id", teamId)
       .eq("mentor_id", mentor.userId)
       .order("created_at"),
+    // the Switchboard: what the head coach turned off for mentors
+    supabase.from("team_features_off").select("feature").eq("team_id", teamId),
   ]);
   if (!team) notFound();
+  const off = new Set((offRows ?? []).map((r) => r.feature));
   const nameOf = (id: string) => {
     const c = cards.get(id);
     return c ? playerName(c.player) : "A player";
@@ -70,6 +73,7 @@ export default async function MentorTeamPage({ params }: PageProps<"/mentor/team
 
       {roster.length > 0 && <PlayerTiles cards={roster.flatMap((p) => (cards.has(p.id) ? [cards.get(p.id)!] : []))} />}
 
+      {!off.has("mentor.notes") && (
       <Panel title="Working with the coaches">
         <p className="-mt-2 text-sm text-muted">
           Team-wide: what you&apos;re working on with the whole team, what&apos;s working, and what you talked about with the coaches. The coaches read this; players
@@ -89,7 +93,9 @@ export default async function MentorTeamPage({ params }: PageProps<"/mentor/team
         />
         <NoteForm action={addMentorNote} hidden={{ team_id: teamId }} placeholder="Met with the head coach: two-strike approach is the team focus through December." />
       </Panel>
+      )}
 
+      {!off.has("mentor.training") && (
       <Panel title="Team training">
         <p className="-mt-2 text-sm text-muted">Shows in each player&apos;s This Week in Softball, marked as from you. Untick anyone it isn&apos;t for.</p>
         <Disclosure summary="+ Add training">
@@ -97,6 +103,7 @@ export default async function MentorTeamPage({ params }: PageProps<"/mentor/team
         </Disclosure>
         <TrainingList rows={training} nameOf={nameOf} />
       </Panel>
+      )}
     </div>
   );
 }

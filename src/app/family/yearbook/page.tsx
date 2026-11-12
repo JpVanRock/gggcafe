@@ -32,7 +32,12 @@ async function FamilyYearbook({ searchParams }: Pick<PageProps<"/family/yearbook
   const { data } = await supabase.rpc("parent_home");
   const links = ((data ?? []) as { team_id: string; team_name: string; status: string }[]).filter((l) => l.status === "approved");
   const teams = [...new Map(links.map((l) => [l.team_id, { id: l.team_id, name: l.team_name }])).values()];
-  const open = await yearbookTeams(supabase, teams.map((t) => t.id));
+  // the Switchboard: a team whose head coach turned the parents' Yearbook off isn't here
+  const { data: offRows } = teams.length
+    ? await supabase.from("team_features_off").select("team_id").eq("feature", "parent.yearbook").in("team_id", teams.map((t) => t.id))
+    : { data: [] };
+  const closed = new Set((offRows ?? []).map((r) => r.team_id));
+  const open = await yearbookTeams(supabase, teams.filter((t) => !closed.has(t.id)).map((t) => t.id));
   const allowed = teams.filter((t) => open.includes(t.id));
   if (allowed.length === 0) {
     return (

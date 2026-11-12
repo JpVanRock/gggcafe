@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { isUuid } from "@/lib/softball";
 import { LiveSectionNav, SectionNav } from "./section-nav";
 import { ParentViewBanner } from "@/components/parent-view-banner";
+import { getCurrentUser, getPlayerFeaturesOff } from "@/lib/auth";
+import { SECTION_SWITCH } from "@/lib/switchboard";
 
 /**
  * Every player section (Goals, Pop Report, ...) is its own page: a Back link to
@@ -24,7 +26,14 @@ async function SectionHeader({ params }: { params: LayoutProps<"/players/[player
   const { playerId } = await params;
   let name = "Player";
   let advanced = false;
+  let hidden: string[] = [];
   if (isUuid(playerId)) {
+    // the Switchboard: sections her head coach turned off leave the bar (coaches see them all)
+    const user = await getCurrentUser();
+    if (user && !user.staff) {
+      const off = await getPlayerFeaturesOff(playerId);
+      hidden = Object.entries(SECTION_SWITCH).flatMap(([slug, key]) => (off.has(key) ? [slug] : []));
+    }
     const supabase = await createClient();
     const [{ data }, { data: access }] = await Promise.all([
       supabase.from("players").select("first_name, preferred_name").eq("id", playerId).maybeSingle(),
@@ -40,8 +49,8 @@ async function SectionHeader({ params }: { params: LayoutProps<"/players/[player
       <Link href={`/players/${playerId}`} className="self-start text-sm text-muted hover:text-ink">
         ← Back to {name}&apos;s menu
       </Link>
-      <Suspense fallback={<SectionNav playerId={playerId} advanced={advanced} />}>
-        <LiveSectionNav playerId={playerId} advanced={advanced} />
+      <Suspense fallback={<SectionNav playerId={playerId} advanced={advanced} hidden={hidden} />}>
+        <LiveSectionNav playerId={playerId} advanced={advanced} hidden={hidden} />
       </Suspense>
     </div>
   );

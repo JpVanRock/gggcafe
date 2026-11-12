@@ -157,6 +157,7 @@ tests/unit/              node --test unit tests (npm run test:unit)
 | Player dashboard | `docs/features/player-dashboard.md` | Her menu: sections, TWIS, goals, Performance Training, Softball IQ tests, Keep the Book, Trophy Room |
 | Players page and intake | `docs/features/players-intake.md` | Players list by age group, player intake, profile photos |
 | Practice planning | `docs/features/practice-planning.md` | Install checklist, road to opening day, notes and cues for players |
+| Switchboard | `docs/features/switchboard.md` | Head coach turns features on/off per team for players, parents, mentors |
 | Team Yearbook | `docs/features/yearbook.md` | Season photos, who can add and view, the viewer |
 | Team playbook & scouting | `docs/features/playbook-scouting.md` | Depth chart, call sheet and flashcards, team quizzes, scouting |
 | UI components | `docs/features/ui-components.md` | Type scale, shared components and props, states, accessibility rules |

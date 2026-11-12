@@ -8,6 +8,7 @@ export const SECTIONS = [
   { slug: "goals", label: "Goals" },
   { slug: "pop", label: "Pop Report" },
   { slug: "mental", label: "Mental GP" },
+  { slug: "journal", label: "My Journal" },
   { slug: "training", label: "Training" },
   { slug: "iq", label: "Softball IQ" },
   { slug: "trophies", label: "Trophy Room" },
@@ -15,20 +16,21 @@ export const SECTIONS = [
   { slug: "activities", label: "Activities" },
 ] as const;
 
-/** G3 Advanced sits after Softball IQ, and only when it's unlocked for her. */
-function sectionsFor(advanced: boolean) {
-  if (!advanced) return SECTIONS;
-  const at = SECTIONS.findIndex((s) => s.slug === "iq") + 1;
-  return [...SECTIONS.slice(0, at), { slug: "advanced", label: "G3 Advanced" }, ...SECTIONS.slice(at)];
+/** G3 Advanced sits after Softball IQ, and only when it's unlocked for her; `hidden`: sections her head coach turned off. */
+function sectionsFor(advanced: boolean, hidden: readonly string[] = []) {
+  const shown = SECTIONS.filter((s) => !hidden.includes(s.slug));
+  if (!advanced) return shown;
+  const at = shown.findIndex((s) => s.slug === "iq") + 1;
+  return [...shown.slice(0, at), { slug: "advanced", label: "G3 Advanced" }, ...shown.slice(at)];
 }
 
 /** The menu across the top of every player section page. */
-export function SectionNav({ playerId, path = "", advanced = false }: { playerId: string; path?: string; advanced?: boolean }) {
+export function SectionNav({ playerId, path = "", advanced = false, hidden = [] }: { playerId: string; path?: string; advanced?: boolean; hidden?: string[] }) {
   const base = `/players/${playerId}`;
   return (
     <TabRow label="Player sections" current={path}>
       <ul className="flex min-w-max gap-5 border-b border-navy-700">
-        {sectionsFor(advanced).map((s) => {
+        {sectionsFor(advanced, hidden).map((s) => {
           const href = `${base}/${s.slug}`;
           const active = path === href || path.startsWith(`${href}/`);
           return (
@@ -50,6 +52,6 @@ export function SectionNav({ playerId, path = "", advanced = false }: { playerId
   );
 }
 
-export function LiveSectionNav({ playerId, advanced = false }: { playerId: string; advanced?: boolean }) {
-  return <SectionNav playerId={playerId} path={usePathname()} advanced={advanced} />;
+export function LiveSectionNav({ playerId, advanced = false, hidden = [] }: { playerId: string; advanced?: boolean; hidden?: string[] }) {
+  return <SectionNav playerId={playerId} path={usePathname()} advanced={advanced} hidden={hidden} />;
 }

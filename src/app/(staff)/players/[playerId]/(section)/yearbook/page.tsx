@@ -17,7 +17,7 @@ export default async function YearbookPage({ params, searchParams }: PageProps<"
   const { playerId } = await params;
   const { team: teamParam, season } = await searchParams;
   const supabase = await createClient();
-  const access = await requirePlayerPage(playerId);
+  const access = await requirePlayerPage(playerId, "player.yearbook");
   const player = await loadPlayer(supabase, playerId);
   const teams = (await loadTeamDugout(supabase, player.id)).map((t) => t.team);
   const team = pickTeam(teams, teamParam);

@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: "Softball IQ · GGG.Cafe" };
 export default async function IqPage({ params }: PageProps<"/players/[playerId]/iq">) {
   const { playerId } = await params;
   const supabase = await createClient();
-  const access = await requirePlayerPage(playerId);
+  const access = await requirePlayerPage(playerId, "player.iq");
   const player = await loadPlayer(supabase, playerId);
   const [iq, pop, team] = await Promise.all([loadIq(supabase, player.id), loadPopReport(supabase, player.id), loadTeamPlaybook(supabase, player.id)]);
   const open = team.quizzes.filter((q) => q.answered < q.total || q.to_fix > 0).length;

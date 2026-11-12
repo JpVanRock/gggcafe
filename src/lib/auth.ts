@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { canEditRole, isHeadCoachRole, type StaffRole } from "@/lib/roles";
 import { loadRoster, type RosterPlayer } from "@/lib/roster";
+import { offForPlayer, switchLabel, type SwitchKey } from "@/lib/switchboard";
 
 export type { StaffRole };
 
@@ -100,6 +101,62 @@ export async function editorCheck(): Promise<string | null> {
 }
 
 // ---------------------------------------------------------------------------
+// Team admins (user, 2026-11-12): parents the head coach made team admin edit their team's
+// calendar, GameDay and measurements. They stay parents; the database scopes every write to
+// their team (private.my_admin_team_ids()).
+// ---------------------------------------------------------------------------
+
+/** Teams the signed-in parent is team admin of (while an approved parent there). */
+export const getAdminTeamIds = cache(async (): Promise<string[]> => {
+  const user = await getCurrentUser();
+  if (!user) return [];
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("my_admin_team_ids");
+  return ((data ?? []) as (string | { my_admin_team_ids: string })[]).map((r) => (typeof r === "string" ? r : r.my_admin_team_ids));
+});
+
+/** Who is on a Calendar / GameDay / Measurements page: staff (their role), or a team admin (their teams). */
+export type DugoutAccess = { user: CurrentUser; role: StaffRole | null; adminTeamIds: string[] };
+
+/**
+ * The Calendar, GameDay and team Measurements pages: staff as before (GameDay isn't an
+ * assistant's tab), or a team admin, for their own teams. Everyone else is sent home.
+ */
+export async function requireDugoutPage(area: "calendar" | "gameday" | "measurements"): Promise<DugoutAccess> {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+  if (user.staff) {
+    if (area === "gameday" && user.staff.role === "assistant") notFound();
+    return { user, role: user.staff.role, adminTeamIds: [] };
+  }
+  const adminTeamIds = await getAdminTeamIds();
+  if (!adminTeamIds.length) redirect("/dashboard");
+  return { user, role: null, adminTeamIds };
+}
+
+/** Can this page's user change things there? Team admins can; staff by role (GameDay: head coaches). */
+export function dugoutCanEdit(access: DugoutAccess, area: "calendar" | "gameday" | "measurements"): boolean {
+  if (!access.role) return access.adminTeamIds.length > 0;
+  return area === "gameday" ? isHeadCoach(access.role) : canEdit(access.role);
+}
+
+/**
+ * For Calendar / GameDay / Measurements server actions: staff by role as before, or a team admin
+ * of `teamId` (actions that only name a row pass no team: the database checks that row's team).
+ */
+export async function dugoutCheck(area: "calendar" | "gameday" | "measurements", teamId?: string | null): Promise<string | null> {
+  const user = await getCurrentUser();
+  if (!user) return "Your session has ended. Sign in again.";
+  if (user.staff) {
+    if (area === "gameday") return isHeadCoach(user.staff.role) ? null : "Only a head coach can change this.";
+    return canEdit(user.staff.role) ? null : "You don't have permission to change this. Ask an admin to make you a coach.";
+  }
+  const teams = await getAdminTeamIds();
+  if (teams.length && (teamId === undefined || teamId === null || teams.includes(teamId))) return null;
+  return "You don't have permission to change this.";
+}
+
+// ---------------------------------------------------------------------------
 // Players with a claimed profile (see the player_claims migration). The
 // database decides; these helpers only route pages and give clear messages.
 // ---------------------------------------------------------------------------
@@ -133,17 +190,51 @@ export type PlayerPageAccess = {
   isParent?: boolean;
 };
 
-/** For a player's dashboard: staff, or the player herself. Others are sent home. */
-export async function requirePlayerPage(playerId: string): Promise<PlayerPageAccess> {
+/**
+ * The Switchboard (user, 2026-11-12): features her head coach turned off, on any of her current
+ * teams. Asked by her, her parents and her mentors; coaches always see everything.
+ */
+export const getPlayerFeaturesOff = cache(async (playerId: string): Promise<Set<SwitchKey>> => {
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("player_features_off", { p_player_id: playerId });
+  return offForPlayer(((data ?? []) as (string | { player_features_off: string })[]).map((r) => ({ feature: typeof r === "string" ? r : r.player_features_off })));
+});
+
+/**
+ * For mentor actions (the Switchboard): a message when the head coach turned `feature` off for
+ * this player (any of her teams) or this team, else null.
+ */
+export async function switchedOff(feature: SwitchKey, { playerId, teamId }: { playerId?: string | null; teamId?: string | null }): Promise<string | null> {
+  const message = `${switchLabel(feature)} is turned off for now by the head coach.`;
+  if (playerId && (await getPlayerFeaturesOff(playerId)).has(feature)) return message;
+  if (teamId) {
+    const supabase = await createClient();
+    const { data } = await supabase.from("team_features_off").select("feature").eq("team_id", teamId).eq("feature", feature).maybeSingle();
+    if (data) return message;
+  }
+  return null;
+}
+
+/**
+ * For a player's dashboard: staff, or the player herself. Others are sent home. With `feature`
+ * (a section's Switchboard key), a player or parent whose head coach turned it off goes back to
+ * her menu, which says so.
+ */
+export async function requirePlayerPage(playerId: string, feature?: SwitchKey): Promise<PlayerPageAccess> {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
   const canManage = Boolean(user.staff && canEdit(user.staff.role));
   if (user.staff) return { user, canManage, canAct: canManage, isSelf: false };
   const mine = await getMyPlayerIds();
-  if (mine.includes(playerId)) return { user, canManage: false, canAct: true, isSelf: true };
+  const isSelf = mine.includes(playerId);
   // her approved parent: what she sees, read only (the database gives parents no writes)
-  if ((await getMyChildIds()).includes(playerId)) return { user, canManage: false, canAct: false, isSelf: false, isParent: true };
-  redirect(mine.length ? "/me" : "/family");
+  const isParent = !isSelf && (await getMyChildIds()).includes(playerId);
+  if (!isSelf && !isParent) redirect(mine.length ? "/me" : "/family");
+  const off = await getPlayerFeaturesOff(playerId);
+  // her head coach turned off parents' View as player
+  if (isParent && off.has("parent.view_as")) redirect("/family");
+  if (feature && off.has(feature)) redirect(`/players/${playerId}?off=${feature}`);
+  return isSelf ? { user, canManage: false, canAct: true, isSelf: true } : { user, canManage: false, canAct: false, isSelf: false, isParent: true };
 }
 
 /** For server actions on one player's data: an error message unless coach/admin or the player herself. */

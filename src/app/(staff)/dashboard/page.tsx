@@ -8,6 +8,12 @@ import { addDays, formatDay, formatTime, todayISO } from "@/lib/dates";
 import { COACH_SIGNUP_ROLE, ROLE_NOTE, canEditPlanRole, dugoutTabsFor, isCoachSignup, type StaffRole } from "@/lib/roles";
 import { loadStaffRequests, type StaffRequestRow } from "@/lib/approvals";
 import { playerName } from "@/lib/softball";
+import { loadRoster } from "@/lib/roster";
+import { ActionForm } from "@/components/action-form";
+import { SubmitButton } from "@/components/submit-button";
+import { fieldClass } from "@/components/ui";
+import { loadOwnTeams } from "../dugout/data";
+import { claimDaughter } from "./actions";
 
 export const metadata: Metadata = { title: "Dashboard · GGG.Cafe" };
 
@@ -53,7 +59,75 @@ export default async function DashboardPage() {
       <Approvals waiting={waiting} staffRequests={staffRequests} />
       {editor && <CheckIns />}
       {role === "assistant" ? <AssistantHome user={staffUser} /> : <HeadCoachHome role={role} />}
+      {editor && <ParentSide userId={staffUser.id} head={head} />}
     </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Coaches who are parents (user, 2026-11-12): claim a daughter from the roster, then switch
+// between the Coach and Parent pages with the header's switch.
+// ---------------------------------------------------------------------------
+
+async function ParentSide({ userId, head }: { userId: string; head: boolean }) {
+  const supabase = await createClient();
+  const [{ data: links }, teams, { data: jwt }] = await Promise.all([
+    supabase.from("parent_links").select("id, child_name, status, team:teams(name)").eq("parent_id", userId).order("requested_at"),
+    loadOwnTeams(supabase),
+    supabase.auth.getClaims(),
+  ]);
+  const mine = (links ?? []) as { id: string; child_name: string; status: "pending" | "approved" | "declined"; team: { name: string } | null }[];
+  const rosters = await Promise.all(teams.map(async (t) => ({ team: t, players: await loadRoster(supabase, t.id, { order: "name" }) })));
+  // the daughter named at sign-up, if one matches
+  const typed = String((jwt?.claims?.user_metadata as { coach_child?: string } | undefined)?.coach_child ?? "").trim().toLowerCase();
+  const suggested = typed ? rosters.flatMap((r) => r.players).find((p) => p.name.toLowerCase() === typed)?.id : undefined;
+  const statusLabel = { approved: "Approved", pending: "Waiting for the head coach", declined: "Not approved" } as const;
+
+  return (
+    <section aria-labelledby="parent-side" className="flex flex-col gap-3">
+      <h2 id="parent-side" className={heading}>
+        Also a parent on the team?
+      </h2>
+      {mine.length > 0 && (
+        <ul className="divide-y divide-navy-800 rounded-2xl border border-navy-700 px-4">
+          {mine.map((l) => (
+            <li key={l.id} className="flex flex-wrap items-center justify-between gap-3 py-2.5">
+              <span>
+                <span className="font-semibold">{l.child_name}</span>
+                <span className="text-sm text-muted"> · {l.team?.name}</span>
+              </span>
+              <span className="text-sm text-muted">{statusLabel[l.status]}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className="max-w-3xl text-sm text-muted">
+        {mine.length > 0
+          ? "Use the Coach / Parent switch at the top to go between this page and your Parent page: her login, her forms, the budget and her mentors."
+          : `Claim your daughter and you get the Parent page too, with this same login: her login and forms, the team budget, her mentors. ${head ? "As head coach you're approved right away." : "Your head coach approves it, like any parent."}`}
+      </p>
+      <ActionForm action={claimDaughter} className="flex flex-wrap items-end gap-3">
+        <label className="flex flex-col gap-1.5">
+          <span className="text-sm font-medium">{mine.length > 0 ? "Claim another daughter" : "Your daughter"}</span>
+          <select name="player_id" defaultValue={suggested ?? ""} className={`${fieldClass} min-w-56`}>
+            <option value="">Choose…</option>
+            {rosters
+              .filter((r) => r.players.length > 0)
+              .map((r) => (
+                <optgroup key={r.team.id} label={r.team.name}>
+                  {r.players.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                      {p.number ? ` #${p.number}` : ""}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+          </select>
+        </label>
+        <SubmitButton pendingLabel="Claiming…">Claim my daughter</SubmitButton>
+      </ActionForm>
+    </section>
   );
 }
 

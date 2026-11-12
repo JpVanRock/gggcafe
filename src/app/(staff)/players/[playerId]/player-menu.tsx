@@ -28,6 +28,24 @@ import { MentorAlerts } from "./mentor-messages";
 import type { MentorMessage } from "@/lib/message-photos";
 import { leadershipHref } from "./leadership";
 import { eyebrowClass } from "@/components/ui";
+import { formatDay } from "@/lib/dates";
+import type { SwitchKey } from "@/lib/switchboard";
+
+/** My Journal's board: how many entries and the last session, or that it's private (coaches). */
+function JournalSummary({ journal, name, isSelf }: { journal: { count: number; last: string | null } | null; name: string; isSelf: boolean }) {
+  if (!journal) return <p className="text-sm text-[var(--menu-note)]">Private: only {name} and her parents read it, and a mentor reads what she shares.</p>;
+  if (journal.count === 0)
+    return <p className="text-sm text-[var(--menu-note)]">{isSelf ? "After your next session, write down what clicked, or record a voice memo." : `Nothing written yet.`}</p>;
+  return (
+    <p className="text-sm">
+      <span className="font-display text-2xl font-bold text-[var(--menu-value)] tabular-nums">{journal.count}</span>{" "}
+      <span className="text-[var(--menu-note)]">
+        {journal.count === 1 ? "entry" : "entries"}
+        {journal.last ? ` · last session ${formatDay(journal.last)}` : ""}
+      </span>
+    </p>
+  );
+}
 
 /** The cafe-menu player dashboard: header, TWIS, then the menu boards. */
 export function PlayerMenu({
@@ -51,6 +69,8 @@ export function PlayerMenu({
   isAdmin = false,
   canWriteCulture = false,
   isSelf = false,
+  journal = null,
+  off = new Set(),
 }: {
   player: Player;
   twis: TwisWeek;
@@ -80,6 +100,10 @@ export function PlayerMenu({
   canWriteCulture?: boolean;
   /** the signed-in player viewing her own dashboard */
   isSelf?: boolean;
+  /** My Journal: her entries (she and her parents), or null for coaches (it's private) */
+  journal?: { count: number; last: string | null } | null;
+  /** the Switchboard: features her head coach turned off (empty for coaches, who see everything) */
+  off?: ReadonlySet<SwitchKey>;
 }) {
   const name = firstName(player);
   const method = player.goal_method ?? "harada";
@@ -95,7 +119,7 @@ export function PlayerMenu({
 
   // The menu. Add a section here (and a board variant in ./menu.tsx if it needs a new look).
   const base = `/players/${player.id}`;
-  const sections: MenuSection[] = [
+  const allSections: MenuSection[] = [
     {
       key: "goals",
       title: `${possessive(name)} Goals`,
@@ -120,6 +144,15 @@ export function PlayerMenu({
       variant: "navy",
       summary: <MentalSummary plan={mental} />,
       href: `${base}/mental`,
+    },
+    {
+      key: "journal",
+      title: "My Journal",
+      subtitle: "Notes and voice memos from mentor sessions",
+      variant: "navy",
+      wide: true,
+      summary: <JournalSummary journal={journal} name={name} isSelf={isSelf} />,
+      href: `${base}/journal`,
     },
     {
       key: "performance",
@@ -162,6 +195,18 @@ export function PlayerMenu({
       href: `${base}/trophies`,
     },
   ];
+
+  // the Switchboard: a section her head coach turned off leaves her menu
+  const sectionSwitch: Record<string, SwitchKey> = {
+    goals: "player.goals",
+    pop: "player.pop",
+    mental: "player.mental",
+    journal: "player.journal",
+    performance: "player.training",
+    iq: "player.iq",
+    trophies: "player.trophies",
+  };
+  const sections = allSections.filter((s) => !(sectionSwitch[s.key] && off.has(sectionSwitch[s.key])));
 
   const tagline = [
     team?.jersey_number && `#${team.jersey_number}`,
@@ -247,7 +292,15 @@ export function PlayerMenu({
             canDismiss={isSelf}
           />
         )}
-        <DugoutStrip teams={dugout} canEdit={canWriteCulture} teamHref={`${base}/team`} yearbookHref={advanced.unlocked ? `${base}/yearbook` : undefined} leaderboardHref={`${base}/leaderboard`} activityHref={`${base}/log`} />
+        <DugoutStrip
+          teams={dugout}
+          canEdit={canWriteCulture}
+          teamHref={`${base}/team`}
+          standards={!off.has("player.team")}
+          yearbookHref={advanced.unlocked && !off.has("player.yearbook") ? `${base}/yearbook` : undefined}
+          leaderboardHref={off.has("player.leaderboard") ? undefined : `${base}/leaderboard`}
+          activityHref={off.has("player.activity") ? undefined : `${base}/log`}
+        />
         <TwisBoard
           playerId={player.id}
           week={twis}

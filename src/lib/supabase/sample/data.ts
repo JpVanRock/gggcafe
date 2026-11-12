@@ -305,6 +305,51 @@ const coach_mental_lessons: Row[] = [
   { user_id: U.coach, lesson: "your-words", notes: null, completed_at: "2026-11-07T18:00:00Z", updated_at: "2026-11-07T18:00:00Z" },
 ];
 
+// the head coach's Team Hitting Philosophy and Throwing Program (user, 2026-11-12); Maya (SS) is an Innie
+const team_hitting_philosophy: Row[] = [
+  {
+    team_id: T.us, updated_at: "2026-11-10T18:00:00Z",
+    statement: "On time, on the attack, hard to get out.",
+    sections: [
+      { title: "Hunt your pitch early", body: "Ahead or even, look for one pitch in one zone and drive it." },
+      { title: "With two strikes, we battle", body: "Choke up, protect the plate, make her throw one more." },
+    ],
+  },
+];
+const team_throwing_programs: Row[] = [
+  {
+    team_id: T.us, grp: "innies", updated_at: "2026-11-10T18:00:00Z", intro: "Quick exchange, accurate ball.",
+    steps: [
+      { name: "Wrist flicks", dose: "10 throws · 10 ft", cue: "Elbow up, snap the wrist." },
+      { name: "Quick exchange", dose: "10 reps · 30 ft", cue: null },
+    ],
+  },
+];
+
+// My Journal (user, 2026-11-12): Maya's notes from sessions with the sample admin (a mentor); one is shared
+const player_journal_entries: Row[] = [
+  {
+    id: id("ajaj00", 1), player_id: maya, mentor_id: U.admin, mentor_name: null, session_date: "2026-11-09", topic: "Backhand footwork",
+    notes: "Plant the right foot, gather, throw through first. Cue: \"low and through.\"", audio_path: null, audio_seconds: null,
+    shared_with_mentor: true, created_at: "2026-11-09T20:00:00Z", updated_at: "2026-11-09T20:00:00Z",
+  },
+  {
+    id: id("ajaj00", 2), player_id: maya, mentor_id: null, mentor_name: "Hitting lesson", session_date: "2026-11-05", topic: "Load early",
+    notes: "Get the load started early so I am never rushed.", audio_path: null, audio_seconds: null,
+    shared_with_mentor: false, created_at: "2026-11-05T20:00:00Z", updated_at: "2026-11-05T20:00:00Z",
+  },
+];
+
+// the sample admin is also a parent of Maya and Emma (parent_home below): the Coach / Parent switch shows
+const parent_links: Row[] = [maya, emma].map((pid, i) => ({
+  id: id("agag00", i + 1), parent_id: U.admin, team_id: T.us, child_name: PLAYERS[P.indexOf(pid)].slice(0, 2).join(" "), player_id: pid, status: "approved",
+  requested_at: "2026-11-01T00:00:00Z", decided_by: U.admin, decided_at: "2026-11-01T00:00:00Z",
+}));
+
+// the Switchboard (user, 2026-11-12): one feature off; the sample admin is also the team's team admin
+const team_features_off: Row[] = [{ team_id: T.us, feature: "player.activity", turned_off_by: U.admin, turned_off_at: "2026-11-11T18:00:00Z" }];
+const team_admins: Row[] = [{ team_id: T.us, user_id: U.admin, granted_by: U.admin, granted_at: "2026-11-11T18:00:00Z" }];
+
 export const TABLES: Record<string, Row[]> = {
   players, teams, seasons, roster_entries, staff, games, batting_lines, pitching_lines, fielding_lines, pa_grades,
   batting_season, pitching_season, fielding_season, qab_season, gameday_profiles, gameday_lineups, depth_chart, staff_duties, staff_standards,
@@ -313,6 +358,7 @@ export const TABLES: Record<string, Row[]> = {
   team_culture, team_standards, player_advanced_access, player_leadership_access, player_leadership_certificates, measurements,
   mentors, mentor_links, mentor_messages, mentor_focus, mentor_notes, player_activities,
   budget_fees, budget_entries, budget_credits, budget_coach_expenses, player_mental_lessons, coach_mental_lessons, mental_game_plans,
+  team_hitting_philosophy, team_throwing_programs, player_journal_entries, parent_links, team_features_off, team_admins,
 };
 
 /** table -> the column other tables use to point at it (for embedded selects) */
@@ -383,6 +429,11 @@ export function sampleRpc(name: string, args: Row = {}): unknown {
     case "team_squads": return [];
     case "unread_notifications": return 2;
     case "pending_approvals": return [];
+    case "player_mentors": return [{ mentor_id: U.admin, display_name: "Coach Sample", specialty: "Pitching" }];
+    case "my_admin_team_ids": return [T.us];
+    // the Parents tab's approved parents (the sample admin, for Maya and Emma; a team admin)
+    case "team_parent_links":
+      return [maya, emma].map((pid, i) => ({ link_id: id("agag00", i + 1), parent_name: "Pat Torres", email: "coach@sample.test", child_name: playerFull(pid), player_id: pid, status: "approved", requested_at: "2026-11-01T00:00:00Z" }));
     case "staff_requests_to_decide": return [];
     // the sample admin is also a parent of Maya (a whole-team mentor) and Emma (a mentor asks), so the family page's mentor cards render
     case "parent_home":

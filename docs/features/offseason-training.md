@@ -23,3 +23,12 @@
   - Coach training (`/dugout/training/coach`, every staff member; user, 2026-11-12): the coaches' Mental Game course.
     See docs/features/mental-game.md.
 - DB tests: `tests/db/training.test.sql`.
+- Team Hitting Philosophy (`/dugout/training/hitting`) and Throwing Program (`/dugout/training/throwing?group=`; user,
+  2026-11-12; migration 20261112132321): the head coach (and admins) writes them, every coach reads them. The philosophy is a
+  statement and up to 12 titled sections; the throwing program is for position players, not pitchers, in three groups:
+  Outies (outfielders), Innies (infielders) and Catchers, each an intro and up to 20 throws (name, reps/distance, cue).
+  "Load the starter" fills the form with our own fastpitch starters (`src/lib/team-programs.ts`, unit-tested) to edit
+  before saving. Tables `team_hitting_philosophy`, `team_throwing_programs` (jsonb typed in scripts/json-types.json).
+  Players read their teams' on the Team page (`#hitting`, `#throwing`): her group comes from her first fielding position
+  (`throwGroupFor`; P, DP, FLEX don't count, so a P/1B is an Innie and a pitcher alone sees none), with the SafetyNote.
+  DB tests: `tests/db/team_programs.test.sql`.

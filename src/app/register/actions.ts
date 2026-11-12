@@ -59,6 +59,7 @@ export async function registerAccount(_prev: RegisterState, fd: FormData): Promi
   if ((player || mentor || coach) && !/\s/.test(values.name)) return fail("Enter your first and last name.", "name");
   if (parent && (!values.child || values.child.length > 80)) return fail("Enter your daughter's first and last name.", "child");
   if (headCoach && !values.org) return fail("Enter your team or organization.", "org");
+  if (coach && values.child.length > 80) return fail("Keep your daughter's name to 80 characters.", "child");
   if (mentor && !values.scope) return fail("Choose one player or the whole team.", "scope");
   if (mentor && values.scope === "player" && (!/\s/.test(values.child) || values.child.length > 80)) return fail("Enter the player's first and last name.", "child");
   if (!/^\S+@\S+\.\S+$/.test(values.email)) return fail("Enter a valid email address.", "email");
@@ -98,6 +99,8 @@ export async function registerAccount(_prev: RegisterState, fd: FormData): Promi
         ...(team ? { team: team.id } : {}),
         ...(parent ? { team_code: values.code, child: values.child } : {}),
         ...(headCoach && values.org ? { note: values.org } : {}),
+        // a coach who is also a parent: the dashboard suggests her when they claim a daughter
+        ...(coach && values.child ? { coach_child: values.child } : {}),
       },
       emailRedirectTo: `${origin}/auth/confirm?next=${player ? "/me" : mentor ? "/mentor" : coach ? "/dashboard" : "/family"}`,
     },

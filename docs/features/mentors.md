@@ -44,3 +44,8 @@
   lead, drawn from the G3 Leadership Guide's lessons (`MENTOR_WAYS` in `dugout/mentors/page.tsx`: earn trust first,
   listen more than you talk, lift her higher, make the people around you better, train the next leader). The
   approval and privacy details sit under "How mentoring works" (user, 2026-11-12).
+- My Journal (user, 2026-11-12): a player can share one of her journal entries (notes and/or a voice memo) with the
+  mentor it's about; that mentor sees it on `/mentor/players/[id]` under "From her journal" (only while they still work
+  with her). See player-dashboard.md.
+- The Switchboard (user, 2026-11-12) can turn off, per team, Message players, Add training, Focus areas & notes, and what a
+  mentor sees (Goals, Pop Report, Mental GP, shared journal entries). See switchboard.md.

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { canEdit, requireHeadCoachPage } from "@/lib/auth";
+import { dugoutCanEdit, requireDugoutPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { isUuid } from "@/lib/softball";
 import { ConfirmSubmit } from "@/components/confirm-submit";
@@ -24,8 +24,9 @@ import { SubmitButton } from "@/components/submit-button";
 export const metadata: Metadata = { title: "Lineup · GameDay · GGG.Cafe" };
 
 export default async function LineupPage({ params, searchParams }: PageProps<"/dugout/gameday/[lineupId]">) {
-  const user = await requireHeadCoachPage();
-  const editor = canEdit(user.staff.role);
+  const access = await requireDugoutPage("gameday");
+  const editor = dugoutCanEdit(access, "gameday");
+  const teamAdmin = access.role === null;
   const { lineupId } = await params;
   const { shared } = await searchParams;
   if (!isUuid(lineupId)) notFound();
@@ -34,8 +35,8 @@ export default async function LineupPage({ params, searchParams }: PageProps<"/d
   if (!lineup) notFound();
   const seasonId = await seasonOrCurrent(supabase, lineup.team.id, lineup.season_id);
   const [roster, staff, depthResult, dutiesResult] = await Promise.all([
-    seasonId ? loadGamedayRoster(supabase, lineup.team.id, seasonId) : Promise.resolve([]),
-    editor ? loadCoachingStaff(supabase) : Promise.resolve([]),
+    seasonId ? loadGamedayRoster(supabase, lineup.team.id, seasonId, { teamAdmin }) : Promise.resolve([]),
+    editor && !teamAdmin ? loadCoachingStaff(supabase) : Promise.resolve([]),
     supabase.from("depth_chart").select("position, player_id").eq("team_id", lineup.team.id).order("rank"),
     supabase.from("staff_duties").select("phase, duty, owner").eq("team_id", lineup.team.id).order("position"),
   ]);
@@ -57,7 +58,7 @@ export default async function LineupPage({ params, searchParams }: PageProps<"/d
         </p>
       )}
       {editor && lineup.status === "draft" ? (
-        <LineupBuilder lineup={lineup} roster={roster} staff={staff} emailReady={emailConfigured()} depth={depth} dutyJobs={dutyJobs} />
+        <LineupBuilder lineup={lineup} roster={roster} staff={staff} emailReady={emailConfigured()} depth={depth} dutyJobs={dutyJobs} canShare={!teamAdmin} />
       ) : (
         <div className="flex flex-col gap-6">
           <header className="flex flex-col gap-4 rounded-2xl border border-navy-700 bg-navy-900/70 p-5 sm:p-6">
@@ -80,7 +81,7 @@ export default async function LineupPage({ params, searchParams }: PageProps<"/d
               <a href={`/dugout/gameday/${lineup.id}/pdf?card=umpire`} target="_blank" rel="noopener" className={pillOutlineClass}>
                 Umpire card
               </a>
-              {editor && lineup.status === "final" && (
+              {editor && !teamAdmin && lineup.status === "final" && (
                 <ShareButton
                   planId={lineup.id}
                   action={shareLineup}

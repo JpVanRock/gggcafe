@@ -21,6 +21,8 @@ export function RegisterForm() {
   const headCoach = role === "head-coach";
   const mentor = role === "mentor";
   const [scope, setScope] = useState(state.values.scope || "player");
+  // a coach who is also a parent on the team (user, 2026-11-12)
+  const [alsoParent, setAlsoParent] = useState(Boolean(state.values.child) && (headCoach || assistant));
 
   if (state.checkEmail) {
     return (
@@ -91,6 +93,22 @@ export function RegisterForm() {
       {headCoach && (
         <Field label="Your team or organization" hint="Helps the admin approve you. You register the team itself after approval.">
           <input name="org" required maxLength={120} autoComplete="organization" defaultValue={state.values.org} className={inputClass} />
+        </Field>
+      )}
+      {(headCoach || assistant) && (
+        <label className="flex items-start gap-2 text-sm">
+          <input type="checkbox" checked={alsoParent} onChange={(e) => setAlsoParent(e.target.checked)} className="mt-0.5 size-4 accent-pink" />
+          <span>
+            I&apos;m also a parent: my daughter plays on the team
+            <span className="block text-xs text-muted">
+              Once you&apos;re approved, claim her from your dashboard and switch between your Coach and Parent pages with this one login.
+            </span>
+          </span>
+        </label>
+      )}
+      {(headCoach || assistant) && alsoParent && (
+        <Field label="Your daughter's name" hint="First and last, as she'll be on the roster">
+          <input name="child" autoComplete="off" maxLength={80} defaultValue={state.values.child} className={inputClass} />
         </Field>
       )}
       {mentor && (

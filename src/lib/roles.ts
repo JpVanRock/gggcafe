@@ -47,7 +47,14 @@ export const DUGOUT_TABS = [
   { href: "/dugout/mentors", label: "Mentors", headOnly: true },
 ] as const;
 
-export type DugoutTab = (typeof DUGOUT_TABS)[number];
+export type DugoutTab = { href: string; label: string; headOnly: boolean };
+
+/** A team admin's Dugout (a parent the head coach made team admin; user, 2026-11-12). */
+export const TEAM_ADMIN_TABS: DugoutTab[] = [
+  { href: "/dugout/calendar", label: "Calendar", headOnly: false },
+  { href: "/dugout/gameday", label: "GameDay", headOnly: false },
+  { href: "/dugout/measurements", label: "Measurements", headOnly: false },
+];
 
 /** The tabs a role sees. Assistants skip Culture, GameDay, Parents and Mentors (and the draft inside Training); everyone else sees all. */
 export function dugoutTabsFor(role: StaffRole | null | undefined): DugoutTab[] {

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { canEdit, isHeadCoach, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ActionForm } from "@/components/action-form";
@@ -39,7 +40,11 @@ export default async function MeasurementsSettingsPage({ searchParams }: PagePro
         <h2 className={heading}>Every player&apos;s list</h2>
         <p className="text-sm text-muted">
           Her POP Report shows these in four columns: {SEASONS.map((s) => s.name).join(", ")}. The date measured picks the season. Coaches enter
-          values on her POP Report; Testing results land there too.
+          values on her POP Report, or for the whole roster at once on{" "}
+          <Link href={`/dugout/measurements?team=${team.id}`} className="text-link hover:underline">
+            Team measurements
+          </Link>
+          ; Testing results land there too.
         </p>
         <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {DEFAULT_MEASUREMENTS.map((m) => (

@@ -15,7 +15,7 @@ export default async function SessionPage({ params }: PageProps<"/players/[playe
   const session = sessionBySlug(slug);
   if (!session) notFound();
   const supabase = await createClient();
-  const access = await requirePlayerPage(playerId);
+  const access = await requirePlayerPage(playerId, "player.mental");
   const player = await loadPlayer(supabase, playerId);
   return (
     <SectionShell title={session.title} subtitle={`Mental GP · ${session.summary}`}>

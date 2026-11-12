@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { requireHeadCoachPage } from "@/lib/auth";
+import { requireDugoutPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { EmptyState, RECENT_LIMIT, ShowAllLink, badgeClass, cardClass } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
@@ -24,10 +24,10 @@ type GameRow = {
 };
 
 export default async function BoxScoresPage({ searchParams }: PageProps<"/dugout/gameday/box">) {
-  await requireHeadCoachPage();
+  const access = await requireDugoutPage("gameday");
   const { team: teamParam, games: gamesParam } = await searchParams;
   const supabase = await createClient();
-  const dugout = await loadDugoutTeam(supabase, teamParam);
+  const dugout = await loadDugoutTeam(supabase, teamParam, access.adminTeamIds);
   if (!dugout) return <NoOwnTeam />;
   const { teams, team } = dugout;
   const today = todayISO();

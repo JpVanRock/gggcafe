@@ -15,7 +15,7 @@ export default async function BullpenPage({ params }: PageProps<"/players/[playe
   const { playerId, scriptId } = await params;
   if (!isUuid(scriptId)) notFound();
   const supabase = await createClient();
-  const access = await requirePlayerPage(playerId);
+  const access = await requirePlayerPage(playerId, "player.training");
   const player = await loadPlayer(supabase, playerId);
   const { data } = await supabase.from("bullpen_scripts").select("id, name, notes, pitches").eq("id", scriptId).maybeSingle();
   if (!data) notFound();

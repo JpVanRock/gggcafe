@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireHeadCoachPage } from "@/lib/auth";
+import { requireDugoutPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { EmptyState } from "@/components/ui";
 import { formatLongDate } from "@/lib/dates";
@@ -26,7 +26,7 @@ type GameRow = {
 };
 
 export default async function BoxScorePage({ params, searchParams }: PageProps<"/dugout/gameday/box/[gameId]">) {
-  await requireHeadCoachPage();
+  const access = await requireDugoutPage("gameday");
   const { gameId } = await params;
   const { team: teamParam } = await searchParams;
   if (!isUuid(gameId)) notFound();
@@ -38,7 +38,10 @@ export default async function BoxScorePage({ params, searchParams }: PageProps<"
     .maybeSingle();
   if (!data) notFound();
   const game = data as GameRow;
-  const ours = [game.home, game.away].filter((t): t is NonNullable<typeof t> => Boolean(t?.is_own_team));
+  // our teams in this game (a team admin: only theirs)
+  const ours = [game.home, game.away].filter(
+    (t): t is NonNullable<typeof t> => Boolean(t?.is_own_team) && (access.role !== null || access.adminTeamIds.includes(t!.id)),
+  );
   const team = ours.find((t) => t.id === teamParam) ?? ours[0];
   if (!team) notFound();
   const home = team.id === game.home_team_id;
@@ -46,7 +49,7 @@ export default async function BoxScorePage({ params, searchParams }: PageProps<"
 
   const seasonId = await seasonOrCurrent(supabase, team.id, game.season_id);
   const [roster, lineupResult, batting, pitching, fielding, grades] = await Promise.all([
-    seasonId ? loadGamedayRoster(supabase, team.id, seasonId) : Promise.resolve([]),
+    seasonId ? loadGamedayRoster(supabase, team.id, seasonId, { teamAdmin: access.role === null }) : Promise.resolve([]),
     supabase.from("gameday_lineups").select("batting_order").eq("game_id", gameId).eq("team_id", team.id).order("updated_at", { ascending: false }).limit(1),
     supabase
       .from("batting_lines")

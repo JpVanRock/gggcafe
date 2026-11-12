@@ -17,7 +17,7 @@ const heading = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft up
 export default async function GamePlanPage({ params }: PageProps<"/players/[playerId]/training/game-plan">) {
   const { playerId } = await params;
   const supabase = await createClient();
-  const access = await requirePlayerPage(playerId);
+  const access = await requirePlayerPage(playerId, "player.training");
   const player = await loadPlayer(supabase, playerId);
   const today = todayISO();
   const { games, plans } = await loadGamePlans(supabase, player.id, addDays(today, -21), addDays(today, 14));

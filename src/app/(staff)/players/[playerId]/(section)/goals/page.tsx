@@ -18,7 +18,7 @@ export const metadata: Metadata = { title: "Goals · GGG.Cafe" };
 export default async function GoalsPage({ params }: PageProps<"/players/[playerId]/goals">) {
   const { playerId } = await params;
   const supabase = await createClient();
-  const access = await requirePlayerPage(playerId);
+  const access = await requirePlayerPage(playerId, "player.goals");
   const player = await loadPlayer(supabase, playerId);
   const method = player.goal_method ?? "harada";
   const [chart, smartGoals, metricOptions, pop, { data: best }] = await Promise.all([

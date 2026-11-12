@@ -43,7 +43,7 @@ export default async function LeaderboardPage({ params, searchParams }: PageProp
   const { playerId } = await params;
   const { team: teamParam } = await searchParams;
   const supabase = await createClient();
-  const access = await requirePlayerPage(playerId);
+  const access = await requirePlayerPage(playerId, "player.leaderboard");
   const player = await loadPlayer(supabase, playerId);
   const name = firstName(player);
   const teams = (await loadTeamDugout(supabase, player.id)).map((t) => t.team);

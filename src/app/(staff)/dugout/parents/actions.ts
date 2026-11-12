@@ -45,6 +45,26 @@ export async function removeParentLink(_prev: FormState, fd: FormData): Promise<
   });
 }
 
+/**
+ * Team admin (user, 2026-11-12): the head coach lets one of the team's approved parents edit the
+ * calendar, measurements and GameDay for this team, or takes it back.
+ */
+export async function setTeamAdmin(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    const teamId = text(fd, "team_id");
+    const userId = text(fd, "user_id");
+    if (!isUuid(teamId) || !isUuid(userId)) return failed(STALE);
+    const on = fd.get("on") === "true";
+    const supabase = await createClient();
+    const { error } = await supabase.rpc("set_team_admin", { p_team_id: teamId, p_user_id: userId, p_on: on });
+    if (error?.code === "P0006") return failed("Only an approved parent of this team can be its team admin.");
+    if (error) return failed(friendlyDbError(error));
+    refresh();
+  });
+}
+
 // ---------------------------------------------------------------------------
 // The parent welcome packet (Phase 6): head coaches write it; parents read it on /family.
 // ---------------------------------------------------------------------------

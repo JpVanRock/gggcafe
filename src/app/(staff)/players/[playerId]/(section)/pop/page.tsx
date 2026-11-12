@@ -17,7 +17,7 @@ export default async function PopPage({ params, searchParams }: PageProps<"/play
   const { playerId } = await params;
   const { year } = await searchParams;
   const supabase = await createClient();
-  const access = await requirePlayerPage(playerId);
+  const access = await requirePlayerPage(playerId, "player.pop");
   const player = await loadPlayer(supabase, playerId);
   const [pop, styles, photos, { data: g3 }] = await Promise.all([
     loadPopReport(supabase, player.id),

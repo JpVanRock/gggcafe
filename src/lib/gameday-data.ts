@@ -17,9 +17,9 @@ export type GamedayPlayer = RosterPlayer & {
 };
 
 /** The team's active roster for a season, with GameDay cards and season batting stats. */
-export async function loadGamedayRoster(supabase: Supabase, teamId: string, seasonId: string): Promise<GamedayPlayer[]> {
+export async function loadGamedayRoster(supabase: Supabase, teamId: string, seasonId: string, { teamAdmin = false } = {}): Promise<GamedayPlayer[]> {
   const [roster, profileResult, statsResult] = await Promise.all([
-    loadRoster(supabase, teamId, { seasonId }),
+    loadRoster(supabase, teamId, { seasonId, teamAdmin }),
     supabase.from("gameday_profiles").select("player_id, hitting_type, base_running, avg, obp, k_pct").eq("team_id", teamId).eq("season_id", seasonId),
     supabase.from("batting_season").select("player_id, pa, avg, obp, k_pct").eq("team_id", teamId).eq("season_id", seasonId),
   ]);
