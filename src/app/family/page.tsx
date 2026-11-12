@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { BudgetSummary, type BudgetSummaryData } from "@/components/budget-summary";
+import { BudgetSummary, CreditsSummary, type BudgetSummaryData } from "@/components/budget-summary";
 import { Card, Disclosure, Loading, PageHeader, secondaryButtonClass, eyebrowClass, badgeClass } from "@/components/ui";
 import { JoinForm } from "./join-form";
 import { FamilyHeader } from "./header";
@@ -274,6 +274,8 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
             <p className="mt-1 text-sm text-muted">View only. Team totals; individual families&apos; payments stay private.</p>
           </div>
           {summary ? <BudgetSummary summary={summary} /> : <p className="text-sm text-muted">The budget isn&apos;t set up yet.</p>}
+          {/* tournament credit: its own running balance, apart from the budget (user, 2026-11-12) */}
+          {summary?.credits && summary.credits.length > 0 && <CreditsSummary credits={summary.credits} />}
         </section>
       ))}
 

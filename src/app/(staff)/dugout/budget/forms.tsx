@@ -220,35 +220,23 @@ export function AdjustmentForm({ scope, players }: { scope: Scope; players: Budg
   );
 }
 
-export function EntryForm({ scope, today }: { scope: Scope; today: string }) {
+/** An expense, or fundraisers and other income: two separate forms (user, 2026-11-12). */
+export function EntryForm({ scope, today, kind }: { scope: Scope; today: string; kind: "expense" | "income" }) {
   const [state, action] = useActionState(addEntry, initialFormState);
-  const [kind, setKind] = useState<"expense" | "income">("expense");
   const categories = ENTRY_FORM_CATEGORIES[kind];
+  const income = kind === "income";
   return (
     <form action={action} className="grid gap-4 sm:grid-cols-6">
       <Hidden scope={scope} />
-      <fieldset className="sm:col-span-6">
-        <legend className="sr-only">Expense or income</legend>
-        <div role="radiogroup" className="inline-flex rounded-full border border-navy-600 p-0.5">
-          {(["expense", "income"] as const).map((k) => (
-            <label
-              key={k}
-              className="cursor-pointer rounded-full px-4 py-1.5 text-sm font-semibold text-muted transition select-none has-checked:bg-pink has-checked:text-on-accent"
-            >
-              <input type="radio" name="kind" value={k} checked={kind === k} onChange={() => setKind(k)} className="sr-only" />
-              {k === "expense" ? "Expense" : "Other income"}
-            </label>
-          ))}
-        </div>
-      </fieldset>
+      <input type="hidden" name="kind" value={kind} />
       <div className="sm:col-span-2">
         <Field label="Date">
           <input type="date" name="entry_date" required defaultValue={today} className={inputClass} />
         </Field>
       </div>
       <div className="sm:col-span-2">
-        <Field label={kind === "income" ? "Source" : "Category"}>
-          <select key={kind} name="category" defaultValue={categories[0]} className={inputClass}>
+        <Field label={income ? "Source" : "Category"}>
+          <select name="category" defaultValue={categories[0]} className={inputClass}>
             {categories.map((c) => (
               <option key={c}>{c}</option>
             ))}
@@ -257,21 +245,16 @@ export function EntryForm({ scope, today }: { scope: Scope; today: string }) {
       </div>
       <div className="sm:col-span-2">
         <Field label="Amount">
-          <input name="amount" required inputMode="decimal" placeholder="650.00" className={moneyInput} />
+          <input name="amount" required inputMode="decimal" placeholder={income ? "300.00" : "650.00"} className={moneyInput} />
         </Field>
       </div>
       <div className="sm:col-span-6">
         <Field label="Description">
-          <input
-            name="description"
-            maxLength={300}
-            placeholder={kind === "income" ? "Pizza Place banner sponsor" : "Fall Classic entry fee"}
-            className={inputClass}
-          />
+          <input name="description" maxLength={300} placeholder={income ? "Car wash fundraiser" : "Fall Classic entry fee"} className={inputClass} />
         </Field>
       </div>
       <div className="flex flex-wrap items-center gap-3 sm:col-span-6">
-        <SubmitButton>{kind === "income" ? "Add income" : "Add expense"}</SubmitButton>
+        <SubmitButton>{income ? "Add income" : "Add expense"}</SubmitButton>
         <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>

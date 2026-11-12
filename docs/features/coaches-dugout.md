@@ -11,6 +11,10 @@
   (`/dugout/gameday/[id]/pdf`, `src/lib/pdf/lineup-pdf.tsx`, landscape lineup card) / Finalize & Share
   (`shareLineup`, same email/mailto flow; `ShareButton` takes the action and return path). Helpers in
   `src/lib/gameday.ts` (no imports; unit-tested). Team pills (`?team=`) appear when there is more than one own team.
+- Team Budget layout (user, 2026-11-12): left column = Registration costs (sized to its content), "Add an expense"
+  and "Discount or extra charge for a player"; right column = money coming in ("Record a player payment", "Add
+  fundraisers or other income"), then the tournament credit and coaches' ledger forms. The income total is labeled
+  "Fundraisers or other income".
 - Team Budget, per team and season (`?season=`): registration costs every player owes (`budget_fees`,
   saved by `save_budget_fees`), per-player discount/extra charge (`budget_adjustments`), and the ledger
   `budget_entries` (kind payment/income/expense). Money math in `src/lib/budget.ts` (cents; no
@@ -27,7 +31,11 @@
     form ("Tournament credit won or used"). User, 2026-11-12: kept apart from the team ledger and balance, in their
     own table (`budget_credits`, kind won/used; migration 20261112001755 moved any credit lines out of the ledger).
     The Tournament credits card keeps their running balance across seasons (`creditLedger`); using more than the
-    balance is refused. The staff page notes the credit balance under the summary.
+    balance is refused. The staff page notes the credit balance under the summary. Migration 20261112003427 moved
+    the credit lines the old form saved during that deploy (dropping one exact duplicate) and the team ledger now
+    refuses tournament-credit lines (`budget_entries_no_tournament_credit_check`). `team_budget_summary()` returns
+    the team's credits (all seasons) as `credits`, which parents see in their own Tournament credits section with
+    its running balance (`CreditsSummary`, below the budget on the family page and in the coaches' Parent view).
   - Coaches' out-of-pocket ledger (`budget_coach_expenses`, same access as the budget): what a coach (or a
     volunteer) paid with their own money, kept apart from the team balance (only a repayment from team money is a
     team expense, because that money leaves the team), with spent / repaid / still owed, who is

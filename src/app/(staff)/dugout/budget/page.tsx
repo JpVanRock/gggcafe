@@ -4,7 +4,7 @@ import { isHeadCoach, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { Modal } from "@/components/modal";
-import { BudgetSummary, type BudgetSummaryData } from "@/components/budget-summary";
+import { BudgetSummary, CreditsSummary, type BudgetSummaryData } from "@/components/budget-summary";
 import { Card, Disclosure, EmptyState, pillQuietClass, tableClass, tdClass, thClass, badgeClass, type BadgeTone, TableScroll } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import {
@@ -184,9 +184,13 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
           {summary && (
             <Modal title="What parents see" subtitle={`${team.name} · ${season.name}`} trigger="Parent view" triggerClassName={pillQuietClass}>
               <p className="mb-5 text-sm text-muted">
-                Approved parents see team totals only: no names, and player payments as daily totals.
+                Approved parents see team totals only: no names, and player payments as daily totals. Tournament credits show on their
+                own, below the budget.
               </p>
-              <BudgetSummary summary={summary} />
+              <div className="flex flex-col gap-6">
+                <BudgetSummary summary={summary} />
+                {summary.credits && summary.credits.length > 0 && <CreditsSummary credits={summary.credits} />}
+              </div>
             </Modal>
           )}
         </div>
@@ -200,34 +204,45 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
         </p>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card title="Registration costs">
-          {editor ? (
-            <FeesForm key={season.id} scope={scope} fees={fees} />
-          ) : fees.length ? (
-            <ul className="flex flex-col gap-1 text-sm">
-              {fees.map((f) => (
-                <li key={f.name} className="flex justify-between">
-                  <span>{f.name}</span>
-                  <span className="tabular-nums">{money(f.cents)}</span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <EmptyState>Not set yet.</EmptyState>
+      {/* Left: registration costs and everything that's an expense or changes what a player owes.
+          Right: money coming in, then tournament credit and the coaches' ledger (user, 2026-11-12). */}
+      <div className="grid items-start gap-6 lg:grid-cols-2">
+        <div className="flex flex-col gap-3">
+          <Card title="Registration costs">
+            {editor ? (
+              <FeesForm key={season.id} scope={scope} fees={fees} />
+            ) : fees.length ? (
+              <ul className="flex flex-col gap-1 text-sm">
+                {fees.map((f) => (
+                  <li key={f.name} className="flex justify-between">
+                    <span>{f.name}</span>
+                    <span className="tabular-nums">{money(f.cents)}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <EmptyState>Not set yet.</EmptyState>
+            )}
+          </Card>
+          {editor && (
+            <>
+              <Disclosure summary="Add an expense">
+                <EntryForm scope={scope} today={today} kind="expense" />
+              </Disclosure>
+              <Disclosure summary="Discount or extra charge for a player">
+                <AdjustmentForm scope={scope} players={options} />
+              </Disclosure>
+            </>
           )}
-        </Card>
+        </div>
 
         {editor && (
           <div className="flex flex-col gap-3">
             <Disclosure summary="Record a player payment" open>
               <PaymentForm scope={scope} players={options} today={today} />
             </Disclosure>
-            <Disclosure summary="Add an expense or other income">
-              <EntryForm scope={scope} today={today} />
-            </Disclosure>
-            <Disclosure summary="Discount or extra charge for a player">
-              <AdjustmentForm scope={scope} players={options} />
+            <Disclosure summary="Add fundraisers or other income">
+              <EntryForm scope={scope} today={today} kind="income" />
             </Disclosure>
             <Disclosure summary="Tournament credit won or used">
               <CreditForm scope={scope} today={today} balance={creditLeft} />

@@ -259,6 +259,7 @@ const budgetSummary = () => {
       ...budget_entries.filter((e) => e.kind !== "payment").map((e) => ({ date: e.entry_date, kind: e.kind, category: e.category, description: e.description, amount: e.amount })),
       ...[...byDay].map(([date, rows]) => ({ date, kind: "payment", category: null, description: `${rows.length} player payment${rows.length === 1 ? "" : "s"}`, amount: sum(rows) })),
     ],
+    credits: budget_credits.map((c) => ({ date: c.entry_date, kind: c.kind, amount: c.amount, description: c.description })),
   };
 };
 const budget_coach_expenses: Row[] = [

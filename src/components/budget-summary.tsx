@@ -6,7 +6,7 @@
 import type { ReactNode } from "react";
 import { Modal } from "@/components/modal";
 import { formatDay, formatLongDateAt } from "@/lib/dates";
-import { money, runningLedger, toCents, type EntryKind } from "@/lib/budget";
+import { creditLedger, money, runningLedger, toCents, type CreditKind, type EntryKind } from "@/lib/budget";
 import { TableScroll, cardClass, EmptyState } from "@/components/ui";
 
 export type BudgetSummaryData = {
@@ -23,6 +23,8 @@ export type BudgetSummaryData = {
   other_income: number;
   expenses: number;
   entries: { date: string; kind: EntryKind; category: string | null; description: string | null; amount: number }[];
+  /** the team's tournament credits, all seasons: shown on their own, never in the budget's totals */
+  credits?: { date: string; kind: CreditKind; amount: number; description: string }[];
 };
 
 function Stat({
@@ -41,7 +43,8 @@ function Stat({
   return (
     <div className={`${cardClass("raised")} relative p-4`}>
       {action && <div className="absolute top-3 right-3">{action}</div>}
-      <p className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">{label}</p>
+      {/* leave room for the Details button in the corner */}
+      <p className={`font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase ${action ? "pr-20" : ""}`}>{label}</p>
       <p
         className={`mt-1 font-display text-2xl font-bold tabular-nums ${
           tone === "highlight" ? "text-highlight" : tone === "danger" ? "text-danger" : "text-ink"
@@ -144,10 +147,10 @@ export function BudgetSummary({ summary, showLedger = true }: { summary: BudgetS
         </div>
         <Stat label="Still owed" value={money(t.owed)} note="Registration not yet paid" />
         <Stat
-          label="Other income"
+          label="Fundraisers or other income"
           value={money(t.other)}
-          note="Sponsors, fundraisers, donations"
-          action={<LineItems title="Other income" kind="income" entries={summary.entries} team={summary.team} />}
+          note="Fundraisers, sponsors, donations, reimbursements"
+          action={<LineItems title="Fundraisers or other income" kind="income" entries={summary.entries} team={summary.team} />}
         />
         <Stat
           label="Expenses"
@@ -195,5 +198,53 @@ export function BudgetSummary({ summary, showLedger = true }: { summary: BudgetS
         </section>
       )}
     </div>
+  );
+}
+
+/**
+ * Tournament credit the team won toward future entry fees and the credit it used, with its running
+ * balance across seasons. Shown apart from the budget (user, 2026-11-12): credit isn't money, so it
+ * never counts in the budget's income, expenses or balance. Parents see it on the family page.
+ */
+export function CreditsSummary({ credits }: { credits: NonNullable<BudgetSummaryData["credits"]> }) {
+  const rows = creditLedger(credits.map((c) => ({ ...c, cents: toCents(c.amount) })));
+  const balance = rows.length ? rows[rows.length - 1].balance : 0;
+  return (
+    <section aria-label="Tournament credits" className={`${cardClass("raised")} flex flex-col gap-4 p-4 sm:p-5`}>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h3 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Tournament credits</h3>
+        <p className="text-xs text-muted">Kept apart from the team budget · all seasons</p>
+      </div>
+      <p className="flex flex-wrap items-baseline gap-x-3">
+        <span className="font-display text-3xl font-bold text-highlight tabular-nums">{money(balance)}</span>
+        <span className="text-sm text-muted">credit toward future tournament entry fees</span>
+      </p>
+      {rows.length > 0 && (
+        <TableScroll label="Tournament credits">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-navy-700 text-left font-mono text-2xs tracking-[0.15em] text-muted uppercase">
+                <th className="py-2 pr-3 font-semibold">Date</th>
+                <th className="py-2 pr-3 font-semibold">Tournament</th>
+                <th className="py-2 pr-3 text-right font-semibold">Won</th>
+                <th className="py-2 pr-3 text-right font-semibold">Used</th>
+                <th className="py-2 text-right font-semibold">Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r, i) => (
+                <tr key={i} className="border-b border-navy-800 last:border-0">
+                  <td className="py-2 pr-3 whitespace-nowrap text-muted">{formatDay(r.date)}</td>
+                  <td className="py-2 pr-3">{r.description}</td>
+                  <td className="py-2 pr-3 text-right tabular-nums">{r.kind === "won" ? money(r.cents) : ""}</td>
+                  <td className="py-2 pr-3 text-right tabular-nums">{r.kind === "used" ? money(r.cents) : ""}</td>
+                  <td className="py-2 text-right font-semibold tabular-nums">{money(r.balance)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </TableScroll>
+      )}
+    </section>
   );
 }

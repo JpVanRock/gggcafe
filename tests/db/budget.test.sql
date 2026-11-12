@@ -249,9 +249,23 @@ select pg_temp.expect('credits don''t change the team''s income or expenses',
 select pg_temp.expect('a credit is won or used, with a tournament',
   pg_temp.err($$insert into public.budget_credits (team_id, season_id, entry_date, kind, amount, description)
                 values ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1', '2026-10-06', 'spent', 5, 'x')$$), '23514');
+select pg_temp.expect('the summary lists the team''s credits on their own',
+  (select string_agg((c ->> 'kind') || ':' || (c ->> 'amount'), ',') from jsonb_array_elements(public.team_budget_summary('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1') -> 'credits') c),
+  'won:250.00,used:200.00');
+select pg_temp.expect('the team ledger refuses a tournament-credit line',
+  pg_temp.err($$insert into public.budget_entries (team_id, season_id, kind, entry_date, amount, category, description)
+                values ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1', 'income', '2026-10-07', 100, 'Tournament credit', 'Not here')$$), '23514');
 select pg_temp.expect('nobody sets the last-updated date by hand',
   pg_temp.err($$update public.budget_changes set changed_at = '2020-01-01'$$) || (select count(*) from public.budget_changes where changed_at < '2021-01-01')::text,
   '0');
+reset role;
+
+-- An approved parent sees the team's credits on their own, but can't read the credits table itself
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"44444444-0000-0000-0000-000000000003"}', false);
+select pg_temp.expect('parent sees the credits in the summary',
+  (select jsonb_array_length(public.team_budget_summary('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000a1') -> 'credits')), 2);
+select pg_temp.expect('parent reads no credit rows directly', (select count(*) from public.budget_credits), 0::bigint);
 reset role;
 
 -- Assistants and viewers read the coaches' ledger but can't add to it or repay it
