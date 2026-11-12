@@ -247,8 +247,13 @@ const budgetSummary = () => {
   const sum = (rows: Row[]) => rows.reduce((t, e) => t + Number(e.amount), 0);
   const pays = budget_entries.filter((e) => e.kind === "payment");
   const players = new Set(roster_entries.filter((r) => r.team_id === T.us && r.season_id === S.fall && r.active).map((r) => r.player_id)).size;
+  // daily totals per kind of payment, no names (as the database does)
   const byDay = new Map<string, Row[]>();
-  for (const p of pays) byDay.set(String(p.entry_date), [...(byDay.get(String(p.entry_date)) ?? []), p]);
+  for (const p of pays) {
+    const key = `${p.entry_date}|${p.category ?? "Registration"}`;
+    byDay.set(key, [...(byDay.get(key) ?? []), p]);
+  }
+  const noun: Record<string, string> = { Registration: "player payment", Equipment: "equipment payment", Other: "other player payment" };
   return {
     team: "GGG Sample 14U", season: "Fall 2026", season_id: S.fall, updated_at: "2026-11-10T21:30:00Z", players,
     fees: [{ name: "Registration", amount: 450 }], fee_per_player: 450, expected: players * 450,
@@ -257,7 +262,10 @@ const budgetSummary = () => {
     expenses: sum(budget_entries.filter((e) => e.kind === "expense")),
     entries: [
       ...budget_entries.filter((e) => e.kind !== "payment").map((e) => ({ date: e.entry_date, kind: e.kind, category: e.category, description: e.description, amount: e.amount })),
-      ...[...byDay].map(([date, rows]) => ({ date, kind: "payment", category: null, description: `${rows.length} player payment${rows.length === 1 ? "" : "s"}`, amount: sum(rows) })),
+      ...[...byDay].map(([key, rows]) => {
+        const [date, bucket] = key.split("|");
+        return { date, kind: "payment", category: bucket === "Registration" ? null : bucket, description: `${rows.length} ${noun[bucket]}${rows.length === 1 ? "" : "s"}`, amount: sum(rows) };
+      }),
     ],
     credits: budget_credits.map((c) => ({ date: c.entry_date, kind: c.kind, amount: c.amount, description: c.description })),
   };

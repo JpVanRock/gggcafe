@@ -68,6 +68,11 @@ select pg_temp.expect('an equipment payment is other income, not collected',
   (select (s ->> 'collected') || ' ' || (s ->> 'other_income')
      from (select public.team_budget_summary('00000000-0000-0000-0000-0000000000b1') as s) q),
   '825.50 345.00');
+select pg_temp.expect('equipment payments are their own daily total, with their category and no names',
+  (select string_agg((e ->> 'description') || '/' || coalesce(e ->> 'category', '-') || '/' || (e ->> 'amount'), ',')
+     from jsonb_array_elements(public.team_budget_summary('00000000-0000-0000-0000-0000000000b1') -> 'entries') e
+    where e ->> 'kind' = 'payment' and e ->> 'date' = '2026-09-04'),
+  '1 equipment payment/Equipment/45.00');
 update public.budget_entries set category = 'Registration' where description = 'Batting gloves';
 select pg_temp.expect('re-categorized as Registration, it counts as collected',
   (select (s ->> 'collected') || ' ' || (s ->> 'other_income')

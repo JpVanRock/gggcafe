@@ -59,13 +59,19 @@ function Stat({
 
 type Entry = BudgetSummaryData["entries"][number];
 
-/** "Details": every expense (or income) line item in a pop-up, grouped by category with subtotals. */
+/** Player payments for equipment or other things count as income, so the income details list them too. */
+const PAYMENT_GROUP: Record<string, string> = { Equipment: "Equipment payments", Other: "Other player payments" };
+const isIncomeLine = (e: Entry) => e.kind === "income" || (e.kind === "payment" && !!e.category && e.category in PAYMENT_GROUP);
+
+/**
+ * "Details": every expense (or income) line item in a pop-up, grouped by category with subtotals. Always
+ * there (user, 2026-11-12), saying so when nothing is recorded yet.
+ */
 function LineItems({ title, kind, entries, team }: { title: string; kind: "expense" | "income"; entries: Entry[]; team: string }) {
-  const items = entries.filter((e) => e.kind === kind).sort((a, b) => a.date.localeCompare(b.date));
-  if (items.length === 0) return null;
+  const items = entries.filter((e) => (kind === "income" ? isIncomeLine(e) : e.kind === "expense")).sort((a, b) => a.date.localeCompare(b.date));
   const groups = new Map<string, Entry[]>();
   for (const e of items) {
-    const key = e.category || "Other";
+    const key = e.kind === "payment" ? PAYMENT_GROUP[e.category!] : e.category || "Other";
     groups.set(key, [...(groups.get(key) ?? []), e]);
   }
   const total = items.reduce((sum, e) => sum + toCents(e.amount), 0);
@@ -79,6 +85,7 @@ function LineItems({ title, kind, entries, team }: { title: string; kind: "expen
       triggerClassName="rounded-full border border-navy-600 px-2.5 py-0.5 text-xs font-semibold text-muted transition hover:border-pink hover:text-ink"
     >
       <div className="flex flex-col gap-6">
+        {items.length === 0 && <EmptyState>Nothing recorded yet.</EmptyState>}
         {[...groups.entries()]
           .sort((a, b) => a[0].localeCompare(b[0]))
           .map(([category, rows]) => (
