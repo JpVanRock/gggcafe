@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { canEdit, requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
@@ -33,10 +34,14 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
     );
   }
 
-  const [codeResult, approvals] = await Promise.all([
+  const admin = user.staff.role === "admin";
+  const [codeResult, approvals, parentIds] = await Promise.all([
     supabase.from("teams").select("team_code").eq("id", team.id).maybeSingle(),
     loadTeamApprovals(supabase, team.id),
+    // admins: whose account each request is, for "View as" (user, 2026-11-12)
+    admin ? supabase.from("parent_links").select("id, parent_id").eq("team_id", team.id) : Promise.resolve({ data: [] }),
   ]);
+  const parentOf = new Map(((parentIds.data ?? []) as { id: string; parent_id: string }[]).map((l) => [l.id, l.parent_id]));
   const code = codeResult.data?.team_code ?? null;
   const links = approvals.parentLinks;
   const players = approvals.parentPlayers;
@@ -51,6 +56,11 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
       <TeamPicker teams={teams} current={team.id} basePath="/dugout/parents" />
 
       <TeamCodeCard team={team} code={code} head />
+      {admin && (
+        <Link href="/view-as" className="-mt-4 self-start text-sm font-semibold text-link hover:underline">
+          View as a parent or mentor <span aria-hidden="true">→</span>
+        </Link>
+      )}
 
       <Card title={`Waiting for approval (${pending.length})`}>
         {pending.length === 0 ? (
@@ -73,6 +83,11 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
                   </p>
                   <p className="text-sm text-muted">Parent of {l.player_id ? (nameOf.get(l.player_id) ?? l.child_name) : l.child_name}</p>
                 </div>
+                {admin && parentOf.get(l.link_id) && (
+                  <Link href={`/view-as/parent/${parentOf.get(l.link_id)}`} className="text-xs font-semibold text-link hover:underline" aria-label={`View as ${l.parent_name}`}>
+                    View as <span aria-hidden="true">→</span>
+                  </Link>
+                )}
                 <ActionForm action={removeParentLink}>
                   <input type="hidden" name="link_id" value={l.link_id} />
                   <ConfirmSubmit message={`Remove ${l.parent_name}'s access to ${team.name}?`} className="text-xs text-danger hover:underline">

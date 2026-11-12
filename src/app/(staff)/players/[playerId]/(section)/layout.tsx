@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { isUuid } from "@/lib/softball";
 import { LiveSectionNav, SectionNav } from "./section-nav";
+import { ParentViewBanner } from "@/components/parent-view-banner";
 
 /**
  * Every player section (Goals, Pop Report, ...) is its own page: a Back link to
@@ -35,6 +36,7 @@ async function SectionHeader({ params }: { params: LayoutProps<"/players/[player
   }
   return (
     <div className="flex flex-col gap-3">
+      <ParentViewBanner playerId={playerId} />
       <Link href={`/players/${playerId}`} className="self-start text-sm text-muted hover:text-ink">
         ← Back to {name}&apos;s menu
       </Link>

@@ -155,6 +155,10 @@ class Query implements PromiseLike<Result> {
   }
 }
 
+const SAMPLE_LOGO =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='#FE1F7C'/><text x='32' y='40' font-size='18' text-anchor='middle' fill='#ffffff' font-family='sans-serif' font-weight='700'>14U</text></svg>");
+
 export function sampleClient() {
   return {
     from: (table: string) => new Query(table),
@@ -166,7 +170,8 @@ export function sampleClient() {
     storage: {
       from: () => ({
         createSignedUrls: async () => ({ data: [], error: null }),
-        createSignedUrl: async () => ({ data: null, error: null }),
+        // a placeholder for the sample team's logo (team-logos), so the header logo renders; nothing else signs one
+        createSignedUrl: async (path?: string) => ({ data: path?.endsWith(".png") ? { signedUrl: SAMPLE_LOGO } : null, error: null }),
         remove: async () => ({ data: [], error: null }),
       }),
     },

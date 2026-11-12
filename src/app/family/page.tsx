@@ -142,8 +142,16 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
               const step = consentStep(consent);
               return (
                 <li key={d.player_id} className="flex flex-col gap-3">
-                  <p className="font-semibold">
-                    {d.player_name} <span className="font-normal text-muted">· {d.team_name}</span>
+                  <p className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                    <span className="font-semibold">
+                      {d.player_name} <span className="font-normal text-muted">· {d.team_name}</span>
+                    </span>
+                    {/* her pages as she sees them, read only (user, 2026-11-12) */}
+                    {d.on_roster && (
+                      <Link href={`/players/${d.player_id}`} className="text-sm font-semibold text-link hover:underline">
+                        View as {first} <span aria-hidden="true">→</span>
+                      </Link>
+                    )}
                   </p>
                   {d.username ? (
                     <>

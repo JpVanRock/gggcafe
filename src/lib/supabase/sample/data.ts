@@ -33,7 +33,7 @@ const players: Row[] = PLAYERS.map(([first, last, , pos, sec], i) => ({
   walk_up_songs: [], created_at: "2026-08-15T00:00:00Z", updated_at: "2026-08-15T00:00:00Z",
 }));
 const teams: Row[] = [
-  { id: T.us, name: "GGG Sample 14U", short_name: "GGG", organization: "GGG.Cafe", age_group: "14U", is_own_team: true, format: "fastpitch", logo_path: null, welcome_message: null, team_code: "GGG234", home_field: null, notes: null },
+  { id: T.us, name: "GGG Sample 14U", short_name: "GGG", organization: "GGG.Cafe", age_group: "14U", is_own_team: true, format: "fastpitch", logo_path: `${id("bbbbbb", 1)}/1731300000000.png`, welcome_message: null, team_code: "GGG234", home_field: null, notes: null },
   { id: T.storm, name: "Lakeside Storm", short_name: "Storm", is_own_team: false, age_group: "14U", format: "fastpitch" },
   { id: T.venom, name: "Valley Venom", short_name: "Venom", is_own_team: false, age_group: "14U", format: "fastpitch" },
   { id: T.rebels, name: "Ridgeline Rebels", short_name: "Rebels", is_own_team: false, age_group: "14U", format: "fastpitch" },
@@ -312,10 +312,41 @@ const playerFull = (pid: string) => {
   return `${PLAYERS[i][0]} ${PLAYERS[i][1]}`;
 };
 
+const viewAccount = (as: string) => ({
+  id: U.admin, email: "coach@sample.test", created_at: "2026-11-01T00:00:00Z", confirmed_at: "2026-11-01T00:05:00Z",
+  last_sign_in_at: "2026-11-10T21:00:00Z", display_name: "Pat Torres", signed_up_as: as,
+});
+
 /** RPC results by function name (anything not listed returns null). */
 export function sampleRpc(name: string, args: Row = {}): unknown {
   switch (name) {
     case "team_current_season": return S.fall;
+    // admins' "View as" (user, 2026-11-12): the sample admin seen as a parent of Maya and Emma, and as a mentor
+    case "admin_view_parent": return {
+      account: viewAccount("parent"),
+      profile: { display_name: "Pat Torres" },
+      links: (sampleRpc("parent_home") as Row[]),
+      daughters: (sampleRpc("parent_player_logins") as Row[]).map((d) => ({ ...d, questionnaire: null, medical: null })),
+      consent: [],
+      packet: [],
+      packet_read: [],
+      mentor_links: mentor_links.map((l) => ({ mentor_id: l.mentor_id, team_id: l.team_id, player_id: l.player_id, status: l.status })),
+      mentors: mentors.map((m) => ({ user_id: m.user_id, display_name: m.display_name, specialty: m.specialty })),
+      budgets: [sampleRpc("team_budget_summary")],
+      yearbook_teams: [],
+      logos: sampleRpc("parent_team_logos"),
+    };
+    case "admin_view_mentor": return {
+      account: viewAccount("mentor"),
+      mentor: { display_name: "Coach Sample", specialty: "Pitching", approved_at: "2026-11-01T00:00:00Z" },
+      links: sampleRpc("my_mentor_links"),
+      players: [maya, emma].map((pid) => ({ id: pid, name: playerFull(pid), position: "SS", team: "GGG Sample 14U", jersey: "2" })),
+      messages: mentor_messages.slice(0, 3).map((m) => ({ player_id: m.player_id, body: m.body, drill_name: m.drill_name ?? null, has_photo: !!m.photo_path, created_at: m.created_at, read_at: m.read_at ?? null, shared_with_coaches: !!m.shared_with_coaches })),
+      training: [],
+      notes: 2,
+      focus: 1,
+    };
+    case "parent_team_logos": return [{ team_id: T.us, team_name: "GGG Sample 14U", logo_path: `${id("bbbbbb", 1)}/1731300000000.png` }];
     case "team_budget_summary": return budgetSummary();
     case "signup_team": return String(args.p_code ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "") === "GGG234" ? [{ id: T.us, name: "GGG Sample 14U" }] : [];
     case "team_bp_leaders": return [{ player_id: maya, first_name: "Maya", last_name: "Torres", jersey_number: "2", swings: 21, production: 3.95 }];

@@ -7,6 +7,7 @@ import { SiteHeader, navClass, navItemClass } from "@/components/site-header";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth";
 import { yearbookTeams } from "@/lib/yearbook-data";
+import { HeaderTeamLogo } from "@/components/header-team-logo";
 
 /** Parents' menu: Home, plus Yearbook when a daughter on one of their teams has G3 Advanced. */
 async function FamilyNav() {
@@ -36,6 +37,11 @@ export function FamilyHeader() {
   return (
     <SiteHeader
       home={{ href: "/family", label: "GGG.Cafe family home" }}
+      teamLogo={
+        <Suspense fallback={null}>
+          <HeaderTeamLogo />
+        </Suspense>
+      }
       nav={
         <Suspense fallback={areaLabel}>
           <MainNav

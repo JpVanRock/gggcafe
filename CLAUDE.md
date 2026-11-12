@@ -28,7 +28,9 @@ src/lib/supabase/        server.ts (Server Components/Actions), client.ts (brows
                          env.ts, database.types.ts (generated from the migrations: npm run db:types)
 src/components/main-nav.tsx  top menu: staff get Dashboard/Coaches Dugout (opens Roster)/Teams/Players on every page,
                          including /me and /family; players get "My profile". Every header is <SiteHeader>
-                         (site-header.tsx): on phones the links fold behind a Menu button
+                         (site-header.tsx): on phones the links fold behind a Menu button. Coaches' and parents' headers
+                         show their team's logo beside ours when it has one (`HeaderTeamLogo`, `headerTeamLogo()` in
+                         lib/team-logos.ts; parents get it from `parent_team_logos()`)
 src/proxy.ts             refreshes the Supabase auth session each request (Next 16 "proxy", formerly middleware)
 src/app/terms, privacy   Terms of Service and Privacy & Security (public); /terms/accept asks signed-in users to agree
 src/app/manifest.ts      the phone app (installable web app; opens /dashboard, which routes each account home).
@@ -101,6 +103,10 @@ tests/unit/              node --test unit tests (npm run test:unit)
   (template `supabase/templates/definer-function.sql`). `tests/db/zz_functions.test.sql` fails on a definer function
   in public, one without the search_path, one everyone can run, or anything signed-out visitors can call beyond
   sign-up. A new private helper used by RLS needs `grant execute … to authenticated` (PUBLIC no longer has it).
+- Parents "view as player" (2026-11-12): every SELECT rule a player reads by (`my_player_ids()`, `my_current_team_ids()`,
+  `has_player_access()`) has a read-only "(parent view)" twin using `my_child_ids()` / `my_child_team_ids()` /
+  `has_child_access()`. A new player-read rule needs its twin in the same migration (`tests/db/zz_parent_view.test.sql`
+  fails without it), and a read function player pages call needs a parent branch; write functions stay the player's.
 - Run `npm run db:test` before `npm run db:push`. It checks stat math, RLS on every table,
   security_invoker on every view, and the viewer/coach/admin access rules.
 - Never edit an applied migration; add a new one (`npm run db:new <name>`).

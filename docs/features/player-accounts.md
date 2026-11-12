@@ -31,3 +31,11 @@
   (P0008, shown in `decidePlayerClaim`). The parent can cancel or withdraw on /family (`withdraw_parental_consent`: her
   parent-made login is deleted and approved claims are declined). Status per daughter: `parent_consent_status`,
   `consentStep()` in `src/lib/consent.ts`. DB tests: `tests/db/parental_consent.test.sql`.
+- Parents "View as player" (user, 2026-11-12; migration 20261112012728): an approved parent opens her daughter's
+  player pages from the family page ("View as {first} →", when she's on the current roster) and sees what the
+  daughter sees, read only. `requirePlayerPage` lets her in with `isParent` (canAct and canManage false, so no
+  forms); `ParentViewBanner` says so with a link back; the top menu shows "Family home" (`NonStaffNav`). The database
+  gives parents SELECT only: read-only twins of every player-read rule (named "... (parent view)") and parent branches
+  in the read functions (teams she can see, the IQ answer key, practice notes, BP leaders, squads, the Leaderboard,
+  team quizzes). Every table a player reads is one her coaches read too, so nothing private to the player alone is
+  shown. `tests/db/zz_parent_view.test.sql`.

@@ -78,7 +78,8 @@ select pg_temp.expect('teammates'' names through the yearbook only',
   (select string_agg(t ->> 'name', ', ' order by t ->> 'name')
      from jsonb_array_elements(public.team_yearbook('00000000-0000-0000-0000-0000000000b1') -> 'photos') p, jsonb_array_elements(p -> 'tags') t),
   'Avery Lopez, Jordan Kim, Riley Chen');
-select pg_temp.expect('parent reads no player rows', (select count(*) from public.players), 0::bigint);
+-- parents "view as player" (2026-11-12): her own daughter's row, no teammates'
+select pg_temp.expect('parent reads only her daughter''s player row', (select count(*) from public.players), 1::bigint);
 select pg_temp.expect('parent upload named from her parent profile',
   (select uploader_name from public.yearbook_photos where id = 'dddddddd-0000-0000-0000-0000000000f2'), 'Pat Lopez');
 do $$ begin

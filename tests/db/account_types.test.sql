@@ -176,7 +176,8 @@ select pg_temp.expect('login made', public.create_player_login('00000000-0000-00
 select pg_temp.expect('only one login', pg_temp.err($$select public.create_player_login('00000000-0000-0000-0000-0000000000c1', 'avery8', 'goodpass123')$$), '23505');
 select pg_temp.expect('parent sees the username', (select username || '/' || has_account from public.parent_player_logins()), 'avery7/true');
 select pg_temp.expect('parent reads the login row', (select count(*) from public.player_logins), 1::bigint);
-select pg_temp.expect('parent still reads no players', (select count(*) from public.players), 0::bigint);
+-- parents "view as player" (2026-11-12): she reads her own daughter, and no one else
+select pg_temp.expect('parent reads only her daughter', (select string_agg(first_name, ',') from public.players), 'Avery');
 reset role;
 
 -- The stranger (pending, not approved) can't make one for Jordan

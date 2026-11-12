@@ -40,3 +40,7 @@
   ones; whole-team ones are listed), and `/family/mentors?player=` with every message, focus area and note about her.
 - DB tests: `tests/db/mentors.test.sql`. Sample data: the sample admin is a whole-team mentor (and parent of Maya and
   Emma) so the mentor, Dugout and family mentor pages render in the smoke test.
+- Coaches Dugout → Mentors opens with the team motto (`team_culture.motto`, set in Culture) and five ways great mentors
+  lead, drawn from the G3 Leadership Guide's lessons (`MENTOR_WAYS` in `dugout/mentors/page.tsx`: earn trust first,
+  listen more than you talk, lift her higher, make the people around you better, train the next leader). The
+  approval and privacy details sit under "How mentoring works" (user, 2026-11-12).

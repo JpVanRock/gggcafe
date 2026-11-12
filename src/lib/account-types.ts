@@ -89,8 +89,8 @@ export const SECTIONS: { title: string; rows: Row[] }[] = [
     rows: [
       row("Coaches dashboard", "Approvals waiting, Leadership check-ins, team and player counts, the Coaches Dugout.", ["yes", "part", "no", "no", "no"],
         "Assistants get their own view: this week's calendar, practice plans for the next two weeks, their drafts, and player claims to approve."),
-      row("Player menu", "The cafe-menu dashboard: TWIS, Goals, Pop Report, Mental GP, Softball IQ, Trophy Room.", ["yes", "yes", "own", "no", "part"],
-        "Coaches open every player's menu. Mentors read Goals, the Pop Report and Mental GP of the players they're approved for."),
+      row("Player menu", "The cafe-menu dashboard: TWIS, Goals, Pop Report, Mental GP, Softball IQ, Trophy Room.", ["yes", "yes", "own", "view", "part"],
+        "Coaches open every player's menu. Parents view their daughter's, read only (View as on the family page). Mentors read Goals, the Pop Report and Mental GP of the players they're approved for."),
       row("Family page", "Their daughter's team, team budget totals (no names), her login, the Yearbook with G3 Advanced.", ["no", "no", "no", "yes", "no"]),
       row("Mentor page", "The team's roster or her approved players, messages with a photo or a drill (shared with coaches if she chooses), training for one player or a group, notes and focus areas with the coaches.", ["no", "no", "no", "no", "yes"]),
     ],
@@ -150,6 +150,8 @@ export const SECTIONS: { title: string; rows: Row[] }[] = [
       row("Welcome packet", "The coach's letter, team policies and how-to-help tips on the family page.", ["yes", "no", "no", "view", "no"],
         "Head coaches write it (Parents tab); approved parents read it and mark each item read."),
       row("Change roles, remove staff", "Head Coach, Assistant Coach or Viewer, on the Roster tab.", ["no", "no", "no", "no", "no"], "Admins only."),
+      row("View as a parent or mentor", "See their family page or mentor home as they see it, read only, to help with their questions.", ["no", "no", "no", "no", "no"],
+        "Admins only: Coaches Dugout → Parents or Mentors, or the View as page."),
     ],
   },
 ];

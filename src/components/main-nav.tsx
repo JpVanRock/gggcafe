@@ -5,7 +5,7 @@
 // On phones the menu sits behind the header's Menu button; MenuCount puts the same
 // counts on that button.
 import { cache, type ReactNode } from "react";
-import { canEdit, getCurrentUser, isHeadCoach } from "@/lib/auth";
+import { canEdit, getCurrentUser, getMyPlayerIds, isHeadCoach } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getWaitingCount } from "@/lib/approvals";
 import { CountBadge } from "@/components/ui";
@@ -74,6 +74,21 @@ export async function MenuCount() {
 }
 
 /** What players see in the staff area's menu. */
+/**
+ * The menu for signed-in non-staff on player pages: players get My profile; a parent viewing as her
+ * daughter (user, 2026-11-12) gets her family home.
+ */
+export async function NonStaffNav() {
+  if ((await getMyPlayerIds()).length) return <PlayerNav />;
+  return (
+    <nav aria-label="Main" className={navClass}>
+      <NavLink href="/family" exact className={navItemClass}>
+        Family home
+      </NavLink>
+    </nav>
+  );
+}
+
 export function PlayerNav() {
   return (
     <nav aria-label="Main" className={navClass}>

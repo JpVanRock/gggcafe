@@ -30,3 +30,10 @@
   see "Verified parental consent" in player-accounts.md).
 - Admin FAQ second page `/faq/accounts` (content `src/lib/account-types.ts`, unit-tested; `FaqNav` links both pages):
   update it with any access change. DB tests: `tests/db/account_types.test.sql`.
+- Admins' "View as" (user, 2026-11-12; migration 20261112011925): `/view-as` lists every parent and mentor, and
+  Coaches Dugout → Parents / Mentors link each approved parent and working mentor. `/view-as/parent/[userId]` and
+  `/view-as/mentor/[userId]` show that person's family page or mentor home, read only, from one call
+  (`admin_view_parent` / `admin_view_mentor`, security invoker): after checking the caller is an admin it sets
+  `request.jwt.claims` to that person for the rest of the call, so their own access rules and functions answer,
+  then puts the setting back. Nobody signs in as anyone and nothing can be changed. `admin_account(user)` (definer,
+  admins only) adds email, sign-up type, account and confirmation dates and last sign-in. `tests/db/admin_view_as.test.sql`.

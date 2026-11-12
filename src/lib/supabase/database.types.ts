@@ -5928,6 +5928,9 @@ export type Database = {
       }
     }
     Functions: {
+      admin_account: { Args: { p_user: string | null }; Returns: Json }
+      admin_view_mentor: { Args: { p_user: string | null }; Returns: Json }
+      admin_view_parent: { Args: { p_user: string | null }; Returns: Json }
       allow_password_reset: { Args: { p_email: string | null }; Returns: boolean }
       answer_team_quiz: { Args: { p_player_id: string | null; p_question_id: string | null; p_chosen: number | null }; Returns: { is_correct: boolean; correct_index: number; explanation: string }[] }
       change_authors: { Args: { p_user_ids: string[] | null }; Returns: { user_id: string; name: string }[] }
@@ -5940,6 +5943,7 @@ export type Database = {
       iq_answer_key: { Args: { p_player_id: string | null }; Returns: { question_id: string; correct_index: number; explanation: string }[] }
       iq_review_status: { Args: { p_attempt_id: string | null }; Returns: { missed: number; reviewed: number; complete: boolean }[] }
       mentor_requests_waiting: { Args: Record<PropertyKey, never>; Returns: number }
+      my_child_ids: { Args: Record<PropertyKey, never>; Returns: string[] }
       my_claims: { Args: Record<PropertyKey, never>; Returns: { claim_id: string; team_id: string; team_name: string; season_name: string; typed_name: string; typed_jersey: string; status: Database["public"]["Enums"]["player_claim_status"]; is_current: boolean; player_id: string; welcome_message: string }[] }
       my_mentor_links: { Args: Record<PropertyKey, never>; Returns: { id: string; team_id: string; team_name: string; player_id: string; player_name: string; status: Database["public"]["Enums"]["mentor_link_status"]; requested_at: string }[] }
       my_player_ids: { Args: Record<PropertyKey, never>; Returns: string[] }
@@ -5953,6 +5957,7 @@ export type Database = {
       parent_medical_card: { Args: { p_player_id: string | null }; Returns: Json }
       parent_player_logins: { Args: Record<PropertyKey, never>; Returns: { player_id: string; player_name: string; team_name: string; on_roster: boolean; username: string; has_account: boolean }[] }
       parent_questionnaire: { Args: { p_player_id: string | null }; Returns: Json }
+      parent_team_logos: { Args: Record<PropertyKey, never>; Returns: { team_id: string; team_name: string; logo_path: string }[] }
       pending_approvals: { Args: Record<PropertyKey, never>; Returns: { team_id: string; team_name: string; player_claims: number; parent_requests: number }[] }
       pending_parental_consents: { Args: Record<PropertyKey, never>; Returns: { id: string; player_id: string; player_name: string; birth_date: string; team_name: string; parent_name: string; parent_account: string; parent_email: string; relationship: string; method: string; form_path: string; submitted_at: string }[] }
       record_iq_answer: { Args: { p_player_id: string | null; p_question_id: string | null; p_chosen: number | null; p_attempt_id?: string | null; p_review_of?: string | null; p_hint_used?: boolean | null }; Returns: { correct: boolean; correct_index: number; explanation: string }[] }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { requirePlayerPage, isHeadCoach } from "@/lib/auth";
+import { ParentViewBanner } from "@/components/parent-view-banner";
 import { createClient } from "@/lib/supabase/server";
 import { isISODate, todayISO, weekStart } from "@/lib/dates";
 import { isUuid, type Player } from "@/lib/softball";
@@ -58,7 +59,7 @@ export default async function PlayerDashboardPage({ params, searchParams }: Page
   ]);
   const photoUrl = player.photo_path ? (photos?.get(player.photo_path) ?? null) : null;
 
-  return (
+  const menu = (
     <PlayerMenu
       player={player}
       twis={twis}
@@ -81,5 +82,13 @@ export default async function PlayerDashboardPage({ params, searchParams }: Page
       mentorMessages={{ unread, total: messageCount ?? 0, photoUrls: messagePhotos }}
       isAdmin={access.user.staff?.role === "admin"}
     />
+  );
+  // her approved parent viewing as her (user, 2026-11-12): what she sees, read only
+  if (!access.isParent) return menu;
+  return (
+    <div className="flex flex-col gap-4">
+      <ParentViewBanner playerId={player.id} />
+      {menu}
+    </div>
   );
 }

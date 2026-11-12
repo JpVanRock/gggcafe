@@ -271,6 +271,17 @@ select pg_temp.expect('nobody sets the last-updated date by hand',
   '0');
 reset role;
 
+-- The header's team logo (user, 2026-11-12): an approved parent gets her team's, a stranger none
+update public.teams set logo_path = '00000000-0000-0000-0000-0000000000b1/1731300000000.png' where id = '00000000-0000-0000-0000-0000000000b1';
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"44444444-0000-0000-0000-000000000003"}', false);
+select pg_temp.expect('parent gets her team''s logo', (select team_name || ':' || logo_path from public.parent_team_logos()),
+  'Sample Squad 14U:00000000-0000-0000-0000-0000000000b1/1731300000000.png');
+select set_config('request.jwt.claims', '{"sub":"44444444-0000-0000-0000-000000000005"}', false);
+select pg_temp.expect('a stranger gets none', (select count(*) from public.parent_team_logos()), 0::bigint);
+reset role;
+update public.teams set logo_path = null where id = '00000000-0000-0000-0000-0000000000b1';
+
 -- An approved parent sees the team's credits on their own, but can't read the credits table itself
 set role authenticated;
 select set_config('request.jwt.claims', '{"sub":"44444444-0000-0000-0000-000000000003"}', false);

@@ -111,6 +111,16 @@ export const getMyPlayerIds = cache(async (): Promise<string[]> => {
   return ((data ?? []) as (string | { my_player_ids: string })[]).map((r) => (typeof r === "string" ? r : r.my_player_ids));
 });
 
+/**
+ * Daughters a parent may view as (approved, on a team's current roster): her parents see her
+ * player pages read only (user, 2026-11-12; private.my_child_ids()).
+ */
+export const getMyChildIds = cache(async (): Promise<string[]> => {
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("my_child_ids");
+  return ((data ?? []) as (string | { my_child_ids: string })[]).map((r) => (typeof r === "string" ? r : r.my_child_ids));
+});
+
 export type PlayerPageAccess = {
   user: CurrentUser;
   /** coach or admin: everything, including coach-only tools */
@@ -119,6 +129,8 @@ export type PlayerPageAccess = {
   canAct: boolean;
   /** the signed-in user is this player */
   isSelf: boolean;
+  /** her approved parent viewing as her: read only */
+  isParent?: boolean;
 };
 
 /** For a player's dashboard: staff, or the player herself. Others are sent home. */
@@ -128,8 +140,10 @@ export async function requirePlayerPage(playerId: string): Promise<PlayerPageAcc
   const canManage = Boolean(user.staff && canEdit(user.staff.role));
   if (user.staff) return { user, canManage, canAct: canManage, isSelf: false };
   const mine = await getMyPlayerIds();
-  if (!mine.includes(playerId)) redirect("/me");
-  return { user, canManage: false, canAct: true, isSelf: true };
+  if (mine.includes(playerId)) return { user, canManage: false, canAct: true, isSelf: true };
+  // her approved parent: what she sees, read only (the database gives parents no writes)
+  if ((await getMyChildIds()).includes(playerId)) return { user, canManage: false, canAct: false, isSelf: false, isParent: true };
+  redirect(mine.length ? "/me" : "/family");
 }
 
 /** For server actions on one player's data: an error message unless coach/admin or the player herself. */
