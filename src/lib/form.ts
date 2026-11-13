@@ -1,3 +1,4 @@
+import { log } from "@/lib/log";
 // Helpers for reading <form> submissions in server actions.
 
 export type FormState = {
@@ -76,7 +77,7 @@ export function friendlyDbError(
       // a rate limit in the database (migration 20261113041701)
       return "That's a lot in a short time. Wait a few minutes and try again.";
     default:
-      console.error("Database error:", error);
+      log("error", "db.error", { code: error.code, message: error.message });
       return "Something went wrong saving that. Try again.";
   }
 }

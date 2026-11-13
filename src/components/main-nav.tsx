@@ -52,6 +52,12 @@ export async function MainNav({ fallback = null }: { fallback?: ReactNode }) {
           FAQ
         </NavLink>
       )}
+      {/* Site health: errors, jobs, connected services (user, 2026-11-13) */}
+      {staff.role === "admin" && (
+        <NavLink href="/health" className={navItemClass}>
+          Health
+        </NavLink>
+      )}
       {headCoach && <BellLink unread={unread} />}
     </nav>
   );

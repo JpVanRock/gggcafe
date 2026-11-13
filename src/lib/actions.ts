@@ -3,6 +3,7 @@ import "server-only";
 // action says why it didn't run, database errors included, instead of failing silently.
 import { unstable_rethrow } from "next/navigation";
 import { friendlyDbError, type FormState } from "@/lib/form";
+import { reportError } from "@/lib/errors";
 
 /** The action worked. */
 export const done = (): FormState => ({ error: null, saved: true });
@@ -32,8 +33,13 @@ export async function runAction(work: () => Promise<FormState | void>): Promise<
     return (await work()) ?? done();
   } catch (e) {
     unstable_rethrow(e);
-    if (e instanceof DbError) return failed(friendlyDbError(e.db));
-    console.error("Action failed:", e);
+    if (e instanceof DbError) {
+      // the database turned it down: expected ones (permission, duplicates, rules) have a message;
+      // anything else is tracked (docs/architecture/observability.md)
+      if (!e.db.code || !/^(42501|23\d{3}|P\d{4})$/.test(e.db.code)) await reportError({ source: "action", error: e, context: { code: e.db.code } });
+      return failed(friendlyDbError(e.db));
+    }
+    await reportError({ source: "action", error: e });
     return failed("Something went wrong. Try again.");
   }
 }

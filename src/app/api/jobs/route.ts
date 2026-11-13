@@ -3,6 +3,7 @@
 // gets a 401. It runs the due jobs and says how many.
 import { timingSafeEqual } from "node:crypto";
 import { runJobs } from "@/lib/jobs/worker";
+import { reportError } from "@/lib/errors";
 
 export const maxDuration = 60;
 
@@ -20,7 +21,7 @@ export async function GET(request: Request) {
     const summary = await runJobs(secret, new URL(request.url).origin);
     return Response.json(summary);
   } catch (e) {
-    console.error("Job worker:", e);
+    await reportError({ source: "job", error: e, route: "/api/jobs" });
     return Response.json({ error: "The job worker couldn't run." }, { status: 500 });
   }
 }

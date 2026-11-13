@@ -6279,6 +6279,7 @@ export type Database = {
       create_player_login: { Args: { p_player_id: string | null; p_username: string | null; p_password: string | null }; Returns: string }
       decide_mentor_link: { Args: { p_link_id: string | null; p_approve: boolean | null }; Returns: undefined }
       decide_staff_request: { Args: { p_user_id: string | null; p_approve: boolean | null }; Returns: undefined }
+      error_summary: { Args: { p_days?: number | null }; Returns: { fingerprint: string; source: string; name: string; message: string; route: string; digest: string; count: number; first_seen: string; last_seen: string; resolved_at: string }[] }
       finish_iq_level: { Args: { p_attempt_id: string | null }; Returns: { correct: number; total: number; passed: boolean; award_earned: boolean }[] }
       finish_scorebook_game: { Args: { p_run_id: string | null; p_line: Json | null }; Returns: { line_ok: boolean; passed: boolean; first_try: number; award_earned: boolean; all_ten_earned: boolean }[] }
       iq_answer_key: { Args: { p_player_id: string | null }; Returns: { question_id: string; correct_index: number; explanation: string }[] }
@@ -6286,6 +6287,7 @@ export type Database = {
       jobs_claim: { Args: { p_secret: string | null; p_limit?: number | null }; Returns: { id: number; kind: string; payload: Json; attempts: number }[] }
       jobs_fail: { Args: { p_secret: string | null; p_id: number | null; p_error: string | null }; Returns: undefined }
       jobs_finish: { Args: { p_secret: string | null; p_id: number | null; p_outcome?: string | null; p_note?: string | null }; Returns: undefined }
+      jobs_summary: { Args: Record<PropertyKey, never>; Returns: { kind: string; waiting: number; done: number; skipped: number; dead: number; retrying: number; last_error: string; last_error_at: string }[] }
       jobs_video_call_email: { Args: { p_secret: string | null; p_call_id: string | null }; Returns: { recipients: string[]; player_first: string; host_name: string; host_kind: string; topic: string; starts_at: string; minutes: number; cancelled: boolean }[] }
       mentor_requests_waiting: { Args: Record<PropertyKey, never>; Returns: number }
       my_admin_team_ids: { Args: Record<PropertyKey, never>; Returns: string[] }
@@ -6311,11 +6313,13 @@ export type Database = {
       rate_limit_hit: { Args: { p_bucket: string | null; p_max: number | null; p_window_seconds: number | null }; Returns: boolean }
       record_iq_answer: { Args: { p_player_id: string | null; p_question_id: string | null; p_chosen: number | null; p_attempt_id?: string | null; p_review_of?: string | null; p_hint_used?: boolean | null }; Returns: { correct: boolean; correct_index: number; explanation: string }[] }
       reimburse_coach_expenses: { Args: { p_ids: string[] | null; p_paid_on: string | null; p_from_team_funds: boolean | null }; Returns: undefined }
+      report_error: { Args: { p_secret: string | null; p_fingerprint: string | null; p_source: string | null; p_name: string | null; p_message: string | null; p_route?: string | null; p_digest?: string | null }; Returns: undefined }
       request_mentor: { Args: { p_code: string | null; p_player_name: string | null }; Returns: string }
       request_parent_link: { Args: { p_code: string | null; p_child_name: string | null }; Returns: string }
       request_player_claim: { Args: { p_team_id: string | null; p_name: string | null; p_jersey: string | null }; Returns: boolean }
       request_staff_access: { Args: { p_role: string | null; p_name: string | null; p_team_id?: string | null; p_note?: string | null }; Returns: string }
       reset_player_password: { Args: { p_player_id: string | null; p_password: string | null }; Returns: undefined }
+      resolve_error: { Args: { p_fingerprint: string | null }; Returns: undefined }
       review_parental_consent: { Args: { p_id: string | null; p_verify: boolean | null; p_note: string | null }; Returns: undefined }
       save_box_score: { Args: { p_game_id: string | null; p_team_id: string | null; p_box: Json | null }; Returns: undefined }
       save_budget_fees: { Args: { p_team_id: string | null; p_season_id: string | null; p_fees: Json | null }; Returns: undefined }

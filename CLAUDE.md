@@ -36,6 +36,8 @@ src/components/main-nav.tsx  top menu: staff get Dashboard/Coaches Dugout (opens
                          lib/team-logos.ts; parents get it from `parent_team_logos()`)
 src/proxy.ts             refreshes the Supabase auth session each request (Next 16 "proxy", formerly middleware)
 src/app/calls/[callId]   a video call (Zoom, in public/zoom-call.html's frame); docs/features/video-calls.md
+src/app/api/errors, (staff)/health, instrumentation(-client).ts   error tracking and structured logs (src/lib/log.ts,
+                         src/lib/errors.ts); admins read /health; docs/architecture/observability.md
 src/app/api/jobs         the job worker (outbox: emails, Zoom cleanup; called by Supabase pg_cron/pg_net);
                          src/lib/jobs/, docs/architecture/jobs.md. Architecture review: docs/architecture/scaling.md
 src/app/terms, privacy   Terms of Service and Privacy & Security (public); /terms/accept asks signed-in users to agree
@@ -167,6 +169,7 @@ tests/unit/              node --test unit tests (npm run test:unit)
 | Team Yearbook | `docs/features/yearbook.md` | Season photos, who can add and view, the viewer |
 | Team playbook & scouting | `docs/features/playbook-scouting.md` | Depth chart, call sheet and flashcards, team quizzes, scouting |
 | UI components | `docs/features/ui-components.md` | Type scale, shared components and props, states, accessibility rules |
+| Error tracking and logs | `docs/architecture/observability.md` | Structured logs, error groups, /health, browser errors, log drain setup |
 | Outbox and job worker | `docs/architecture/jobs.md` | Jobs table, worker, retries, the jobs secret, setup, adding a job kind |
 | Video calls | `docs/features/video-calls.md` | Zoom calls inside the site: admin and head-coach switches, booking, joining, safeguards, Zoom and Vercel setup |
 

@@ -8,8 +8,8 @@
 do $$
 declare
   r record;
-  -- the job worker's functions run without a session and refuse anyone without the jobs secret
-  anon_ok text[] := array['signup_team', 'allow_password_reset', 'jobs_claim', 'jobs_finish', 'jobs_fail', 'jobs_video_call_email'];
+  -- the job worker's functions and error reporting run without a session and refuse anyone without the server (jobs) secret
+  anon_ok text[] := array['signup_team', 'allow_password_reset', 'jobs_claim', 'jobs_finish', 'jobs_fail', 'jobs_video_call_email', 'report_error'];
 begin
   for r in select p.oid::regprocedure as f from pg_proc p where p.pronamespace = 'public'::regnamespace and p.prosecdef loop
     raise exception 'FAIL: % is security definer in public: move it to private and use private.expose()', r.f;

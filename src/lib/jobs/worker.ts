@@ -12,6 +12,8 @@ import { emailConfigured, sendEmail } from "@/lib/email";
 import { formatCallTime } from "@/lib/video-calls";
 import { deleteZoomMeeting, zoomConfigured } from "@/lib/zoom";
 import { isJobKind, jobPayload, videoCallEmail } from "@/lib/jobs/rules";
+import { reportError } from "@/lib/errors";
+import { log } from "@/lib/log";
 
 type Outcome = { outcome: "done" } | { outcome: "skipped"; why: string };
 type Db = ReturnType<typeof createClient<Database>>;
@@ -39,13 +41,14 @@ export async function runJobs(secret: string, origin: string): Promise<RunSummar
         summary[result.outcome === "done" ? "done" : "skipped"] += 1;
       } catch (e) {
         const message = e instanceof Error ? e.message : String(e);
-        console.error(`Job ${job.id} (${job.kind}) failed, try ${job.attempts}:`, message);
+        await reportError({ source: "job", error: e, route: job.kind, context: { job: job.id, attempt: job.attempts } });
         await db.rpc("jobs_fail", { p_secret: secret, p_id: job.id, p_error: message });
         summary.failed += 1;
       }
     }
     if (jobs.length < BATCH) break;
   }
+  if (summary.claimed) log("info", "jobs.run", { ...summary, ms: Date.now() - started });
   return summary;
 }
 

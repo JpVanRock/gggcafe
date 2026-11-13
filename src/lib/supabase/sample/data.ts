@@ -445,6 +445,17 @@ export function sampleRpc(name: string, args: Row = {}): unknown {
     case "my_admin_team_ids": return [T.us];
     case "video_call_team": return T.us;
     case "rate_limit_hit": return true;
+    // Site health (user, 2026-11-13): one open error and one resolved; the job worker's week
+    case "error_summary":
+      return [
+        { fingerprint: "a1b2c3d4e5f60718", source: "server", name: "TypeError", message: "Cannot read properties of null (reading 'team')", route: "/players/[playerId]/pop", digest: "2814953301", count: 3, first_seen: "2026-11-12T14:00:00Z", last_seen: "2026-11-13T09:30:00Z", resolved_at: null },
+        { fingerprint: "0f1e2d3c4b5a6978", source: "browser", name: "Error", message: "Failed to fetch", route: "/family", digest: null, count: 1, first_seen: "2026-11-11T20:00:00Z", last_seen: "2026-11-11T20:00:00Z", resolved_at: "2026-11-12T08:00:00Z" },
+      ];
+    case "jobs_summary":
+      return [
+        { kind: "email.video_call", waiting: 0, done: 4, skipped: 1, dead: 0, retrying: 0, last_error: "Email isn't set up (RESEND_API_KEY, EMAIL_FROM).", last_error_at: "2026-11-12T19:10:00Z" },
+        { kind: "zoom.delete_meeting", waiting: 0, done: 1, skipped: 0, dead: 0, retrying: 0, last_error: null, last_error_at: null },
+      ];
     case "video_call_role": return video_calls.find((c) => c.id === args.p_call_id)?.cancelled_at ? "cancelled" : "host";
     // the Parents tab's approved parents (the sample admin, for Maya and Emma; a team admin)
     case "team_parent_links":

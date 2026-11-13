@@ -203,7 +203,7 @@ export const QUESTIONS: { q: string; a: string[] }[] = [
   {
     q: "Where does the admin fit?",
     a: [
-      "The admin isn't a sign-up type. It has everything a head coach has, plus approving head coaches, approving any mentor request, reading every mentor message, checking parents' consent for players under 13, changing roles and these FAQ pages. Head coaches and admins both unlock G3 Advanced for a player (Coaches Dugout → Roster).",
+      "The admin isn't a sign-up type. It has everything a head coach has, plus approving head coaches, approving any mentor request, reading every mentor message, checking parents' consent for players under 13, changing roles, these FAQ pages and Site health (errors, the job worker, connected services). Head coaches and admins both unlock G3 Advanced for a player (Coaches Dugout → Roster).",
     ],
   },
   {
