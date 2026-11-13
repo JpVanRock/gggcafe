@@ -59,6 +59,25 @@ select pg_temp.expect('the 31st is refused', pg_temp.err($$insert into public.pl
 select pg_temp.expect('30 saved', (select count(*) from public.player_journal_entries where notes like 'RL entry %'), 30::bigint);
 reset role;
 
+-- Video call bookings: 4 an hour per person (migration 20261113130143), then P0009
+insert into auth.users (id, email) values ('e8e8e8e8-0000-0000-0000-000000000003', 'rl-head@example.test');
+insert into public.staff (user_id, display_name, role) values ('e8e8e8e8-0000-0000-0000-000000000003', 'RL Head', 'coach');
+insert into public.team_video_access (team_id) values ('00000000-0000-0000-0000-0000000000b1') on conflict do nothing;
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"e8e8e8e8-0000-0000-0000-000000000003"}', false);
+do $$
+begin
+  for i in 1..4 loop
+    insert into public.video_calls (team_id, player_id, host_kind, host_name, topic, starts_at, minutes, zoom_meeting_id)
+    values ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000c1', 'coach', 'RL Head', 'RL call ' || i,
+            now() + make_interval(days => i), 30, '8200000000' || i);
+  end loop;
+end $$;
+select pg_temp.expect('the 5th booking in an hour is refused', pg_temp.err($$insert into public.video_calls (team_id, player_id, host_kind, host_name, topic, starts_at, minutes, zoom_meeting_id)
+  values ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000c1', 'coach', 'RL Head', 'RL call 5', now() + interval '5 days', 30, '82000000005')$$), 'P0009');
+reset role;
+select pg_temp.expect('4 booked', (select count(*) from public.video_calls where topic like 'RL call %'), 4::bigint);
+
 -- Writes with no signed-in user (jobs, the owner) aren't limited
 select set_config('request.jwt.claims', '', false);
 insert into public.player_journal_entries (player_id, session_date, notes) values ('00000000-0000-0000-0000-0000000000c1', current_date, 'RL entry owner');
@@ -69,6 +88,11 @@ select private.purge_rate_limits();
 select pg_temp.expect('recent counters stay', (select count(*) > 0 from private.rate_limit_hits where user_id::text like 'e8e8e8e8-%'), true);
 
 -- Clean up
+delete from private.jobs where payload ->> 'call_id' in (select id::text from public.video_calls where topic like 'RL call %');
+delete from public.notifications where kind = 'video-call' and player_id = '00000000-0000-0000-0000-0000000000c1';
+delete from public.video_calls where topic like 'RL call %';
+delete from public.team_video_access where team_id = '00000000-0000-0000-0000-0000000000b1';
+delete from public.staff where user_id::text like 'e8e8e8e8-%';
 delete from public.player_journal_entries where notes like 'RL entry%';
 delete from private.rate_limit_hits where user_id::text like 'e8e8e8e8-%';
 delete from public.player_claims where user_id::text like 'e8e8e8e8-%';

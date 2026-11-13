@@ -36,6 +36,8 @@ to every call.
 
 ## Rules
 - A call is 15, 30, 45, 60 or 90 minutes long and is booked 5 minutes to 90 days ahead.
+- Each person books at most 4 calls an hour (user, 2026-11-13), checked before the site asks Zoom
+  and again in the database (migration 20261113130143).
 - The call page opens 10 minutes before the start and closes 15 minutes after the planned end.
 - **One call at a time across the whole site.** Every call is booked under one licensed Zoom
   user, and a Zoom user hosts one meeting at a time. The database refuses an overlapping

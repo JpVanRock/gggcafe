@@ -37,9 +37,9 @@ export async function scheduleVideoCall(_prev: FormState, fd: FormData): Promise
     const teamId = coach ? text(fd, "team_id") : herTeam;
     if (!isUuid(teamId)) return failed(STALE);
     if (!zoomConfigured()) return failed(ZOOM_NOT_CONNECTED);
-    // each booking is a call to Zoom: at most 12 an hour per person (and the database limits the bookings too)
-    const { data: allowed } = await supabase.rpc("rate_limit_hit", { p_bucket: "zoom.book", p_max: 12, p_window_seconds: 3600 });
-    if (!allowed) return failed("That's a lot of bookings in a short time. Wait a few minutes and try again.");
+    // each booking is a call to Zoom: at most 4 an hour per person (user, 2026-11-13; the database limits the bookings too)
+    const { data: allowed } = await supabase.rpc("rate_limit_hit", { p_bucket: "zoom.book", p_max: 4, p_window_seconds: 3600 });
+    if (!allowed) return failed("You can book up to 4 video calls an hour. Try again later.");
 
     const meeting = await createZoomMeeting({ startsAt: clean.call.startsAt, minutes: clean.call.minutes });
     if (!meeting.ok) return failed(meeting.error);
@@ -58,6 +58,7 @@ export async function scheduleVideoCall(_prev: FormState, fd: FormData): Promise
       await deleteZoomMeeting(meeting.value);
       if (saveError.code === "P0008") return invalid("when", "Another video call is booked then. Pick another time.");
       if (saveError.code === "P0007") return invalid("when", "Pick a time that's still ahead.");
+      if (saveError.code === "P0009") return failed("You can book up to 4 video calls an hour. Try again later.");
       if (saveError.code === "42501") return failed(OFF_FOR_HER);
       return failed(friendlyDbError(saveError));
     }

@@ -260,18 +260,18 @@ begin
   return v_hits <= p_max;
 end $$;
 
--- triggers: 60 mentor messages, 30 journal entries, 12 video call bookings per hour per person
+-- triggers: 60 mentor messages, 30 journal entries, 4 video call bookings per hour per person
 create trigger rate_limit before insert on public.mentor_messages
   for each row execute function private.limit_mentor_messages();
 ```
 
 **App:**
-- Server actions check before each call to Zoom (12 bookings an hour, 30 joins every 10 minutes).
+- Server actions check before each call to Zoom (4 bookings an hour, 30 joins every 10 minutes).
 - friendlyDbError turns P0009 into one plain message.
 
 ```ts
 // src/app/calls/actions.ts: before asking Zoom for a meeting
-const { data: allowed } = await supabase.rpc("rate_limit_hit", { p_bucket: "zoom.book", p_max: 12, p_window_seconds: 3600 });
+const { data: allowed } = await supabase.rpc("rate_limit_hit", { p_bucket: "zoom.book", p_max: 4, p_window_seconds: 3600 });
 if (!allowed) return failed("That's a lot of bookings in a short time. Wait a few minutes and try again.");
 ```
 
