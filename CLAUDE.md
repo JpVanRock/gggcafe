@@ -32,10 +32,11 @@ src/lib/supabase/        server.ts (Server Components/Actions), client.ts (brows
                          env.ts, database.types.ts (generated from the migrations: npm run db:types)
 src/components/main-nav.tsx  top menu: staff get Dashboard/Coaches Dugout (opens Roster)/Teams/Players on every page,
                          including /me and /family; players get "My profile". Every header is <SiteHeader>
-                         (site-header.tsx): on phones the links fold behind a Menu button. Parents' header shows their
-                         team's logo beside ours when it has one (`HeaderTeamLogo`); coaches see it large beside the
-                         Coaches Dugout title (`DugoutTeamLogo`, both in header-team-logo.tsx; `headerTeamLogo()` in
-                         lib/team-logos.ts; parents get it from `parent_team_logos()`)
+                         (site-header.tsx): on phones the links fold behind a Menu button. Headers carry only our
+                         logo. The team's logo sits large beside the home page titles (user, 2026-11-13): the Coaches
+                         Dugout and the family page (`MyTeamLogo`, `myTeamLogo()`), and top right of the player dashboard
+                         (`TeamLogoMark`, `playerTeamLogo()`); components/team-logo.tsx, lib/team-logos.ts; parents get
+                         it from `parent_team_logos()`
 src/proxy.ts             refreshes the Supabase auth session each request (Next 16 "proxy", formerly middleware)
 src/app/calls/[callId]   a video call (Zoom, in public/zoom-call.html's frame); docs/features/video-calls.md
 src/app/api/errors, (staff)/health, instrumentation(-client).ts   error tracking and structured logs (src/lib/log.ts,
@@ -45,7 +46,9 @@ src/app/api/jobs         the job worker (outbox: emails, Zoom cleanup; called by
 src/app/terms, privacy   Terms of Service and Privacy & Security (public); /terms/accept asks signed-in users to agree
 src/app/manifest.ts      the phone app (installable web app; opens /dashboard, which routes each account home).
                          Icons in public/icons/ (maskable = logo inside the 80% safe zone); iPhone settings are
-                         `appleWebApp` in the root layout. No service worker: nothing private is cached on phones
+                         `appleWebApp` in the root layout. iPhone icon: src/app/apple-icon.png and public/apple-touch-icon(-precomposed).png,
+                         180×180 with no transparency (iOS shows a letter when it can't get one, and never re-checks:
+                         delete the home screen icon and add it again). No service worker: nothing private is cached on phones
 supabase/migrations/     schema, applied in filename order
 supabase/seed.sql        fictional sample data — local tests only, never pushed
 tests/db/                SQL checks run by npm run db:test

@@ -15,6 +15,7 @@ import { PlayerMenu } from "./player-menu";
 import { loadAdvanced } from "./advanced-data";
 import { loadLeaderCertificate, loadLeadership } from "./leadership-data";
 import { signedPhotoUrls } from "@/lib/player-photos";
+import { playerTeamLogo } from "@/lib/team-logos";
 import { MESSAGE_COLUMNS, signedMessagePhotoUrls, type MentorMessage } from "@/lib/message-photos";
 import { VIDEO_CALL_COLUMNS, VideoCallList, type VideoCallRow } from "@/components/video-calls";
 import { comingSinceISO, isComing } from "@/lib/video-calls";
@@ -33,7 +34,7 @@ export default async function PlayerDashboardPage({ params, searchParams }: Page
   const monday = weekStart(isISODate(week) ? week : today);
   // Everything that only needs the player's id loads together (one round trip, not six);
   // what depends on those results (her leadership book, signed photo links) loads next.
-  const [{ data }, twis, chart, mental, pop, smartGoals, performance, iq, dugout, styles, advanced, certificate, { data: unreadRows }, { count: messageCount }] =
+  const [{ data }, twis, chart, mental, pop, smartGoals, performance, iq, dugout, styles, advanced, certificate, { data: unreadRows }, { count: messageCount }, teamLogo] =
     await Promise.all([
       supabase.from("players").select("*").eq("id", playerId).maybeSingle(),
       loadTwisWeek(supabase, playerId, monday),
@@ -51,6 +52,8 @@ export default async function PlayerDashboardPage({ params, searchParams }: Page
       // Mentor messages: new ones show as alerts at the top of her menu
       supabase.from("mentor_messages").select(MESSAGE_COLUMNS).eq("player_id", playerId).is("read_at", null).order("created_at", { ascending: false }).limit(10),
       supabase.from("mentor_messages").select("id", { count: "exact", head: true }).eq("player_id", playerId),
+      // her team's logo, top right of her menu (user, 2026-11-13)
+      playerTeamLogo(supabase, playerId, Boolean(access.isParent)),
     ]);
   const player = data as Player | null;
   if (!player) notFound();
@@ -106,6 +109,7 @@ export default async function PlayerDashboardPage({ params, searchParams }: Page
       mentorMessages={{ unread, total: messageCount ?? 0, photoUrls: messagePhotos }}
       off={off}
       calls={callPanel || null}
+      teamLogo={teamLogo}
     />
   );
   const notice = offNotice && (

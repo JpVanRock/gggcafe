@@ -37,7 +37,6 @@ export function SiteHeader({
   account = <SignOutButton />,
   count,
   width = "wide",
-  teamLogo,
 }: {
   /** where the logo goes, and what screen readers call that link */
   home: { href: string; label: string };
@@ -47,8 +46,6 @@ export function SiteHeader({
   count?: ReactNode;
   /** match the page under it: "wide" (most pages) or "narrow" (the player home) */
   width?: "wide" | "narrow";
-  /** the team's logo beside ours, when it has one (coaches' and parents' pages) */
-  teamLogo?: ReactNode;
 }) {
   return (
     <header className="z-10 border-b border-pink/40 bg-navy-950/90 backdrop-blur sm:sticky sm:top-0">
@@ -56,7 +53,6 @@ export function SiteHeader({
         <Link href={home.href} aria-label={home.label} className="shrink-0">
           <Logo size={44} className="h-11 w-11" />
         </Link>
-        {teamLogo}
         <HeaderMenu nav={nav} account={account} toggle={<ThemeToggle />} count={count} />
       </div>
     </header>

@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { OutlineText, SpeedStripes } from "@/components/athletic";
+import { TeamLogoMark } from "@/components/team-logo";
+import type { TeamLogo } from "@/lib/team-logos";
 import { GOAL_METHOD_LABEL, batsThrows, playerName, type Player } from "@/lib/softball";
 import {
   currentRostering, firstName, possessive,
@@ -54,6 +56,7 @@ export function PlayerMenu({
   isSelf = false,
   off = new Set(),
   calls = null,
+  teamLogo = null,
 }: {
   player: Player;
   twis: TwisWeek;
@@ -85,6 +88,8 @@ export function PlayerMenu({
   off?: ReadonlySet<SwitchKey>;
   /** video calls booked with her that are still ahead (user, 2026-11-12) */
   calls?: ReactNode;
+  /** her team's logo, top right (user, 2026-11-13) */
+  teamLogo?: TeamLogo | null;
 }) {
   const name = firstName(player);
   const method = player.goal_method ?? "harada";
@@ -197,6 +202,8 @@ export function PlayerMenu({
             ← Players
           </Link>
         )}
+        {/* her team's logo, top right, across from "← Players" (user, 2026-11-13) */}
+        <TeamLogoMark logo={teamLogo} className="absolute top-0 right-0 z-10 h-14 w-14 sm:h-24 sm:w-24" />
         {/* Jersey number behind the name, media-day style */}
         <OutlineText className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[11rem] tracking-tighter sm:text-[15rem]">
           {team?.jersey_number ?? player.primary_position ?? ""}

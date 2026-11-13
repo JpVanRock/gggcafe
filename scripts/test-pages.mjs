@@ -75,6 +75,15 @@ async function checkApp() {
     const ok = ir.status === 200 && (ir.headers.get("content-type") ?? "").includes(icon.type);
     results.push({ route: icon.src, ok, why: ok ? undefined : `HTTP ${ir.status} ${ir.headers.get("content-type")}`, ms: 0 });
   }
+  // iPhone home screen icon (user, 2026-11-13: an iPhone showed the letter "G" instead): the page's
+  // apple-touch-icon in <head>, and the root paths iOS also tries on its own, all real PNGs.
+  const touch = /<link[^>]*rel="apple-touch-icon"[^>]*href="([^"]+)"/.exec(home);
+  if (!touch || touch.index > home.indexOf("</head>")) results.push(...fail("no apple-touch-icon in <head>"));
+  for (const src of [touch?.[1], "/apple-touch-icon.png", "/apple-touch-icon-precomposed.png"].filter(Boolean)) {
+    const ir = await fetch(BASE + src);
+    const ok = ir.status === 200 && (ir.headers.get("content-type") ?? "").includes("image/png");
+    results.push({ route: src, ok, why: ok ? undefined : `HTTP ${ir.status} ${ir.headers.get("content-type")}`, ms: 0 });
+  }
   return [{ route, ok: true, ms: Date.now() - started }, ...results];
 }
 

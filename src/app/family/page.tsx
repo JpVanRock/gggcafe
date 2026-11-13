@@ -23,6 +23,7 @@ import { isStaffParent } from "@/components/role-switch";
 import type { SwitchKey } from "@/lib/switchboard";
 import { VIDEO_CALL_COLUMNS, VideoCallList, type VideoCallRow } from "@/components/video-calls";
 import { comingSinceISO, isComing } from "@/lib/video-calls";
+import { MyTeamLogo } from "@/components/team-logo";
 
 export const metadata: Metadata = { title: "Family · GGG.Cafe" };
 
@@ -124,14 +125,18 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
 
   return (
     <div className="flex flex-col gap-8">
-      <PageHeader title={firstName ? `Welcome, ${firstName}` : "Welcome"} description={user.email ?? undefined}>
-        {/* a coach who is a parent here has the header's Coach / Parent switch instead */}
-        {user.staff && !(await isStaffParent()) && (
-          <Link href="/dashboard" className={secondaryButtonClass}>
-            Coach dashboard →
-          </Link>
-        )}
-      </PageHeader>
+      {/* their team's logo on the right, beside the title (user, 2026-11-13) */}
+      <div className="mb-6 flex items-center justify-between gap-4 [&>header]:mb-0">
+        <PageHeader title={firstName ? `Welcome, ${firstName}` : "Welcome"} description={user.email ?? undefined}>
+          {/* a coach who is a parent here has the header's Coach / Parent switch instead */}
+          {user.staff && !(await isStaffParent()) && (
+            <Link href="/dashboard" className={secondaryButtonClass}>
+              Coach dashboard →
+            </Link>
+          )}
+        </PageHeader>
+        <MyTeamLogo />
+      </div>
 
       {code === "invalid" && (
         <p role="alert" className="rounded-lg border border-pink/60 bg-pink/10 p-4 text-sm">
