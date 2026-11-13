@@ -32,8 +32,9 @@ src/lib/supabase/        server.ts (Server Components/Actions), client.ts (brows
                          env.ts, database.types.ts (generated from the migrations: npm run db:types)
 src/components/main-nav.tsx  top menu: staff get Dashboard/Coaches Dugout (opens Roster)/Teams/Players on every page,
                          including /me and /family; players get "My profile". Every header is <SiteHeader>
-                         (site-header.tsx): on phones the links fold behind a Menu button. Coaches' and parents' headers
-                         show their team's logo beside ours when it has one (`HeaderTeamLogo`, `headerTeamLogo()` in
+                         (site-header.tsx): on phones the links fold behind a Menu button. Parents' header shows their
+                         team's logo beside ours when it has one (`HeaderTeamLogo`); coaches see it large beside the
+                         Coaches Dugout title (`DugoutTeamLogo`, both in header-team-logo.tsx; `headerTeamLogo()` in
                          lib/team-logos.ts; parents get it from `parent_team_logos()`)
 src/proxy.ts             refreshes the Supabase auth session each request (Next 16 "proxy", formerly middleware)
 src/app/calls/[callId]   a video call (Zoom, in public/zoom-call.html's frame); docs/features/video-calls.md

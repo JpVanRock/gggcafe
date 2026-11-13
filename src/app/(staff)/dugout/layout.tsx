@@ -1,5 +1,6 @@
 import { Suspense, type ReactNode } from "react";
 import { PageHeader } from "@/components/ui";
+import { DugoutTeamLogo } from "@/components/header-team-logo";
 import { DugoutTabs, TabList } from "./tabs";
 import { canEdit, getAdminTeamIds, getCurrentUser } from "@/lib/auth";
 import { getWaitingCount } from "@/lib/approvals";
@@ -17,7 +18,13 @@ export default function DugoutLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <PageHeader title="Coaches Dugout" description="Organize your team: standards, culture, calendar, drills and practice plans." />
+        {/* the team logo on the right, beside the title (user, 2026-11-13); it never wraps under it */}
+        <div className="mb-6 flex items-center justify-between gap-4 [&>header]:mb-0">
+          <PageHeader title="Coaches Dugout" description="Organize your team: standards, culture, calendar, drills and practice plans." />
+          <Suspense fallback={null}>
+            <DugoutTeamLogo />
+          </Suspense>
+        </div>
         {/* until her role is known, only the tabs every coach has */}
         <Suspense fallback={<TabList role="assistant" />}>
           <TabsWithCounts />

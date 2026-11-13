@@ -22,7 +22,8 @@ export async function signedLogoUrl(supabase: Supabase, path: string | null | un
 }
 
 /**
- * The team logo for the header's top left (user, 2026-11-12), once per request: for coaches, their own
+ * The team logo, once per request: beside the Coaches Dugout title for coaches (user, 2026-11-13), at
+ * the header's top left for parents (2026-11-12). For coaches, their own
  * team's (the first, by name, that has a logo); for parents, the team they're approved for. Null when
  * there's no logo, or for anyone else.
  */
