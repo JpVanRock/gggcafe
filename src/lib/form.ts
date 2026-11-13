@@ -72,6 +72,9 @@ export function friendlyDbError(
       return "One of the values is out of range. Check the numbers and try again.";
     case "23503":
       return "Something this refers to no longer exists. Reload the page and try again.";
+    case "P0009":
+      // a rate limit in the database (migration 20261113041701)
+      return "That's a lot in a short time. Wait a few minutes and try again.";
     default:
       console.error("Database error:", error);
       return "Something went wrong saving that. Try again.";

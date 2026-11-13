@@ -3,7 +3,7 @@
 // G3 Advanced: admins grant access; the player (or a coach) keeps her book. The
 // database enforces both (admin-only access rows; her book only while she has access).
 import { refresh } from "next/cache";
-import { actForCheck, adminCheck, editorCheck } from "@/lib/auth";
+import { actForCheck, editorCheck, getCurrentUser, headCoachCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { friendlyDbError } from "@/lib/form";
 import { FIELD_POSITIONS, isUuid, type FieldPosition } from "@/lib/softball";
@@ -11,14 +11,18 @@ import { CHAPTERS, NOTES_MAX, cleanBookTitle, cleanMyHabits } from "@/lib/advanc
 
 type Result = { error: string | null };
 
-/** Admins turn G3 Advanced on or off for a player. Her book is kept when it's turned off. */
+/**
+ * Head coaches and admins turn G3 Advanced on or off for a player (head coaches since 2026-11-12, user).
+ * Her book is kept when it's turned off. `source` says who unlocked it.
+ */
 export async function setAdvancedAccess(input: { playerId: string; on: boolean }): Promise<Result> {
-  const denied = await adminCheck();
+  const denied = await headCoachCheck();
   if (denied) return { error: denied };
+  const user = await getCurrentUser();
   if (!isUuid(input.playerId)) return { error: "Unknown player." };
   const supabase = await createClient();
   const { error } = input.on
-    ? await supabase.from("player_advanced_access").upsert({ player_id: input.playerId, source: "admin" }, { onConflict: "player_id" })
+    ? await supabase.from("player_advanced_access").upsert({ player_id: input.playerId, source: user?.staff?.role === "admin" ? "admin" : "coach" }, { onConflict: "player_id" })
     : await supabase.from("player_advanced_access").delete().eq("player_id", input.playerId);
   if (error) return { error: friendlyDbError(error) };
   refresh();

@@ -5,7 +5,7 @@
 
 export const TIERS = [
   { key: "standard", label: "Standard Access", note: "Every player whose profile claim a coach approves, or whose parent made her login." },
-  { key: "advanced", label: "Advanced Access", note: "G3 Advanced: an admin unlocks it per player today; a paid subscription later." },
+  { key: "advanced", label: "Advanced Access", note: "G3 Advanced: a head coach or admin unlocks it per player today; a paid subscription later." },
 ] as const;
 
 /** included = a softball; "coach" = included once a coach or admin also says so (picked, confirmed). */
@@ -104,7 +104,7 @@ export const FAQ: { q: string; a: string[] }[] = [
   {
     q: "How do I give a player Advanced Access?",
     a: [
-      "Coaches Dugout → Roster. Admins see a G3 Advanced column; click Unlock next to her name, and the G3 Advanced board and section appear for her. Until then her pages say nothing about it, so she doesn't know it exists.",
+      "Coaches Dugout → Roster. Head coaches and admins see a G3 Advanced column; click Unlock next to her name, and the G3 Advanced board and section appear for her. Until then her pages say nothing about it, so she doesn't know it exists.",
       "Later, a paid subscription will unlock it the same way.",
     ],
   },

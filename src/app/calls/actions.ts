@@ -37,6 +37,9 @@ export async function scheduleVideoCall(_prev: FormState, fd: FormData): Promise
     const teamId = coach ? text(fd, "team_id") : herTeam;
     if (!isUuid(teamId)) return failed(STALE);
     if (!zoomConfigured()) return failed(ZOOM_NOT_CONNECTED);
+    // each booking is a call to Zoom: at most 12 an hour per person (and the database limits the bookings too)
+    const { data: allowed } = await supabase.rpc("rate_limit_hit", { p_bucket: "zoom.book", p_max: 12, p_window_seconds: 3600 });
+    if (!allowed) return failed("That's a lot of bookings in a short time. Wait a few minutes and try again.");
 
     const meeting = await createZoomMeeting({ startsAt: clean.call.startsAt, minutes: clean.call.minutes });
     if (!meeting.ok) return failed(meeting.error);
@@ -105,6 +108,9 @@ export async function joinVideoCall(callId: string): Promise<JoinResult> {
   if (state === "upcoming") return { error: "The call opens 10 minutes before it starts." };
   if (state === "over") return { error: "This call is over." };
   if (!zoomConfigured()) return { error: ZOOM_NOT_CONNECTED };
+  // each join asks Zoom for the meeting (and the host's key): at most 30 every 10 minutes per person
+  const { data: allowed } = await supabase.rpc("rate_limit_hit", { p_bucket: "zoom.join", p_max: 30, p_window_seconds: 600 });
+  if (!allowed) return { error: "That's a lot of tries in a short time. Wait a few minutes and join again." };
 
   const host = role === "host";
   const details = await zoomJoinDetails(call.zoom_meeting_id, host);

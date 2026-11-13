@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requirePlayerPage } from "@/lib/auth";
+import { isHeadCoach, requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { buttonClass, secondaryButtonClass } from "@/components/ui";
 import { CHAPTERS, MY_HABITS_MAX, MY_HABIT_LENGTH, NOTES_MAX, chapterLabel, courseLessons, visibleChapters } from "@/lib/advanced-book";
 import { loadAdvanced } from "../../../advanced-data";
-import { AdvancedNotFoundForAdmin, LEVEL_LABEL, advancedHref } from "../../../advanced";
+import { AdvancedNotFoundForCoach, LEVEL_LABEL, advancedHref } from "../../../advanced";
 import { ChapterDone, ChapterNotes, FoundationHabits, MyHabits } from "../../../advanced-client";
 import { CourseRunner } from "../../../course-client";
 import { CountPlan } from "../../../my-zone";
@@ -29,8 +29,9 @@ export default async function AdvancedChapterPage({ params }: PageProps<"/player
   const book = await loadAdvanced(supabase, player.id);
   const name = firstName(player);
   if (!book.unlocked) {
-    if (access.user.staff?.role !== "admin") notFound();
-    return <AdvancedNotFoundForAdmin playerId={player.id} name={name} />;
+    // head coaches and admins can unlock it here; nobody else learns it exists
+    if (!access.user.staff || !isHeadCoach(access.user.staff.role)) notFound();
+    return <AdvancedNotFoundForCoach playerId={player.id} name={name} />;
   }
 
   // her book: position chapters only for positions a coach has confirmed

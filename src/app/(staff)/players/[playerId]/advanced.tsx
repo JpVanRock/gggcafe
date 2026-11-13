@@ -46,12 +46,12 @@ export function AdvancedSummary({ book, leadership = null }: { book: AdvancedBoo
   );
 }
 
-/** What admins see before G3 Advanced is unlocked for a player (everyone else sees nothing). */
+/** What head coaches and admins see before G3 Advanced is unlocked for a player (everyone else sees nothing). */
 export function AdvancedLocked({ playerId, name }: { playerId: string; name: string }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-dashed border-navy-600 px-5 py-4">
       <div>
-        <p className="font-mono text-xs tracking-[0.2em] text-pink-soft uppercase">{LEVEL_LABEL} · Admins only</p>
+        <p className="font-mono text-xs tracking-[0.2em] text-pink-soft uppercase">{LEVEL_LABEL} · Head coaches and admins</p>
         <p className="mt-1 text-sm text-muted">
           Locked for {name}. Players don&apos;t see G3 Advanced until it&apos;s unlocked.
         </p>
@@ -61,7 +61,7 @@ export function AdvancedLocked({ playerId, name }: { playerId: string; name: str
   );
 }
 
-export function AdvancedNotFoundForAdmin({ playerId, name }: { playerId: string; name: string }) {
+export function AdvancedNotFoundForCoach({ playerId, name }: { playerId: string; name: string }) {
   return (
     <div className="flex flex-col gap-4">
       <EmptyState>G3 Advanced isn&apos;t unlocked for {name} yet.</EmptyState>

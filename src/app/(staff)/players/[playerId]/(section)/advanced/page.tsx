@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requirePlayerPage } from "@/lib/auth";
+import { isHeadCoach, requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { buttonClass, eyebrowClass } from "@/components/ui";
 import { OutlineText, SpeedStripes } from "@/components/athletic";
@@ -13,7 +13,7 @@ import { loadLeadership } from "../../leadership-data";
 import { LeaderToggle } from "../../leadership-client";
 import { leadershipHref } from "../../leadership";
 import { guideProgress, programTitle } from "@/lib/leadership-guide";
-import { AdvancedNotFoundForAdmin, LEVEL_LABEL, advancedHref } from "../../advanced";
+import { AdvancedNotFoundForCoach, LEVEL_LABEL, advancedHref } from "../../advanced";
 import { AdvancedAccessToggle, BookTitle, ConfirmPosition } from "../../advanced-client";
 import { firstName, loadPlayer } from "../../section-data";
 import { SectionShell } from "../section-shell";
@@ -26,11 +26,12 @@ export default async function AdvancedPage({ params }: PageProps<"/players/[play
   const access = await requirePlayerPage(playerId);
   const player = await loadPlayer(supabase, playerId);
   const book = await loadAdvanced(supabase, player.id);
-  const isAdmin = access.user.staff?.role === "admin";
+  // head coaches and admins unlock it and turn it off (head coaches since 2026-11-12, user)
+  const canUnlock = Boolean(access.user.staff && isHeadCoach(access.user.staff.role));
   const name = firstName(player);
   if (!book.unlocked) {
-    if (!isAdmin) notFound();
-    return <AdvancedNotFoundForAdmin playerId={player.id} name={name} />;
+    if (!canUnlock) notFound();
+    return <AdvancedNotFoundForCoach playerId={player.id} name={name} />;
   }
 
   const chapters = visibleChapters(book.confirmed);
@@ -129,9 +130,9 @@ export default async function AdvancedPage({ params }: PageProps<"/players/[play
         </div>
       )}
 
-      {isAdmin && (
+      {canUnlock && (
         <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-navy-700 pt-4 text-xs text-muted">
-          <span>Unlocked {book.source === "subscription" ? "by subscription" : "by an admin"}.</span>
+          <span>Unlocked {book.source === "subscription" ? "by subscription" : book.source === "coach" ? "by a head coach" : "by an admin"}.</span>
           <AdvancedAccessToggle playerId={player.id} name={name} on />
         </div>
       )}

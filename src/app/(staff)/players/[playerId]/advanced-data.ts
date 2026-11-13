@@ -6,7 +6,7 @@ type Supabase = Awaited<ReturnType<typeof createClient>>;
 
 export type AdvancedBook = {
   unlocked: boolean;
-  source: "admin" | "subscription" | null;
+  source: "admin" | "coach" | "subscription" | null;
   title: string;
   work: ChapterWork[];
   /** positions a coach has confirmed (opens position chapters, e.g. Pitching) */

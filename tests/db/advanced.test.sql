@@ -1,4 +1,5 @@
--- G3 Advanced: only admins grant access; a player keeps her own book only while
+-- G3 Advanced: head coaches and admins grant access (head coaches since 2026-11-12; assistants
+-- never); a player keeps her own book only while
 -- she has it. Own users, removed at the end. Seed: c1 Avery Lopez #7 (team b1).
 create function pg_temp.expect(label text, actual anycompatible, expected anycompatible) returns void
 language plpgsql as $$
@@ -12,10 +13,12 @@ grant execute on function pg_temp.expect(text, anycompatible, anycompatible) to 
 insert into auth.users (id, email) values
   ('99999999-0000-0000-0000-000000000001', 'adv-player@example.test'),
   ('99999999-0000-0000-0000-000000000002', 'adv-coach@example.test'),
-  ('99999999-0000-0000-0000-000000000003', 'adv-admin@example.test');
+  ('99999999-0000-0000-0000-000000000003', 'adv-admin@example.test'),
+  ('99999999-0000-0000-0000-000000000004', 'adv-assistant@example.test');
 insert into public.staff (user_id, display_name, role) values
   ('99999999-0000-0000-0000-000000000002', 'Adv Coach', 'coach'),
-  ('99999999-0000-0000-0000-000000000003', 'Adv Admin', 'admin');
+  ('99999999-0000-0000-0000-000000000003', 'Adv Admin', 'admin'),
+  ('99999999-0000-0000-0000-000000000004', 'Adv Assistant', 'assistant');
 insert into public.player_claims (user_id, team_id, season_id, roster_entry_id, typed_name, typed_jersey, status)
 select '99999999-0000-0000-0000-000000000001', r.team_id, r.season_id, r.id, 'Avery Lopez', '7', 'approved'
   from public.roster_entries r
@@ -37,20 +40,28 @@ exception when insufficient_privilege then null;
 end $$;
 reset role;
 
--- A coach can't grant it; an admin can
+-- An assistant can't grant it; a head coach can (and take it back); so can an admin
 set role authenticated;
-select set_config('request.jwt.claims', '{"sub":"99999999-0000-0000-0000-000000000002"}', false);
+select set_config('request.jwt.claims', '{"sub":"99999999-0000-0000-0000-000000000004"}', false);
 do $$ begin
   insert into public.player_advanced_access (player_id) values ('00000000-0000-0000-0000-0000000000c1');
-  raise exception 'FAIL: a coach granted G3 Advanced';
+  raise exception 'FAIL: an assistant granted G3 Advanced';
 exception when insufficient_privilege then null;
 end $$;
-reset role;
-set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"99999999-0000-0000-0000-000000000002"}', false);
+insert into public.player_advanced_access (player_id, source) values ('00000000-0000-0000-0000-0000000000c1', 'coach');
+select pg_temp.expect('granted by the head coach', (select granted_by::text || ' ' || source from public.player_advanced_access),
+  '99999999-0000-0000-0000-000000000002 coach');
+delete from public.player_advanced_access where player_id = '00000000-0000-0000-0000-0000000000c1';
+select pg_temp.expect('the head coach took it back', (select count(*) from public.player_advanced_access), 0::bigint);
 select set_config('request.jwt.claims', '{"sub":"99999999-0000-0000-0000-000000000003"}', false);
 insert into public.player_advanced_access (player_id) values ('00000000-0000-0000-0000-0000000000c1');
 select pg_temp.expect('granted by the admin', (select granted_by::text from public.player_advanced_access), '99999999-0000-0000-0000-000000000003');
+-- an assistant's delete removes nothing
+select set_config('request.jwt.claims', '{"sub":"99999999-0000-0000-0000-000000000004"}', false);
+delete from public.player_advanced_access where player_id = '00000000-0000-0000-0000-0000000000c1';
 reset role;
+select pg_temp.expect('an assistant can''t take it away', (select count(*) from public.player_advanced_access), 1::bigint);
 
 -- Unlocked: her own book, nobody else's
 set role authenticated;

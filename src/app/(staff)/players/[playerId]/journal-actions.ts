@@ -5,7 +5,7 @@
 import { refresh } from "next/cache";
 import { getCurrentUser, getMyPlayerIds } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { text, type FormState } from "@/lib/form";
+import { friendlyDbError, text, type FormState } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
 import { STALE, failed, must, runAction } from "@/lib/actions";
 import { todayISO } from "@/lib/dates";
@@ -38,7 +38,7 @@ export async function saveJournalEntry(input: JournalInput & { playerId: string;
     if (before.audio_path && before.audio_path !== cleaned.row.audio_path) await supabase.storage.from(JOURNAL_BUCKET).remove([before.audio_path]);
   } else {
     const { error } = await supabase.from("player_journal_entries").insert({ ...cleaned.row, player_id: input.playerId });
-    if (error) return { error: "Couldn't save your entry. Try again." };
+    if (error) return { error: error.code === "P0009" ? friendlyDbError(error) : "Couldn't save your entry. Try again." };
   }
   refresh();
   return { error: null };

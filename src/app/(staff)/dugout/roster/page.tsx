@@ -72,10 +72,11 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
     .sort((a, b) => Number(b.active) - Number(a.active) || compareJersey(a.jersey_number, b.jersey_number) || a.player.last_name.localeCompare(b.player.last_name));
 
   // Leader Badge: coaches/admins only (the certificates' RLS hides them from view-only staff). G3 Advanced:
-  // admins unlock it here, not on her pages, which say nothing about it until it's on (user, 2026-11-12).
+  // head coaches and admins unlock it here, not on her pages, which say nothing about it until it's on
+  // (user, 2026-11-12).
   const [leaders, { data: g3Rows }] = await Promise.all([
     editor ? loadLeaderBadges(supabase, roster.map((r) => r.player.id)) : Promise.resolve(new Set<string>()),
-    admin && roster.length
+    head && roster.length
       ? supabase.from("player_advanced_access").select("player_id").in("player_id", roster.map((r) => r.player.id))
       : Promise.resolve({ data: [] as { player_id: string }[] }),
   ]);
@@ -193,7 +194,7 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
                   <th className={thClass}>Class</th>
                   {editor && <th className={thClass}>Player account</th>}
                   {head && <th className={thClass}>Parents</th>}
-                  {admin && <th className={thClass}>G3 Advanced</th>}
+                  {head && <th className={thClass}>G3 Advanced</th>}
                 </tr>
               </thead>
               <tbody>
@@ -227,7 +228,7 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
                         </td>
                       )}
                       {head && <td className={`${tdClass} tabular-nums`}>{parents || "–"}</td>}
-                      {admin && (
+                      {head && (
                         <td className={tdClass}>
                           <span className="flex items-center gap-2">
                             {g3.has(r.player.id) && <Pill tone="on">On</Pill>}

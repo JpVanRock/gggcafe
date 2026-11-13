@@ -444,6 +444,7 @@ export function sampleRpc(name: string, args: Row = {}): unknown {
     case "player_mentors": return [{ mentor_id: U.admin, display_name: "Coach Sample", specialty: "Pitching" }];
     case "my_admin_team_ids": return [T.us];
     case "video_call_team": return T.us;
+    case "rate_limit_hit": return true;
     case "video_call_role": return video_calls.find((c) => c.id === args.p_call_id)?.cancelled_at ? "cancelled" : "host";
     // the Parents tab's approved parents (the sample admin, for Maya and Emma; a team admin)
     case "team_parent_links":

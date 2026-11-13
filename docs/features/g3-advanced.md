@@ -1,11 +1,12 @@
 # G3 Advanced (Level 2, `/players/[id]/advanced`)
-- The advanced tier (user, 2026-11-07): admin-approved per player now, a paid subscription later
-  (`player_advanced_access`, one row per player who has it, `source` admin|subscription; only admins
-  insert/delete; `private.has_advanced()`). Until unlocked NOTHING about it shows on her pages, for anyone:
-  no menu board, no section-menu entry, no Movement Preferences note, pages 404 for non-admins (user,
-  2026-11-12: players mustn't learn it exists until it's unlocked). Admins unlock it on Coaches Dugout → Roster
-  (the admin-only "G3 Advanced" column: Unlock / Turn off), and can also turn it off at the bottom of her book
-  (her work is kept).
+- The advanced tier (user, 2026-11-07): approved per player by a head coach or admin now (head coaches since
+  2026-11-12, user; migration 20261113041115), a paid subscription later (`player_advanced_access`, one row per
+  player who has it, `source` admin|coach|subscription; head coaches and admins insert/delete, assistants and
+  viewers can't; `private.has_advanced()`). Until unlocked NOTHING about it shows on her pages, for anyone: no
+  menu board, no section-menu entry, no Movement Preferences note, pages 404 for everyone but head coaches and
+  admins (user, 2026-11-12: players mustn't learn it exists until it's unlocked). They unlock it on Coaches
+  Dugout → Roster (the "G3 Advanced" column, head coaches and admins only: Unlock / Turn off), and can also
+  turn it off at the bottom of her book (her work is kept; it says who unlocked it).
 - It's her book on how to compete: default title "How to Cook" (user's choice; she can rename it,
   `player_advanced_books`), theme line "How to Compete". Content in `src/lib/advanced-book.ts`, which
   is paid content: import it from server code only, never from a "use client" file (client pieces

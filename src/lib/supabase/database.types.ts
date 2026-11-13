@@ -6304,6 +6304,7 @@ export type Database = {
       pending_parental_consents: { Args: Record<PropertyKey, never>; Returns: { id: string; player_id: string; player_name: string; birth_date: string; team_name: string; parent_name: string; parent_account: string; parent_email: string; relationship: string; method: string; form_path: string; submitted_at: string }[] }
       player_features_off: { Args: { p_player_id: string | null }; Returns: string[] }
       player_mentors: { Args: { p_player_id: string | null }; Returns: { mentor_id: string; display_name: string; specialty: string }[] }
+      rate_limit_hit: { Args: { p_bucket: string | null; p_max: number | null; p_window_seconds: number | null }; Returns: boolean }
       record_iq_answer: { Args: { p_player_id: string | null; p_question_id: string | null; p_chosen: number | null; p_attempt_id?: string | null; p_review_of?: string | null; p_hint_used?: boolean | null }; Returns: { correct: boolean; correct_index: number; explanation: string }[] }
       reimburse_coach_expenses: { Args: { p_ids: string[] | null; p_paid_on: string | null; p_from_team_funds: boolean | null }; Returns: undefined }
       request_mentor: { Args: { p_code: string | null; p_player_name: string | null }; Returns: string }

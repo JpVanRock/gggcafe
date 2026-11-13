@@ -306,7 +306,7 @@ export function ChapterDone({
   );
 }
 
-/** Admins only: turn G3 Advanced on or off for a player. `compact`: the Roster tab's G3 column. */
+/** Head coaches and admins: turn G3 Advanced on or off for a player. `compact`: the Roster tab's G3 column. */
 export function AdvancedAccessToggle({ playerId, name, on, compact = false }: { playerId: string; name: string; on: boolean; compact?: boolean }) {
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
