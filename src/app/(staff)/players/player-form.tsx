@@ -8,7 +8,7 @@ import { updatePlayer } from "./actions";
 import { PlayerFields } from "./player-fields";
 import { SubmitButton } from "@/components/submit-button";
 
-/** "Edit profile" on the player dashboard. Team and jersey number live on the team page. */
+/** "Edit profile" on her Pop Report, and the Roster tab's Edit page (dugout/roster/players/[playerId]). */
 export function PlayerForm({ player, photoUrl }: { player: Player; photoUrl?: string | null }) {
   const [state, action] = useActionState(updatePlayer, initialFormState);
 
@@ -27,7 +27,7 @@ export function PlayerForm({ player, photoUrl }: { player: Player; photoUrl?: st
           <textarea name="notes" rows={3} defaultValue={player.notes ?? ""} className={inputClass} />
         </Field>
         <p className="text-xs text-muted">
-          Team and jersey number are set on the team&apos;s page. Notes are hidden on her dashboard, but a player with an account could
+          Jersey number is set on the Dugout&apos;s Roster tab (Edit) or the team&apos;s page. Notes are hidden on her dashboard, but a player with an account could
           still reach them, so keep them coach-appropriate.
         </p>
       </fieldset>

@@ -218,6 +218,16 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
                           </Link>
                         )}
                         {!r.active && <span className="ml-2 text-xs">inactive</span>}
+                        {editor && (
+                          // edit her name, profile and jersey here (user, 2026-11-13); next to the name so phones see it
+                          <Link
+                            href={`/dugout/roster/players/${r.player.id}?team=${team.id}${season ? `&season=${season.id}` : ""}`}
+                            className="ml-3 text-xs text-link hover:underline"
+                            aria-label={`Edit ${playerName(r.player)}`}
+                          >
+                            Edit
+                          </Link>
+                        )}
                       </td>
                       <td className={tdClass}>{[r.player.primary_position, ...r.player.secondary_positions].filter(Boolean).slice(0, 3).join(", ") || "–"}</td>
                       <td className={tdClass}>{batsThrows(r.player)}</td>

@@ -2,6 +2,9 @@
 - "Waiting for approval" first (player claims + parent requests for the team, approve/decline in place),
   then the team code card for coaches (`dugout/team-code.tsx`: the code players, parents and assistant coaches sign up
   with; head coaches make a new one or turn sign-up off), then the season's roster with each player's account status (Claimed / Waiting) and approved parents,
+  and an Edit link per row for coaches and admins (user, 2026-11-13): `dugout/roster/players/[playerId]` (`?team=&season=`)
+  edits her name and profile with the Pop Report's form (`players/player-form.tsx`, `updatePlayer`) and her jersey
+  number and Active for this team and season (`RosterEntryEditor`, `updateRosterEntry`); viewers get a 404;
   then player accounts (remove access), then "Move a player to another team" for coaches (`players/move-form.tsx`,
   `movePlayer`: pick her from the active roster, the new team (ours or another organization, never this one),
   season and jersey; her active spots go inactive but stay in her history, and she gets a spot on the new team).

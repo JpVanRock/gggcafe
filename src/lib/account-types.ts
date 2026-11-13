@@ -103,8 +103,8 @@ export const SECTIONS: { title: string; rows: Row[] }[] = [
   {
     title: "Coaches Dugout",
     rows: [
-      row("Roster", "The season's roster, player accounts, approvals, moving a player to another team, the coaching staff, and staff duties & standards (the duty matrix, the staff commitment, the before-practice checklist).", ["yes", "part", "no", "no", "no"],
-        "Assistants approve player claims and see the staff duties; parent requests, coach sign-ups and the duty matrix go to head coaches."),
+      row("Roster", "The season's roster, editing a player's name, profile and jersey number, player accounts, approvals, moving a player to another team, the coaching staff, and staff duties & standards (the duty matrix, the staff commitment, the before-practice checklist).", ["yes", "part", "no", "no", "no"],
+        "Assistants edit players and approve player claims, and see the staff duties; parent requests, coach sign-ups and the duty matrix go to head coaches."),
       row("Culture", "Team Standards and Team Culture.", ["yes", "no", "view", "no", "no"], "Players read them in From the Dugout."),
       row("Calendar", "Practices and events, one time or repeating, that show on every player's TWIS; offseason dates.", ["yes", "yes", "view", "part", "no"],
         "Players see the dates in TWIS. A parent the head coach makes team admin changes the team's calendar (not the offseason dates)."),
