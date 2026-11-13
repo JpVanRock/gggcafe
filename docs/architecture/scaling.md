@@ -16,6 +16,7 @@ The site doesn't need a rewrite to grow. It needs six things, in this order:
 
 1. **Protect the database.** Rate limits on costly and busy writes. Built this round.
 2. **An async job layer:** an outbox table and a scheduled worker, for email, retries and cleanup.
+   Built 2026-11-13 (docs/architecture/jobs.md).
 3. **Observability:** error tracking, structured action logs and query insights, before traffic arrives.
 4. **Tenancy:** an organizations layer, so one deployment serves many clubs.
 5. **Shared caching:** team-wide reference data, tagged and invalidated by the action that changes it.
@@ -276,7 +277,9 @@ if (!allowed) return failed("That's a lot of bookings in a short time. Wait a fe
 
 ## 11. Next increments (design code)
 
-**Outbox worker (Phase 1).** Jobs are claimed safely by many workers and retried with backoff.
+**Outbox worker (Phase 1; built 2026-11-13, see docs/architecture/jobs.md: Supabase calls the worker
+with pg_cron and pg_net, and the job functions check a shared secret instead of a worker key).** Jobs
+are claimed safely by many workers and retried with backoff.
 
 ```sql
 create table private.jobs (
@@ -364,7 +367,7 @@ $$;
 
 | Phase | Trigger | Work |
 |---|---|---|
-| 1. One full club | Now | Rate limits (done). Error tracking and a log drain. Outbox and worker; parent emails for video calls. Private cache for the header. Watch connections and CPU; upgrade compute past 60% CPU or 40 connections. |
+| 1. One full club | Now | Rate limits (done). Outbox and worker, with parent emails for video calls (done). Error tracking and a log drain. Private cache for the header. Watch connections and CPU; upgrade compute past 60% CPU or 40 connections. |
 | 2. Second club | First outside club signs on | Organizations tenancy and staff per organization. Stripe for G3 subscriptions. Remote cache for team-wide data. Staging project with seeded data. Backups and restore drill. |
 | 3. National | Over 2,500 queries/s or a 50 GB database | Read replica for leaderboards, stats and reports. Monthly partitions on growth tables. A queue service for jobs. Usage-based limits per organization. |
 

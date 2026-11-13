@@ -65,3 +65,7 @@ alter table storage.objects enable row level security;
 grant usage on schema storage to anon, authenticated, service_role;
 grant all on storage.objects to anon, authenticated, service_role;
 grant select on storage.buckets to anon, authenticated, service_role;
+
+-- Supabase Vault: just the view the job worker's functions read (migration 20261113124214)
+create schema vault;
+create table vault.decrypted_secrets (name text not null, decrypted_secret text, created_at timestamptz not null default now());

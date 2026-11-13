@@ -19,7 +19,14 @@ export function zoomConfigured(): boolean {
 
 export const ZOOM_NOT_CONNECTED = "Video calls aren't connected to Zoom yet. A site admin adds the Zoom keys in Vercel first.";
 
-class ZoomError extends Error {}
+class ZoomError extends Error {
+  constructor(
+    message: string,
+    readonly status?: number,
+  ) {
+    super(message);
+  }
+}
 
 export type ZoomResult<T> = { ok: true; value: T } | { ok: false; error: string };
 
@@ -57,7 +64,7 @@ async function zoom<T>(path: string, init: { method?: "GET" | "POST" | "DELETE";
   });
   if (res.status === 204) return undefined as T;
   const body = (await res.json().catch(() => null)) as (T & { message?: string }) | null;
-  if (!res.ok || body === null) throw new ZoomError(`Zoom said no: ${body?.message ?? `error ${res.status}`}.`);
+  if (!res.ok || body === null) throw new ZoomError(`Zoom said no: ${body?.message ?? `error ${res.status}`}.`, res.status);
   return body;
 }
 
@@ -93,8 +100,16 @@ export function createZoomMeeting({ startsAt, minutes }: { startsAt: string; min
   });
 }
 
+/** Deletes a meeting; one that's already gone counts as deleted (the job worker retries otherwise). */
 export function deleteZoomMeeting(meetingId: string) {
-  return attempt(() => zoom<void>(`/meetings/${encodeURIComponent(meetingId)}`, { method: "DELETE" }));
+  return attempt(async () => {
+    try {
+      await zoom<void>(`/meetings/${encodeURIComponent(meetingId)}`, { method: "DELETE" });
+    } catch (e) {
+      if (e instanceof ZoomError && e.status === 404) return;
+      throw e;
+    }
+  });
 }
 
 export type JoinDetails = {

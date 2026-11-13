@@ -134,7 +134,8 @@ into the call.
 - Join from a phone as the player's parent. The host lets them in from the waiting room.
 
 ## Not done
-- Emails to parents: they're told on the site (the bell, the family page). An email would need
-  a server key that can read parents' addresses.
+- (Done 2026-11-13: the job worker emails her approved parents when a call is booked or cancelled,
+  once Resend and the jobs secret are set up; docs/architecture/jobs.md. A cancelled call's Zoom
+  meeting is also deleted by a job, with retries.)
 - Team-wide calls: every call is with one player.
 - Calls at the same time (see "One call at a time" under Rules).

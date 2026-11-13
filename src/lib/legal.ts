@@ -399,7 +399,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
       [
         "Supabase: database, sign-in, file storage and account emails, hosted in the United States.",
         "Vercel: website hosting.",
-        "Resend: emails you ask us to send, such as a practice plan.",
+        "Resend: emails we send, such as a practice plan you share or a notice to parents that a video call was booked or cancelled.",
         "Zoom: video calls held on the site, for teams that use them. Sound and video pass through Zoom's servers during the call; calls aren't recorded.",
         "A payment processor, if you buy a paid feature.",
       ],

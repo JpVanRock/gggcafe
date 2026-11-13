@@ -6283,6 +6283,10 @@ export type Database = {
       finish_scorebook_game: { Args: { p_run_id: string | null; p_line: Json | null }; Returns: { line_ok: boolean; passed: boolean; first_try: number; award_earned: boolean; all_ten_earned: boolean }[] }
       iq_answer_key: { Args: { p_player_id: string | null }; Returns: { question_id: string; correct_index: number; explanation: string }[] }
       iq_review_status: { Args: { p_attempt_id: string | null }; Returns: { missed: number; reviewed: number; complete: boolean }[] }
+      jobs_claim: { Args: { p_secret: string | null; p_limit?: number | null }; Returns: { id: number; kind: string; payload: Json; attempts: number }[] }
+      jobs_fail: { Args: { p_secret: string | null; p_id: number | null; p_error: string | null }; Returns: undefined }
+      jobs_finish: { Args: { p_secret: string | null; p_id: number | null; p_outcome?: string | null; p_note?: string | null }; Returns: undefined }
+      jobs_video_call_email: { Args: { p_secret: string | null; p_call_id: string | null }; Returns: { recipients: string[]; player_first: string; host_name: string; host_kind: string; topic: string; starts_at: string; minutes: number; cancelled: boolean }[] }
       mentor_requests_waiting: { Args: Record<PropertyKey, never>; Returns: number }
       my_admin_team_ids: { Args: Record<PropertyKey, never>; Returns: string[] }
       my_child_ids: { Args: Record<PropertyKey, never>; Returns: string[] }
