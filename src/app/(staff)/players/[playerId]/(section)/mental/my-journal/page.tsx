@@ -1,18 +1,20 @@
 import type { Metadata } from "next";
-import { requirePlayerPage } from "@/lib/auth";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getPlayerFeaturesOff, requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatDay, todayISO } from "@/lib/dates";
 import { JOURNAL_BUCKET, formatSeconds } from "@/lib/journal";
 import { Badge, EmptyState, RECENT_LIMIT, ShowAllLink, eyebrowClass } from "@/components/ui";
 import { ActionForm } from "@/components/action-form";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { loadPlayer } from "../../section-data";
-import { firstName } from "../../data";
-import { SectionShell } from "../section-shell";
-import { EditableEntry, JournalEntryForm, type JournalEntryValues, type JournalMentor } from "../../journal-client";
-import { deleteJournalEntry, shareJournalEntry } from "../../journal-actions";
+import { loadPlayer } from "../../../section-data";
+import { firstName } from "../../../data";
+import { SectionShell } from "../../section-shell";
+import { EditableEntry, JournalEntryForm, type JournalEntryValues, type JournalMentor } from "../../../journal-client";
+import { deleteJournalEntry, shareJournalEntry } from "../../../journal-actions";
 
-export const metadata: Metadata = { title: "My Journal · GGG.Cafe" };
+export const metadata: Metadata = { title: "My Journal · Mental GP · GGG.Cafe" };
 
 const COLUMNS = "id, session_date, mentor_id, mentor_name, topic, notes, audio_path, audio_seconds, shared_with_mentor";
 
@@ -44,11 +46,13 @@ function Entry({ entry, mentor, audioUrl }: { entry: JournalEntryValues; mentor:
 
 // My Journal (user, 2026-11-12): her notes and voice memos from sessions with her mentors.
 // She writes it; her approved parents read it (view as player); she can share an entry
-// with that mentor. Coaches don't read it (the database gives them nothing).
-export default async function JournalPage({ params, searchParams }: PageProps<"/players/[playerId]/journal">) {
+// with that mentor. Coaches don't read it (the database gives them nothing). It lives in
+// Mental GP, opened from a pill there (user, 2026-11-12), so it closes with Mental GP too.
+export default async function JournalPage({ params, searchParams }: PageProps<"/players/[playerId]/mental/my-journal">) {
   const { playerId } = await params;
   const { entries: show } = await searchParams;
   const access = await requirePlayerPage(playerId, "player.journal");
+  if (!access.user.staff && (await getPlayerFeaturesOff(playerId)).has("player.mental")) redirect(`/players/${playerId}?off=player.mental`);
   const supabase = await createClient();
   const player = await loadPlayer(supabase, playerId);
   const name = firstName(player);
@@ -56,7 +60,7 @@ export default async function JournalPage({ params, searchParams }: PageProps<"/
 
   if (!reader) {
     return (
-      <SectionShell title="My Journal" subtitle="Notes from mentor sessions">
+      <SectionShell title="My Journal" subtitle="Mental GP · notes from mentor sessions">
         <EmptyState title="Private">
           {name}&apos;s journal is hers: only she and her parents read it, and a mentor reads an entry she shares with them. Coaches don&apos;t see it.
         </EmptyState>
@@ -88,8 +92,11 @@ export default async function JournalPage({ params, searchParams }: PageProps<"/
   const who = (e: JournalEntryValues) => (e.mentor_id ? (mentorName.get(e.mentor_id) ?? "a former mentor") : e.mentor_name);
 
   return (
-    <SectionShell title="My Journal" subtitle={access.isSelf ? "Notes from your mentor sessions" : `${name}'s notes from mentor sessions`}>
+    <SectionShell title="My Journal" subtitle={`Mental GP · ${access.isSelf ? "notes from your mentor sessions" : `${name}'s notes from mentor sessions`}`}>
       <div className="flex flex-col gap-10">
+        <Link href={`/players/${player.id}/mental`} className="self-start text-sm text-link hover:underline">
+          ← Mental GP
+        </Link>
         {access.isSelf && (
           <section className="flex flex-col gap-4">
             <div>
@@ -147,7 +154,7 @@ export default async function JournalPage({ params, searchParams }: PageProps<"/
               })}
             </ul>
           )}
-          <ShowAllLink shown={entries.length} total={count ?? entries.length} href={`/players/${player.id}/journal?entries=all`} noun="entries" />
+          <ShowAllLink shown={entries.length} total={count ?? entries.length} href={`/players/${player.id}/mental/my-journal?entries=all`} noun="entries" />
         </section>
       </div>
     </SectionShell>

@@ -93,7 +93,7 @@ export const SECTIONS: { title: string; rows: Row[] }[] = [
         "Coaches open every player's menu. Parents view their daughter's, read only (View as on the family page). Mentors read Goals, the Pop Report and Mental GP of the players they're approved for."),
       row("Family page", "Their daughter's team, team budget totals (no names), her login, the Yearbook with G3 Advanced.", ["part", "part", "no", "yes", "no"],
         "A coach who is also a parent here claims their daughter from the dashboard (a head coach's claim is approved at once, an assistant's waits for the head coach) and gets this page too, with the Coach / Parent switch at the top."),
-      row("My Journal", "Her notes and voice memos from mentor sessions.", ["no", "no", "own", "view", "part"],
+      row("My Journal", "Her notes and voice memos from mentor sessions (a pill in Mental GP).", ["no", "no", "own", "view", "part"],
         "Hers: her parents read it; a mentor reads only the entries she shares with them; coaches don't see it (the user's choice)."),
       row("Video calls", "Zoom calls with one player, held on GGG.Cafe and never recorded.", ["yes", "view", "part", "part", "part"],
         "Off until a site admin turns them on for a team; then the head coach switches them on for mentors (the Switchboard). Head coaches and her mentors book them; she and her parents are told and join; head coaches can drop in; assistants see them on the Calendar."),

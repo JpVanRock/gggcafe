@@ -34,7 +34,7 @@ export const FEATURE_SECTIONS: { title: string; features: Feature[] }[] = [
       { name: "Monthly self-scan", detail: "Ten mental skills rated 1 to 5 once a month, with the trend.", standard: "yes", advanced: "yes" },
       { name: "Guided sessions", detail: "Breathing and imagery, a few minutes each; as a mental routine they show in TWIS and count toward achievements.", standard: "yes", advanced: "yes" },
       { name: "Practice journal", detail: "A purpose before practice, what worked and what to fix after, and a weekly look-back.", standard: "yes", advanced: "yes" },
-      { name: "My Journal", detail: "Her notes and voice memos from sessions with her mentors. Hers and her parents'; she can share an entry with that mentor; coaches don't read it.", standard: "yes", advanced: "yes" },
+      { name: "My Journal", detail: "A pill in Mental GP: her notes and voice memos from sessions with her mentors. Hers and her parents'; she can share an entry with that mentor; coaches don't read it.", standard: "yes", advanced: "yes" },
       { name: "Video calls", detail: "Zoom calls a mentor or head coach books with her, held on GGG.Cafe; her parents are told and can join; never recorded. Only where a site admin turned calls on for her team.", standard: "yes", advanced: "yes" },
       { name: "Mental GP lessons", detail: "Eight short lessons for game moments (between pitches, big at-bats, nerves, errors, slumps, bad calls, her role, game day); her answer finishes each one, four of them build her Mental Game Plan, and an Up next pick follows her self-scan. With G3 Advanced, each links to the chapters that go deeper.", standard: "yes", advanced: "yes" },
     ],
@@ -104,7 +104,7 @@ export const FAQ: { q: string; a: string[] }[] = [
   {
     q: "How do I give a player Advanced Access?",
     a: [
-      "Open her player menu. Admins see an \"Unlock G3 Advanced\" strip under her menu boards. One click unlocks it, and the G3 Advanced board and section appear for her.",
+      "Coaches Dugout → Roster. Admins see a G3 Advanced column; click Unlock next to her name, and the G3 Advanced board and section appear for her. Until then her pages say nothing about it, so she doesn't know it exists.",
       "Later, a paid subscription will unlock it the same way.",
     ],
   },

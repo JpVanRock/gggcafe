@@ -118,8 +118,9 @@
   a scorebook box, page or field, `{"kind": ...}`): it shows the situation only, never the answer.
 - Coaches/admins fill dashboards in; players with an approved claim can open and edit their own (see
   docs/features/player-accounts.md).
-- My Journal (user, 2026-11-12; migration 20261112132733): `/players/[id]/journal` (section "My Journal", a wide navy
-  menu board). Her notes from mentor sessions: day, who it was with (one of her mentors from `player_mentors()`, or someone
+- My Journal (user, 2026-11-12; migration 20261112132733): `/players/[id]/mental/my-journal`, opened from a "My Journal"
+  pill at the top of Mental GP (her and her parents only; user, 2026-11-12: not its own section or menu board; the old
+  `/players/[id]/journal` redirects there). It closes with Mental GP, and with its own Switchboard switch. Her notes from mentor sessions: day, who it was with (one of her mentors from `player_mentors()`, or someone
   else by name), what they worked on, notes, and an optional voice memo recorded in the browser (MediaRecorder; WebM/Ogg
   Opus or MP4/AAC on Safari; stops at 5 minutes; uploaded to the private bucket `journal-audio` as
   `<player id>/<uuid>.<ext>`, played through signed URLs). Table `player_journal_entries`. Hers (user's choice): she writes,

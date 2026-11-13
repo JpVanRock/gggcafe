@@ -10,6 +10,7 @@ import { loadDugoutTeam } from "../data";
 import { NoOwnTeam, TeamPicker } from "../team-picker";
 import { ApprovedClaimList, PendingClaimList, PendingParentList } from "../approvals";
 import { LeaderBadge } from "@/components/leader-badge";
+import { AdvancedAccessToggle } from "../../players/[playerId]/advanced-client";
 import { loadLeaderBadges } from "@/lib/leader-badges";
 import { PendingStaffList, StaffList, type StaffMember } from "./staff";
 import { TeamCodeCard } from "../team-code";
@@ -70,8 +71,15 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
     .filter((r) => r.player)
     .sort((a, b) => Number(b.active) - Number(a.active) || compareJersey(a.jersey_number, b.jersey_number) || a.player.last_name.localeCompare(b.player.last_name));
 
-  // Leader Badge: coaches/admins only (the certificates' RLS hides them from view-only staff)
-  const leaders = editor ? await loadLeaderBadges(supabase, roster.map((r) => r.player.id)) : new Set<string>();
+  // Leader Badge: coaches/admins only (the certificates' RLS hides them from view-only staff). G3 Advanced:
+  // admins unlock it here, not on her pages, which say nothing about it until it's on (user, 2026-11-12).
+  const [leaders, { data: g3Rows }] = await Promise.all([
+    editor ? loadLeaderBadges(supabase, roster.map((r) => r.player.id)) : Promise.resolve(new Set<string>()),
+    admin && roster.length
+      ? supabase.from("player_advanced_access").select("player_id").in("player_id", roster.map((r) => r.player.id))
+      : Promise.resolve({ data: [] as { player_id: string }[] }),
+  ]);
+  const g3 = new Set((g3Rows ?? []).map((r) => r.player_id));
 
   const moveTeams = ((moveTeamsResult.data ?? []) as MoveTeam[]).filter((t) => t.id !== team.id);
   const movable = roster.filter((r) => r.active).map((r) => ({ id: r.player.id, label: `${r.jersey_number ? `#${r.jersey_number} ` : ""}${playerName(r.player)}` }));
@@ -185,6 +193,7 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
                   <th className={thClass}>Class</th>
                   {editor && <th className={thClass}>Player account</th>}
                   {head && <th className={thClass}>Parents</th>}
+                  {admin && <th className={thClass}>G3 Advanced</th>}
                 </tr>
               </thead>
               <tbody>
@@ -218,6 +227,14 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
                         </td>
                       )}
                       {head && <td className={`${tdClass} tabular-nums`}>{parents || "–"}</td>}
+                      {admin && (
+                        <td className={tdClass}>
+                          <span className="flex items-center gap-2">
+                            {g3.has(r.player.id) && <Pill tone="on">On</Pill>}
+                            <AdvancedAccessToggle playerId={r.player.id} name={r.player.preferred_name || r.player.first_name} on={g3.has(r.player.id)} compact />
+                          </span>
+                        </td>
+                      )}
                     </tr>
                   );
                 })}

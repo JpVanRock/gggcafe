@@ -33,7 +33,7 @@ export default async function PlayerDashboardPage({ params, searchParams }: Page
   const monday = weekStart(isISODate(week) ? week : today);
   // Everything that only needs the player's id loads together (one round trip, not six);
   // what depends on those results (her leadership book, signed photo links) loads next.
-  const [{ data }, twis, chart, mental, pop, smartGoals, performance, iq, dugout, styles, advanced, certificate, { data: unreadRows }, { count: messageCount }, journalRows] =
+  const [{ data }, twis, chart, mental, pop, smartGoals, performance, iq, dugout, styles, advanced, certificate, { data: unreadRows }, { count: messageCount }] =
     await Promise.all([
       supabase.from("players").select("*").eq("id", playerId).maybeSingle(),
       loadTwisWeek(supabase, playerId, monday),
@@ -51,10 +51,6 @@ export default async function PlayerDashboardPage({ params, searchParams }: Page
       // Mentor messages: new ones show as alerts at the top of her menu
       supabase.from("mentor_messages").select(MESSAGE_COLUMNS).eq("player_id", playerId).is("read_at", null).order("created_at", { ascending: false }).limit(10),
       supabase.from("mentor_messages").select("id", { count: "exact", head: true }).eq("player_id", playerId),
-      // My Journal: hers and her parents' (coaches read nothing, so they don't ask)
-      access.isSelf || access.isParent
-        ? supabase.from("player_journal_entries").select("session_date", { count: "exact" }).eq("player_id", playerId).order("session_date", { ascending: false }).limit(1)
-        : Promise.resolve(null),
     ]);
   const player = data as Player | null;
   if (!player) notFound();
@@ -108,8 +104,6 @@ export default async function PlayerDashboardPage({ params, searchParams }: Page
       leadership={leadership.open ? { work: leadership.work, program: leadership.program } : null}
       leader={Boolean(certificate)}
       mentorMessages={{ unread, total: messageCount ?? 0, photoUrls: messagePhotos }}
-      isAdmin={access.user.staff?.role === "admin"}
-      journal={journalRows ? { count: journalRows.count ?? 0, last: journalRows.data?.[0]?.session_date ?? null } : null}
       off={off}
       calls={callPanel || null}
     />

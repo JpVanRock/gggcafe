@@ -26,7 +26,8 @@ export default async function PopPage({ params, searchParams }: PageProps<"/play
     // Movement Preferences is G3 Advanced
     supabase.from("player_advanced_access").select("player_id").eq("player_id", player.id).maybeSingle(),
   ]);
-  const movementAccess = g3 ? "open" : access.user.staff?.role === "admin" ? "locked" : "hidden";
+  // G3 Advanced stays invisible on her pages until it's unlocked (user, 2026-11-12): no note, even for admins
+  const movementAccess = g3 ? "open" : "hidden";
   // her current own team and season, for her stats (the preseason questionnaire is on the parents' page)
   const ownTeam = (await loadTeamDugout(supabase, player.id))[0]?.team ?? null;
   const season = ownTeam ? await seasonOrCurrent(supabase, ownTeam.id, null) : null;

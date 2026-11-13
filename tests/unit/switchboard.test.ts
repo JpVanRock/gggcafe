@@ -25,10 +25,11 @@ test("player sections map to player switches, and every switchable section is in
     assert.ok(isSwitchKey(key) && key.startsWith("player."), `${slug} → ${key}`);
   }
   // the player section bar's switchable sections (SECTIONS in (section)/section-nav.tsx)
-  for (const s of ["goals", "pop", "mental", "journal", "training", "iq", "trophies", "team"]) assert.ok(SECTION_SWITCH[s], s);
-  // every player switch is used by some section
-  const used = new Set(Object.values(SECTION_SWITCH));
+  for (const s of ["goals", "pop", "mental", "training", "iq", "trophies", "team"]) assert.ok(SECTION_SWITCH[s], s);
+  // every player switch is used by some section, or is a pill inside one (My Journal: a pill in Mental GP)
+  const used = new Set<string>([...Object.values(SECTION_SWITCH), "player.journal"]);
   for (const s of switchesFor("players")) assert.ok(used.has(s.key), `${s.key} has no section`);
+  assert.ok(!("journal" in SECTION_SWITCH), "My Journal isn't its own section any more");
 });
 
 test("lookups", () => {

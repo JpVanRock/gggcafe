@@ -4,7 +4,7 @@
 // props from the server page; never import src/lib/advanced-book.ts here (paid
 // content stays on the server). Type-only imports are fine.
 import { useState, useTransition } from "react";
-import { buttonClass, inputClass, secondaryButtonClass, eyebrowClass } from "@/components/ui";
+import { buttonClass, inputClass, pillOutlineClass, secondaryButtonClass, eyebrowClass } from "@/components/ui";
 import type { Habit } from "@/lib/advanced-book";
 import {
   renameAdvancedBook, saveAdvancedMine, saveAdvancedNotes, setAdvancedAccess, setAdvancedChapterDone, setAdvancedHabit, setConfirmedPosition,
@@ -306,8 +306,8 @@ export function ChapterDone({
   );
 }
 
-/** Admins only: turn G3 Advanced on or off for a player. */
-export function AdvancedAccessToggle({ playerId, name, on }: { playerId: string; name: string; on: boolean }) {
+/** Admins only: turn G3 Advanced on or off for a player. `compact`: the Roster tab's G3 column. */
+export function AdvancedAccessToggle({ playerId, name, on, compact = false }: { playerId: string; name: string; on: boolean; compact?: boolean }) {
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   return (
@@ -320,9 +320,10 @@ export function AdvancedAccessToggle({ playerId, name, on }: { playerId: string;
           setError(null);
           startTransition(async () => setError((await setAdvancedAccess({ playerId, on: !on })).error));
         }}
-        className={on ? "text-xs text-muted underline hover:text-danger" : buttonClass}
+        aria-label={compact ? (on ? `Turn off G3 Advanced for ${name}` : `Unlock G3 Advanced for ${name}`) : undefined}
+        className={on ? "text-xs text-muted underline hover:text-danger" : compact ? pillOutlineClass : buttonClass}
       >
-        {pending ? "Saving…" : on ? "Turn off G3 Advanced" : `Unlock G3 Advanced for ${name}`}
+        {pending ? "Saving…" : compact ? (on ? "Turn off" : "Unlock") : on ? "Turn off G3 Advanced" : `Unlock G3 Advanced for ${name}`}
       </button>
       <ErrorLine error={error} />
     </div>

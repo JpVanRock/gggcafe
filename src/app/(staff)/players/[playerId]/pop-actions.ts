@@ -26,7 +26,7 @@ export async function saveMovement(_prev: FormState, fd: FormData): Promise<Form
   const supabase = await createClient();
   // Movement Preferences is G3 Advanced (user, 2026-11-08)
   const { data: g3 } = await supabase.from("player_advanced_access").select("player_id").eq("player_id", playerId).maybeSingle();
-  if (!g3) return { error: "Movement Preferences is a G3 Advanced feature. Unlock G3 Advanced for her first." };
+  if (!g3) return { error: "Movement Preferences is a G3 Advanced feature. An admin unlocks G3 Advanced for her first (Coaches Dugout → Roster)." };
   const { data: latest } = await supabase
     .from("movement_preferences")
     .select("*") // compared on MOVEMENT_KEYS only (a built column list can't be typed)

@@ -21,7 +21,7 @@ import { PerformanceSummary, summarizePerformance } from "./performance";
 import { PopSummary } from "./pop-report";
 import { SmartSummary } from "./smart";
 import { TwisBoard } from "./twis";
-import { AdvancedLocked, AdvancedSummary, LEVEL_LABEL, advancedHref } from "./advanced";
+import { AdvancedSummary, LEVEL_LABEL, advancedHref } from "./advanced";
 import type { AdvancedBook } from "./advanced-data";
 import type { LessonWork, Program } from "@/lib/leadership-guide";
 import { PlayerName } from "./player-name";
@@ -29,24 +29,7 @@ import { MentorAlerts } from "./mentor-messages";
 import type { MentorMessage } from "@/lib/message-photos";
 import { leadershipHref } from "./leadership";
 import { eyebrowClass } from "@/components/ui";
-import { formatDay } from "@/lib/dates";
 import type { SwitchKey } from "@/lib/switchboard";
-
-/** My Journal's board: how many entries and the last session, or that it's private (coaches). */
-function JournalSummary({ journal, name, isSelf }: { journal: { count: number; last: string | null } | null; name: string; isSelf: boolean }) {
-  if (!journal) return <p className="text-sm text-[var(--menu-note)]">Private: only {name} and her parents read it, and a mentor reads what she shares.</p>;
-  if (journal.count === 0)
-    return <p className="text-sm text-[var(--menu-note)]">{isSelf ? "After your next session, write down what clicked, or record a voice memo." : `Nothing written yet.`}</p>;
-  return (
-    <p className="text-sm">
-      <span className="font-display text-2xl font-bold text-[var(--menu-value)] tabular-nums">{journal.count}</span>{" "}
-      <span className="text-[var(--menu-note)]">
-        {journal.count === 1 ? "entry" : "entries"}
-        {journal.last ? ` · last session ${formatDay(journal.last)}` : ""}
-      </span>
-    </p>
-  );
-}
 
 /** The cafe-menu player dashboard: header, TWIS, then the menu boards. */
 export function PlayerMenu({
@@ -67,10 +50,8 @@ export function PlayerMenu({
   leadership = null,
   leader = false,
   mentorMessages = null,
-  isAdmin = false,
   canWriteCulture = false,
   isSelf = false,
-  journal = null,
   off = new Set(),
   calls = null,
 }: {
@@ -96,14 +77,10 @@ export function PlayerMenu({
   leader?: boolean;
   /** messages from her mentors: new ones show as alerts at the top */
   mentorMessages?: { unread: MentorMessage[]; total: number; photoUrls: Map<string, string> } | null;
-  /** admins see an unlock control while G3 Advanced is locked */
-  isAdmin?: boolean;
   /** head coaches/admins: links to write the team's standards and culture */
   canWriteCulture?: boolean;
   /** the signed-in player viewing her own dashboard */
   isSelf?: boolean;
-  /** My Journal: her entries (she and her parents), or null for coaches (it's private) */
-  journal?: { count: number; last: string | null } | null;
   /** the Switchboard: features her head coach turned off (empty for coaches, who see everything) */
   off?: ReadonlySet<SwitchKey>;
   /** video calls booked with her that are still ahead (user, 2026-11-12) */
@@ -148,15 +125,6 @@ export function PlayerMenu({
       variant: "navy",
       summary: <MentalSummary plan={mental} />,
       href: `${base}/mental`,
-    },
-    {
-      key: "journal",
-      title: "My Journal",
-      subtitle: "Notes and voice memos from mentor sessions",
-      variant: "navy",
-      wide: true,
-      summary: <JournalSummary journal={journal} name={name} isSelf={isSelf} />,
-      href: `${base}/journal`,
     },
     {
       key: "performance",
@@ -205,7 +173,6 @@ export function PlayerMenu({
     goals: "player.goals",
     pop: "player.pop",
     mental: "player.mental",
-    journal: "player.journal",
     performance: "player.training",
     iq: "player.iq",
     trophies: "player.trophies",
@@ -319,7 +286,6 @@ export function PlayerMenu({
           <MenuBoard key={section.key} section={section} number={i + 1} />
         ))}
       </section>
-      {isAdmin && !advanced.unlocked && <AdvancedLocked playerId={player.id} name={name} />}
     </div>
   );
 }

@@ -8,7 +8,6 @@ export const SECTIONS = [
   { slug: "goals", label: "Goals" },
   { slug: "pop", label: "Pop Report" },
   { slug: "mental", label: "Mental GP" },
-  { slug: "journal", label: "My Journal" },
   { slug: "training", label: "Training" },
   { slug: "iq", label: "Softball IQ" },
   { slug: "trophies", label: "Trophy Room" },

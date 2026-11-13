@@ -1,9 +1,11 @@
 # G3 Advanced (Level 2, `/players/[id]/advanced`)
 - The advanced tier (user, 2026-11-07): admin-approved per player now, a paid subscription later
   (`player_advanced_access`, one row per player who has it, `source` admin|subscription; only admins
-  insert/delete; `private.has_advanced()`). Until unlocked NOTHING about it shows: no menu board, no
-  section-menu entry, pages 404 for non-admins. Admins see a slim "Unlock G3 Advanced" strip under a
-  locked player's menu boards, and "Turn off" at the bottom of her book (her work is kept).
+  insert/delete; `private.has_advanced()`). Until unlocked NOTHING about it shows on her pages, for anyone:
+  no menu board, no section-menu entry, no Movement Preferences note, pages 404 for non-admins (user,
+  2026-11-12: players mustn't learn it exists until it's unlocked). Admins unlock it on Coaches Dugout → Roster
+  (the admin-only "G3 Advanced" column: Unlock / Turn off), and can also turn it off at the bottom of her book
+  (her work is kept).
 - It's her book on how to compete: default title "How to Cook" (user's choice; she can rename it,
   `player_advanced_books`), theme line "How to Compete". Content in `src/lib/advanced-book.ts`, which
   is paid content: import it from server code only, never from a "use client" file (client pieces
