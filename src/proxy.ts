@@ -5,7 +5,10 @@ import { sampleDataEnabled } from "@/lib/supabase/sample/enabled";
 import { needsTermsAgreement } from "@/lib/legal";
 
 /** Pages that need a signed-in user. The page itself still checks staff access. */
-const PROTECTED_PREFIXES = ["/dashboard", "/dugout", "/teams", "/players", "/family", "/me"];
+const PROTECTED_PREFIXES = [
+  "/dashboard", "/dugout", "/teams", "/players", "/family", "/me", "/mentor", "/calls",
+  "/faq", "/health", "/notifications", "/switchboard", "/view-as",
+];
 
 /**
  * Runs before every page request:

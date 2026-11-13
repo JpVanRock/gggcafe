@@ -115,3 +115,9 @@ test("Coach's Responsibilities: the user's sixteen, three in bold", async () => 
   assert.equal(COACHING_ETIQUETTE_MOTTO, "Creating a Habit of Excellence");
   assert.ok(!JSON.stringify(COACHING_ETIQUETTE).includes("11 Strong"));
 });
+
+test("the privacy link in emails and PDFs is on the site's main address", async () => {
+  const { PRIVACY_URL } = await import("../../src/lib/legal.ts");
+  const { SITE_URL } = await import("../../src/lib/site.ts");
+  assert.equal(PRIVACY_URL, `${SITE_URL}/privacy`);
+});

@@ -6,8 +6,9 @@ Unrelated to investment-os — none of that project's rules, sources or database
 GITHUB:   https://github.com/JpVanRock/gggcafe (public repo — never commit secrets)
 DATABASE: Supabase project `vhvjoigbkyuebsduonpf` (US East / Ohio), settings in `.env.local`
 SITE:     Next.js 16 App Router + TypeScript + Tailwind, `src/`.
-HOSTING:  Vercel team "GGG", project `gggcafe`, https://gggcafe.vercel.app. Every push to main
-          deploys to production. Vercel env vars: NEXT_PUBLIC_SUPABASE_URL and
+HOSTING:  Vercel team "GGG", project `gggcafe`, https://www.ggg.cafe (main address; ggg.cafe redirects to it; domain
+          and DNS at GoDaddy; gggcafe.vercel.app still works). Every push to main deploys to production.
+          Vercel env vars: NEXT_PUBLIC_SUPABASE_URL and
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY (never the DB password). Optional, server-only, for
           emailing practice plans: RESEND_API_KEY + EMAIL_FROM (see src/lib/email.ts); for video
           calls: ZOOM_ACCOUNT_ID, ZOOM_CLIENT_ID, ZOOM_CLIENT_SECRET, ZOOM_SDK_KEY, ZOOM_SDK_SECRET,
@@ -76,6 +77,8 @@ tests/unit/              node --test unit tests (npm run test:unit)
   (`player-achievements.ts`). Softball IQ UI: `iq-quiz-client.tsx` (practice quiz, question bank) and
   `iq-tests-client.tsx` (level tests), shared bits in `iq-shared.ts`.
 - Names: `playerName()` in `src/lib/softball.ts`.
+- The site's address: links made during a request use `requestOrigin()` (`src/lib/request-origin.ts`), so they match
+  the address the visitor is on; fixed text (emails, PDFs) uses `SITE_URL` (`src/lib/site.ts`). Never hard-code a host.
 - Rosters: `src/lib/roster.ts`. A team's players: `loadRoster(supabase, teamId, { seasonId?, order? })` (active, current
   season by default); the season: `currentSeason()` / `seasonOrCurrent()` (the database's `team_current_season`, the
   same rule as claims and RLS); a player's teams: `activeTeams()` / `activeTeamIds()`. GameDay, practice plans and
@@ -246,8 +249,8 @@ like a sports brand or media-day graphics. Never childish or preschool.
   the default `{{ .ConfirmationURL }}` (PKCE `?code=`) only works in the browser that asked and within ~5 minutes.
   Supabase's built-in email sends about 2 emails an hour for the whole project (resets + sign-up confirmations);
   more needs custom SMTP in Supabase Auth settings. Per person: 4 reset emails per address every 20 minutes
-  (`allow_password_reset()`, signed-out callable; keeps only a SHA-256 of the address, for a day). Supabase Auth URL config: Site URL
-  https://gggcafe.vercel.app, Redirect URLs https://gggcafe.vercel.app/** (localhost isn't listed).
+  (`allow_password_reset()`, signed-out callable; keeps only a SHA-256 of the address, for a day). Supabase Auth URL config (user, 2026-11-13): Site URL
+  https://www.ggg.cafe, Redirect URLs https://www.ggg.cafe/** and https://gggcafe.vercel.app/** (localhost isn't listed).
 - Auth: `getCurrentUser()` in `src/lib/auth.ts` (verified claims + staff record). `src/proxy.ts`
   redirects signed-out visitors away from `/dashboard`; pages still check staff access themselves.
 - Read `node_modules/next/dist/docs/` before using an unfamiliar API.

@@ -1,4 +1,4 @@
-import { headers } from "next/headers";
+import { requestOrigin } from "@/lib/request-origin";
 import { Card, pillQuietClass } from "@/components/ui";
 import { ActionForm } from "@/components/action-form";
 import { ConfirmSubmit } from "@/components/confirm-submit";
@@ -11,9 +11,7 @@ import { setTeamCode } from "./team-code-actions";
  * one or turn sign-up off (Roster and Parents tabs).
  */
 export async function TeamCodeCard({ team, code, head }: { team: { id: string; name: string }; code: string | null; head: boolean }) {
-  const h = await headers();
-  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "gggcafe.vercel.app";
-  const signUpUrl = `${host.startsWith("localhost") ? "http" : "https"}://${host}/register`;
+  const signUpUrl = `${await requestOrigin()}/register`;
 
   return (
     <Card title="Team code">

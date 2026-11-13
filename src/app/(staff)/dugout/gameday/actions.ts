@@ -1,7 +1,6 @@
 "use server";
 
 import { refresh } from "next/cache";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { dugoutCheck, getCurrentUser, headCoachCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -24,6 +23,7 @@ import { emailConfigured, escapeHtml, sendEmail } from "@/lib/email";
 import { lineupFilename, renderLineupPdf } from "@/lib/pdf/lineup-pdf";
 import type { ShareResult } from "../plans/actions";
 import { STALE, failed, must, runAction } from "@/lib/actions";
+import { requestOrigin } from "@/lib/request-origin";
 
 // ---------------------------------------------------------------------------
 // Player cards (hitting type, base running, typed stats) for a team + season
@@ -259,9 +259,7 @@ export async function shareLineup(lineupId: string, recipientIds: string[], note
   const to = staff.filter((s) => recipientIds.includes(s.user_id));
   if (to.length === 0) return { error: "Pick at least one coach to send it to." };
 
-  const h = await headers();
-  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "gggcafe.vercel.app";
-  const url = `${host.startsWith("localhost") ? "http" : "https"}://${host}/dugout/gameday/${lineup.id}`;
+  const url = `${await requestOrigin()}/dugout/gameday/${lineup.id}`;
   const user = await getCurrentUser();
   const from = user?.staff?.displayName ?? "A coach";
   const vs = lineup.opponent ? ` vs ${lineup.opponent}` : "";

@@ -1,7 +1,6 @@
 "use server";
 
 import { refresh } from "next/cache";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { editorCheck, getCurrentUser } from "@/lib/auth";
 import { canEditPlanRole } from "@/lib/roles";
@@ -18,6 +17,7 @@ import { emailConfigured, escapeHtml, sendEmail } from "@/lib/email";
 import { NOTE_LIMITS, cleanNote } from "@/lib/install";
 import { practicePlanFilename, renderPracticePlanPdf } from "@/lib/pdf/practice-plan-pdf";
 import { STALE, failed, must, runAction } from "@/lib/actions";
+import { requestOrigin } from "@/lib/request-origin";
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
@@ -223,13 +223,6 @@ export type ShareResult = {
   mailto?: string;
 };
 
-async function siteOrigin() {
-  const h = await headers();
-  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "gggcafe.vercel.app";
-  const proto = h.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
-  return `${proto}://${host}`;
-}
-
 function summaryLines(plan: PracticePlan) {
   const { slots } = planTimeline(plan.start_time, plan.blocks);
   return plan.blocks.map((b, i) => {
@@ -304,7 +297,7 @@ export async function sharePracticePlan(planId: string, recipientIds: string[], 
 
   const user = await getCurrentUser();
   const from = user?.staff?.displayName ?? "A coach";
-  const url = `${await siteOrigin()}/dugout/plans/${plan.id}`;
+  const url = `${await requestOrigin()}/dugout/plans/${plan.id}`;
   const subject = `Practice plan: ${plan.team.name} · ${formatDay(plan.practice_date)}`;
   const cleanNote = note.trim().slice(0, 1000) || null;
   const { text: textBody, html } = emailBodies({ ...plan, status: "final" }, url, from, cleanNote);

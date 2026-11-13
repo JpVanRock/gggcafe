@@ -7,7 +7,6 @@
  * date the new version takes effect). Everyone signed in is asked to agree again (src/proxy.ts sends
  * them to /terms/accept); each agreement is recorded in public.terms_acceptances.
  */
-
 /** The version people agree to: the date it took effect (YYYY-MM-DD). */
 export const TERMS_VERSION = "2026-11-13";
 
@@ -506,7 +505,9 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
  * Verified parental consent for players under 13 (COPPA; docs/features/legal.md). The family page and the
  * printable form (src/lib/pdf/consent-form-pdf.tsx) use these words; the form's version is TERMS_VERSION.
  */
-export const PRIVACY_URL = "https://gggcafe.vercel.app/privacy";
+// SITE_URL (src/lib/site.ts) + /privacy; written out because this file has no runtime imports (the unit
+// tests load it directly), and tests/unit/legal.test.ts checks they match.
+export const PRIVACY_URL = "https://www.ggg.cafe/privacy";
 export const CONSENT_FORM_TITLE = "Parental Consent for a Player Under 13";
 export const CONSENT_NOTICE: { heading: string; text: string }[] = [
   {

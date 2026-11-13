@@ -60,7 +60,8 @@ Until this is done, jobs wait in the outbox, and nothing breaks.
    - Go to the dashboard → Integrations → Vault → Add new secret.
    - Add two secrets:
      - name `jobs_secret`, value: the same secret;
-     - name `jobs_worker_url`, value `https://gggcafe.vercel.app/api/jobs`.
+     - name `jobs_worker_url`, value `https://www.ggg.cafe/api/jobs`. Use the main address: ggg.cafe
+       only redirects, and the worker call may not follow a redirect.
    - The SQL editor works too (`select vault.create_secret('<value>', '<name>')`), but it keeps
      query history, so the Vault screen is better for the secret.
 4. **For the parent emails:** `RESEND_API_KEY` and `EMAIL_FROM` in Vercel (see src/lib/email.ts).

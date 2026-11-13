@@ -1,10 +1,10 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { CODE_TYPES, SIGNUP_TYPES, type SignupType } from "@/lib/account-types";
 import { TERMS_VERSION } from "@/lib/legal";
+import { requestOrigin } from "@/lib/request-origin";
 
 export type RegisterState = {
   error: string | null;
@@ -81,9 +81,7 @@ export async function registerAccount(_prev: RegisterState, fd: FormData): Promi
     if (!team) return fail("That team code doesn't match a team. Check it with your coach.", "code");
   }
 
-  const h = await headers();
-  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "gggcafe.vercel.app";
-  const origin = `${host.startsWith("localhost") ? "http" : "https"}://${host}`;
+  const origin = await requestOrigin();
 
   const { data, error } = await supabase.auth.signUp({
     email: values.email,
