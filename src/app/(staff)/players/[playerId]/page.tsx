@@ -16,6 +16,8 @@ import { loadAdvanced } from "./advanced-data";
 import { loadLeaderCertificate, loadLeadership } from "./leadership-data";
 import { signedPhotoUrls } from "@/lib/player-photos";
 import { MESSAGE_COLUMNS, signedMessagePhotoUrls, type MentorMessage } from "@/lib/message-photos";
+import { VIDEO_CALL_COLUMNS, VideoCallList, type VideoCallRow } from "@/components/video-calls";
+import { comingSinceISO, isComing } from "@/lib/video-calls";
 
 export const metadata: Metadata = { title: "Player · GGG.Cafe" };
 
@@ -60,13 +62,31 @@ export default async function PlayerDashboardPage({ params, searchParams }: Page
   // the Switchboard: what her head coach turned off (coaches see everything)
   const off = access.user.staff ? new Set<SwitchKey>() : await getPlayerFeaturesOff(player.id);
   const offNotice = isSwitchKey(offParam) && off.has(offParam) ? switchLabel(offParam) : null;
-  const [leadership, photos, messagePhotos] = await Promise.all([
+  const [leadership, photos, messagePhotos, { data: callRows }] = await Promise.all([
     loadLeadership(supabase, player.id, advanced.unlocked),
     player.photo_path ? signedPhotoUrls(supabase, [player.photo_path]) : Promise.resolve(null),
     signedMessagePhotoUrls(supabase, unread.map((m) => m.photo_path)),
+    // video calls booked with her (user, 2026-11-12), still ahead or happening now
+    supabase
+      .from("video_calls")
+      .select(VIDEO_CALL_COLUMNS)
+      .eq("player_id", player.id)
+      .is("cancelled_at", null)
+      .gte("starts_at", comingSinceISO())
+      .order("starts_at")
+      .limit(5),
   ]);
+  const calls = ((callRows ?? []) as VideoCallRow[]).filter((c) => isComing(c));
   const photoUrl = player.photo_path ? (photos?.get(player.photo_path) ?? null) : null;
 
+  const callPanel = calls.length > 0 && (
+    <section aria-labelledby="video-calls" className="rounded-2xl border border-neon/50 bg-navy-900/70 px-5 py-4">
+      <h2 id="video-calls" className="font-display text-xl leading-none font-bold tracking-wide text-highlight uppercase">
+        Video calls
+      </h2>
+      <VideoCallList calls={calls} />
+    </section>
+  );
   const menu = (
     <PlayerMenu
       player={player}
@@ -91,6 +111,7 @@ export default async function PlayerDashboardPage({ params, searchParams }: Page
       isAdmin={access.user.staff?.role === "admin"}
       journal={journalRows ? { count: journalRows.count ?? 0, last: journalRows.data?.[0]?.session_date ?? null } : null}
       off={off}
+      calls={callPanel || null}
     />
   );
   const notice = offNotice && (

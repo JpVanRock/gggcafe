@@ -130,3 +130,8 @@
 - Her Team page also shows the Team Hitting Philosophy and her group's Throwing Program (see offseason-training.md).
 - Sections her head coach switched off (the Switchboard) leave her menu, the section bar and the strip; their pages send
   her (and her parents) back to the menu with a note. See switchboard.md.
+
+## Video calls (user, 2026-11-12)
+Coming calls a mentor or head coach booked with her show above her menu, with Join (the call page opens 10
+minutes early). Players and parents get the notifications bell for calls booked or cancelled.
+docs/features/video-calls.md.

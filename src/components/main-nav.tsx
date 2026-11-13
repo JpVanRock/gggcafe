@@ -11,6 +11,7 @@ import { getWaitingCount } from "@/lib/approvals";
 import { CountBadge } from "@/components/ui";
 import { NavLink } from "@/components/nav-link";
 import { navClass, navItemClass } from "@/components/site-header";
+import { BellLink, NotificationBell } from "@/components/notification-bell";
 
 const NAV = [
   { href: "/dashboard", section: "/dashboard", label: "Dashboard" },
@@ -51,17 +52,7 @@ export async function MainNav({ fallback = null }: { fallback?: ReactNode }) {
           FAQ
         </NavLink>
       )}
-      {headCoach && (
-        <NavLink href="/notifications" className={navItemClass} aria-label={unread ? `Notifications: ${unread} new` : "Notifications"} title="Notifications">
-          <svg viewBox="0 0 24 24" aria-hidden className="size-[1.1rem]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-          </svg>
-          {/* on phones the bell sits in a list, so it gets its name */}
-          <span className="sm:hidden">Notifications</span>
-          <CountBadge count={unread} label={`${unread} new`} tone="neon" />
-        </NavLink>
-      )}
+      {headCoach && <BellLink unread={unread} />}
     </nav>
   );
 }
@@ -79,7 +70,7 @@ export async function MenuCount() {
  * daughter (user, 2026-11-12) gets her family home.
  */
 export async function NonStaffNav() {
-  if ((await getMyPlayerIds()).length) return <PlayerNav />;
+  if ((await getMyPlayerIds()).length) return <PlayerNav bell={<NotificationBell />} />;
   const teamAdmin = (await getAdminTeamIds()).length > 0;
   return (
     <nav aria-label="Main" className={navClass}>
@@ -92,16 +83,19 @@ export async function NonStaffNav() {
           Coaches Dugout
         </NavLink>
       )}
+      {/* video call notices (user, 2026-11-12) */}
+      <NotificationBell />
     </nav>
   );
 }
 
-export function PlayerNav() {
+export function PlayerNav({ bell = null }: { bell?: ReactNode }) {
   return (
     <nav aria-label="Main" className={navClass}>
       <NavLink href="/me" className={navItemClass}>
         My profile
       </NavLink>
+      {bell}
     </nav>
   );
 }

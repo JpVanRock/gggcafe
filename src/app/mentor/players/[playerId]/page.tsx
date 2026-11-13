@@ -27,6 +27,9 @@ import { Badge, RECENT_LIMIT } from "@/components/ui";
 import { JOURNAL_BUCKET } from "@/lib/journal";
 import { FocusBoard, FocusControls, FocusForm, NoteForm, NotesThread, RemoveNote, type FocusItem, type MentorNote } from "@/components/mentor-work";
 import { addMentorFocus, addMentorNote, removeMentorFocus, removeMentorNote, setMentorFocus, setMessageSharing } from "../../actions";
+import { VIDEO_CALL_COLUMNS, VideoCallList, type VideoCallRow } from "@/components/video-calls";
+import { VideoCallForm } from "@/components/video-call-form";
+import { zoomConfigured } from "@/lib/zoom";
 import { TrainingList, loadTraining } from "../../parts";
 
 export const metadata: Metadata = { title: "Player · Mentor · GGG.Cafe" };
@@ -82,15 +85,22 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
     // her signals, intensity checks and self-scans (never the journal)
     loadMentalTools(supabase, player.id, todayISO()),
   ]);
-  // My Journal: only the entries she shared with this mentor (the database shows nothing else)
-  const { data: journalRows } = await supabase
-    .from("player_journal_entries")
-    .select("id, session_date, topic, notes, audio_path, audio_seconds")
-    .eq("player_id", player.id)
-    .eq("mentor_id", mentor.userId)
-    .eq("shared_with_mentor", true)
-    .order("session_date", { ascending: false })
-    .limit(RECENT_LIMIT);
+  const [{ data: journalRows }, { data: callTeam }, { data: callRows }] = await Promise.all([
+    // My Journal: only the entries she shared with this mentor (the database shows nothing else)
+    supabase
+      .from("player_journal_entries")
+      .select("id, session_date, topic, notes, audio_path, audio_seconds")
+      .eq("player_id", player.id)
+      .eq("mentor_id", mentor.userId)
+      .eq("shared_with_mentor", true)
+      .order("session_date", { ascending: false })
+      .limit(RECENT_LIMIT),
+    // video calls (user, 2026-11-12): her team when an admin turned calls on and her head coach
+    // switched them on for mentors; null otherwise
+    supabase.rpc("video_call_team", { p_player_id: player.id }),
+    supabase.from("video_calls").select(VIDEO_CALL_COLUMNS).eq("player_id", player.id).eq("host_id", mentor.userId).order("starts_at", { ascending: false }).limit(RECENT_LIMIT),
+  ]);
+  const calls = (callRows ?? []) as VideoCallRow[];
   const shared = journalRows ?? [];
   const memoPaths = shared.flatMap((j) => (j.audio_path ? [j.audio_path] : []));
   const memoUrls = new Map<string, string>();
@@ -159,6 +169,23 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
               ))}
             </ul>
           )}
+        </Panel>
+      )}
+
+      {(callTeam || calls.length > 0) && (
+        <Panel title="Video calls">
+          <p className="-mt-2 text-sm text-muted">
+            Book a Zoom call with {first}, held right here on GGG.Cafe. Her parents are told and can join; her head coach can drop in. Calls aren&apos;t
+            recorded.
+          </p>
+          {!callTeam ? (
+            <p className="text-sm">Video calls are off for her team right now. Calls already booked can&apos;t go ahead until they&apos;re back on.</p>
+          ) : zoomConfigured() ? (
+            <VideoCallForm player={{ id: player.id, name: first }} />
+          ) : (
+            <p className="text-sm">Zoom isn&apos;t connected yet. A site admin adds the Zoom keys first.</p>
+          )}
+          <VideoCallList calls={calls} canCancel={(c) => c.host_id === mentor.userId} empty="No calls booked with her yet." />
         </Panel>
       )}
 

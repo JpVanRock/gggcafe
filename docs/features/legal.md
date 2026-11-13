@@ -106,3 +106,9 @@ and voice memos with photos and logos under private storage. A recording of a ch
 information under COPPA, so the user chose to have everyone agree again. Existing signed parental consents
 stay on file with the version they were given under; whether parents of players under 13 should sign a new
 consent form for this change is for the attorney to confirm.
+
+## Video calls (user, 2026-11-12; version 2026-11-13, everyone agrees again)
+Zoom joins the service providers (docs/features/video-calls.md). The Privacy notice says what we keep about a call
+(who, when, how long, what about), that it runs on Zoom while it happens and isn't recorded, and, in the children's
+section and the parental consent notice, that her parents are invited to every call. Shipped late on 2026-11-12
+Eastern, after that day's version, so it took the next date.

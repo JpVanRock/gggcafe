@@ -350,6 +350,17 @@ const parent_links: Row[] = [maya, emma].map((pid, i) => ({
 const team_features_off: Row[] = [{ team_id: T.us, feature: "player.activity", turned_off_by: U.admin, turned_off_at: "2026-11-11T18:00:00Z" }];
 const team_admins: Row[] = [{ team_id: T.us, user_id: U.admin, granted_by: U.admin, granted_at: "2026-11-11T18:00:00Z" }];
 
+// video calls (user, 2026-11-12): on for the sample team and its mentors; the sample admin (a mentor
+// there too) booked one with Maya, a head coach one with Emma, and one was cancelled
+const team_video_access: Row[] = [
+  { team_id: T.us, allowed_by: U.admin, allowed_at: "2026-11-12T18:00:00Z", mentors_on: true, mentors_set_by: U.admin, mentors_set_at: "2026-11-12T18:05:00Z" },
+];
+const video_calls: Row[] = [
+  { id: id("a0ca11", 1), team_id: T.us, player_id: maya, host_id: U.admin, host_kind: "mentor", host_name: "Coach Sample", topic: "Changeup grip and release", starts_at: "2027-01-12T00:00:00Z", minutes: 30, zoom_meeting_id: "81000000101", cancelled_at: null, cancelled_by: null, created_at: "2026-11-12T19:00:00Z" },
+  { id: id("a0ca11", 2), team_id: T.us, player_id: emma, host_id: U.admin, host_kind: "coach", host_name: "Pat Torres", topic: "Winter plan check-in", starts_at: "2027-01-14T23:30:00Z", minutes: 45, zoom_meeting_id: "81000000102", cancelled_at: null, cancelled_by: null, created_at: "2026-11-12T19:10:00Z" },
+  { id: id("a0ca11", 3), team_id: T.us, player_id: maya, host_id: U.admin, host_kind: "mentor", host_name: "Coach Sample", topic: "Spin drills", starts_at: "2026-12-02T00:00:00Z", minutes: 30, zoom_meeting_id: "81000000103", cancelled_at: "2026-11-12T20:00:00Z", cancelled_by: U.admin, created_at: "2026-11-12T19:20:00Z" },
+];
+
 export const TABLES: Record<string, Row[]> = {
   players, teams, seasons, roster_entries, staff, games, batting_lines, pitching_lines, fielding_lines, pa_grades,
   batting_season, pitching_season, fielding_season, qab_season, gameday_profiles, gameday_lineups, depth_chart, staff_duties, staff_standards,
@@ -359,6 +370,7 @@ export const TABLES: Record<string, Row[]> = {
   mentors, mentor_links, mentor_messages, mentor_focus, mentor_notes, player_activities,
   budget_fees, budget_entries, budget_credits, budget_coach_expenses, player_mental_lessons, coach_mental_lessons, mental_game_plans,
   team_hitting_philosophy, team_throwing_programs, player_journal_entries, parent_links, team_features_off, team_admins,
+  team_video_access, video_calls,
 };
 
 /** table -> the column other tables use to point at it (for embedded selects) */
@@ -431,6 +443,8 @@ export function sampleRpc(name: string, args: Row = {}): unknown {
     case "pending_approvals": return [];
     case "player_mentors": return [{ mentor_id: U.admin, display_name: "Coach Sample", specialty: "Pitching" }];
     case "my_admin_team_ids": return [T.us];
+    case "video_call_team": return T.us;
+    case "video_call_role": return video_calls.find((c) => c.id === args.p_call_id)?.cancelled_at ? "cancelled" : "host";
     // the Parents tab's approved parents (the sample admin, for Maya and Emma; a team admin)
     case "team_parent_links":
       return [maya, emma].map((pid, i) => ({ link_id: id("agag00", i + 1), parent_name: "Pat Torres", email: "coach@sample.test", child_name: playerFull(pid), player_id: pid, status: "approved", requested_at: "2026-11-01T00:00:00Z" }));
@@ -474,4 +488,5 @@ export function sampleRpc(name: string, args: Row = {}): unknown {
 export const SAMPLE_IDS = {
   player: maya, lightLeader: lila, team: T.us, opponent: T.storm, lineup: id("abab00", 1), game: G.g1, quiz: QZ, plan: PL,
   bullpenScript: bullpen_scripts[0].id, spotlight: player_spotlights[0].id, mentor: U.admin, consentPlayer: emma,
+  call: id("a0ca11", 1),
 };

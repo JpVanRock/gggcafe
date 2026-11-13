@@ -49,3 +49,9 @@
   with her). See player-dashboard.md.
 - The Switchboard (user, 2026-11-12) can turn off, per team, Message players, Add training, Focus areas & notes, and what a
   mentor sees (Goals, Pop Report, Mental GP, shared journal entries). See switchboard.md.
+
+## Video calls (user, 2026-11-12)
+Where a site admin turned video calls on for her team and the head coach switched them on for mentors, the
+player page has a Video calls panel: book a Zoom call with her, held on GGG.Cafe; her parents are told and can
+join, and head coaches can drop in. Mentors get the notifications bell (a head coach cancelling one of their
+calls). docs/features/video-calls.md.

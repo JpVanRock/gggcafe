@@ -9,16 +9,30 @@ import { formatLongDateAt } from "@/lib/dates";
 import { ALWAYS_ON, AUDIENCES, switchesFor, type SwitchKey } from "@/lib/switchboard";
 import { loadDugoutTeam } from "../dugout/data";
 import { NoOwnTeam, TeamPicker } from "../dugout/team-picker";
-import { setAudience, setFeature } from "./actions";
+import { setAudience, setFeature, setMentorVideo, setTeamVideo } from "./actions";
+import { zoomConfigured } from "@/lib/zoom";
+import type { FormState } from "@/lib/form";
 
 export const metadata: Metadata = { title: "Switchboard · GGG.Cafe" };
 
-/** One on/off switch: a submit button that flips it. */
-function Toggle({ teamId, feature, on, label }: { teamId: string; feature: SwitchKey; on: boolean; label: string }) {
+/** One on/off switch: a submit button that flips it (a Switchboard feature, or video calls). */
+function Toggle({
+  teamId,
+  feature,
+  on,
+  label,
+  action = setFeature,
+}: {
+  teamId: string;
+  feature?: SwitchKey;
+  on: boolean;
+  label: string;
+  action?: (prev: FormState, fd: FormData) => Promise<FormState>;
+}) {
   return (
-    <ActionForm action={setFeature} className="flex shrink-0 flex-col items-end">
+    <ActionForm action={action} className="flex shrink-0 flex-col items-end">
       <input type="hidden" name="team_id" value={teamId} />
-      <input type="hidden" name="feature" value={feature} />
+      {feature && <input type="hidden" name="feature" value={feature} />}
       <input type="hidden" name="on" value={on ? "false" : "true"} />
       <button
         type="submit"
@@ -47,10 +61,13 @@ export default async function SwitchboardPage({ searchParams }: PageProps<"/swit
   const dugout = await loadDugoutTeam(supabase, teamParam);
   if (!dugout) return <NoOwnTeam />;
   const { teams, team } = dugout;
-  const [{ data: offRows }, { data: teamRow }] = await Promise.all([
+  const [{ data: offRows }, { data: teamRow }, { data: video }] = await Promise.all([
     supabase.from("team_features_off").select("feature, turned_off_at").eq("team_id", team.id),
     supabase.from("teams").select("team_code").eq("id", team.id).maybeSingle(),
+    supabase.from("team_video_access").select("mentors_on").eq("team_id", team.id).maybeSingle(),
   ]);
+  // video calls (user, 2026-11-12): a site admin turns them on per team; then the head coach decides for mentors
+  const admin = user.staff.role === "admin";
   const off = new Map((offRows ?? []).map((r) => [r.feature, r.turned_off_at]));
   const offCount = off.size;
 
@@ -75,6 +92,20 @@ export default async function SwitchboardPage({ searchParams }: PageProps<"/swit
         </span>
         <span className="ml-auto font-display text-sm text-muted tabular-nums">{offCount ? `${offCount} switched off` : "Everything on"}</span>
       </div>
+
+      <section aria-labelledby="sb-video" className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-navy-700 bg-navy-900/60 px-4 py-3">
+        <div className="min-w-0 flex-1">
+          <h2 id="sb-video" className="font-semibold">
+            Video calls (Zoom) <span className={badgeClass(video ? "neon" : "neutral")}>{video ? "On" : "Off"}</span>
+          </h2>
+          <p className="text-xs text-muted">
+            Mentors and head coaches book Zoom calls with one player, held here on GGG.Cafe. Her parents are told and can join; nothing is recorded.{" "}
+            {admin ? "Only site admins turn this on or off for a team." : video ? "A site admin turned it on for this team." : "Only a site admin can turn it on for this team."}
+            {admin && !zoomConfigured() && " Zoom isn't connected yet: add the Zoom keys in Vercel."}
+          </p>
+        </div>
+        {admin && <Toggle teamId={team.id} on={Boolean(video)} label="Video calls for this team" action={setTeamVideo} />}
+      </section>
 
       <div className="grid gap-6 lg:grid-cols-3">
         {AUDIENCES.map((a) => {
@@ -127,6 +158,19 @@ export default async function SwitchboardPage({ searchParams }: PageProps<"/swit
                     </li>
                   );
                 })}
+                {a.key === "mentors" && (
+                  <li className="flex items-center justify-between gap-4 py-3">
+                    <div className="min-w-0">
+                      <p className={`font-semibold ${video?.mentors_on ? "" : "text-muted"}`}>Video calls</p>
+                      <p className="text-xs text-muted">Book Zoom calls with players; her parents are told and can join. Starts off.</p>
+                    </div>
+                    {video ? (
+                      <Toggle teamId={team.id} on={video.mentors_on} label="Mentors: Video calls" action={setMentorVideo} />
+                    ) : (
+                      <span className={badgeClass("neutral")}>Needs a site admin</span>
+                    )}
+                  </li>
+                )}
                 {ALWAYS_ON.filter((x) => x.audience === a.key).map((x) => (
                   <li key={x.label} className="flex items-center justify-between gap-4 py-3">
                     <div className="min-w-0">

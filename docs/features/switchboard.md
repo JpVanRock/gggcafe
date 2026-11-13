@@ -18,3 +18,9 @@
 - Always on (not switchable): TWIS, messages from mentors (set by Message players), the medical card, her login and
   parental consent, parents' oversight of mentors.
 - DB tests: `tests/db/switchboard.test.sql`.
+
+## Video calls (user, 2026-11-12)
+Not a `team_features_off` switch. Above the three groups, site admins turn video calls on or off for the team
+(`team_video_access`; head coaches see the state). Under Mentors, the head coach's "Video calls" switch
+(`mentors_on`, off at first) shows once an admin has turned calls on. "All on" and "All off" leave it alone.
+docs/features/video-calls.md.

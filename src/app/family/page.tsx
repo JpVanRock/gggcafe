@@ -21,6 +21,8 @@ import { consentStep } from "@/lib/consent";
 import { formatLongDateAt } from "@/lib/dates";
 import { isStaffParent } from "@/components/role-switch";
 import type { SwitchKey } from "@/lib/switchboard";
+import { VIDEO_CALL_COLUMNS, VideoCallList, type VideoCallRow } from "@/components/video-calls";
+import { comingSinceISO, isComing } from "@/lib/video-calls";
 
 export const metadata: Metadata = { title: "Family · GGG.Cafe" };
 
@@ -104,7 +106,21 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
   const firstName = (account?.display_name ?? metaName).split(" ")[0];
   // team admin (user, 2026-11-12): the head coach let them run the calendar, GameDay and measurements
   const adminTeams = approvedTeams.filter((l) => adminTeamIds.includes(l.team_id));
-  const yearbooks = await yearbookTeams(supabase, approvedTeams.filter((l) => !offOn(l.team_id, "parent.yearbook")).map((l) => l.team_id));
+  const [yearbooks, { data: callRows }] = await Promise.all([
+    yearbookTeams(supabase, approvedTeams.filter((l) => !offOn(l.team_id, "parent.yearbook")).map((l) => l.team_id)),
+    // video calls booked with their daughters (user, 2026-11-12): parents are invited to every one
+    daughters.length
+      ? supabase
+          .from("video_calls")
+          .select(VIDEO_CALL_COLUMNS)
+          .in("player_id", daughters.map((d) => d.player_id))
+          .is("cancelled_at", null)
+          .gte("starts_at", comingSinceISO())
+          .order("starts_at")
+          .limit(10)
+      : Promise.resolve({ data: [] }),
+  ]);
+  const calls = ((callRows ?? []) as VideoCallRow[]).filter((c) => isComing(c));
 
   return (
     <div className="flex flex-col gap-8">
@@ -121,6 +137,15 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
         <p role="alert" className="rounded-lg border border-pink/60 bg-pink/10 p-4 text-sm">
           Your account is set up, but that team code didn&apos;t match a team. Check it with your coach and enter it below.
         </p>
+      )}
+
+      {calls.length > 0 && (
+        <Card title="Video calls">
+          <p className="text-sm text-muted">
+            You&apos;re invited to every call a mentor or head coach books with your daughter. Join from the call page; it opens 10 minutes before the start.
+          </p>
+          <VideoCallList calls={calls} showPlayer />
+        </Card>
       )}
 
       {links.length > 0 && (

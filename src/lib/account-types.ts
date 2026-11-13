@@ -95,6 +95,8 @@ export const SECTIONS: { title: string; rows: Row[] }[] = [
         "A coach who is also a parent here claims their daughter from the dashboard (a head coach's claim is approved at once, an assistant's waits for the head coach) and gets this page too, with the Coach / Parent switch at the top."),
       row("My Journal", "Her notes and voice memos from mentor sessions.", ["no", "no", "own", "view", "part"],
         "Hers: her parents read it; a mentor reads only the entries she shares with them; coaches don't see it (the user's choice)."),
+      row("Video calls", "Zoom calls with one player, held on GGG.Cafe and never recorded.", ["yes", "view", "part", "part", "part"],
+        "Off until a site admin turns them on for a team; then the head coach switches them on for mentors (the Switchboard). Head coaches and her mentors book them; she and her parents are told and join; head coaches can drop in; assistants see them on the Calendar."),
       row("Mentor page", "The team's roster or her approved players, messages with a photo or a drill (shared with coaches if she chooses), training for one player or a group, notes and focus areas with the coaches.", ["no", "no", "no", "no", "yes"]),
     ],
   },
@@ -221,8 +223,15 @@ export const QUESTIONS: { q: string; a: string[] }[] = [
   {
     q: "What does the Switchboard turn off?",
     a: [
-      "Head coaches (and admins) open it from the Switchboard pill under the main menu. For one team, it turns off features for Players (Goals, Pop Report, Mental GP, My Journal, Training, Softball IQ, Trophy Room, Leaderboard, + Activity, Team page, Yearbook), Parents (Team Budget, welcome packet, questionnaire, View as player, Yearbook) and Mentors (messages, training, notes, and what they can see).",
+      "Head coaches (and admins) open it from the Switchboard pill under the main menu. For one team, it turns off features for Players (Goals, Pop Report, Mental GP, My Journal, Training, Softball IQ, Trophy Room, Leaderboard, + Activity, Team page, Yearbook), Parents (Team Budget, welcome packet, questionnaire, View as player, Yearbook) and Mentors (messages, training, notes, what they can see, and video calls once a site admin turns calls on for the team).",
       "Off hides it on the site and stops new posts; nothing saved is deleted, and switching it back on brings it all back. Some things stay on for safety or the law: TWIS, the medical card, her login and consent, and parents' oversight of mentors. A player on two teams loses a feature if either team turns it off.",
+    ],
+  },
+  {
+    q: "How do video calls work, and who can use them?",
+    a: [
+      "They're off for every team until a site admin turns them on for that team on the Switchboard. Then the team's head coach decides whether mentors can book them too (Mentors → Video calls, off at first). With a team's calls off, nobody on it can book, start or join one; a player on two teams needs both to allow it.",
+      "Head coaches book calls on Coaches Dugout → Calendar, mentors on the player's page. Each call is with one player: she and her approved parents are told (the bell) and join from the call page, which opens 10 minutes early; head coaches can drop in. Everyone waits in Zoom's waiting room until the host lets them in, and nothing is recorded.",
     ],
   },
   {

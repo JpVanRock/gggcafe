@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getAdminTeamIds, getCurrentUser } from "@/lib/auth";
 import { yearbookTeams } from "@/lib/yearbook-data";
 import { HeaderTeamLogo } from "@/components/header-team-logo";
+import { NotificationBell } from "@/components/notification-bell";
 
 /** Parents' menu: Home, plus Yearbook when a daughter on one of their teams has G3 Advanced. */
 async function FamilyNav() {
@@ -39,6 +40,8 @@ async function FamilyNav() {
           Coaches Dugout
         </NavLink>
       )}
+      {/* video call notices (user, 2026-11-12) */}
+      <NotificationBell />
     </nav>
   );
 }

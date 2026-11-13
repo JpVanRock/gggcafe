@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Video call</title>
+<!--
+  The Zoom call inside a GGG.Cafe call page (src/app/calls/[callId]/call-room.tsx, docs/features/video-calls.md).
+  Zoom's web kit runs on its own copy of React, so it lives in this frame, apart from the site.
+  The page sends the join details (made on the server for this one person) by postMessage from
+  the same origin only; nothing here is stored. Version pinned: change it in all six URLs together.
+-->
+<style>
+  html, body { margin: 0; height: 100%; background: #000a2d; color: #fff; font: 15px/1.4 system-ui, sans-serif; overflow: hidden; }
+  #status { margin: 0; padding: 16px; }
+  #zoom { position: absolute; inset: 0; }
+</style>
+</head>
+<body>
+<p id="status" role="status">Connecting to the call…</p>
+<div id="zoom"></div>
+<script src="https://source.zoom.us/6.10.0/lib/vendor/react.min.js"></script>
+<script src="https://source.zoom.us/6.10.0/lib/vendor/react-dom.min.js"></script>
+<script src="https://source.zoom.us/6.10.0/lib/vendor/redux.min.js"></script>
+<script src="https://source.zoom.us/6.10.0/lib/vendor/redux-thunk.min.js"></script>
+<script src="https://source.zoom.us/6.10.0/lib/vendor/lodash.min.js"></script>
+<script src="https://source.zoom.us/6.10.0/zoom-meeting-embedded-6.10.0.min.js"></script>
+<script>
+(function () {
+  var started = false;
+  var status = document.getElementById("status");
+  function tell(type, detail) {
+    window.parent.postMessage({ source: "ggg-zoom", type: type, detail: detail || null }, window.location.origin);
+  }
+  window.addEventListener("message", function (event) {
+    if (event.origin !== window.location.origin || started) return;
+    var d = event.data;
+    if (!d || d.source !== "ggg-call" || d.type !== "join") return;
+    if (typeof window.ZoomMtgEmbedded === "undefined") {
+      tell("error", "Zoom didn't load. Check your connection and try again.");
+      return;
+    }
+    started = true;
+    var client = window.ZoomMtgEmbedded.createClient();
+    client
+      .init({
+        zoomAppRoot: document.getElementById("zoom"),
+        language: "en-US",
+        patchJsMedia: true,
+        leaveOnPageUnload: true,
+        customize: {
+          // no meeting number, passcode or invite link on screen: people join through the site
+          meetingInfo: ["topic", "host", "participant"],
+          video: {
+            isResizable: false,
+            popper: { disableDraggable: true },
+            viewSizes: { default: { width: window.innerWidth, height: Math.max(240, window.innerHeight - 56) } }
+          }
+        }
+      })
+      .then(function () {
+        return client.join({
+          signature: d.signature,
+          meetingNumber: d.meetingNumber,
+          password: d.password,
+          userName: d.userName,
+          zak: d.zak || undefined
+        });
+      })
+      .then(function () {
+        status.hidden = true;
+        tell("joined");
+        client.on("connection-change", function (payload) {
+          if (payload && payload.state === "Closed") tell("ended");
+        });
+      })
+      .catch(function (e) {
+        started = false;
+        tell("error", (e && (e.reason || e.message)) || "Couldn't join the call.");
+      });
+  });
+  tell("ready");
+})();
+</script>
+</body>
+</html>

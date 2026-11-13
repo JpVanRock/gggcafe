@@ -113,3 +113,8 @@
   `src/lib/dugout.ts` (no imports; unit-tested). Field layout `FIELD_SPOT` is shared by web and PDF.
 - Team admins (user, 2026-11-12): a parent the head coach names gets only Calendar, GameDay and Measurements
   (`/dugout/measurements`, the team measurement grid, also linked from Training → Measurements). See account-types.md.
+
+## Video calls (user, 2026-11-12)
+Calendar → Video calls (coaches only, not team admins): every call on the team from the last 30 days and ahead;
+head coaches book one with a player, and can cancel any. Off until a site admin turns calls on for the team.
+docs/features/video-calls.md.

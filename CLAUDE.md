@@ -9,7 +9,9 @@ SITE:     Next.js 16 App Router + TypeScript + Tailwind, `src/`.
 HOSTING:  Vercel team "GGG", project `gggcafe`, https://gggcafe.vercel.app. Every push to main
           deploys to production. Vercel env vars: NEXT_PUBLIC_SUPABASE_URL and
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY (never the DB password). Optional, server-only, for
-          emailing practice plans: RESEND_API_KEY + EMAIL_FROM (see src/lib/email.ts).
+          emailing practice plans: RESEND_API_KEY + EMAIL_FROM (see src/lib/email.ts); for video
+          calls: ZOOM_ACCOUNT_ID, ZOOM_CLIENT_ID, ZOOM_CLIENT_SECRET, ZOOM_SDK_KEY, ZOOM_SDK_SECRET,
+          ZOOM_HOST_EMAIL (src/lib/zoom.ts, docs/features/video-calls.md).
 
 @AGENTS.md
 
@@ -32,6 +34,7 @@ src/components/main-nav.tsx  top menu: staff get Dashboard/Coaches Dugout (opens
                          show their team's logo beside ours when it has one (`HeaderTeamLogo`, `headerTeamLogo()` in
                          lib/team-logos.ts; parents get it from `parent_team_logos()`)
 src/proxy.ts             refreshes the Supabase auth session each request (Next 16 "proxy", formerly middleware)
+src/app/calls/[callId]   a video call (Zoom, in public/zoom-call.html's frame); docs/features/video-calls.md
 src/app/terms, privacy   Terms of Service and Privacy & Security (public); /terms/accept asks signed-in users to agree
 src/app/manifest.ts      the phone app (installable web app; opens /dashboard, which routes each account home).
                          Icons in public/icons/ (maskable = logo inside the 80% safe zone); iPhone settings are
@@ -161,6 +164,7 @@ tests/unit/              node --test unit tests (npm run test:unit)
 | Team Yearbook | `docs/features/yearbook.md` | Season photos, who can add and view, the viewer |
 | Team playbook & scouting | `docs/features/playbook-scouting.md` | Depth chart, call sheet and flashcards, team quizzes, scouting |
 | UI components | `docs/features/ui-components.md` | Type scale, shared components and props, states, accessibility rules |
+| Video calls | `docs/features/video-calls.md` | Zoom calls inside the site: admin and head-coach switches, booking, joining, safeguards, Zoom and Vercel setup |
 
 ## Softball conventions
 - Default format is fastpitch; `teams.format` allows slowpitch.

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { OutlineText, SpeedStripes } from "@/components/athletic";
 import { GOAL_METHOD_LABEL, batsThrows, playerName, type Player } from "@/lib/softball";
@@ -71,6 +72,7 @@ export function PlayerMenu({
   isSelf = false,
   journal = null,
   off = new Set(),
+  calls = null,
 }: {
   player: Player;
   twis: TwisWeek;
@@ -104,6 +106,8 @@ export function PlayerMenu({
   journal?: { count: number; last: string | null } | null;
   /** the Switchboard: features her head coach turned off (empty for coaches, who see everything) */
   off?: ReadonlySet<SwitchKey>;
+  /** video calls booked with her that are still ahead (user, 2026-11-12) */
+  calls?: ReactNode;
 }) {
   const name = firstName(player);
   const method = player.goal_method ?? "harada";
@@ -283,6 +287,7 @@ export function PlayerMenu({
       </header>
 
       <div className="flex flex-col gap-3">
+        {calls}
         {mentorMessages && (
           <MentorAlerts
             playerId={player.id}

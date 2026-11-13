@@ -5639,6 +5639,41 @@ export type Database = {
           },
         ]
       }
+      team_video_access: {
+        Row: {
+          team_id: string
+          allowed_by: string | null
+          allowed_at: string
+          mentors_on: boolean
+          mentors_set_by: string | null
+          mentors_set_at: string | null
+        }
+        Insert: {
+          team_id: string
+          allowed_by?: string | null
+          allowed_at?: string
+          mentors_on?: boolean
+          mentors_set_by?: string | null
+          mentors_set_at?: string | null
+        }
+        Update: {
+          team_id?: string
+          allowed_by?: string | null
+          allowed_at?: string
+          mentors_on?: boolean
+          mentors_set_by?: string | null
+          mentors_set_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_video_access_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: true
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       teams: {
         Row: {
           id: string
@@ -5880,6 +5915,69 @@ export type Database = {
             columns: ["team_event_id"]
             isOneToOne: false
             referencedRelation: "team_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_calls: {
+        Row: {
+          id: string
+          team_id: string
+          player_id: string
+          host_id: string
+          host_kind: string
+          host_name: string
+          topic: string
+          starts_at: string
+          minutes: number
+          zoom_meeting_id: string
+          cancelled_at: string | null
+          cancelled_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          team_id: string
+          player_id: string
+          host_id?: string
+          host_kind: string
+          host_name: string
+          topic: string
+          starts_at: string
+          minutes: number
+          zoom_meeting_id: string
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          team_id?: string
+          player_id?: string
+          host_id?: string
+          host_kind?: string
+          host_name?: string
+          topic?: string
+          starts_at?: string
+          minutes?: number
+          zoom_meeting_id?: string
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_calls_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_calls_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
             referencedColumns: ["id"]
           },
         ]
@@ -6243,6 +6341,8 @@ export type Database = {
       team_welcome: { Args: { p_team_id: string | null }; Returns: { team_name: string; season_name: string; welcome_message: string }[] }
       team_yearbook: { Args: { p_team_id: string | null; p_season_id?: string | null }; Returns: Json }
       unread_notifications: { Args: Record<PropertyKey, never>; Returns: number }
+      video_call_role: { Args: { p_call_id: string | null }; Returns: string }
+      video_call_team: { Args: { p_player_id: string | null }; Returns: string }
       withdraw_parental_consent: { Args: { p_player_id: string | null }; Returns: undefined }
       yearbook_access: { Args: { p_team_id: string | null }; Returns: string }
     }

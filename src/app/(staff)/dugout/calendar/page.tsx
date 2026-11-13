@@ -9,6 +9,13 @@ import { loadDugoutTeam } from "../data";
 import { NoOwnTeam, TeamPicker } from "../team-picker";
 import { CalendarView, type CalEvent, type CalGame } from "./calendar";
 import { OffseasonForm, OffseasonPanel } from "./offseason";
+import { isHeadCoachRole } from "@/lib/roles";
+import { loadRoster } from "@/lib/roster";
+import { RECENT_LIMIT } from "@/components/ui";
+import { VIDEO_CALL_COLUMNS, VideoCallList, type VideoCallRow } from "@/components/video-calls";
+import { VideoCallForm } from "@/components/video-call-form";
+import { zoomConfigured } from "@/lib/zoom";
+import { recentSinceISO } from "@/lib/video-calls";
 
 export const metadata: Metadata = { title: "Calendar · Coaches Dugout · GGG.Cafe" };
 
@@ -119,6 +126,22 @@ export default async function CalendarPage({ searchParams }: PageProps<"/dugout/
   });
 
   const link = (m: string) => `/dugout/calendar?team=${team.id}&month=${m}`;
+  // video calls (user, 2026-11-12): coaches see every call on the team; head coaches book them
+  const headCoach = isHeadCoachRole(access.role);
+  const [{ data: videoAccess }, { data: callRows }, roster] = coach
+    ? await Promise.all([
+        supabase.from("team_video_access").select("mentors_on").eq("team_id", team.id).maybeSingle(),
+        supabase
+          .from("video_calls")
+          .select(VIDEO_CALL_COLUMNS)
+          .eq("team_id", team.id)
+          .gte("starts_at", recentSinceISO())
+          .order("starts_at")
+          .limit(RECENT_LIMIT),
+        headCoach ? loadRoster(supabase, team.id, { order: "name" }) : Promise.resolve([]),
+      ])
+    : [{ data: null }, { data: [] }, []];
+  const calls = (callRows ?? []) as VideoCallRow[];
 
   return (
     <div className="flex flex-col gap-6">
@@ -172,6 +195,24 @@ export default async function CalendarPage({ searchParams }: PageProps<"/dugout/
           {editor && coach && <OffseasonForm key={`${team.id}-${offseason?.starts_on}-${offseason?.ends_on}`} teamId={team.id} startsOn={offseason?.starts_on ?? null} endsOn={offseason?.ends_on ?? null} />}
         </OffseasonPanel>
       </CalendarView>
+      {coach && (
+        <section aria-labelledby="video-calls" className="flex flex-col gap-4 rounded-2xl border border-navy-700 bg-navy-900/70 p-5">
+          <div>
+            <h2 id="video-calls" className="font-display text-2xl leading-none font-bold tracking-wide text-highlight uppercase">
+              Video calls
+            </h2>
+            <p className="mt-2 text-sm text-muted">
+              {videoAccess
+                ? `Zoom calls with one player, held on GGG.Cafe. Her parents are told and can join; head coaches can drop in; nothing is recorded. Mentors: ${videoAccess.mentors_on ? "on" : "off"} (the Switchboard).`
+                : `Off for ${team.name}. Only a site admin can turn video calls on for a team (the Switchboard).`}
+            </p>
+          </div>
+          {videoAccess && headCoach && (zoomConfigured() ? <VideoCallForm teamId={team.id} players={roster.map((p) => ({ id: p.id, name: p.name }))} /> : (
+            <p className="text-sm">Zoom isn&apos;t connected yet. A site admin adds the Zoom keys in Vercel first.</p>
+          ))}
+          <VideoCallList calls={calls} showPlayer canCancel={() => headCoach} empty={videoAccess ? "No calls booked in the last 30 days or ahead." : undefined} />
+        </section>
+      )}
       {editor && (
         <p className="text-xs text-muted">
           + Event adds a practice, workout, lesson or meeting, one time or repeating (+ on a day starts it on that day). Tap an event to change or remove it.

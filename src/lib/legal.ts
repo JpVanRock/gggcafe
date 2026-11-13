@@ -9,10 +9,10 @@
  */
 
 /** The version people agree to: the date it took effect (YYYY-MM-DD). */
-export const TERMS_VERSION = "2026-11-12";
+export const TERMS_VERSION = "2026-11-13";
 
 /** Shown at the top of both documents. */
-export const EFFECTIVE_DATE = "November 12, 2026";
+export const EFFECTIVE_DATE = "November 13, 2026";
 
 /** Who runs GGG.Cafe, whose law applies, and where to reach us (user, 2026-11-09). */
 export const LEGAL = {
@@ -327,6 +327,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
         "Player information: profile details (for example birth date, graduation year, positions, jersey number, bats and throws), photos, walk-up songs, training and test results, measurements, stats, goals, check-offs, journal entries (typed, or voice memos she records), mental-game entries, quiz and test results, notes and messages.",
         "Family and medical information that parents and coaches choose to add: emergency contacts, allergies, conditions, medications, physician and insurance details, and preseason questionnaire answers (such as uniform sizes).",
         "Coach, mentor and parent information: name, role, specialty, team and the content you add.",
+        "Video calls, where a team uses them: who a call is with, when, how long and what it's about. The call itself runs on Zoom while it happens and isn't recorded.",
         "Payment information, if you buy a paid feature: what you bought and when. Card details are handled by the payment processor, not stored by us.",
         "Communications: what you send us, such as support requests and privacy requests.",
         "Technical information: the cookies that keep you signed in, and basic logs (such as IP address, browser and device type, pages requested and the time) that our hosting and database providers keep for security and troubleshooting. A few display choices, such as Night Game or Day Game, are saved only on your device.",
@@ -399,6 +400,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
         "Supabase: database, sign-in, file storage and account emails, hosted in the United States.",
         "Vercel: website hosting.",
         "Resend: emails you ask us to send, such as a practice plan.",
+        "Zoom: video calls held on the site, for teams that use them. Sound and video pass through Zoom's servers during the call; calls aren't recorded.",
         "A payment processor, if you buy a paid feature.",
       ],
       "They process information on our behalf and under their own security programs. We'll update this list if it changes.",
@@ -418,7 +420,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     blocks: [
       "GGG.Cafe is built for youth athletes, with parents involved. This section is our notice to parents under the Children's Online Privacy Protection Act (COPPA).",
       "Children under 13 can't sign themselves up. Before a child under 13 can sign in, a parent or guardian (approved for that player by the team's head coach) gives verified consent in one of two ways: by signing our consent form by hand and uploading a photo or scan of it, or by a short video call with our staff. Our staff check the consent before the parent can create the child's login, and no coach can approve a profile claim for a child under 13 until it's checked. We keep the signed form, or a note of the call, as the record of consent while we keep the child's information, and afterward only as long as needed to show that consent was given. Coaches may also add a child's profile and stats to a team roster.",
-      "What we collect from or about a child: the profile, training, goals, mental-game, journal (including voice memos she records), quiz, stats, photo and message information listed above, and the medical card and questionnaire a parent adds. We use it only to provide the Service to the child and their team. We don't show it publicly, we don't use it for advertising, and we don't share it with third parties except our service providers and as the law requires. We don't ask a child for more information than a feature needs, and a child doesn't have to give more than that to take part.",
+      "What we collect from or about a child: the profile, training, goals, mental-game, journal (including voice memos she records), quiz, stats, photo and message information listed above, video calls a mentor or head coach books with her (her parents are invited to each one; calls aren't recorded), and the medical card and questionnaire a parent adds. We use it only to provide the Service to the child and their team. We don't show it publicly, we don't use it for advertising, and we don't share it with third parties except our service providers and as the law requires. We don't ask a child for more information than a feature needs, and a child doesn't have to give more than that to take part.",
       "Parents can review their child's information, have it corrected or deleted, and refuse to let us collect or use any more of it, at any time, by contacting us or the head coach. A parent can also withdraw consent on the family page: that deletes the child's login right away, so she can't sign in. Deleting the information ends the child's access. We'll confirm a parent's identity and connection to the child before acting on a request.",
       "If we learn we collected information from a child under 13 without a parent's consent, we'll delete it.",
     ],
@@ -513,11 +515,11 @@ export const CONSENT_NOTICE: { heading: string; text: string }[] = [
   },
   {
     heading: "What she adds when she signs in",
-    text: "Her goals, training check-offs and workouts, journal and mental-game entries (her journal can include voice memos she records), quiz and test answers, messages with her coaches and the mentors you approve, and a profile photo if one is added. Her coaches also add her roster details, stats and evaluations.",
+    text: "Her goals, training check-offs and workouts, journal and mental-game entries (her journal can include voice memos she records), quiz and test answers, messages with her coaches and the mentors you approve, and a profile photo if one is added. Where her team uses video calls, her mentors or head coach can book one with her; you're invited to each call, and calls aren't recorded. Her coaches also add her roster details, stats and evaluations.",
   },
   {
     heading: "How it's used and who sees it",
-    text: "Only to run GGG.Cafe for her and her team. She sees her own information; so do you, her other approved parents, her team's coaches, mentors you approve and GGG.Cafe admins. Teammates see her only in team views such as the leaderboard and yearbook. Nothing is public, sold, used for advertising or used to train AI. Our hosting providers (Supabase, Vercel and Resend) process it only for us.",
+    text: "Only to run GGG.Cafe for her and her team. She sees her own information; so do you, her other approved parents, her team's coaches, mentors you approve and GGG.Cafe admins. Teammates see her only in team views such as the leaderboard and yearbook. Nothing is public, sold, used for advertising or used to train AI. Our providers (Supabase, Vercel, Resend, and Zoom for video calls) process it only for us.",
   },
   {
     heading: "Your rights",
