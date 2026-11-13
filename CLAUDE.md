@@ -44,7 +44,7 @@ src/app/api/errors, (staff)/health, instrumentation(-client).ts   error tracking
 src/app/api/jobs         the job worker (outbox: emails, Zoom cleanup; called by Supabase pg_cron/pg_net);
                          src/lib/jobs/, docs/architecture/jobs.md. Architecture review: docs/architecture/scaling.md
 src/app/terms, privacy   Terms of Service and Privacy & Security (public); /terms/accept asks signed-in users to agree
-src/app/manifest.ts      the phone app (installable web app; opens /dashboard, which routes each account home).
+src/app/manifest.ts      the phone app (installable web app, "GGG Cafe" under the icon; opens /dashboard, which routes each account home).
                          Icons in public/icons/ (maskable = logo inside the 80% safe zone); iPhone settings are
                          `appleWebApp` in the root layout. iPhone icon: src/app/apple-icon.png and public/apple-touch-icon(-precomposed).png,
                          180×180 with no transparency (iOS shows a letter when it can't get one, and never re-checks:

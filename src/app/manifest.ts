@@ -10,8 +10,9 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "GGG.Cafe",
-    short_name: "GGG.Cafe",
+    // the app's name on home screens and in app lists (user, 2026-11-13); page titles keep "GGG.Cafe"
+    name: "GGG Cafe",
+    short_name: "GGG Cafe",
     description: "Softball player development and team management",
     start_url: "/dashboard",
     scope: "/",
