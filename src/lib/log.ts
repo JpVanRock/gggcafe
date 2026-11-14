@@ -32,6 +32,20 @@ export function logLine(level: LogLevel, event: string, fields: Record<string, u
   return JSON.stringify({ level, event, time: now.toISOString(), ...(redact(fields) as Record<string, unknown>) });
 }
 
+/** A log line as the log drain keeps it (user, 2026-11-14): route and message lifted out, the rest redacted. */
+export type DrainEntry = { level: LogLevel; event: string; route: string | null; message: string | null; fields: Record<string, unknown> };
+
+export function drainEntry(level: LogLevel, event: string, fields: Record<string, unknown> = {}): DrainEntry {
+  const { route, message, ...rest } = redact(fields) as Record<string, unknown>;
+  return {
+    level,
+    event: event.slice(0, 80),
+    route: typeof route === "string" ? route.slice(0, 200) : null,
+    message: typeof message === "string" ? message.slice(0, 500) : null,
+    fields: rest,
+  };
+}
+
 export function log(level: LogLevel, event: string, fields: Record<string, unknown> = {}): void {
   const line = logLine(level, event, fields);
   if (level === "error") console.error(line);

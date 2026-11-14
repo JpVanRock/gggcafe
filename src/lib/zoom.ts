@@ -9,6 +9,7 @@ import "server-only";
 //   ZOOM_HOST_EMAIL  the licensed Zoom user every call is booked under (one call at a time)
 // Until all six are set, scheduling and joining say Zoom isn't connected yet.
 import { meetingSdkSignature } from "@/lib/zoom-signature";
+import { logAndKeep } from "@/lib/log-drain";
 
 const API = "https://api.zoom.us/v2";
 const KEYS = ["ZOOM_ACCOUNT_ID", "ZOOM_CLIENT_ID", "ZOOM_CLIENT_SECRET", "ZOOM_SDK_KEY", "ZOOM_SDK_SECRET", "ZOOM_HOST_EMAIL"] as const;
@@ -37,7 +38,8 @@ async function attempt<T>(work: () => Promise<T>): Promise<ZoomResult<T>> {
   try {
     return { ok: true, value: await work() };
   } catch (e) {
-    console.error("Zoom:", e);
+    // kept in the log drain (user, 2026-11-14): what Zoom said, on the admin Site health page
+    await logAndKeep("warn", "zoom.error", { message: e instanceof Error ? e.message : String(e) });
     return { ok: false, error: e instanceof ZoomError ? e.message : "Couldn't reach Zoom. Try again in a minute." };
   }
 }

@@ -163,7 +163,7 @@ export const SECTIONS: { title: string; rows: Row[] }[] = [
       row("Welcome packet", "The coach's letter, team policies and how-to-help tips on the family page.", ["yes", "no", "no", "view", "no"],
         "Head coaches write it (Parents tab); approved parents read it and mark each item read."),
       row("Change roles, remove staff", "Head Coach, Assistant Coach or Viewer, on the Roster tab.", ["no", "no", "no", "no", "no"], "Admins only."),
-      row("View as a parent or mentor", "See their family page or mentor home as they see it, read only, to help with their questions: Parent view and Mentor view toggles on the Dugout's Parents and Mentors tabs.", ["no", "no", "no", "no", "no"],
+      row("View as a parent or mentor", "See their family page or mentor home as they see it, read only, to help with their questions: Parent view and Mentor view toggles on the Dugout's Parents and Mentors tabs. A team with no mentors yet shows an example mentor's page with the team's roster and schedule.", ["no", "no", "no", "no", "no"],
         "Admins only: Coaches Dugout → Parents or Mentors, or the View as page."),
     ],
   },

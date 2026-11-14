@@ -3,6 +3,8 @@
   the season motto (`team_culture.motto`, shown in From the Dugout), Team Season Goals (`team_goals`: phase, optional
   target/progress by hand until box scores, achieved), the pledge tracker, and Player Spotlights (`player_spotlights`: the
   player's name and number are copied in so teammates can read them). Players on the team read goals and spotlights.
+- The team's tagline (the culture headline) and the season motto show in pink italics wherever they appear: the team
+  culture page, the family board, From the Dugout and the Mentors tab (user, 2026-11-14).
 - Her commitment and the team pledge (`team_pledges`, per team and current season, plus a typed signature) on her Team
   page (`team-culture-client.tsx`, `culture-actions.ts`, `team-culture-data.ts`). One "I will..." that covers every Team
   Standard (user, 2026-11-11): the standards are listed, she writes once (`lines` = { all: … }, `cleanPledge`,

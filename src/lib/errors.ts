@@ -9,7 +9,8 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
 import { supabaseConfig } from "@/lib/supabase/env";
-import { cleanRoute, errorFingerprint, log, normalizeMessage } from "@/lib/log";
+import { cleanRoute, drainEntry, errorFingerprint, log, normalizeMessage } from "@/lib/log";
+import { keepLogs } from "@/lib/log-drain";
 
 export type ErrorSource = "server" | "action" | "route" | "browser" | "job";
 
@@ -28,11 +29,14 @@ export async function reportError(input: { source: ErrorSource; error: unknown; 
     const route = cleanRoute(input.route);
     const fingerprint = errorFingerprint(input.source, name, message, route);
     const digest = input.digest && /^[\w-]{1,64}$/.test(input.digest) ? input.digest : null;
-    log("error", "error", { source: input.source, name, message, route, digest, fingerprint, ...input.context });
+    const fields = { source: input.source, name, message, route, digest, fingerprint, ...input.context };
+    log("error", "error", fields);
+    // the log drain keeps the line (user, 2026-11-14), alongside counting it below
+    const kept = keepLogs([drainEntry("error", "error", fields)]);
 
     const secret = process.env.JOBS_SECRET;
     const config = supabaseConfig();
-    if (!secret || secret.length < 32 || !config) return;
+    if (!secret || secret.length < 32 || !config) return await kept;
     const db = createClient<Database>(config.url, config.key, { auth: { persistSession: false, autoRefreshToken: false } });
     const { error } = await db
       .rpc("report_error", {
@@ -46,6 +50,7 @@ export async function reportError(input: { source: ErrorSource; error: unknown; 
       })
       .abortSignal(AbortSignal.timeout(2000));
     if (error) log("warn", "error.report_failed", { code: error.code, message: error.message });
+    await kept;
   } catch (e) {
     log("warn", "error.report_failed", { message: e instanceof Error ? e.message : String(e) });
   }

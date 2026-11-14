@@ -3,7 +3,7 @@
 // logged, and the same error in the same place gets the same fingerprint.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { cleanRoute, errorFingerprint, logLine, normalizeMessage, redact } from "../../src/lib/log.ts";
+import { cleanRoute, drainEntry, errorFingerprint, logLine, normalizeMessage, redact } from "../../src/lib/log.ts";
 
 test("one JSON line with level, event and time; secrets and emails never get through", () => {
   const line = logLine("error", "job.failed", {
@@ -46,4 +46,11 @@ test("the same error in the same place groups; a different place doesn't", () =>
   assert.match(a, /^[0-9a-f]{16}$/);
   assert.equal(a, b);
   assert.notEqual(a, c);
+});
+
+test("a log drain line: route and message lifted out, the rest redacted", () => {
+  const line = drainEntry("warn", "email.failed", { status: 422, message: "Invalid to: pat@example.com", route: "/dugout", apiKey: "re_secret" });
+  assert.deepEqual(line, { level: "warn", event: "email.failed", route: "/dugout", message: "Invalid to: [email]", fields: { status: 422, apiKey: "[redacted]" } });
+  assert.deepEqual(drainEntry("info", "jobs.run", { route: 7 }), { level: "info", event: "jobs.run", route: null, message: null, fields: {} });
+  assert.equal(drainEntry("info", "x".repeat(100)).event.length, 80);
 });

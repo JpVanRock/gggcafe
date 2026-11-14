@@ -64,10 +64,12 @@ nothing about players leaves the site.
 - **Error counting needs only the server secret.** That's the same setup as the job worker
   (docs/architecture/jobs.md). Until then, errors are still logged to Vercel; they just aren't
   counted on /health.
-- **The log drain** is optional. It sends Vercel's logs somewhere they're kept longer and can be
-  searched and alerted on.
-  1. Vercel log drains need a Pro or Enterprise plan. On Hobby, use Vercel's own logs (kept for a
-     short time) and /health.
+- **The log drain is built in** (user, 2026-11-14: "build the log drain", in our own database rather than
+  Vercel's Pro-plan drains or an outside service, so nothing about players leaves the site). Nothing to set up
+  beyond the server secret. See "The log drain" below.
+- **A Vercel log drain** (optional, for every line Vercel sees, including crashes and timeouts the site can't log
+  itself) sends Vercel's logs somewhere else as well.
+  1. Vercel log drains need a Pro or Enterprise plan.
   2. Pick a destination: Better Stack, Axiom or Datadog all have a Vercel integration, from the
      Vercel Marketplace or the team's Settings → Log Drains.
   3. Add it for the project `gggcafe`, with sources Functions (and Edge, if listed), and the format
@@ -79,9 +81,31 @@ nothing about players leaves the site.
 - **Database logs and slow queries:** in the Supabase dashboard, use Logs (Postgres, API, Auth) and
   Advisors → Query Performance. Supabase's own log drains need a Team plan.
 
+## The log drain (user, 2026-11-14; migration 20261114214843)
+- **What's kept:** the lines worth looking back at, written by the server code that logs them with
+  `logAndKeep(level, event, fields)` / `keepLogs()` (`src/lib/log-drain.ts`), which logs to Vercel too:
+  - `error`: every tracked error (`reportError`, alongside counting it);
+  - `zoom.error`: what Zoom said when a call to it failed (`src/lib/zoom.ts`);
+  - `email.sent` / `email.failed`: how many recipients and attachments, or the status and Resend's reason
+    (never the addresses, subject or body; `src/lib/email.ts`);
+  - `jobs.run`: each worker run that did something.
+  Lines are shaped by `drainEntry()` in log.ts: route and message lifted out, the rest redacted as above.
+- **Where:** `private.log_events`, written only by `drain_logs()` with the server secret (at most 50 lines a
+  call and 5,000 an hour; malformed lines are left out), read only by admins through `admin_logs()`
+  (level: everything, warnings and errors, errors only; search in the event, message and page; 100 at a
+  time, Older → pages back). Purged after 30 days (`purge-logs`, daily at 04:57 UTC).
+- **On /health:** a Logs card under the job worker with the level and search filters.
+- **Alerts:** `report_error` queues `email.error_alert` when an error is new, or back after it was
+  resolved: each admin gets one email with the error and a link to /health, at most one a day per error
+  and 10 a day in all (docs/architecture/jobs.md).
+- **Saving never gets in the way:** 2 seconds at most, never throws; a failed save is a plain
+  `log.drain_failed` console line (not drained again).
+- **Privacy:** no new provider (Supabase already holds the data), no emails, tokens or IP addresses, kept
+  30 days: within the Privacy notice's "technical logs" (flagged for the attorney's review).
+
 ## Files
-- **Database:** `supabase/migrations/20261113131948_error_tracking.sql`. Test:
-  `tests/db/errors.test.sql`.
-- **App:** `src/lib/log.ts` (unit test `tests/unit/log.test.ts`), `src/lib/errors.ts`,
+- **Database:** `supabase/migrations/20261113131948_error_tracking.sql` and `20261114214843_log_drain.sql`.
+  Tests: `tests/db/errors.test.sql`, `tests/db/log_drain.test.sql`.
+- **App:** `src/lib/log.ts` (unit test `tests/unit/log.test.ts`), `src/lib/errors.ts`, `src/lib/log-drain.ts`,
   `src/instrumentation.ts`, `src/instrumentation-client.ts`, `src/app/api/errors/route.ts`, and
   `src/app/(staff)/health/`.

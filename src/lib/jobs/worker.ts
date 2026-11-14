@@ -11,9 +11,9 @@ import { APP_TIME_ZONE } from "@/lib/dates";
 import { emailConfigured, sendEmail } from "@/lib/email";
 import { formatCallTime } from "@/lib/video-calls";
 import { deleteZoomMeeting, zoomConfigured } from "@/lib/zoom";
-import { isJobKind, jobPayload, videoCallEmail } from "@/lib/jobs/rules";
+import { errorAlertEmail, isJobKind, jobPayload, videoCallEmail } from "@/lib/jobs/rules";
 import { reportError } from "@/lib/errors";
-import { log } from "@/lib/log";
+import { logAndKeep } from "@/lib/log-drain";
 
 type Outcome = { outcome: "done" } | { outcome: "skipped"; why: string };
 type Db = ReturnType<typeof createClient<Database>>;
@@ -48,7 +48,7 @@ export async function runJobs(secret: string, origin: string): Promise<RunSummar
     }
     if (jobs.length < BATCH) break;
   }
-  if (summary.claimed) log("info", "jobs.run", { ...summary, ms: Date.now() - started });
+  if (summary.claimed) await logAndKeep("info", "jobs.run", { ...summary, ms: Date.now() - started });
   return summary;
 }
 
@@ -78,6 +78,22 @@ async function runOne(db: Db, secret: string, origin: string, kind: string, payl
     });
     // one email per parent, so parents don't see each other's addresses
     for (const to of call.recipients) {
+      const sent = await sendEmail({ to: [to], ...email });
+      if (sent.error) throw new Error(sent.error);
+    }
+    return { outcome: "done" };
+  }
+
+  // a new error: one email per admin (user, 2026-11-14)
+  if (kind === "email.error_alert" && "fingerprint" in job) {
+    if (!emailConfigured()) return { outcome: "skipped", why: "Email isn't set up (RESEND_API_KEY, EMAIL_FROM)." };
+    const { data, error } = await db.rpc("jobs_error_alert", { p_secret: secret, p_fingerprint: job.fingerprint });
+    if (error) throw new Error(`Couldn't read the error: ${error.message}`);
+    const err = data?.[0];
+    if (!err) return { outcome: "skipped", why: "The error is gone (purged)." };
+    if (!err.recipients.length) return { outcome: "skipped", why: "No admins with an email." };
+    const email = errorAlertEmail({ source: err.source, name: err.name, message: err.message, route: err.route, count: err.count, healthUrl: `${origin}/health` });
+    for (const to of err.recipients) {
       const sent = await sendEmail({ to: [to], ...email });
       if (sent.error) throw new Error(sent.error);
     }

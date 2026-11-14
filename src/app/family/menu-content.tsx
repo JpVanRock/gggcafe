@@ -113,7 +113,9 @@ export function familyMenu(input: FamilyMenuInput, { preview = false }: { previe
       body: lead ? (
         <div className="flex flex-col gap-4">
           {hasCulture(lead.culture) && (lead.culture.headline || lead.culture.motto) && (
-            <p className="text-xl leading-snug font-semibold">“{lead.culture.headline || lead.culture.motto}”</p>
+            // the team's tagline in pink italics (user, 2026-11-14); bold, so it counts as large text and
+            // pink keeps enough contrast on this board in both themes
+            <p className="text-xl leading-snug font-bold text-link italic">“{lead.culture.headline || lead.culture.motto}”</p>
           )}
           {lead.standards.slice(0, 4).map((s, i) => (
             <MenuItem key={s.title} name={s.title} value={String(i + 1).padStart(2, "0")} note={s.detail ?? undefined} />

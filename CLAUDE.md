@@ -45,7 +45,8 @@ src/components/main-nav.tsx  top menu: staff get Dashboard/Coaches Dugout (opens
 src/proxy.ts             refreshes the Supabase auth session each request (Next 16 "proxy", formerly middleware)
 src/app/calls/[callId]   a video call (Zoom, in public/zoom-call.html's frame); docs/features/video-calls.md
 src/app/api/errors, (staff)/health, instrumentation(-client).ts   error tracking and structured logs (src/lib/log.ts,
-                         src/lib/errors.ts); admins read /health; docs/architecture/observability.md
+                         src/lib/errors.ts); the log drain keeps lines 30 days in our database (src/lib/log-drain.ts,
+                         `logAndKeep`); admins read /health; docs/architecture/observability.md
 src/app/api/jobs         the job worker (outbox: emails, Zoom cleanup; called by Supabase pg_cron/pg_net);
                          src/lib/jobs/, docs/architecture/jobs.md. Architecture review: docs/architecture/scaling.md
 src/app/terms, privacy   Terms of Service and Privacy & Security (public); /terms/accept asks signed-in users to agree

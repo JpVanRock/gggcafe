@@ -4,16 +4,15 @@ import { createClient } from "@/lib/supabase/server";
 import { addDays, formatDay, todayISO } from "@/lib/dates";
 import { isUuid } from "@/lib/softball";
 import { Badge, Card, EmptyState, tableClass, tdClass, thClass, TableScroll } from "@/components/ui";
-import { MenuHeader, MenuItem, MenuPanel } from "@/components/menu-board";
-import { ComingUpCard } from "@/components/coming-up";
 import { PillNav } from "@/components/pill-nav";
 import { comingUp } from "@/lib/family";
 import type { MentorView } from "@/lib/view-as";
 import { loadComingUp } from "@/app/family/team-data";
 import { asComingUp, loadMentorCalendar } from "@/app/mentor/calendar-data";
-import { MENTOR_SECTIONS, loadTraining } from "@/app/mentor/parts";
+import { loadTraining } from "@/app/mentor/parts";
 import { trainingDates } from "@/lib/mentors";
 import { AccountFacts, ViewBanner, ViewToggle, requireAdminPage } from "../../parts";
+import { MentorPreview } from "../preview";
 
 export const metadata: Metadata = { title: "Mentor view · GGG.Cafe" };
 
@@ -57,11 +56,7 @@ export default async function ViewAsMentorPage({ params, searchParams }: PagePro
   const { data: mentorNames } = mentorIds.length
     ? await supabase.from("mentors").select("user_id, display_name").in("user_id", mentorIds).order("display_name")
     : { data: [] };
-  const [nameFirst, ...nameRest] = name.split(" ");
   const total = v.players.length;
-  const byTeam = [...new Set(v.players.map((p) => p.team ?? "Team"))];
-  const note = "text-sm text-[var(--menu-note)]";
-  const sectionLink = "text-sm font-semibold text-link";
   const coachHref = pickerTeam ? `/dugout/mentors?team=${pickerTeam}` : "/view-as";
 
   return (
@@ -85,107 +80,34 @@ export default async function ViewAsMentorPage({ params, searchParams }: PagePro
           </EmptyState>
         ) : (
           <>
-            <MenuHeader
-              eyebrow="Mentor menu"
-              first={nameFirst}
-              last={nameRest.join(" ") || undefined}
+            <MentorPreview
+              name={name}
               line={`${v.mentor.specialty ?? "Mentor"} · ${total} player${total === 1 ? "" : "s"}${teams.length ? ` · ${teams.map((t) => t.name).join(" · ")}` : ""}`}
+              requests={waiting.map((l) => ({
+                id: l.id,
+                label: l.player_id ? (l.player_name ?? "A player") : `${l.team_name}: the whole team`,
+                waitingOn: l.status === "pending" ? (l.player_id ? "parents" : "coach") : null,
+              }))}
+              players={v.players}
+              upcoming={upcoming}
+              calendarHref={`/dugout/calendar?team=${teams[0]?.id ?? ""}`}
+              sessions={sessions.map((r) => {
+                const next = trainingDates(r, today, addDays(today, 366))[0] ?? r.starts_on;
+                const weekly = r.ends_on && r.ends_on !== r.starts_on;
+                return {
+                  key: r.id,
+                  name: r.title,
+                  value: formatDay(next).replace(/^\w+, /, ""),
+                  note: [weekly && `Weekly through ${formatDay(r.ends_on!)}`, playerName(r.player_id)].filter(Boolean).join(" · "),
+                };
+              })}
+              messages={v.messages.slice(0, 5).map((m, i) => ({
+                key: String(i),
+                name: playerName(m.player_id),
+                value: m.read_at ? "Seen" : "New",
+                note: [m.body, m.drill_name && `Drill: ${m.drill_name}`, m.has_photo && "Photo", m.shared_with_coaches && "shared with coaches"].filter(Boolean).join(" · "),
+              }))}
             />
-            {waiting.length > 0 && (
-              <section aria-label="Their requests" className="rounded-2xl border-2 border-pink bg-pink/5 p-4 sm:p-5">
-                <h2 className="mb-3 flex items-center gap-2 font-mono text-xs font-bold tracking-[0.2em] text-pink-soft uppercase">
-                  <span className="grid size-6 place-items-center rounded-full bg-pink font-display text-sm text-on-accent tabular-nums">{waiting.length}</span>
-                  Your requests
-                </h2>
-                <ul className="divide-y divide-navy-700">
-                  {waiting.map((l) => (
-                    <li key={l.id} className="flex flex-wrap items-center gap-x-4 gap-y-1 py-2.5 text-sm">
-                      <span className="font-semibold">{l.player_id ? l.player_name : `${l.team_name}: the whole team`}</span>
-                      <Badge tone={l.status === "pending" ? "pink" : "neutral"}>
-                        {l.status === "pending" ? (l.player_id ? "Waiting for her parents" : "Waiting for the head coach") : "Not approved"}
-                      </Badge>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
-            {total > 0 && <ComingUpCard items={upcoming} calendarHref={`/dugout/calendar?team=${teams[0]?.id ?? ""}`} subtitle="The next two weeks" />}
-            {total > 0 && (
-              <section aria-label="Mentor menu" className="grid gap-8 md:grid-cols-2">
-                <MenuPanel number={1} title="My Roster" subtitle={`${total} player${total === 1 ? "" : "s"} · goals, Pop Report, Mental GP`} variant="outlineNeon" wide>
-                  <div className="flex flex-col gap-6">
-                    {byTeam.map((team) => (
-                      <div key={team}>
-                        {byTeam.length > 1 && <h3 className="mb-3 font-display text-xl font-bold tracking-wide uppercase">{team}</h3>}
-                        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                          {v.players
-                            .filter((p) => (p.team ?? "Team") === team)
-                            .map((p) => (
-                              <li key={p.id} className="flex flex-col rounded-2xl border border-navy-600">
-                                <div className="flex items-center gap-4 p-4">
-                                  <span className="grid size-14 shrink-0 place-items-center rounded-full border-2 border-navy-600 font-display text-xl font-bold text-highlight">
-                                    {p.jersey ?? p.position ?? "–"}
-                                  </span>
-                                  <span className="min-w-0">
-                                    <span className="block truncate font-display text-xl font-bold tracking-wide uppercase">{p.name}</span>
-                                    <span className="block truncate font-mono text-xs text-muted">{[p.jersey && `#${p.jersey}`, p.position, p.team].filter(Boolean).join(" · ")}</span>
-                                  </span>
-                                </div>
-                                <p className="flex flex-wrap gap-x-4 gap-y-1 border-t border-navy-700 px-4 py-2.5">
-                                  {MENTOR_SECTIONS.map((x) => (
-                                    <span key={x.hash} className={sectionLink}>
-                                      {x.label}
-                                    </span>
-                                  ))}
-                                </p>
-                              </li>
-                            ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                </MenuPanel>
-                <MenuPanel number={2} title="Training on Their Weeks" subtitle="In their This Week in Softball" variant="pink" cta={{ label: "Add & manage" }}>
-                  {sessions.length === 0 ? (
-                    <p className={note}>Nothing coming up. Add a lesson, a bullpen or a hitting session to their weeks.</p>
-                  ) : (
-                    <div className="flex flex-col gap-4">
-                      {sessions.map((r) => {
-                        const next = trainingDates(r, today, addDays(today, 366))[0] ?? r.starts_on;
-                        const weekly = r.ends_on && r.ends_on !== r.starts_on;
-                        return (
-                          <MenuItem
-                            key={r.id}
-                            name={r.title}
-                            value={formatDay(next).replace(/^\w+, /, "")}
-                            note={[weekly && `Weekly through ${formatDay(r.ends_on!)}`, playerName(r.player_id)].filter(Boolean).join(" · ")}
-                          />
-                        );
-                      })}
-                    </div>
-                  )}
-                </MenuPanel>
-                <MenuPanel number={3} title="Messages You Sent" subtitle="Seen when she opens them" variant="navy">
-                  {v.messages.length === 0 ? (
-                    <p className={note}>Nothing sent yet.</p>
-                  ) : (
-                    <div className="flex flex-col gap-4">
-                      {v.messages.slice(0, 5).map((m, i) => (
-                        <MenuItem
-                          key={i}
-                          name={playerName(m.player_id)}
-                          value={m.read_at ? "Seen" : "New"}
-                          note={[m.body, m.drill_name && `Drill: ${m.drill_name}`, m.has_photo && "Photo", m.shared_with_coaches && "shared with coaches"].filter(Boolean).join(" · ")}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </MenuPanel>
-                <MenuPanel number={4} title="Work With More Players" subtitle="A player or a whole team" variant="outlinePink" wide>
-                  <p className={note}>Ask with the team code. Her parents approve you for one player; the head coach approves you for the whole team.</p>
-                </MenuPanel>
-              </section>
-            )}
             {total === 0 && <EmptyState>Once they&apos;re approved, their players show up here.</EmptyState>}
           </>
         )}

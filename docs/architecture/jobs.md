@@ -38,6 +38,7 @@ after, retries what fails, and keeps a record.
 |---|---|---|---|
 | `email.video_call` | A video call is booked or cancelled | Emails her approved parents, one email each (no shared addresses) | Email isn't set up; no approved parent has an email; a booking was cancelled before its email went out |
 | `zoom.delete_meeting` | A video call is cancelled | Deletes the Zoom meeting; one already gone counts as done | Zoom isn't connected |
+| `email.error_alert` | `report_error` sees a new error, or one back after it was resolved (at most one a day per error, 10 a day in all; user, 2026-11-14) | Emails every admin, one email each, with the error and a link to /health (`jobs_error_alert`) | Email isn't set up; the error was purged; no admin has an email |
 
 **To add a kind:**
 1. Enqueue it from a trigger or definer function, with a dedupe key.

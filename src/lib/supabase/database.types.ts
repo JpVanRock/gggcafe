@@ -6272,6 +6272,7 @@ export type Database = {
     }
     Functions: {
       admin_account: { Args: { p_user: string | null }; Returns: Json }
+      admin_logs: { Args: { p_level?: string | null; p_search?: string | null; p_before?: number | null; p_limit?: number | null }; Returns: { id: number; at: string; level: string; event: string; route: string; message: string; fields: Json }[] }
       admin_view_mentor: { Args: { p_user: string | null }; Returns: Json }
       admin_view_parent: { Args: { p_user: string | null }; Returns: Json }
       allow_password_reset: { Args: { p_email: string | null }; Returns: boolean }
@@ -6282,12 +6283,14 @@ export type Database = {
       create_player_login: { Args: { p_player_id: string | null; p_username: string | null; p_password: string | null }; Returns: string }
       decide_mentor_link: { Args: { p_link_id: string | null; p_approve: boolean | null }; Returns: undefined }
       decide_staff_request: { Args: { p_user_id: string | null; p_approve: boolean | null }; Returns: undefined }
+      drain_logs: { Args: { p_secret: string | null; p_lines: Json | null }; Returns: number }
       error_summary: { Args: { p_days?: number | null }; Returns: { fingerprint: string; source: string; name: string; message: string; route: string; digest: string; count: number; first_seen: string; last_seen: string; resolved_at: string }[] }
       finish_iq_level: { Args: { p_attempt_id: string | null }; Returns: { correct: number; total: number; passed: boolean; award_earned: boolean }[] }
       finish_scorebook_game: { Args: { p_run_id: string | null; p_line: Json | null }; Returns: { line_ok: boolean; passed: boolean; first_try: number; award_earned: boolean; all_ten_earned: boolean }[] }
       iq_answer_key: { Args: { p_player_id: string | null }; Returns: { question_id: string; correct_index: number; explanation: string }[] }
       iq_review_status: { Args: { p_attempt_id: string | null }; Returns: { missed: number; reviewed: number; complete: boolean }[] }
       jobs_claim: { Args: { p_secret: string | null; p_limit?: number | null }; Returns: { id: number; kind: string; payload: Json; attempts: number }[] }
+      jobs_error_alert: { Args: { p_secret: string | null; p_fingerprint: string | null }; Returns: { source: string; name: string; message: string; route: string; count: number; first_seen: string; recipients: string[] }[] }
       jobs_fail: { Args: { p_secret: string | null; p_id: number | null; p_error: string | null }; Returns: undefined }
       jobs_finish: { Args: { p_secret: string | null; p_id: number | null; p_outcome?: string | null; p_note?: string | null }; Returns: undefined }
       jobs_summary: { Args: Record<PropertyKey, never>; Returns: { kind: string; waiting: number; done: number; skipped: number; dead: number; retrying: number; last_error: string; last_error_at: string }[] }

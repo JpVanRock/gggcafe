@@ -6,6 +6,9 @@ import "server-only";
 //   RESEND_API_KEY  the API key from Resend
 //   EMAIL_FROM      a sender on a domain verified in Resend, e.g. "GGG.Cafe <plans@yourdomain.com>"
 // Until both are set, sharing falls back to opening the coach's own email app.
+// Each send is logged and kept in the log drain (user, 2026-11-14): how many recipients and whether it
+// went, never the addresses, subject or body.
+import { logAndKeep } from "@/lib/log-drain";
 
 export function emailConfigured() {
   return Boolean(process.env.RESEND_API_KEY && process.env.EMAIL_FROM);
@@ -47,12 +50,13 @@ export async function sendEmail({
       }),
     });
     if (!res.ok) {
-      console.error("Email send failed:", res.status, await res.text());
+      await logAndKeep("warn", "email.failed", { status: res.status, message: (await res.text()).slice(0, 300) });
       return { error: "The email service turned the message down. Try again, or print the plan instead." };
     }
+    await logAndKeep("info", "email.sent", { recipients: to.length, attachments: attachments.length });
     return { error: null };
   } catch (e) {
-    console.error("Email send failed:", e);
+    await logAndKeep("warn", "email.failed", { message: e instanceof Error ? e.message : String(e) });
     return { error: "Couldn't reach the email service. Try again in a minute." };
   }
 }

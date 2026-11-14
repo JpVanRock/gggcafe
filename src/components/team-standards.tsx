@@ -36,7 +36,8 @@ export function CultureStatement({ culture }: { culture: TeamCulture }) {
       {culture.headline && (
         <div className="mb-6">
           <SpeedStripes className="h-4 w-12 text-link" />
-          <p className="mt-3 font-display text-3xl leading-tight font-bold tracking-tight text-highlight uppercase sm:text-4xl">
+          {/* the team's tagline in pink italics (user, 2026-11-14), like the motto everywhere else */}
+          <p className="mt-3 font-display text-3xl leading-tight font-bold tracking-tight text-link uppercase italic sm:text-4xl">
             {culture.headline}
           </p>
         </div>

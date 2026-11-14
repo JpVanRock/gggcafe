@@ -103,18 +103,16 @@ export default async function MentorsPage({ searchParams }: PageProps<"/dugout/m
           kind="mentor"
           current="coach"
           coachHref={`/dugout/mentors?team=${team.id}`}
-          viewHref={working.length ? `/view-as/mentor/${working[0]}?team=${team.id}` : null}
+          // no mentors yet: an example of what one would see (user, 2026-11-14), not a dead toggle
+          viewHref={working.length ? `/view-as/mentor/${working[0]}?team=${team.id}` : `/view-as/mentor/example?team=${team.id}`}
         />
       )}
       <div className="flex flex-col gap-4">
         <div>
           <h2 className="text-3xl leading-tight font-bold tracking-tight text-highlight uppercase">Mentors</h2>
           {culture?.motto && (
-            <p className="mt-2 font-display text-xl font-bold tracking-wide text-ink uppercase">
-              <span className="text-link">“</span>
-              {culture.motto}
-              <span className="text-link">”</span>
-            </p>
+            // the season motto in pink italics (user, 2026-11-14)
+            <p className="mt-2 font-display text-xl font-bold tracking-wide text-link uppercase italic">“{culture.motto}”</p>
           )}
           <p className="mt-2 max-w-3xl text-ink/90">
             The best players make the people around them better, and the best mentors do the same. Every mentor here is helping a player

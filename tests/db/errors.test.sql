@@ -68,6 +68,10 @@ begin
 end $$;
 select pg_temp.expect('capped at 200 new an hour', (select count(*) from private.error_groups where first_seen > now() - interval '1 hour'), 200::bigint);
 
+-- Alerts (migration 20261114214843): a new error emails the admins once a day; at most 10 alert emails a day
+select pg_temp.expect('one alert for the first error', (select count(*) from private.jobs where kind = 'email.error_alert' and payload->>'fingerprint' = '0123456789abcdef'), 1::bigint);
+select pg_temp.expect('at most 10 alerts a day', (select count(*) from private.jobs where kind = 'email.error_alert'), 10::bigint);
+
 -- Old groups go
 update private.error_groups set last_seen = now() - interval '31 days' where fingerprint = '0123456789abcdef';
 select private.purge_errors();
@@ -75,6 +79,7 @@ select pg_temp.expect('purged', (select count(*) from private.error_groups where
 
 -- Clean up
 delete from private.error_groups;
+delete from private.jobs where kind = 'email.error_alert';
 delete from public.staff where user_id::text like 'eaeaeaea-%';
 delete from auth.users where id::text like 'eaeaeaea-%';
 delete from vault.decrypted_secrets where name = 'jobs_secret';

@@ -93,7 +93,8 @@ export function DugoutStrip({
       <div className="min-w-0">
         <p className={eyebrowClass}>{label}</p>
         {teams.map((t) => t.culture?.motto).filter(Boolean).slice(0, 1).map((m) => (
-          <p key={m} className="font-display text-sm font-bold tracking-wide text-highlight uppercase italic">“{m}”</p>
+          // the season motto in pink italics (user, 2026-11-14)
+          <p key={m} className="font-display text-sm font-bold tracking-wide text-link uppercase italic">“{m}”</p>
         ))}
         <p className="mt-0.5 truncate text-sm font-semibold text-ink">{names}</p>
       </div>

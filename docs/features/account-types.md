@@ -42,7 +42,9 @@
   (working mentor) with `?team=`; a picker switches between that team's parents (mentors), and Coach view goes back. The
   View as pages now draw the page the way the person sees it: the Parent View with the family page's own builder
   (`familyMenu` in `family/menu-content.tsx`, `preview`: labels without links), the Mentor View in the mentor menu's
-  layout. The account and troubleshooting facts follow under "Behind the page".
+  layout (`view-as/mentor/preview.tsx`, shared). The account and troubleshooting facts follow under "Behind the page".
+  A team with no mentors yet (user, 2026-11-14: "the toggle for mentor view does not work") gets an example instead of a
+  dead toggle: `/view-as/mentor/example?team=` draws a whole-team mentor's page with the team's real roster and schedule.
 - Coaches who are parents (user, 2026-11-12; migration 20261112133311): coach sign-ups can tick "I'm also a parent" and
   name their daughter (metadata `coach_child`). The dashboard's "Also a parent on the team?" claims her from our current
   rosters (`claim_my_daughter`: makes the parent profile and a parent link per team; a head coach's or admin's is approved

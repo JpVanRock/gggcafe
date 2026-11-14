@@ -7,7 +7,8 @@ import { emailConfigured } from "@/lib/email";
 import { zoomConfigured } from "@/lib/zoom";
 import { ActionForm } from "@/components/action-form";
 import { SubmitButton } from "@/components/submit-button";
-import { Badge, Card, EmptyState, PageHeader, TableScroll, tableClass, tdClass, thClass } from "@/components/ui";
+import Link from "next/link";
+import { Badge, Card, EmptyState, Field, PageHeader, TableScroll, buttonStyles, fieldClass, tableClass, tdClass, thClass } from "@/components/ui";
 import { resolveError } from "./actions";
 import { TitleWithTeamLogo } from "@/components/team-logo";
 
@@ -20,12 +21,45 @@ const SOURCE_LABEL: Record<string, string> = { server: "Page", action: "Action",
 
 // Site health (user, 2026-11-13; docs/architecture/observability.md), site admins only: whether the
 // outside services are connected, the errors of the last 7 days grouped and counted, and how the
-// job worker is doing. Error details never include emails or tokens (src/lib/log.ts).
-export default async function HealthPage() {
+// job worker is doing. Error details never include emails or tokens (src/lib/log.ts). The log drain
+// (user, 2026-11-14): the kept log lines of the last 30 days, by level and search, 100 at a time.
+const LOG_LEVELS = [
+  { key: "", label: "Everything" },
+  { key: "warn", label: "Warnings and errors" },
+  { key: "error", label: "Errors only" },
+] as const;
+const LOG_TONE: Record<string, "pink" | "neon" | "neutral"> = { error: "pink", warn: "neon", info: "neutral" };
+const PAGE = 100;
+
+/** A line's other fields, short: "status: 422 · recipients: 2". */
+function details(fields: unknown): string {
+  if (!fields || typeof fields !== "object") return "";
+  return Object.entries(fields as Record<string, unknown>)
+    .map(([k, v]) => `${k}: ${v !== null && typeof v === "object" ? JSON.stringify(v) : String(v)}`)
+    .join(" · ")
+    .slice(0, 300);
+}
+
+export default async function HealthPage({ searchParams }: PageProps<"/health">) {
   const user = await requireStaffPage();
   if (user.staff.role !== "admin") notFound();
+  const params = await searchParams;
+  const one = (v: string | string[] | undefined) => (typeof v === "string" ? v : "");
+  const level = LOG_LEVELS.some((l) => l.key === one(params.logs)) ? one(params.logs) : "";
+  const search = one(params.q).trim().slice(0, 100);
+  const before = /^\d{1,18}$/.test(one(params.before)) ? Number(one(params.before)) : null;
   const supabase = await createClient();
-  const [{ data: errorRows }, { data: jobRows }] = await Promise.all([supabase.rpc("error_summary", { p_days: 7 }), supabase.rpc("jobs_summary")]);
+  const [{ data: errorRows }, { data: jobRows }, { data: logRows }] = await Promise.all([
+    supabase.rpc("error_summary", { p_days: 7 }),
+    supabase.rpc("jobs_summary"),
+    supabase.rpc("admin_logs", { p_level: level || undefined, p_search: search || undefined, p_before: before ?? undefined, p_limit: PAGE }),
+  ]);
+  const logs = logRows ?? [];
+  const logHref = (extra: Record<string, string>) => {
+    const q = new URLSearchParams({ ...(level ? { logs: level } : {}), ...(search ? { q: search } : {}), ...extra });
+    const text = q.toString();
+    return `/health${text ? `?${text}` : ""}#logs`;
+  };
   const errors = errorRows ?? [];
   const jobs = jobRows ?? [];
   const open = errors.filter((e) => !e.resolved_at);
@@ -144,6 +178,87 @@ export default async function HealthPage() {
           </TableScroll>
         )}
       </Card>
+
+      <section id="logs" className="scroll-mt-24">
+        <Card title={`Logs · last 30 days${logs.length ? ` (${logs.length}${logs.length === PAGE ? "+" : ""}${before ? ", older" : ""})` : ""}`}>
+          <form method="get" action="/health#logs" className="mb-4 flex flex-wrap items-end gap-3">
+            <Field label="Show">
+              <select name="logs" defaultValue={level} className={`${fieldClass} w-56`}>
+                {LOG_LEVELS.map((l) => (
+                  <option key={l.key} value={l.key}>
+                    {l.label}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="Search">
+              <input name="q" defaultValue={search} maxLength={100} placeholder="zoom, email, /players…" className={`${fieldClass} w-64`} />
+            </Field>
+            <button type="submit" className={buttonStyles("secondary")}>
+              Filter
+            </button>
+            {(level || search || before) && (
+              <Link href="/health#logs" className="text-sm text-link hover:underline">
+                Clear
+              </Link>
+            )}
+          </form>
+          {logs.length === 0 ? (
+            <EmptyState>
+              {!serverSecret ? "Log lines are kept here once the server secret is set." : level || search || before ? "Nothing matches." : "No log lines yet."}
+            </EmptyState>
+          ) : (
+            <TableScroll label="Logs">
+              <table className={tableClass}>
+                <thead>
+                  <tr>
+                    <th className={thClass}>Time</th>
+                    <th className={thClass}>Level</th>
+                    <th className={thClass}>Event</th>
+                    <th className={thClass}>Details</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {logs.map((l) => (
+                    <tr key={l.id}>
+                      <td className={`${tdClass} whitespace-nowrap font-display tabular-nums`}>{when(l.at)}</td>
+                      <td className={tdClass}>
+                        <Badge tone={LOG_TONE[l.level] ?? "neutral"}>{l.level}</Badge>
+                      </td>
+                      <td className={tdClass}>
+                        <span className="block font-mono text-xs">{l.event}</span>
+                        {l.route && <span className="mt-1 block font-mono text-xs break-all text-muted">{l.route}</span>}
+                      </td>
+                      <td className={`${tdClass} min-w-56`}>
+                        {l.message && <span className="block text-xs break-words">{l.message}</span>}
+                        {details(l.fields) && <span className="block text-xs break-words text-muted">{details(l.fields)}</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </TableScroll>
+          )}
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-xs text-muted">
+              Errors, Zoom and email problems, emails sent (how many, never to whom) and job runs, kept 30 days. Emails, tokens and secrets are taken out before
+              anything is saved.
+            </p>
+            <span className="flex gap-4 text-sm">
+              {before && (
+                <Link href={logHref({})} className="text-link hover:underline">
+                  ← Newest
+                </Link>
+              )}
+              {logs.length === PAGE && (
+                <Link href={logHref({ before: String(logs[logs.length - 1].id) })} className="text-link hover:underline">
+                  Older →
+                </Link>
+              )}
+            </span>
+          </div>
+        </Card>
+      </section>
     </div>
   );
 }

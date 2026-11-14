@@ -457,6 +457,25 @@ export function sampleRpc(name: string, args: Row = {}): unknown {
         { kind: "email.video_call", waiting: 0, done: 4, skipped: 1, dead: 0, retrying: 0, last_error: "Email isn't set up (RESEND_API_KEY, EMAIL_FROM).", last_error_at: "2026-11-12T19:10:00Z" },
         { kind: "zoom.delete_meeting", waiting: 0, done: 1, skipped: 0, dead: 0, retrying: 0, last_error: null, last_error_at: null },
       ];
+    // the log drain (user, 2026-11-14): a few kept lines, newest first, filtered like the database does
+    case "admin_logs": {
+      const lines = [
+        { id: 5, at: "2026-11-14T15:12:00Z", level: "info", event: "jobs.run", route: null, message: null, fields: { claimed: 2, done: 2, skipped: 0, failed: 0, ms: 840 } },
+        { id: 4, at: "2026-11-14T15:11:58Z", level: "info", event: "email.sent", route: null, message: null, fields: { recipients: 1, attachments: 0 } },
+        { id: 3, at: "2026-11-14T14:40:00Z", level: "warn", event: "zoom.error", route: null, message: "Zoom didn't accept the app keys (Invalid client_id or client_secret).", fields: {} },
+        { id: 2, at: "2026-11-13T09:30:00Z", level: "error", event: "error", route: "/players/[id]/pop", message: "Cannot read properties of null (reading 'team')", fields: { source: "server", name: "TypeError", fingerprint: "a1b2c3d4e5f60718" } },
+        { id: 1, at: "2026-11-12T19:10:00Z", level: "warn", event: "email.failed", route: null, message: "Email isn't set up yet.", fields: { status: 0 } },
+      ];
+      const level = args.p_level as string | undefined;
+      const q = typeof args.p_search === "string" ? args.p_search.toLowerCase() : "";
+      const before = typeof args.p_before === "number" ? args.p_before : Infinity;
+      return lines.filter(
+        (l) =>
+          (!level || l.level === level || (level === "warn" && l.level === "error")) &&
+          l.id < before &&
+          (!q || [l.event, l.message, l.route].some((t) => t?.toLowerCase().includes(q))),
+      );
+    }
     case "video_call_role": return video_calls.find((c) => c.id === args.p_call_id)?.cancelled_at ? "cancelled" : "host";
     // the Parents tab's approved parents (the sample admin, for Maya and Emma; a team admin)
     case "team_parent_links":
