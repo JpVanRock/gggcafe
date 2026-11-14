@@ -16,6 +16,7 @@ import { VIDEO_CALL_COLUMNS, VideoCallList, type VideoCallRow } from "@/componen
 import { VideoCallForm } from "@/components/video-call-form";
 import { zoomConfigured } from "@/lib/zoom";
 import { recentSinceISO } from "@/lib/video-calls";
+import { callEvents, callRange } from "@/lib/call-events";
 
 export const metadata: Metadata = { title: "Calendar · Coaches Dugout · GGG.Cafe" };
 
@@ -128,7 +129,8 @@ export default async function CalendarPage({ searchParams }: PageProps<"/dugout/
   const link = (m: string) => `/dugout/calendar?team=${team.id}&month=${m}`;
   // video calls (user, 2026-11-12): coaches see every call on the team; head coaches book them
   const headCoach = isHeadCoachRole(access.role);
-  const [{ data: videoAccess }, { data: callRows }, roster] = coach
+  const [callFrom, callTo] = callRange(from, to);
+  const [{ data: videoAccess }, { data: callRows }, roster, { data: monthCallRows }] = coach
     ? await Promise.all([
         supabase.from("team_video_access").select("mentors_on").eq("team_id", team.id).maybeSingle(),
         supabase
@@ -139,9 +141,12 @@ export default async function CalendarPage({ searchParams }: PageProps<"/dugout/
           .order("starts_at")
           .limit(RECENT_LIMIT),
         headCoach ? loadRoster(supabase, team.id, { order: "name" }) : Promise.resolve([]),
+        // this month's calls on the grid (user, 2026-11-14): the ones booked to show on the Dugout calendar
+        supabase.from("video_calls").select(VIDEO_CALL_COLUMNS).eq("team_id", team.id).gte("starts_at", callFrom).lte("starts_at", callTo).order("starts_at"),
       ])
-    : [{ data: null }, { data: [] }, []];
+    : [{ data: null }, { data: [] }, [], { data: [] }];
   const calls = (callRows ?? []) as VideoCallRow[];
+  const gridEvents = [...events, ...callEvents((monthCallRows ?? []) as VideoCallRow[], from, to, "coaches")];
 
   return (
     <div className="flex flex-col gap-6">
@@ -152,7 +157,7 @@ export default async function CalendarPage({ searchParams }: PageProps<"/dugout/
         month={month}
         days={days}
         today={today}
-        events={events}
+        events={gridEvents}
         games={games}
         canEdit={editor}
         offseason={offseason ? { startsOn: offseason.starts_on, endsOn: offseason.ends_on } : null}

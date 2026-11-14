@@ -5,6 +5,7 @@ import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
 import {
   BOOK_AHEAD_DAYS, CALL_MINUTES, TOPIC_MAX, callDateAndClock, callEnds, callState, cleanCallInput, comingSinceISO, formatCallTime, isComing,
+  callCalendars,
 } from "../../src/lib/video-calls.ts";
 
 test("a call's day and clock in the team's time zone (the mentor's calendar)", () => {
@@ -59,4 +60,11 @@ test("the Meeting SDK signature: HS256 over the app key, meeting, role and two h
   assert.equal(claims.exp - claims.iat, 2 * 60 * 60);
   assert.equal(claims.tokenExp, claims.exp);
   assert.equal(signature, createHmac("sha256", "secret456").update(`${header}.${payload}`).digest("base64url"));
+});
+
+test("which calendars show a call: the picked ones, and a head coach's always on the Dugout's", () => {
+  assert.deepEqual(callCalendars(["family", "player"], "mentor"), ["player", "family"]);
+  assert.deepEqual(callCalendars([], "mentor"), []);
+  assert.deepEqual(callCalendars(["player"], "coach"), ["player", "coaches"]);
+  assert.deepEqual(callCalendars(["coaches", "everyone", null, "player", "player"], "mentor"), ["player", "coaches"]);
 });

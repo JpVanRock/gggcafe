@@ -16,12 +16,14 @@ export type VideoCallRow = CallTimes & {
   host_kind: string;
   host_name: string;
   topic: string;
+  /** which calendars show it besides the host's own (lib/video-calls CALL_CALENDARS) */
+  calendars: string[];
   player?: { first_name: string; preferred_name: string | null; last_name: string } | null;
 };
 
 /** The columns VideoCallList reads (with the player's name). */
 export const VIDEO_CALL_COLUMNS =
-  "id, player_id, host_id, host_kind, host_name, topic, starts_at, minutes, cancelled_at, player:players(first_name, preferred_name, last_name)" as const;
+  "id, player_id, host_id, host_kind, host_name, topic, starts_at, minutes, cancelled_at, calendars, player:players(first_name, preferred_name, last_name)" as const;
 
 export function VideoCallList({
   calls,

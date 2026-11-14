@@ -4,10 +4,10 @@ import "server-only";
 // (mentor_calendar(): mentors can't read the team schedule tables themselves). The calendar page and
 // the mentor menu's Coming up both use it.
 import type { createClient } from "@/lib/supabase/server";
-import { APP_TIME_ZONE, addDays } from "@/lib/dates";
+import { addDays } from "@/lib/dates";
 import { EVENT_KINDS, type EventKind } from "@/lib/dugout";
 import { trainingDates } from "@/lib/mentors";
-import { callDateAndClock, callEnds } from "@/lib/video-calls";
+import { callEvents } from "@/lib/call-events";
 import type { ComingUpItem } from "@/lib/family";
 import { VIDEO_CALL_COLUMNS, type VideoCallRow } from "@/components/video-calls";
 import type { CalEvent, CalGame } from "@/app/(staff)/dugout/calendar/calendar";
@@ -97,26 +97,8 @@ export async function loadMentorCalendar(
   const games: CalGame[] = schedule
     .filter((r) => r.item === "game")
     .map((r) => ({ id: r.id, date: r.on_date, start: hhmm(r.start_time), label: whose(r.team_name, r.title), place: r.place }));
-  const calls: CalEvent[] = ((callRows ?? []) as VideoCallRow[]).flatMap((c) => {
-    const start = callDateAndClock(c.starts_at, APP_TIME_ZONE);
-    if (start.date < from || start.date > to) return [];
-    const first = c.player ? c.player.preferred_name || c.player.first_name : "a player";
-    return [
-      {
-        id: c.id,
-        kind: "meeting" as const,
-        title: `Video call · ${first}`,
-        date: start.date,
-        start: start.clock,
-        end: callDateAndClock(callEnds(c).toISOString(), APP_TIME_ZONE).clock,
-        location: "On GGG.Cafe (Zoom)",
-        notes: c.topic,
-        seriesId: null,
-        byline: null,
-        planId: null,
-      },
-    ];
-  });
+  // every call she hosts is on her own calendar, linking to the call (user, 2026-11-14)
+  const calls = callEvents((callRows ?? []) as VideoCallRow[], from, to, "host");
 
   return { events: [...teamEvents, ...training, ...calls], games };
 }

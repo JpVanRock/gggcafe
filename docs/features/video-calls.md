@@ -18,6 +18,15 @@ to every call.
 - **The player and her approved parents** are told of every booking and cancellation (the bell).
   They see coming calls on her dashboard and on the family page, and join from the call page.
 - **Assistants and viewers** see the calls on the Calendar but can't book or join them.
+- **Which calendars show a call** (user, 2026-11-14; migration 20261114160922, `video_calls.calendars`):
+  picked on the booking form's "Show on calendars" dropdown, all ticked to start: Her week (This Week on
+  her player page), Her parents' calendar (the family Calendar) and, for a mentor's call, the Coaches
+  Dugout calendar. The booker's own calendar always shows it: a head coach's is the Dugout calendar (the
+  database requires `coaches` on a coach's call), a mentor's is their mentor calendar (every call they
+  host). Each entry links to the call page (`src/lib/call-events.ts`; on her week, a "Video call" line
+  with Open, not a check-off). It only changes the calendars: her parents are still told of every call,
+  her dashboard and the family page still list her coming calls, and the Dugout's Video calls list has
+  them all. Calls booked before it show on every calendar.
 - **A player on more than one team** needs every one of her teams to allow calls. This is the
   same rule as the Switchboard.
 
@@ -68,11 +77,15 @@ to every call.
   - The kit is built on an older React than this site, so it's kept out of the site's code. It
     loads from Zoom's servers (`source.zoom.us`), version 6.10.0 pinned in that file.
   - Join details go to the frame by `postMessage`, same origin only.
+  - Zoom draws a header bar above the video and its controls below it, inside the frame: the video is
+    sized to the frame less 140px for the two (user, 2026-11-14: the controls were cut off), and is
+    refitted when the window changes size (`updateVideoOptions`).
   - Zoom retires old web-kit versions, so update the six URLs together at least once a year.
 - **Where calls show up:**
   - **Mentor's player page:** the Video calls panel, shown only when calls are on for her or
     calls already exist.
-  - **Dugout Calendar:** the Video calls section.
+  - **Dugout Calendar:** the Video calls section, and on the month grid when booked to show there.
+  - **Her week, the family Calendar, the mentor calendar:** see "Which calendars show a call" above.
   - **Player dashboard:** coming calls, above her menu.
   - **Family page:** a Video calls card.
   - **Switchboard:** the admin's switch and the mentors' switch.

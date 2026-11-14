@@ -10,12 +10,15 @@ import { todayISO } from "@/lib/dates";
 import { CalendarView, type CalEvent, type CalGame } from "@/app/(staff)/dugout/calendar/calendar";
 import { TeamPicker, pickTeam } from "@/app/(staff)/dugout/team-picker";
 import { FamilyHeader } from "../header";
+import { VIDEO_CALL_COLUMNS, type VideoCallRow } from "@/components/video-calls";
+import { callEvents, callRange } from "@/lib/call-events";
 
 export const metadata: Metadata = { title: "Calendar · GGG.Cafe" };
 
 // The team calendar for parents (user, 2026-11-13): the month the players see in TWIS (practices,
 // workouts, lessons, meetings, games and training phases), view only. Parents read it through the
-// "(parent view)" rules; the Switchboard's parent "Calendar" switch closes it per team.
+// "(parent view)" rules; the Switchboard's parent "Calendar" switch closes it per team. Her video calls
+// show too when they were booked to (user, 2026-11-14), each linking to the call.
 export default function FamilyCalendarPage({ searchParams }: PageProps<"/family/calendar">) {
   return (
     <div className="flex flex-1 flex-col">
@@ -63,7 +66,8 @@ async function FamilyCalendar({ searchParams }: Pick<PageProps<"/family/calendar
   const month = monthOf(monthParam, today);
   const days = monthGrid(month);
   const [from, to] = [days[0], days[days.length - 1]];
-  const [eventsResult, gamesResult, phasesResult] = await Promise.all([
+  const [callFrom, callTo] = callRange(from, to);
+  const [eventsResult, gamesResult, phasesResult, callsResult] = await Promise.all([
     supabase
       .from("team_events")
       .select("id, kind, title, event_date, start_time, end_time, location, notes, series_id")
@@ -79,8 +83,10 @@ async function FamilyCalendar({ searchParams }: Pick<PageProps<"/family/calendar
       .gte("game_date", from)
       .lte("game_date", to),
     supabase.from("training_phases").select("name, kind, starts_on, ends_on").eq("team_id", team.id).lte("starts_on", to).gte("ends_on", from),
+    // her video calls on this team (parents read their daughters' calls)
+    supabase.from("video_calls").select(VIDEO_CALL_COLUMNS).eq("team_id", team.id).gte("starts_at", callFrom).lte("starts_at", callTo).order("starts_at"),
   ]);
-  const events: CalEvent[] = (eventsResult.data ?? []).map((e) => ({
+  const teamEvents: CalEvent[] = (eventsResult.data ?? []).map((e) => ({
     id: e.id,
     kind: e.kind,
     title: e.title,
@@ -94,6 +100,7 @@ async function FamilyCalendar({ searchParams }: Pick<PageProps<"/family/calendar
     byline: null,
     planId: null,
   }));
+  const events = [...teamEvents, ...callEvents((callsResult.data ?? []) as VideoCallRow[], from, to, "family")];
   const games: CalGame[] = (gamesResult.data ?? []).map((g) => {
     const home = g.home_team_id === team.id;
     const opponent = home ? g.away : g.home;

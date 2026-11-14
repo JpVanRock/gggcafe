@@ -30,6 +30,13 @@
 (function () {
   var started = false;
   var status = document.getElementById("status");
+  // Zoom draws a header bar above the video and its controls below it, both inside this frame:
+  // leave room for the two so the controls aren't cut off (user, 2026-11-14), and fit the video
+  // again when the window changes size.
+  var BARS = 140;
+  function viewSize() {
+    return { width: window.innerWidth, height: Math.max(200, window.innerHeight - BARS) };
+  }
   function tell(type, detail) {
     window.parent.postMessage({ source: "ggg-zoom", type: type, detail: detail || null }, window.location.origin);
   }
@@ -55,7 +62,7 @@
           video: {
             isResizable: false,
             popper: { disableDraggable: true },
-            viewSizes: { default: { width: window.innerWidth, height: Math.max(240, window.innerHeight - 56) } }
+            viewSizes: { default: viewSize() }
           }
         }
       })
@@ -71,6 +78,13 @@
       .then(function () {
         status.hidden = true;
         tell("joined");
+        var resizing;
+        window.addEventListener("resize", function () {
+          clearTimeout(resizing);
+          resizing = setTimeout(function () {
+            if (typeof client.updateVideoOptions === "function") client.updateVideoOptions({ viewSizes: { default: viewSize() } });
+          }, 200);
+        });
         client.on("connection-change", function (payload) {
           if (payload && payload.state === "Closed") tell("ended");
         });

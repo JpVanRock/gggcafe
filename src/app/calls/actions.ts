@@ -11,7 +11,7 @@ import { createClient } from "@/lib/supabase/server";
 import { friendlyDbError, invalid, text, type FormState } from "@/lib/form";
 import { STALE, failed, runAction } from "@/lib/actions";
 import { isUuid, playerName } from "@/lib/softball";
-import { callState, cleanCallInput } from "@/lib/video-calls";
+import { callCalendars, callState, cleanCallInput } from "@/lib/video-calls";
 import { ZOOM_NOT_CONNECTED, createZoomMeeting, deleteZoomMeeting, zoomConfigured, zoomJoinDetails, type JoinDetails } from "@/lib/zoom";
 
 const OFF_FOR_HER = "Video calls are off for her team. A site admin turns them on for the team, and the head coach for mentors (the Switchboard).";
@@ -52,6 +52,8 @@ export async function scheduleVideoCall(_prev: FormState, fd: FormData): Promise
       starts_at: clean.call.startsAt,
       minutes: clean.call.minutes,
       zoom_meeting_id: meeting.value,
+      // which calendars show it (user, 2026-11-14); the booker's own always does
+      calendars: callCalendars(fd.getAll("calendars"), coach ? "coach" : "mentor"),
     });
     if (saveError) {
       // nothing was booked here, so take it off Zoom too

@@ -12,6 +12,25 @@ export const BOOK_AHEAD_DAYS = 90;
 export const OPENS_EARLY_MINUTES = 10;
 export const STAYS_OPEN_MINUTES = 15;
 
+/**
+ * Calendars a call can show on besides the booker's own (user, 2026-11-14; migration 20261114160922),
+ * picked when it's booked. A head coach's own calendar is the Coaches Dugout's, so their calls always
+ * show there; a mentor's own calendar shows every call they host.
+ */
+export const CALL_CALENDARS = [
+  { key: "player", label: "Her week", hint: "This Week on her player page" },
+  { key: "family", label: "Her parents' calendar", hint: "The Calendar on the family page" },
+  { key: "coaches", label: "Coaches Dugout calendar", hint: "The team calendar coaches use" },
+] as const;
+export type CallCalendar = (typeof CALL_CALENDARS)[number]["key"];
+
+/** The calendars picked on the booking form, plus the booker's own (a head coach: the Dugout's). */
+export function callCalendars(picked: unknown[], host: "coach" | "mentor"): CallCalendar[] {
+  const keys = new Set<CallCalendar>(CALL_CALENDARS.map((c) => c.key).filter((k) => picked.some((p) => p === k)));
+  if (host === "coach") keys.add("coaches");
+  return CALL_CALENDARS.map((c) => c.key).filter((k) => keys.has(k));
+}
+
 export type CallTimes = { starts_at: string; minutes: number; cancelled_at: string | null };
 export type CallState = "cancelled" | "upcoming" | "open" | "over";
 

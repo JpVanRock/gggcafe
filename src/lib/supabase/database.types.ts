@@ -5934,6 +5934,7 @@ export type Database = {
           cancelled_at: string | null
           cancelled_by: string | null
           created_at: string
+          calendars: string[]
         }
         Insert: {
           id?: string
@@ -5949,6 +5950,7 @@ export type Database = {
           cancelled_at?: string | null
           cancelled_by?: string | null
           created_at?: string
+          calendars?: string[]
         }
         Update: {
           id?: string
@@ -5964,6 +5966,7 @@ export type Database = {
           cancelled_at?: string | null
           cancelled_by?: string | null
           created_at?: string
+          calendars?: string[]
         }
         Relationships: [
           {

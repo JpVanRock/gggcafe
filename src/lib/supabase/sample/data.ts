@@ -355,10 +355,11 @@ const team_admins: Row[] = [{ team_id: T.us, user_id: U.admin, granted_by: U.adm
 const team_video_access: Row[] = [
   { team_id: T.us, allowed_by: U.admin, allowed_at: "2026-11-12T18:00:00Z", mentors_on: true, mentors_set_by: U.admin, mentors_set_at: "2026-11-12T18:05:00Z" },
 ];
+// calendars (user, 2026-11-14): Emma's call skips her parents' calendar
 const video_calls: Row[] = [
-  { id: id("a0ca11", 1), team_id: T.us, player_id: maya, host_id: U.admin, host_kind: "mentor", host_name: "Coach Sample", topic: "Changeup grip and release", starts_at: "2027-01-12T00:00:00Z", minutes: 30, zoom_meeting_id: "81000000101", cancelled_at: null, cancelled_by: null, created_at: "2026-11-12T19:00:00Z" },
-  { id: id("a0ca11", 2), team_id: T.us, player_id: emma, host_id: U.admin, host_kind: "coach", host_name: "Pat Torres", topic: "Winter plan check-in", starts_at: "2027-01-14T23:30:00Z", minutes: 45, zoom_meeting_id: "81000000102", cancelled_at: null, cancelled_by: null, created_at: "2026-11-12T19:10:00Z" },
-  { id: id("a0ca11", 3), team_id: T.us, player_id: maya, host_id: U.admin, host_kind: "mentor", host_name: "Coach Sample", topic: "Spin drills", starts_at: "2026-12-02T00:00:00Z", minutes: 30, zoom_meeting_id: "81000000103", cancelled_at: "2026-11-12T20:00:00Z", cancelled_by: U.admin, created_at: "2026-11-12T19:20:00Z" },
+  { id: id("a0ca11", 1), team_id: T.us, player_id: maya, host_id: U.admin, host_kind: "mentor", host_name: "Coach Sample", topic: "Changeup grip and release", starts_at: "2027-01-12T00:00:00Z", minutes: 30, zoom_meeting_id: "81000000101", cancelled_at: null, cancelled_by: null, created_at: "2026-11-12T19:00:00Z", calendars: ["player", "family", "coaches"] },
+  { id: id("a0ca11", 2), team_id: T.us, player_id: emma, host_id: U.admin, host_kind: "coach", host_name: "Pat Torres", topic: "Winter plan check-in", starts_at: "2027-01-14T23:30:00Z", minutes: 45, zoom_meeting_id: "81000000102", cancelled_at: null, cancelled_by: null, created_at: "2026-11-12T19:10:00Z", calendars: ["player", "coaches"] },
+  { id: id("a0ca11", 3), team_id: T.us, player_id: maya, host_id: U.admin, host_kind: "mentor", host_name: "Coach Sample", topic: "Spin drills", starts_at: "2026-12-02T00:00:00Z", minutes: 30, zoom_meeting_id: "81000000103", cancelled_at: "2026-11-12T20:00:00Z", cancelled_by: U.admin, created_at: "2026-11-12T19:20:00Z", calendars: ["player", "family", "coaches"] },
 ];
 
 export const TABLES: Record<string, Row[]> = {

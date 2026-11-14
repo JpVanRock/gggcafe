@@ -6,7 +6,7 @@ import { Field, FormMessage, inputClass, badgeClass, type BadgeTone } from "@/co
 import { WEEKDAYS } from "@/lib/dates";
 import { initialFormState } from "@/lib/form";
 import { addActivity, setTwisCheck } from "./twis-actions";
-import type { PracticeNote, TwisItem } from "./data";
+import type { PracticeNote, TwisCall, TwisItem } from "./data";
 import { SubmitButton } from "@/components/submit-button";
 
 export type TwisCellView = {
@@ -18,6 +18,8 @@ export type TwisCellView = {
   items: TwisItem[];
   /** the coach's practice notes that day, with her own cue */
   notes?: PracticeNote[];
+  /** video calls that day (not check-offs) */
+  calls?: TwisCall[];
 };
 
 function PracticeNotes({ notes, many }: { notes: PracticeNote[]; many: boolean }) {
@@ -94,7 +96,23 @@ export function TwisChecklist({ playerId, cells, canEdit }: { playerId: string; 
               <span className="font-mono text-xs font-bold tracking-widest text-highlight uppercase">{cell.label}</span>
               <span className="font-mono text-xs text-muted">{cell.isToday ? "Today" : cell.sublabel}</span>
             </header>
-            {cell.items.length === 0 && !cell.notes?.length ? (
+            {cell.calls && cell.calls.length > 0 && (
+              <ul className="mt-3 space-y-2">
+                {cell.calls.map((c) => (
+                  <li key={c.id} className="rounded-lg border border-pink/60 bg-pink/10 px-2.5 py-2">
+                    <span className="block text-sm leading-snug font-medium">{c.title}</span>
+                    <span className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted">
+                      <span className={badgeClass("pinkSolid")}>Video call</span>
+                      {c.detail}
+                      <Link href={c.href} className="font-semibold text-link hover:underline">
+                        Open →
+                      </Link>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {cell.items.length === 0 && !cell.notes?.length && !cell.calls?.length ? (
               <p className="mt-3 text-sm text-muted">{cell.isRestDay ? "Rest day" : "Nothing extra this week"}</p>
             ) : cell.items.length === 0 ? null : (
               <ul className="mt-3 space-y-2.5">

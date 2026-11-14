@@ -1,6 +1,8 @@
 import "server-only";
 import type { createClient } from "@/lib/supabase/server";
-import { addDays, formatTime, isoWeekday, weekDates } from "@/lib/dates";
+import { APP_TIME_ZONE, addDays, formatTime, isoWeekday, weekDates } from "@/lib/dates";
+import { callDateAndClock, formatCallClock } from "@/lib/video-calls";
+import { callRange } from "@/lib/call-events";
 import type { FieldPosition, Player, Position } from "@/lib/softball";
 import type { DiamondSpec } from "@/components/diamond";
 import type { TeamCulture, TeamStandard } from "@/components/team-standards";
@@ -53,7 +55,10 @@ export type PracticeNote = {
   cue: string | null;
 };
 
-export type TwisCell = { key: string; date: string | null; items: TwisItem[]; notes?: PracticeNote[] };
+/** A video call that day (user, 2026-11-14): not a check-off, a link to the call. */
+export type TwisCall = { id: string; title: string; detail: string; href: string };
+
+export type TwisCell = { key: string; date: string | null; items: TwisItem[]; notes?: PracticeNote[]; calls?: TwisCall[] };
 
 export type TwisWeek = {
   monday: string;
@@ -115,6 +120,16 @@ export async function loadTwisWeek(supabase: Supabase, playerId: string, monday:
     ? supabase.from("training_phases").select("name, focus, starts_on, ends_on").in("team_id", teamIds).lte("starts_on", sunday).gte("ends_on", monday)
     : Promise.resolve({ data: [] });
   const notesPromise = supabase.rpc("my_practice_notes", { p_player_id: playerId, p_from: monday, p_to: sunday });
+  // her video calls booked to show on her week (user, 2026-11-14)
+  const [callFrom, callTo] = callRange(monday, sunday);
+  const callsPromise = supabase
+    .from("video_calls")
+    .select("id, topic, host_name, starts_at, minutes, calendars")
+    .eq("player_id", playerId)
+    .is("cancelled_at", null)
+    .gte("starts_at", callFrom)
+    .lte("starts_at", callTo)
+    .order("starts_at");
   const [eventsResult, gamesResult, activitiesResult, checksResult] = await Promise.all([
     teamIds.length
       ? supabase
@@ -229,9 +244,17 @@ export async function loadTwisWeek(supabase: Supabase, playerId: string, monday:
     announcements: string | null;
     cue: string | null;
   }[];
+  const callsByDate = new Map<string, TwisCall[]>();
+  for (const c of (await callsPromise).data ?? []) {
+    if (!c.calendars.includes("player")) continue;
+    const day = callDateAndClock(c.starts_at, APP_TIME_ZONE).date;
+    const call = { id: c.id, title: c.topic, detail: `${formatCallClock(c.starts_at, APP_TIME_ZONE)} · ${c.minutes} min · with ${c.host_name}`, href: `/calls/${c.id}` };
+    callsByDate.set(day, [...(callsByDate.get(day) ?? []), call]);
+  }
   const cells: TwisCell[] = dates.map((d) => ({
     key: d,
     date: d,
+    calls: callsByDate.get(d),
     items: (byDate.get(d) ?? []).sort((x, y) => x.sort.localeCompare(y.sort)).map((x) => x.item),
     notes: notes
       .filter((n) => n.practice_date === d)

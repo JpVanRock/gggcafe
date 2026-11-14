@@ -138,6 +138,13 @@ select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-0000000
 select pg_temp.expect('team off', (select public.video_call_role(id) from public.video_calls where zoom_meeting_id = '81000000001'), 'off');
 reset role;
 
+-- Which calendars show a call (user, 2026-11-14): only the three choices; a head coach's call
+-- always shows on the Coaches Dugout calendar; older calls show everywhere
+select pg_temp.expect('calls default to every calendar', (select calendars from public.video_calls where zoom_meeting_id = '81000000001'), array['player', 'family', 'coaches']::text[]);
+select pg_temp.expect('only the three calendars', pg_temp.err($$update public.video_calls set calendars = array['player', 'everyone'] where zoom_meeting_id = '81000000006'$$), '23514');
+select pg_temp.expect('a head coach''s call stays on the Dugout calendar', pg_temp.err($$update public.video_calls set calendars = array['player'] where zoom_meeting_id = '81000000001'$$), '23514');
+select pg_temp.expect('a mentor''s call can leave it off', pg_temp.err($$update public.video_calls set calendars = array['family'] where zoom_meeting_id = '81000000006'$$), '');
+
 -- Clean up
 select set_config('request.jwt.claims', '', false);
 delete from public.notifications where user_id::text like 'e7e7e7e7-%';

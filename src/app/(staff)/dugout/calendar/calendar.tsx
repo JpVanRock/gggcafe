@@ -27,6 +27,8 @@ export type CalEvent = {
   /** "Added by JP" / "Changed by JP" */
   byline: string | null;
   planId: string | null;
+  /** a video call (user, 2026-11-14): its page, and it isn't edited here */
+  href?: string | null;
 };
 export type CalGame = { id: string; date: string; start: string | null; label: string; place: string | null };
 
@@ -244,7 +246,20 @@ export function CalendarView({
     const e = mode.event;
     title = eventTitle(e);
     const when = [dayLabel(e.date), [time(e.start), time(e.end)].filter(Boolean).join("–")].filter(Boolean).join(" · ");
-    body = canEdit ? (
+    body = e.href ? (
+      <div className="flex flex-col gap-4">
+        <Details
+          rows={[
+            ["When", when],
+            ["Where", e.location],
+            ["About", e.notes],
+          ]}
+        />
+        <Link href={e.href} className="self-start text-sm font-semibold text-link hover:underline">
+          Open the call →
+        </Link>
+      </div>
+    ) : canEdit ? (
       <div className="flex flex-col gap-4">
         <p className="text-sm text-muted">
           {when}
