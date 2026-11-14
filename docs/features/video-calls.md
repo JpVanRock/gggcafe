@@ -89,13 +89,20 @@ and the Switchboard tells admins the same.
 - Pick or create the one licensed user every call is booked under, for example a club address.
   That user's email is `ZOOM_HOST_EMAIL`.
 
-**2. Zoom account settings** (zoom.us → Settings, as the account owner). Lock each one with its
-padlock under Account Settings so users can't change it:
-- **Security:** Waiting Room on; "Require a passcode when scheduling new meetings" on.
-- **Schedule Meeting:** "Allow participants to join before host" off.
-- **Recording:** local recording and cloud recording off.
-- **In Meeting:** screen sharing for the host only; private chat between participants off;
-  "Allow removed participants to rejoin" off.
+**2. Zoom account settings** (zoom.us → profile picture → Settings, as the account owner; user's screenshot,
+2026-11-14: there is no Security tab, Security is a section of the **Meeting** tab, whose left menu lists the sections).
+The site also asks for the waiting room, no join before host and no recording on every call it books; these stop
+anything in Zoom undoing that.
+- **Meeting → Security:** Waiting Room on; "Require a passcode when scheduling new meetings" on.
+- **Meeting → Schedule Meeting:** "Allow participants to join before host" off.
+- **Meeting → In Meeting (Basic):** "Meeting chat - Direct messages" off; Screen sharing on with "Who can share?"
+  Host Only; "Allow removed participants to rejoin" off.
+- **Recording tab:** local, cloud and automatic recording off.
+- **Zoom AI tab → Meeting:** "Participants can request the host to start in-meeting AI features" off, "Allow users
+  to ask questions in-meeting with AI" off, "Restrict Zoom AI features and transcription when external users join"
+  on, any meeting summary or transcript setting off (calls include a minor; nothing is kept).
+- Padlocks only matter when other people sign in to the Zoom account: the same settings under Admin → Account
+  Management → Account Settings (newer menus: Admin Center → Settings), each locked with its padlock.
 
 **3. App 1: Server-to-Server OAuth** (marketplace.zoom.us → Develop → Build App →
 Server-to-Server OAuth). It books, reads and deletes meetings, and gets the host's key.
