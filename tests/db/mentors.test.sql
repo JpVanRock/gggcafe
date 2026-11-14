@@ -107,7 +107,28 @@ select pg_temp.expect('her team', (select count(*) from public.teams), 1::bigint
 select pg_temp.expect('her Mental GP', (select count(*) from public.mental_game_plans), 1::bigint);
 select pg_temp.expect('no coach notes', (select count(*) from public.coach_notes), 0::bigint);
 select pg_temp.expect('no team schedule', (select count(*) from public.team_events), 0::bigint);
+select pg_temp.expect('no games table', (select count(*) from public.games), 0::bigint);
 select pg_temp.expect('no staff list', (select count(*) from public.staff), 0::bigint);
+-- her calendar (user, 2026-11-13): her players' team practices and games, only through mentor_calendar()
+select pg_temp.expect('her calendar: the practice and both games, opponents named',
+  (select string_agg(item || ' ' || on_date::text || ' ' || coalesce(title, kind) || ' ' || team_name, ', ' order by on_date)
+     from public.mentor_calendar('2026-09-01', '2026-09-30')),
+  'game 2026-09-12 vs Blaze Sample, event 2026-09-15 practice Sample, game 2026-09-19 @ Blaze Sample');
+select pg_temp.expect('the practice''s details', (select place || ' ' || start_time::text from public.mentor_calendar('2026-09-15', '2026-09-15')), 'Field 2 17:30:00');
+select pg_temp.expect('a month at a time', pg_temp.err($$select * from public.mentor_calendar('2026-01-01', '2026-12-31')$$), '22023');
+reset role;
+-- the head coach hides the team calendar from mentors (the Switchboard)
+insert into public.team_features_off (team_id, feature) values ('00000000-0000-0000-0000-0000000000b1', 'mentor.calendar');
+set role authenticated;
+select pg_temp.as_user('cccccccc-0000-0000-0000-000000000001');
+select pg_temp.expect('switched off: no team calendar', (select count(*) from public.mentor_calendar('2026-09-01', '2026-09-30')), 0::bigint);
+reset role;
+delete from public.team_features_off where feature = 'mentor.calendar';
+set role authenticated;
+-- not a mentor: refused
+select pg_temp.as_user('cccccccc-0000-0000-0000-000000000005');
+select pg_temp.expect('a parent can''t read the mentor calendar', pg_temp.err($$select * from public.mentor_calendar('2026-09-01', '2026-09-30')$$), '42501');
+select pg_temp.as_user('cccccccc-0000-0000-0000-000000000001');
 do $$ begin
   update public.players set notes = 'x' where id = '00000000-0000-0000-0000-0000000000c2';
   if found then raise exception 'FAIL: a mentor edited a player'; end if;

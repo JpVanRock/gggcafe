@@ -44,6 +44,7 @@ export const SWITCHES = [
   { key: "mentor.pop", audience: "mentors", label: "See Pop Report", detail: "Her profile, stats and measurements" },
   { key: "mentor.mental", audience: "mentors", label: "See Mental GP", detail: "Her game plan, signals and self-scans" },
   { key: "mentor.journal", audience: "mentors", label: "Shared journal entries", detail: "Entries a player chooses to share from My Journal" },
+  { key: "mentor.calendar", audience: "mentors", label: "See the team calendar", detail: "Practices, events and games on their calendar (user, 2026-11-13)" },
 ] as const satisfies readonly { key: string; audience: Audience; label: string; detail: string }[];
 
 export type SwitchKey = (typeof SWITCHES)[number]["key"];

@@ -6289,6 +6289,7 @@ export type Database = {
       jobs_finish: { Args: { p_secret: string | null; p_id: number | null; p_outcome?: string | null; p_note?: string | null }; Returns: undefined }
       jobs_summary: { Args: Record<PropertyKey, never>; Returns: { kind: string; waiting: number; done: number; skipped: number; dead: number; retrying: number; last_error: string; last_error_at: string }[] }
       jobs_video_call_email: { Args: { p_secret: string | null; p_call_id: string | null }; Returns: { recipients: string[]; player_first: string; host_name: string; host_kind: string; topic: string; starts_at: string; minutes: number; cancelled: boolean }[] }
+      mentor_calendar: { Args: { p_from: string | null; p_to: string | null }; Returns: { item: string; id: string; team_id: string; team_name: string; on_date: string; start_time: string; end_time: string; kind: string; title: string; place: string; notes: string }[] }
       mentor_requests_waiting: { Args: Record<PropertyKey, never>; Returns: number }
       my_admin_team_ids: { Args: Record<PropertyKey, never>; Returns: string[] }
       my_child_ids: { Args: Record<PropertyKey, never>; Returns: string[] }

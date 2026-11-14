@@ -274,13 +274,16 @@ export function CalendarView({
     body = (
       <div className="flex flex-col gap-4">
         <Details rows={[["When", [dayLabel(g.date), time(g.start)].filter(Boolean).join(" · ")], ["Where", g.place]]} />
-        <p className="text-xs text-muted">
-          Games are added and changed on the{" "}
-          <Link href={`/teams/${teamId}`} className="text-link hover:underline">
-            team page
-          </Link>
-          .
-        </p>
+        {/* for the people who can change it (the family and mentor calendars are view only) */}
+        {canEdit && (
+          <p className="text-xs text-muted">
+            Games are added and changed on the{" "}
+            <Link href={`/teams/${teamId}`} className="text-link hover:underline">
+              team page
+            </Link>
+            .
+          </p>
+        )}
       </div>
     );
   }

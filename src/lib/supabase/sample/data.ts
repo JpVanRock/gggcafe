@@ -483,6 +483,23 @@ export function sampleRpc(name: string, args: Row = {}): unknown {
       return mentor_links
         .filter((l) => l.mentor_id === U.admin)
         .map((l) => ({ id: l.id, team_id: l.team_id, team_name: "GGG Sample 14U", player_id: l.player_id, player_name: l.player_name, status: l.status, requested_at: l.requested_at }));
+    // the mentor's calendar: her players' team practices, events and games (the sample admin mentors the whole team)
+    case "mentor_calendar": {
+      const inRange = (d: unknown) => String(d) >= String(args.p_from) && String(d) <= String(args.p_to);
+      return [
+        ...team_events
+          .filter((e) => e.team_id === T.us && inRange(e.event_date))
+          .map((e) => ({ item: "event", id: e.id, team_id: T.us, team_name: "GGG", on_date: e.event_date, start_time: e.start_time, end_time: e.end_time, kind: e.kind, title: e.title, place: e.location, notes: null })),
+        ...games
+          .filter((g) => (g.home_team_id === T.us || g.away_team_id === T.us) && inRange(g.game_date))
+          .map((g) => {
+            const home = g.home_team_id === T.us;
+            const opp = teams.find((t) => t.id === (home ? g.away_team_id : g.home_team_id));
+            const place = [g.event_name, g.venue].filter(Boolean).join(" · ") || null;
+            return { item: "game", id: g.id, team_id: T.us, team_name: "GGG", on_date: g.game_date, start_time: g.start_time, end_time: null, kind: "game", title: `${home ? "vs" : "@"} ${opp?.short_name || opp?.name || "TBD"}`, place, notes: null };
+          }),
+      ];
+    }
     case "coaching_staff": return staff.map((s) => ({ user_id: s.user_id, display_name: s.display_name, email: "coach@sample.test" }));
     case "my_practice_notes":
       return practice_plans

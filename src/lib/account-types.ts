@@ -97,7 +97,7 @@ export const SECTIONS: { title: string; rows: Row[] }[] = [
         "Hers: her parents read it; a mentor reads only the entries she shares with them; coaches don't see it (the user's choice)."),
       row("Video calls", "Zoom calls with one player, held on GGG.Cafe and never recorded.", ["yes", "view", "part", "part", "part"],
         "Off until a site admin turns them on for a team; then the head coach switches them on for mentors (the Switchboard). Head coaches and her mentors book them; she and her parents are told and join; head coaches can drop in; assistants see them on the Calendar."),
-      row("Mentor page", "My roster: the team's roster or her approved players, each with links to Goals, the Pop Report and Mental GP; a calendar of her training and video calls; messages with a photo or a drill (shared with coaches if she chooses), training for one player or a group, notes and focus areas with the coaches.", ["no", "no", "no", "no", "yes"]),
+      row("Mentor page", "My roster: the team's roster or her approved players, each with links to Goals, the Pop Report and Mental GP; a calendar of her training, her video calls and her players' team practices and games; messages with a photo or a drill (shared with coaches if she chooses), training for one player or a group, notes and focus areas with the coaches.", ["no", "no", "no", "no", "yes"]),
     ],
   },
   {

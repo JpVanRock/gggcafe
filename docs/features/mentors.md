@@ -63,5 +63,9 @@ calls). docs/features/video-calls.md.
   the head coach turned that section off for mentors (`getPlayerFeaturesOff` per player).
 - `/mentor/calendar` ("Calendar" in the mentor menu): her own month, view only, in the Dugout's `CalendarView`: the
   training she put on her players' weeks (`trainingDates` in `src/lib/mentors.ts`; a session sent to several players
-  is one entry naming them) and the video calls she booked (`callDateAndClock` in `src/lib/video-calls.ts`). Team
-  practices and games aren't on it: mentors can't read the team calendar.
+  is one entry naming them) and the video calls she booked (`callDateAndClock` in `src/lib/video-calls.ts`), plus her
+  players' team practices, events and games (user, 2026-11-13; migration 20261114010911). Mentors still can't read
+  `team_events`, `games` or other teams: `mentor_calendar(from, to)` (definer, at most about two months) returns only the
+  calendar rows for her players' current teams (whole-team links, and her one-on-one players' teams this season) with
+  the opponent's name. The Switchboard's "See the team calendar" (`mentor.calendar`) hides a team's, in the database.
+  DB tests: `tests/db/mentors.test.sql`.
