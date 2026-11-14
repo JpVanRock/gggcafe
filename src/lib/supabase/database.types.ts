@@ -5919,6 +5919,36 @@ export type Database = {
           },
         ]
       }
+      video_call_players: {
+        Row: {
+          call_id: string
+          player_id: string
+        }
+        Insert: {
+          call_id: string
+          player_id: string
+        }
+        Update: {
+          call_id?: string
+          player_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_call_players_call_id_fkey"
+            columns: ["call_id"]
+            isOneToOne: false
+            referencedRelation: "video_calls"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_call_players_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       video_calls: {
         Row: {
           id: string
@@ -5935,6 +5965,7 @@ export type Database = {
           cancelled_by: string | null
           created_at: string
           calendars: string[]
+          group_size: number
         }
         Insert: {
           id?: string
@@ -5951,6 +5982,7 @@ export type Database = {
           cancelled_by?: string | null
           created_at?: string
           calendars?: string[]
+          group_size?: number
         }
         Update: {
           id?: string
@@ -5967,6 +5999,7 @@ export type Database = {
           cancelled_by?: string | null
           created_at?: string
           calendars?: string[]
+          group_size?: number
         }
         Relationships: [
           {
@@ -6277,6 +6310,7 @@ export type Database = {
       admin_view_parent: { Args: { p_user: string | null }; Returns: Json }
       allow_password_reset: { Args: { p_email: string | null }; Returns: boolean }
       answer_team_quiz: { Args: { p_player_id: string | null; p_question_id: string | null; p_chosen: number | null }; Returns: { is_correct: boolean; correct_index: number; explanation: string }[] }
+      book_video_call: { Args: { p_team_id: string | null; p_player_ids: string[] | null; p_host_name: string | null; p_topic: string | null; p_starts_at: string | null; p_minutes: number | null; p_zoom_meeting_id: string | null; p_calendars: string[] | null }; Returns: string }
       change_authors: { Args: { p_user_ids: string[] | null }; Returns: { user_id: string; name: string }[] }
       claim_my_daughter: { Args: { p_player_id: string | null }; Returns: string }
       coaching_staff: { Args: Record<PropertyKey, never>; Returns: { user_id: string; display_name: string; email: string }[] }
@@ -6296,6 +6330,7 @@ export type Database = {
       jobs_summary: { Args: Record<PropertyKey, never>; Returns: { kind: string; waiting: number; done: number; skipped: number; dead: number; retrying: number; last_error: string; last_error_at: string }[] }
       jobs_video_call_email: { Args: { p_secret: string | null; p_call_id: string | null }; Returns: { recipients: string[]; player_first: string; host_name: string; host_kind: string; topic: string; starts_at: string; minutes: number; cancelled: boolean }[] }
       mentor_calendar: { Args: { p_from: string | null; p_to: string | null }; Returns: { item: string; id: string; team_id: string; team_name: string; on_date: string; start_time: string; end_time: string; kind: string; title: string; place: string; notes: string }[] }
+      mentor_call_players: { Args: Record<PropertyKey, never>; Returns: { player_id: string; team_id: string }[] }
       mentor_requests_waiting: { Args: Record<PropertyKey, never>; Returns: number }
       my_admin_team_ids: { Args: Record<PropertyKey, never>; Returns: string[] }
       my_child_ids: { Args: Record<PropertyKey, never>; Returns: string[] }

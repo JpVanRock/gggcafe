@@ -100,9 +100,14 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
     // video calls (user, 2026-11-12): her team when an admin turned calls on and her head coach
     // switched them on for mentors; null otherwise
     supabase.rpc("video_call_team", { p_player_id: player.id }),
-    supabase.from("video_calls").select(VIDEO_CALL_COLUMNS).eq("player_id", player.id).eq("host_id", mentor.userId).order("starts_at", { ascending: false }).limit(RECENT_LIMIT),
+    // the calls she booked that invite her (group calls too: the host reads every invite of her calls)
+    supabase.from("video_call_players").select("call_id").eq("player_id", player.id),
   ]);
-  const calls = (callRows ?? []) as VideoCallRow[];
+  const callIds = (callRows ?? []).map((r) => r.call_id);
+  const { data: hosted } = callIds.length
+    ? await supabase.from("video_calls").select(VIDEO_CALL_COLUMNS).in("id", callIds).eq("host_id", mentor.userId).order("starts_at", { ascending: false }).limit(RECENT_LIMIT)
+    : { data: [] };
+  const calls = (hosted ?? []) as VideoCallRow[];
   const shared = journalRows ?? [];
   const memoPaths = shared.flatMap((j) => (j.audio_path ? [j.audio_path] : []));
   const memoUrls = new Map<string, string>();

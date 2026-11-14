@@ -48,3 +48,11 @@ test("error alerts: a 16-hex fingerprint, and an email that links to Site health
   assert.match(email.html, /Cannot read &lt;b&gt;/);
   assert.match(email.html, /href="https:\/\/www\.ggg\.cafe\/health"/);
 });
+
+test("a group call's email names her and how many others", () => {
+  const base = { player: "Maya", hostName: "Pat", hostKind: "mentor", topic: "Bunting", when: "Tue, Nov 17 · 7:00 PM", minutes: 30, cancelled: false, familyUrl: "https://www.ggg.cafe/family" };
+  assert.match(videoCallEmail({ ...base, others: 2 }).text, /Pat \(mentor\) booked a group video call with Maya and 2 other players\./);
+  assert.match(videoCallEmail({ ...base, others: 1 }).text, /with Maya and 1 other player\./);
+  assert.match(videoCallEmail(base).text, /booked a video call with Maya\./);
+  assert.match(videoCallEmail({ ...base, cancelled: true, others: 1 }).text, /The group video call Pat \(mentor\) booked with Maya and 1 other player is cancelled\./);
+});

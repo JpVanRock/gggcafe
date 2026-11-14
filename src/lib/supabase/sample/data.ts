@@ -356,10 +356,17 @@ const team_video_access: Row[] = [
   { team_id: T.us, allowed_by: U.admin, allowed_at: "2026-11-12T18:00:00Z", mentors_on: true, mentors_set_by: U.admin, mentors_set_at: "2026-11-12T18:05:00Z" },
 ];
 // calendars (user, 2026-11-14): Emma's call skips her parents' calendar
+// group calls (user, 2026-11-14): who's invited to each; the first call is a group of two
+const video_call_players: Row[] = [
+  { call_id: id("a0ca11", 1), player_id: maya },
+  { call_id: id("a0ca11", 1), player_id: emma },
+  { call_id: id("a0ca11", 2), player_id: emma },
+  { call_id: id("a0ca11", 3), player_id: maya },
+];
 const video_calls: Row[] = [
-  { id: id("a0ca11", 1), team_id: T.us, player_id: maya, host_id: U.admin, host_kind: "mentor", host_name: "Coach Sample", topic: "Changeup grip and release", starts_at: "2027-01-12T00:00:00Z", minutes: 30, zoom_meeting_id: "81000000101", cancelled_at: null, cancelled_by: null, created_at: "2026-11-12T19:00:00Z", calendars: ["player", "family", "coaches"] },
-  { id: id("a0ca11", 2), team_id: T.us, player_id: emma, host_id: U.admin, host_kind: "coach", host_name: "Pat Torres", topic: "Winter plan check-in", starts_at: "2027-01-14T23:30:00Z", minutes: 45, zoom_meeting_id: "81000000102", cancelled_at: null, cancelled_by: null, created_at: "2026-11-12T19:10:00Z", calendars: ["player", "coaches"] },
-  { id: id("a0ca11", 3), team_id: T.us, player_id: maya, host_id: U.admin, host_kind: "mentor", host_name: "Coach Sample", topic: "Spin drills", starts_at: "2026-12-02T00:00:00Z", minutes: 30, zoom_meeting_id: "81000000103", cancelled_at: "2026-11-12T20:00:00Z", cancelled_by: U.admin, created_at: "2026-11-12T19:20:00Z", calendars: ["player", "family", "coaches"] },
+  { id: id("a0ca11", 1), team_id: T.us, player_id: maya, host_id: U.admin, host_kind: "mentor", host_name: "Coach Sample", topic: "Changeup grip and release", starts_at: "2027-01-12T00:00:00Z", minutes: 30, zoom_meeting_id: "81000000101", cancelled_at: null, cancelled_by: null, created_at: "2026-11-12T19:00:00Z", calendars: ["player", "family", "coaches"], group_size: 2 },
+  { id: id("a0ca11", 2), team_id: T.us, player_id: emma, host_id: U.admin, host_kind: "coach", host_name: "Pat Torres", topic: "Winter plan check-in", starts_at: "2027-01-14T23:30:00Z", minutes: 45, zoom_meeting_id: "81000000102", cancelled_at: null, cancelled_by: null, created_at: "2026-11-12T19:10:00Z", calendars: ["player", "coaches"], group_size: 1 },
+  { id: id("a0ca11", 3), team_id: T.us, player_id: maya, host_id: U.admin, host_kind: "mentor", host_name: "Coach Sample", topic: "Spin drills", starts_at: "2026-12-02T00:00:00Z", minutes: 30, zoom_meeting_id: "81000000103", cancelled_at: "2026-11-12T20:00:00Z", cancelled_by: U.admin, created_at: "2026-11-12T19:20:00Z", calendars: ["player", "family", "coaches"], group_size: 1 },
 ];
 
 export const TABLES: Record<string, Row[]> = {
@@ -371,7 +378,7 @@ export const TABLES: Record<string, Row[]> = {
   mentors, mentor_links, mentor_messages, mentor_focus, mentor_notes, player_activities,
   budget_fees, budget_entries, budget_credits, budget_coach_expenses, player_mental_lessons, coach_mental_lessons, mental_game_plans,
   team_hitting_philosophy, team_throwing_programs, player_journal_entries, parent_links, team_features_off, team_admins,
-  team_video_access, video_calls,
+  team_video_access, video_calls, video_call_players,
 };
 
 /** table -> the column other tables use to point at it (for embedded selects) */
@@ -445,6 +452,8 @@ export function sampleRpc(name: string, args: Row = {}): unknown {
     case "player_mentors": return [{ mentor_id: U.admin, display_name: "Coach Sample", specialty: "Pitching" }];
     case "my_admin_team_ids": return [T.us];
     case "video_call_team": return T.us;
+    // the mentor's players she may call now (the sample team's roster)
+    case "mentor_call_players": return P.map((pid) => ({ player_id: pid, team_id: T.us }));
     case "rate_limit_hit": return true;
     // Site health (user, 2026-11-13): one open error and one resolved; the job worker's week
     case "error_summary":

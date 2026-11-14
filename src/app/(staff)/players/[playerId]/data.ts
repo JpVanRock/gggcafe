@@ -1,7 +1,8 @@
 import "server-only";
 import type { createClient } from "@/lib/supabase/server";
 import { APP_TIME_ZONE, addDays, formatTime, isoWeekday, weekDates } from "@/lib/dates";
-import { callDateAndClock, formatCallClock } from "@/lib/video-calls";
+import { callDateAndClock, formatCallClock, groupLabel } from "@/lib/video-calls";
+import { callsForPlayers } from "@/lib/video-call-data";
 import { callRange } from "@/lib/call-events";
 import type { FieldPosition, Player, Position } from "@/lib/softball";
 import type { DiamondSpec } from "@/components/diamond";
@@ -122,14 +123,8 @@ export async function loadTwisWeek(supabase: Supabase, playerId: string, monday:
   const notesPromise = supabase.rpc("my_practice_notes", { p_player_id: playerId, p_from: monday, p_to: sunday });
   // her video calls booked to show on her week (user, 2026-11-14)
   const [callFrom, callTo] = callRange(monday, sunday);
-  const callsPromise = supabase
-    .from("video_calls")
-    .select("id, topic, host_name, starts_at, minutes, calendars")
-    .eq("player_id", playerId)
-    .is("cancelled_at", null)
-    .gte("starts_at", callFrom)
-    .lte("starts_at", callTo)
-    .order("starts_at");
+  // group calls she's invited to as well (user, 2026-11-14)
+  const callsPromise = callsForPlayers(supabase, [playerId], { since: callFrom, until: callTo, limit: 50 });
   const [eventsResult, gamesResult, activitiesResult, checksResult] = await Promise.all([
     teamIds.length
       ? supabase
@@ -245,10 +240,11 @@ export async function loadTwisWeek(supabase: Supabase, playerId: string, monday:
     cue: string | null;
   }[];
   const callsByDate = new Map<string, TwisCall[]>();
-  for (const c of (await callsPromise).data ?? []) {
+  for (const c of (await callsPromise).calls) {
     if (!c.calendars.includes("player")) continue;
     const day = callDateAndClock(c.starts_at, APP_TIME_ZONE).date;
-    const call = { id: c.id, title: c.topic, detail: `${formatCallClock(c.starts_at, APP_TIME_ZONE)} · ${c.minutes} min · with ${c.host_name}`, href: `/calls/${c.id}` };
+    const detail = [formatCallClock(c.starts_at, APP_TIME_ZONE), `${c.minutes} min`, groupLabel(c.group_size), `with ${c.host_name}`].filter(Boolean).join(" · ");
+    const call = { id: c.id, title: c.topic, detail, href: `/calls/${c.id}` };
     callsByDate.set(day, [...(callsByDate.get(day) ?? []), call]);
   }
   const cells: TwisCell[] = dates.map((d) => ({

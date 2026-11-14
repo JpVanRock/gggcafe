@@ -118,6 +118,52 @@ select pg_temp.expect('head coach told of the mentor''s call', (select count(*) 
 select pg_temp.expect('head coach drops in', (select public.video_call_role(id) from public.video_calls where zoom_meeting_id = '81000000006'), 'guest');
 reset role;
 
+-- Group calls (migration 20261114224959): the mentor books one call with two of her players at once; each
+-- invited player and her parents read it, join it and were told; a parent sees only her own child's invite
+insert into auth.users (id, email, raw_user_meta_data) values ('e7e7e7e7-0000-0000-0000-000000000008', 'vc-parent2@example.test', '{"role": "parent"}');
+insert into public.parent_accounts (user_id, display_name) values ('e7e7e7e7-0000-0000-0000-000000000008', 'VC Parent Two');
+insert into public.parent_links (parent_id, team_id, child_name, player_id, status, decided_at) values
+  ('e7e7e7e7-0000-0000-0000-000000000008', '00000000-0000-0000-0000-0000000000b1', 'Jordan Kim', '00000000-0000-0000-0000-0000000000c2', 'approved', now());
+insert into public.mentor_links (mentor_id, player_id, status) values ('e7e7e7e7-0000-0000-0000-000000000005', '00000000-0000-0000-0000-0000000000c2', 'approved');
+insert into vault.decrypted_secrets (name, decrypted_secret) values ('jobs_secret', 'vc-test-secret-0123456789abcdefghijklmnop');
+select pg_temp.expect('older calls list their player', (select count(*) from public.video_call_players where call_id in (select id from vc_ids)), 2::bigint);
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000005"}', false);
+select pg_temp.expect('her players to call', (select count(*) from public.mentor_call_players()), 2::bigint);
+select pg_temp.expect('not a player she doesn''t mentor', pg_temp.err($$select public.book_video_call('00000000-0000-0000-0000-0000000000b1',
+  array['00000000-0000-0000-0000-0000000000c1', '00000000-0000-0000-0000-0000000000c3']::uuid[], 'VC Mentor', 'Group', now() + interval '3 days', 30, '81000000010', '{}')$$), '42501');
+select pg_temp.expect('at least one player', pg_temp.err($$select public.book_video_call('00000000-0000-0000-0000-0000000000b1',
+  '{}'::uuid[], 'VC Mentor', 'Group', now() + interval '3 days', 30, '81000000010', '{}')$$), '22023');
+select pg_temp.expect('at most 12', pg_temp.err($$select public.book_video_call('00000000-0000-0000-0000-0000000000b1',
+  (select array_agg(gen_random_uuid()) from generate_series(1, 13)), 'VC Mentor', 'Group', now() + interval '3 days', 30, '81000000010', '{}')$$), '22023');
+select public.book_video_call('00000000-0000-0000-0000-0000000000b1',
+  array['00000000-0000-0000-0000-0000000000c1', '00000000-0000-0000-0000-0000000000c2', '00000000-0000-0000-0000-0000000000c1']::uuid[],
+  'VC Mentor', 'Group hitting', now() + interval '3 days', 30, '81000000009', array['player', 'family']);
+select pg_temp.expect('one call, two players', (select group_size from public.video_calls where zoom_meeting_id = '81000000009'), 2::smallint);
+select pg_temp.expect('the mentor reads both invites', (select count(*) from public.video_call_players where call_id = (select id from public.video_calls where zoom_meeting_id = '81000000009')), 2::bigint);
+select pg_temp.expect('a mentor''s call isn''t on the Dugout calendar unless picked', (select calendars from public.video_calls where zoom_meeting_id = '81000000009'), array['player', 'family']);
+select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000008"}', false);
+select pg_temp.expect('Jordan''s parent reads the group call', (select count(*) from public.video_calls), 1::bigint);
+select pg_temp.expect('and only Jordan''s invite', (select count(*) from public.video_call_players), 1::bigint);
+select pg_temp.expect('Jordan''s parent joins as a guest', (select public.video_call_role(id) from public.video_calls where zoom_meeting_id = '81000000009'), 'guest');
+select pg_temp.expect('Jordan''s parent was told', (select body from public.notifications where kind = 'video-call') like '%group video call (2 players) with Jordan%', true);
+select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000006"}', false);
+select pg_temp.expect('Avery''s parent reads all three', (select count(*) from public.video_calls), 3::bigint);
+select pg_temp.expect('Avery''s parent sees only Avery''s invites', (select count(*) from public.video_call_players where player_id <> '00000000-0000-0000-0000-0000000000c1'), 0::bigint);
+select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000007"}', false);
+select pg_temp.expect('Casey still reads none', (select count(*) from public.video_calls), 0::bigint);
+select pg_temp.expect('Casey can''t join the group', pg_temp.err($$select public.video_call_role((select id from public.video_calls where zoom_meeting_id = '81000000009'))$$), '42501');
+select pg_temp.expect('nobody writes invites directly', pg_temp.err($$insert into public.video_call_players (call_id, player_id) values (gen_random_uuid(), '00000000-0000-0000-0000-0000000000c3')$$), '42501');
+reset role;
+-- the parents' emails: one row per invited player, each with her own parents
+select pg_temp.expect('one email row per player', (select count(*) from private.jobs_video_call_email('vc-test-secret-0123456789abcdefghijklmnop',
+  (select id from public.video_calls where zoom_meeting_id = '81000000009'))), 2::bigint);
+select pg_temp.expect('Jordan''s row goes to her parent', (select recipients from private.jobs_video_call_email('vc-test-secret-0123456789abcdefghijklmnop',
+  (select id from public.video_calls where zoom_meeting_id = '81000000009')) where player_first = 'Jordan'), array['vc-parent2@example.test']);
+update public.video_calls set cancelled_at = now() where zoom_meeting_id = '81000000009';
+select pg_temp.expect('the cancellation reaches Jordan''s parent', (select count(*) from public.notifications where user_id = 'e7e7e7e7-0000-0000-0000-000000000008' and title like 'Video call cancelled%'), 1::bigint);
+delete from vault.decrypted_secrets where name = 'jobs_secret';
+
 -- Mentors switched off: her mentor's call can't happen
 set role authenticated;
 select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000001"}', false);
@@ -130,7 +176,8 @@ select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-0000000
 update public.video_calls set cancelled_at = now(), cancelled_by = 'e7e7e7e7-0000-0000-0000-000000000005' where zoom_meeting_id = '81000000006';
 select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000006"}', false);
 select pg_temp.expect('cancelled', (select public.video_call_role(id) from public.video_calls where zoom_meeting_id = '81000000006'), 'cancelled');
-select pg_temp.expect('her parent was told', (select count(*) from public.notifications where title like 'Video call cancelled%'), 1::bigint);
+-- (and of the group call cancelled above: Avery was invited to it too)
+select pg_temp.expect('her parent was told', (select count(*) from public.notifications where title like 'Video call cancelled%'), 2::bigint);
 -- the admin turns the team off: nothing on b1 can happen
 select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000003"}', false);
 delete from public.team_video_access where team_id = '00000000-0000-0000-0000-0000000000b1';

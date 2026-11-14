@@ -16,6 +16,10 @@ import { RequestForm } from "./mentor-client";
 import { asComingUp, loadMentorCalendar } from "./calendar-data";
 import { withdrawMentorLink } from "./actions";
 import { PlayerTiles, loadMentees, loadTraining, oneOnOne } from "./parts";
+import { VIDEO_CALL_COLUMNS, VideoCallList, type VideoCallRow } from "@/components/video-calls";
+import { VideoCallForm } from "@/components/video-call-form";
+import { comingSinceISO, isComing } from "@/lib/video-calls";
+import { zoomConfigured } from "@/lib/zoom";
 
 export const metadata: Metadata = { title: "My players · Mentor · GGG.Cafe" };
 
@@ -59,7 +63,7 @@ export default async function MentorHome() {
   }
 
   const today = todayISO();
-  const [cards, training, { data: teamRows }, { data: sent }] = await Promise.all([
+  const [cards, training, { data: teamRows }, { data: sent }, { data: callPlayers }, { data: callRows }] = await Promise.all([
     loadMentees(supabase, access.menteeIds),
     mentor ? loadTraining(supabase, mentor.userId) : Promise.resolve([]),
     access.teamIds.length ? supabase.from("teams").select("id, name").in("id", access.teamIds).order("name") : Promise.resolve({ data: [] }),
@@ -70,6 +74,11 @@ export default async function MentorHome() {
           .eq("sender_id", mentor.userId)
           .order("created_at", { ascending: false })
           .limit(5)
+      : Promise.resolve({ data: [] }),
+    // video calls (user, 2026-11-14): the players she may call now, and the calls she booked that are ahead
+    mentor ? supabase.rpc("mentor_call_players") : Promise.resolve({ data: [] }),
+    mentor
+      ? supabase.from("video_calls").select(VIDEO_CALL_COLUMNS).eq("host_id", mentor.userId).is("cancelled_at", null).gte("starts_at", comingSinceISO()).order("starts_at").limit(10)
       : Promise.resolve({ data: [] }),
   ]);
   const teams = (teamRows ?? []) as { id: string; name: string }[];
@@ -90,6 +99,11 @@ export default async function MentorHome() {
   // the next few training sessions, one line per session (a group's comes once)
   const sessions = [...new Map(training.map((r) => [[r.title, r.starts_on, r.ends_on, r.days.join(",")].join("|"), r])).values()].slice(0, 3);
   const [nameFirst, ...nameRest] = (mentor?.displayName ?? meta.display_name ?? "Mentor").split(" ");
+  const myCalls = ((callRows ?? []) as VideoCallRow[]).filter((c) => isComing(c));
+  // the players she can book with, by team then name (a group call is for one team)
+  const callable = ((callPlayers ?? []) as { player_id: string; team_id: string }[])
+    .map((c) => ({ id: c.player_id, name: nameOf(c.player_id), team: cards.get(c.player_id)?.team ?? "Team" }))
+    .sort((a, b) => a.team.localeCompare(b.team) || a.name.localeCompare(b.name));
   const menuNote = "text-sm text-[var(--menu-note)]";
 
   return (
@@ -142,7 +156,7 @@ export default async function MentorHome() {
       {total > 0 && (
         <section aria-label="Mentor menu" className="grid gap-8 md:grid-cols-2">
           {/* every player she mentors, by team, then her one-on-one players (user, 2026-11-13) */}
-          <MenuPanel number={1} title="My Roster" subtitle={`${total} player${total === 1 ? "" : "s"} · goals, Pop Report, Mental GP`} variant="outlineNeon" wide>
+          <MenuPanel number={1} title="Mentor Roster" subtitle={`${total} player${total === 1 ? "" : "s"} · goals, Pop Report, Mental GP`} variant="outlineNeon" wide>
             <div className="flex flex-col gap-6">
               {teams.map((t) => {
                 const roster = access.rosters.find((r) => r.teamId === t.id)?.players ?? [];
@@ -173,7 +187,29 @@ export default async function MentorHome() {
             </div>
           </MenuPanel>
 
-          <MenuPanel number={2} title="Training on Their Weeks" subtitle="In their This Week in Softball" variant="pink" cta={{ href: "/mentor/training", label: "Add & manage" }}>
+          {/* video calls from the dashboard (user, 2026-11-14): one player, or a group from one team */}
+          <MenuPanel number={2} title="Video Calls" subtitle="One player, or a group from one team" variant="navy" wide>
+            <div className="flex flex-col gap-5">
+              <VideoCallList calls={myCalls} showPlayer canCancel={() => true} empty="No calls booked. Schedule one below." />
+              {callable.length === 0 ? (
+                <p className={menuNote}>
+                  Video calls aren&apos;t on for your players&apos; teams yet. A site admin turns them on for a team, then the head coach lets mentors book them
+                  (the Switchboard).
+                </p>
+              ) : !zoomConfigured() ? (
+                <p className={menuNote}>Video calls aren&apos;t connected to Zoom yet. A site admin adds the Zoom keys first.</p>
+              ) : (
+                <Disclosure summary="Schedule a video call">
+                  <VideoCallForm players={callable} />
+                </Disclosure>
+              )}
+              <p className="text-xs text-[var(--menu-note)]">
+                Held here on GGG.Cafe. Every player&apos;s parents are invited and told; head coaches can drop in; nothing is recorded.
+              </p>
+            </div>
+          </MenuPanel>
+
+          <MenuPanel number={3} title="Training on Their Weeks" subtitle="In their This Week in Softball" variant="pink" cta={{ href: "/mentor/training", label: "Add & manage" }}>
             {sessions.length === 0 ? (
               <p className={menuNote}>Nothing coming up. Add a lesson, a bullpen or a hitting session to their weeks.</p>
             ) : (
@@ -195,7 +231,7 @@ export default async function MentorHome() {
             )}
           </MenuPanel>
 
-          <MenuPanel number={3} title="Messages You Sent" subtitle="Seen when she opens them" variant="navy">
+          <MenuPanel number={4} title="Messages You Sent" subtitle="Seen when she opens them" variant="navy">
             {(sent ?? []).length === 0 ? (
               <p className={menuNote}>Nothing sent yet. Open a player on your roster to message her a note, a photo or a drill.</p>
             ) : (
@@ -212,8 +248,8 @@ export default async function MentorHome() {
             )}
           </MenuPanel>
 
-          {/* the last of three half-width boards: across the page, not alone in a half row (user, 2026-11-13) */}
-          <MenuPanel number={4} title="Work With More Players" subtitle="A player or a whole team" variant="outlinePink" wide>
+          {/* across the page, under the two half-width boards (user, 2026-11-13) */}
+          <MenuPanel number={5} title="Work With More Players" subtitle="A player or a whole team" variant="outlinePink" wide>
             <p className={`mb-4 ${menuNote}`}>Ask with the team code. Her parents approve you for one player; the head coach approves you for the whole team.</p>
             <Disclosure summary="Ask to work with another player or team">
               <RequestForm />

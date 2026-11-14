@@ -13,6 +13,10 @@ import { loadTraining } from "@/app/mentor/parts";
 import { trainingDates } from "@/lib/mentors";
 import { AccountFacts, ViewBanner, ViewToggle, requireAdminPage } from "../../parts";
 import { MentorPreview } from "../preview";
+import { VIDEO_CALL_COLUMNS, type VideoCallRow } from "@/components/video-calls";
+import { comingSinceISO, formatCallTime, groupLabel, isComing } from "@/lib/video-calls";
+import { APP_TIME_ZONE } from "@/lib/dates";
+import { playerName as fullName } from "@/lib/softball";
 
 export const metadata: Metadata = { title: "Mentor view · GGG.Cafe" };
 
@@ -42,12 +46,14 @@ export default async function ViewAsMentorPage({ params, searchParams }: PagePro
   const today = todayISO();
 
   // the next two weeks of their calendar: their training and video calls, and their players' team schedule
-  const [calendar, teamItems, { data: teamMentors }, training] = await Promise.all([
+  const [calendar, teamItems, { data: teamMentors }, training, { data: callRows }] = await Promise.all([
     loadMentorCalendar(supabase, userId, playerName, today, addDays(today, 13), { teamSchedule: false }),
     loadComingUp(supabase, teams, 20),
     pickerTeam ? supabase.from("mentor_links").select("mentor_id").eq("team_id", pickerTeam).eq("status", "approved") : Promise.resolve({ data: [] }),
     // the training they added, as their own Training board reads it
     loadTraining(supabase, userId),
+    // the video calls they booked that are ahead (their Video Calls board)
+    supabase.from("video_calls").select(VIDEO_CALL_COLUMNS).eq("host_id", userId).is("cancelled_at", null).gte("starts_at", comingSinceISO()).order("starts_at").limit(5),
   ]);
   // the next few sessions, one line per session (a group's comes once), at the next day each lands on
   const sessions = [...new Map(training.map((r) => [[r.title, r.starts_on, r.ends_on, r.days.join(",")].join("|"), r])).values()].slice(0, 3);
@@ -101,6 +107,12 @@ export default async function ViewAsMentorPage({ params, searchParams }: PagePro
                   note: [weekly && `Weekly through ${formatDay(r.ends_on!)}`, playerName(r.player_id)].filter(Boolean).join(" · "),
                 };
               })}
+              calls={((callRows ?? []) as VideoCallRow[]).filter((c) => isComing(c)).map((c) => ({
+                key: c.id,
+                name: c.topic,
+                value: formatCallTime(c.starts_at, APP_TIME_ZONE),
+                note: [c.player ? fullName(c.player) : null, groupLabel(c.group_size), `${c.minutes} min`].filter(Boolean).join(" · "),
+              }))}
               messages={v.messages.slice(0, 5).map((m, i) => ({
                 key: String(i),
                 name: playerName(m.player_id),

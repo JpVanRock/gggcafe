@@ -61,25 +61,32 @@ async function runOne(db: Db, secret: string, origin: string, kind: string, payl
     if (!emailConfigured()) return { outcome: "skipped", why: "Email isn't set up (RESEND_API_KEY, EMAIL_FROM)." };
     const { data, error } = await db.rpc("jobs_video_call_email", { p_secret: secret, p_call_id: job.callId });
     if (error) throw new Error(`Couldn't read the call: ${error.message}`);
-    const call = data?.[0];
-    if (!call) return { outcome: "skipped", why: "The call no longer exists." };
-    if (!call.recipients.length) return { outcome: "skipped", why: "She has no approved parents with an email." };
+    // one row per invited player (a group call has several; user, 2026-11-14), each with her own parents
+    const rows = data ?? [];
+    if (!rows.length) return { outcome: "skipped", why: "The call no longer exists." };
+    if (!rows.some((r) => r.recipients.length)) return { outcome: "skipped", why: "No invited player has approved parents with an email." };
     // a booking that was cancelled before its email went out: the cancellation email covers it
-    if (job.event === "booked" && call.cancelled) return { outcome: "skipped", why: "Cancelled before the email went out." };
-    const email = videoCallEmail({
-      player: call.player_first,
-      hostName: call.host_name,
-      hostKind: call.host_kind,
-      topic: call.topic,
-      when: formatCallTime(call.starts_at, APP_TIME_ZONE),
-      minutes: call.minutes,
-      cancelled: job.event === "cancelled",
-      familyUrl: `${origin}/family`,
-    });
-    // one email per parent, so parents don't see each other's addresses
-    for (const to of call.recipients) {
-      const sent = await sendEmail({ to: [to], ...email });
-      if (sent.error) throw new Error(sent.error);
+    if (job.event === "booked" && rows[0].cancelled) return { outcome: "skipped", why: "Cancelled before the email went out." };
+    // one email per parent, naming their own daughter, so parents don't see each other's addresses
+    const sentTo = new Set<string>();
+    for (const call of rows) {
+      const email = videoCallEmail({
+        player: call.player_first,
+        hostName: call.host_name,
+        hostKind: call.host_kind,
+        topic: call.topic,
+        when: formatCallTime(call.starts_at, APP_TIME_ZONE),
+        minutes: call.minutes,
+        cancelled: job.event === "cancelled",
+        familyUrl: `${origin}/family`,
+        others: rows.length - 1,
+      });
+      for (const to of call.recipients) {
+        if (sentTo.has(to)) continue;
+        sentTo.add(to);
+        const sent = await sendEmail({ to: [to], ...email });
+        if (sent.error) throw new Error(sent.error);
+      }
     }
     return { outcome: "done" };
   }

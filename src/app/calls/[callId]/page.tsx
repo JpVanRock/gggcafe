@@ -19,26 +19,32 @@ export default async function CallPage({ params }: PageProps<"/calls/[callId]">)
   const user = await getCurrentUser();
   if (!user) redirect("/login");
   const supabase = await createClient();
-  const [{ data: call }, { data: role }, myPlayers] = await Promise.all([
+  const [{ data: call }, { data: role }, myPlayers, { data: invites }] = await Promise.all([
     supabase
       .from("video_calls")
-      .select("id, team_id, player_id, host_kind, host_name, topic, starts_at, minutes, cancelled_at, player:players(first_name, preferred_name, last_name)")
+      .select("id, team_id, player_id, host_kind, host_name, topic, starts_at, minutes, cancelled_at, group_size, player:players(first_name, preferred_name, last_name)")
       .eq("id", callId)
       .maybeSingle(),
     supabase.rpc("video_call_role", { p_call_id: callId }),
     getMyPlayerIds(),
+    // her own invite (a player or parent reads only their own; a group call has several players)
+    supabase.from("video_call_players").select("player_id").eq("call_id", callId),
   ]);
   if (!call) notFound();
   const state = callState(call);
-  const her = call.player ? playerName(call.player) : "her";
+  const group = call.group_size > 1;
+  const myInvite = (invites ?? []).map((r) => r.player_id).find((id) => myPlayers.includes(id));
+  const her = group ? `A group of ${call.group_size} players` : call.player ? playerName(call.player) : "her";
   const hostLabel = call.host_kind === "mentor" ? "mentor" : "head coach";
   // back to where this person keeps their calls
   const back = user.staff
     ? { href: `/dugout/calendar?team=${call.team_id}`, label: "Calendar" }
     : role === "host"
-      ? { href: `/mentor/players/${call.player_id}`, label: her }
-      : myPlayers.includes(call.player_id)
-        ? { href: `/players/${call.player_id}`, label: "My dashboard" }
+      ? group
+        ? { href: "/mentor", label: "Mentor home" }
+        : { href: `/mentor/players/${call.player_id}`, label: her }
+      : myInvite
+        ? { href: `/players/${myInvite}`, label: "My dashboard" }
         : { href: "/family", label: "Family home" };
   const opens = new Date(new Date(call.starts_at).getTime() - OPENS_EARLY_MINUTES * 60_000).toISOString();
 
@@ -60,7 +66,9 @@ export default async function CallPage({ params }: PageProps<"/calls/[callId]">)
       ) : role === "off" ? (
         <p className="rounded-xl border border-navy-700 px-4 py-3 text-sm">Video calls are turned off for her team right now, so this call can&apos;t go ahead.</p>
       ) : role !== "host" && role !== "guest" ? (
-        <p className="rounded-xl border border-navy-700 px-4 py-3 text-sm">Only the host, {her}, her parents and head coaches can join this call.</p>
+        <p className="rounded-xl border border-navy-700 px-4 py-3 text-sm">
+          {group ? "Only the host, the invited players, their parents and head coaches can join this call." : `Only the host, ${her}, her parents and head coaches can join this call.`}
+        </p>
       ) : state === "upcoming" ? (
         <p className="rounded-xl border border-navy-700 px-4 py-3 text-sm">
           The call opens at {formatCallClock(opens, APP_TIME_ZONE)} on {formatCallDay(opens, APP_TIME_ZONE)}, {OPENS_EARLY_MINUTES} minutes before it starts.
@@ -74,7 +82,7 @@ export default async function CallPage({ params }: PageProps<"/calls/[callId]">)
 
       <ul className="flex flex-col gap-1 text-xs text-muted">
         <li>Calls aren&apos;t recorded, here or on Zoom.</li>
-        <li>Her parents are invited to every call and can join it; head coaches can drop in.</li>
+        <li>{group ? "Every invited player's parents are invited and can join it" : "Her parents are invited to every call and can join it"}; head coaches can drop in.</li>
         <li>Everyone waits in the waiting room until the host lets them in.</li>
       </ul>
     </div>

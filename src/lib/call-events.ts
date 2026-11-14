@@ -12,7 +12,8 @@ export function callEvents(rows: VideoCallRow[], from: string, to: string, calen
     if (c.cancelled_at || (calendar !== "host" && !c.calendars.includes(calendar))) return [];
     const start = callDateAndClock(c.starts_at, APP_TIME_ZONE);
     if (start.date < from || start.date > to) return [];
-    const first = c.player ? c.player.preferred_name || c.player.first_name : "a player";
+    // a group call names no child (a parent sees only her own daughter's invite)
+    const first = c.group_size > 1 ? `group of ${c.group_size}` : c.player ? c.player.preferred_name || c.player.first_name : "a player";
     return [
       {
         id: c.id,

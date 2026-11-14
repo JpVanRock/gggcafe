@@ -6,6 +6,13 @@
 export const CALL_MINUTES = [15, 30, 45, 60, 90] as const;
 export type CallMinutes = (typeof CALL_MINUTES)[number];
 export const TOPIC_MAX = 120;
+/** A group call has up to this many players, all on one team (user, 2026-11-14; book_video_call checks it too). */
+export const CALL_MAX_PLAYERS = 12;
+
+/** "Group call · 3 players" for a call with more than one player, else null. */
+export function groupLabel(groupSize: number): string | null {
+  return groupSize > 1 ? `Group call · ${groupSize} players` : null;
+}
 /** How far ahead a call can be booked. */
 export const BOOK_AHEAD_DAYS = 90;
 /** The call opens this long before it starts, and stays open this long after it should end. */
@@ -18,8 +25,8 @@ export const STAYS_OPEN_MINUTES = 15;
  * show there; a mentor's own calendar shows every call they host.
  */
 export const CALL_CALENDARS = [
-  { key: "player", label: "Her week", hint: "This Week on her player page" },
-  { key: "family", label: "Her parents' calendar", hint: "The Calendar on the family page" },
+  { key: "player", label: "Players' weeks", hint: "This Week on each invited player's page" },
+  { key: "family", label: "Parents' calendars", hint: "The Calendar on each family page" },
   { key: "coaches", label: "Coaches Dugout calendar", hint: "The team calendar coaches use" },
 ] as const;
 export type CallCalendar = (typeof CALL_CALENDARS)[number]["key"];

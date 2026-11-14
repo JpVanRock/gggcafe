@@ -55,6 +55,10 @@ Where a site admin turned video calls on for her team and the head coach switche
 player page has a Video calls panel: book a Zoom call with her, held on GGG.Cafe; her parents are told and can
 join, and head coaches can drop in. Mentors get the notifications bell (a head coach cancelling one of their
 calls). docs/features/video-calls.md.
+The mentor dashboard (user, 2026-11-14) has a Video Calls board (board 2, under the Mentor Roster, which was "My
+Roster"): the calls she booked that are ahead, with Cancel, and "Schedule a video call": tick one player, or
+several from one team for a group call, from the players she may call now (`mentor_call_players()`). The admin's
+Mentor View shows the same board, read only.
 
 ## My roster and calendar (user, 2026-11-13)
 - `/mentor` groups every player she mentors under "My roster" (by whole-team team, then One-on-one). Each tile opens the

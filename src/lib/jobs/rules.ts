@@ -39,12 +39,17 @@ export function videoCallEmail(call: {
   minutes: number;
   cancelled: boolean;
   familyUrl: string;
+  /** how many other players are on a group call (user, 2026-11-14); 0 for one-on-one */
+  others?: number;
 }): { subject: string; text: string; html: string } {
   const host = `${call.hostName} (${call.hostKind === "mentor" ? "mentor" : "head coach"})`;
+  const others = call.others ?? 0;
+  const kind = others > 0 ? "group video call" : "video call";
+  const withWho = others > 0 ? `${call.player} and ${others} other player${others === 1 ? "" : "s"}` : call.player;
   if (call.cancelled) {
     const subject = `Video call cancelled: ${call.player}, ${call.when}`;
     const lines = [
-      `The video call ${host} booked with ${call.player} is cancelled.`,
+      `The ${kind} ${host} booked with ${withWho} is cancelled.`,
       `What: ${call.topic}`,
       `When: ${call.when} (${call.minutes} minutes)`,
       `Your family page on GGG.Cafe shows her calls: ${call.familyUrl}`,
@@ -53,7 +58,7 @@ export function videoCallEmail(call: {
   }
   const subject = `Video call booked: ${call.player}, ${call.when}`;
   const lines = [
-    `${host} booked a video call with ${call.player}.`,
+    `${host} booked a ${kind} with ${withWho}.`,
     `What: ${call.topic}`,
     `When: ${call.when} (${call.minutes} minutes)`,
     "You're invited to every call. Join from your family page on GGG.Cafe: the call opens 10 minutes before it starts. Calls aren't recorded.",

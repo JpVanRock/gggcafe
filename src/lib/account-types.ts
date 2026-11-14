@@ -95,9 +95,9 @@ export const SECTIONS: { title: string; rows: Row[] }[] = [
         "A coach who is also a parent here claims their daughter from the dashboard (a head coach's claim is approved at once, an assistant's waits for the head coach) and gets this page too, with the Coach / Parent switch at the top."),
       row("My Journal", "Her notes and voice memos from mentor sessions (a pill in Mental GP).", ["no", "no", "own", "view", "part"],
         "Hers: her parents read it; a mentor reads only the entries she shares with them; coaches don't see it (the user's choice)."),
-      row("Video calls", "Zoom calls with one player, held on GGG.Cafe and never recorded.", ["yes", "view", "part", "part", "part"],
+      row("Video calls", "Zoom calls with one player or a group from one team, held on GGG.Cafe and never recorded.", ["yes", "view", "part", "part", "part"],
         "Off until a site admin turns them on for a team; then the head coach switches them on for mentors (the Switchboard). Head coaches and her mentors book them; she and her parents are told and join; head coaches can drop in; assistants see them on the Calendar."),
-      row("Mentor page", "My roster: the team's roster or her approved players, each with links to Goals, the Pop Report and Mental GP; a calendar of her training, her video calls and her players' team practices and games; messages with a photo or a drill (shared with coaches if she chooses), training for one player or a group, notes and focus areas with the coaches.", ["no", "no", "no", "no", "yes"]),
+      row("Mentor page", "Mentor Roster: the team's roster or her approved players, each with links to Goals, the Pop Report and Mental GP; a calendar of her training, her video calls and her players' team practices and games; messages with a photo or a drill (shared with coaches if she chooses), training for one player or a group, video calls with one player or a group from one team (where the head coach allows), notes and focus areas with the coaches.", ["no", "no", "no", "no", "yes"]),
     ],
   },
   {
@@ -231,7 +231,7 @@ export const QUESTIONS: { q: string; a: string[] }[] = [
     q: "How do video calls work, and who can use them?",
     a: [
       "They're off for every team until a site admin turns them on for that team on the Switchboard. Then the team's head coach decides whether mentors can book them too (Mentors → Video calls, off at first). With a team's calls off, nobody on it can book, start or join one; a player on two teams needs both to allow it.",
-      "Head coaches book calls on Coaches Dugout → Calendar, mentors on the player's page. Each call is with one player: she and her approved parents are told (the bell) and join from the call page, which opens 10 minutes early; head coaches can drop in. Everyone waits in Zoom's waiting room until the host lets them in, and nothing is recorded.",
+      "Head coaches book calls on Coaches Dugout → Calendar, mentors on their dashboard or the player's page, with one player or a group of up to 12 from one team (every player's parents are invited; a family sees only its own daughter named). Every invited player and her approved parents are told (the bell) and join from the call page, which opens 10 minutes early; head coaches can drop in. Everyone waits in Zoom's waiting room until the host lets them in, and nothing is recorded.",
       "When booking, \"Show on calendars\" picks where the call is listed: her week on her player page, her parents' calendar and (for a mentor's call) the Coaches Dugout calendar, all ticked to start. The person who booked it always has it on their own calendar. Her parents are told about every call either way.",
     ],
   },

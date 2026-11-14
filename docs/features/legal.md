@@ -112,3 +112,12 @@ Zoom joins the service providers (docs/features/video-calls.md). The Privacy not
 (who, when, how long, what about), that it runs on Zoom while it happens and isn't recorded, and, in the children's
 section and the parental consent notice, that her parents are invited to every call. Shipped late on 2026-11-12
 Eastern, after that day's version, so it took the next date.
+
+## Group video calls (user, 2026-11-14; version 2026-11-14, everyone agrees again)
+Mentors and head coaches can book one call with several players from one team (docs/features/video-calls.md). On a
+group call the invited players and their parents can see and hear each other, so the Privacy notice now says a call can
+be with a group (section 1), that group-call families see and hear each other during the call while the site lists
+each family only its own daughter's invitation (section 4), and the children's section and the parental consent
+notice say the same. Because that's a new way other families see a child, the version moved to 2026-11-14 and
+everyone agrees again. Signed parental consents stay on file under the version they were given; whether parents of
+players under 13 should sign again for group calls is for the attorney (the review page's video-call question).

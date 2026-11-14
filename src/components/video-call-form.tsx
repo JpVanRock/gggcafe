@@ -3,12 +3,13 @@
 // Booking a video call (user, 2026-11-12; docs/features/video-calls.md): a mentor on her page, or
 // a head coach on the Dugout Calendar (pick the player). The day and time are in the booker's own
 // time zone; the browser turns them into an exact time for the server. "Show on calendars" (user,
-// 2026-11-14) picks which calendars list it; the booker's own always does.
+// 2026-11-14) picks which calendars list it; the booker's own always does. With a list of players, any
+// number of them can be ticked for a group call (user, 2026-11-14), all on one team, up to 12.
 import { useActionState, useState } from "react";
 import { Field, FormMessage, inputClass } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
 import { initialFormState } from "@/lib/form";
-import { CALL_CALENDARS, CALL_MINUTES, TOPIC_MAX, type CallCalendar } from "@/lib/video-calls";
+import { CALL_CALENDARS, CALL_MAX_PLAYERS, CALL_MINUTES, TOPIC_MAX, type CallCalendar } from "@/lib/video-calls";
 import { scheduleVideoCall } from "@/app/calls/actions";
 
 export function VideoCallForm({
@@ -20,8 +21,8 @@ export function VideoCallForm({
   teamId?: string;
   /** a mentor's page: the call is with her */
   player?: { id: string; name: string };
-  /** the Dugout Calendar: pick from the roster */
-  players?: { id: string; name: string }[];
+  /** the Dugout Calendar's roster, or a mentor's players (with their team): tick one or several */
+  players?: { id: string; name: string; team?: string }[];
 }) {
   const [state, action] = useActionState(scheduleVideoCall, initialFormState);
   const [when, setWhen] = useState("");
@@ -29,6 +30,11 @@ export function VideoCallForm({
   const booker = teamId ? "coach" : "mentor";
   const choices = CALL_CALENDARS.filter((c) => !(booker === "coach" && c.key === "coaches"));
   const [shown, setShown] = useState<Set<CallCalendar>>(() => new Set(choices.map((c) => c.key)));
+  // ticked players; a call is for one team, so once one is ticked the other teams' players are greyed out
+  const [picked, setPicked] = useState<Set<string>>(() => new Set());
+  const teamOf = new Map((players ?? []).map((p) => [p.id, p.team ?? ""]));
+  const pickedTeam = picked.size ? teamOf.get([...picked][0]) : undefined;
+  const teamNames = [...new Set((players ?? []).map((p) => p.team ?? ""))];
   const summary = [booker === "coach" ? "Coaches Dugout (yours)" : "Your calendar", ...choices.filter((c) => shown.has(c.key)).map((c) => c.label)].join(", ");
   const startsAt = (() => {
     const d = when ? new Date(when) : null;
@@ -36,24 +42,58 @@ export function VideoCallForm({
   })();
   return (
     // after a booking the form resets: every calendar ticked again
-    <form action={action} onReset={() => setShown(new Set(choices.map((c) => c.key)))} className="grid gap-4 sm:grid-cols-2">
+    <form
+      action={action}
+      onReset={() => {
+        setShown(new Set(choices.map((c) => c.key)));
+        setPicked(new Set());
+      }}
+      className="grid gap-4 sm:grid-cols-2"
+    >
       {teamId && <input type="hidden" name="team_id" value={teamId} />}
       <input type="hidden" name="starts_at" value={startsAt} />
       {player ? (
         <input type="hidden" name="player_id" value={player.id} />
       ) : (
-        <Field label="With" required>
-          <select name="player_id" required defaultValue="" className={inputClass}>
-            <option value="" disabled>
-              Pick a player
-            </option>
-            {(players ?? []).map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
-        </Field>
+        <fieldset className="flex min-w-0 flex-col gap-2 sm:col-span-2">
+          <legend className="mb-1.5 text-sm font-medium">
+            With <span className="ml-1.5 text-xs font-normal text-muted">Required</span>
+          </legend>
+          <p className="text-xs text-muted">
+            Tick one player, or several for a group call (up to {CALL_MAX_PLAYERS}, one team). Every player&apos;s parents are invited.
+            {picked.size > 0 && ` ${picked.size} picked.`}
+          </p>
+          {teamNames.map((team) => (
+            <div key={team || "team"} className="flex flex-col gap-2">
+              {teamNames.length > 1 && <p className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">{team}</p>}
+              <div className="grid gap-x-4 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
+                {(players ?? [])
+                  .filter((p) => (p.team ?? "") === team)
+                  .map((p) => {
+                    const otherTeam = pickedTeam !== undefined && (p.team ?? "") !== pickedTeam;
+                    const full = picked.size >= CALL_MAX_PLAYERS && !picked.has(p.id);
+                    return (
+                      <label key={p.id} className={`flex items-center gap-2.5 ${otherTeam || full ? "opacity-50" : "cursor-pointer"}`}>
+                        <input
+                          type="checkbox"
+                          name="player_id"
+                          value={p.id}
+                          disabled={otherTeam || full}
+                          // read every box, so the count and the team lock match them even after a tick made before the page was ready
+                          onChange={(e) => {
+                            const boxes = e.currentTarget.form?.querySelectorAll<HTMLInputElement>('input[name="player_id"]') ?? [];
+                            setPicked(new Set([...boxes].filter((b) => b.checked).map((b) => b.value)));
+                          }}
+                          className="size-5 shrink-0 accent-pink"
+                        />
+                        <span className="min-w-0 truncate text-sm">{p.name}</span>
+                      </label>
+                    );
+                  })}
+              </div>
+            </div>
+          ))}
+        </fieldset>
       )}
       <Field label="Day and time" hint="In your time zone." required>
         <input type="datetime-local" name="when" required value={when} onChange={(e) => setWhen(e.target.value)} className={inputClass} />

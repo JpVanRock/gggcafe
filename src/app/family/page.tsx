@@ -7,7 +7,8 @@ import { Card, secondaryButtonClass } from "@/components/ui";
 import { MenuHeader, NeedsYou } from "@/components/menu-board";
 import { MyTeamLogo } from "@/components/team-logo";
 import { isStaffParent } from "@/components/role-switch";
-import { VIDEO_CALL_COLUMNS, VideoCallList, type VideoCallRow } from "@/components/video-calls";
+import { VideoCallList, type VideoCallRow } from "@/components/video-calls";
+import { callsForPlayers } from "@/lib/video-call-data";
 import { yearbookTeams } from "@/lib/yearbook-data";
 import { medicalOnFile } from "@/lib/family";
 import { consentStep } from "@/lib/consent";
@@ -57,7 +58,7 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
     daughterGoals,
     budgets,
     yearbooks,
-    { data: callRows },
+    { calls: callRows, invited },
   ] = await Promise.all([
     supabase.from("parent_accounts").select("display_name").eq("user_id", user.id).maybeSingle(),
     supabase.auth.getClaims(),
@@ -83,17 +84,8 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
       })),
     ),
     yearbookTeams(supabase, teamsWith("parent.yearbook").map((t) => t.id)),
-    // video calls booked with their daughters (user, 2026-11-12): parents are invited to every one
-    daughters.length
-      ? supabase
-          .from("video_calls")
-          .select(VIDEO_CALL_COLUMNS)
-          .in("player_id", daughters.map((d) => d.player_id))
-          .is("cancelled_at", null)
-          .gte("starts_at", comingSinceISO())
-          .order("starts_at")
-          .limit(10)
-      : Promise.resolve({ data: [] }),
+    // video calls their daughters are invited to (user, 2026-11-12; group calls 2026-11-14): parents are invited to every one
+    callsForPlayers(supabase, daughters.map((d) => d.player_id), { since: comingSinceISO(), limit: 10 }),
   ]);
 
   const meta = (claims?.claims?.user_metadata ?? {}) as { display_name?: string; team_code?: string; child?: string };
@@ -102,7 +94,10 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
   const fullName = (account?.display_name || metaName || user.staff?.displayName || "").trim();
   const [nameFirst, ...nameRest] = fullName.split(" ");
   const consents = new Map((consentRows ?? []).map((c) => [c.player_id, c]));
-  const calls = ((callRows ?? []) as VideoCallRow[]).filter((c) => isComing(c));
+  const calls = callRows.filter((c) => isComing(c));
+  // on a group call, name only their own daughters
+  const daughtersOn = (c: VideoCallRow) =>
+    (invited.get(c.id) ?? []).map((id) => daughters.find((d) => d.player_id === id)?.player_name).filter(Boolean).join(", ") || null;
   // Needs you, the hamburger menu and the boards: the same builder as an admin's Parent View
   const { needs, menuItems, boards } = familyMenu({
     daughters,
@@ -160,7 +155,7 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
           <p className="text-sm text-muted">
             You&apos;re invited to every call a mentor or head coach books with your daughter. Join from the call page; it opens 10 minutes before the start.
           </p>
-          <VideoCallList calls={calls} showPlayer />
+          <VideoCallList calls={calls} showPlayer playerLabel={daughtersOn} />
         </Card>
       )}
 

@@ -1,6 +1,7 @@
 # Video calls (Zoom, inside the site)
 
-User, 2026-11-12. Mentors and head coaches book a Zoom call with one player. The call happens
+User, 2026-11-12. Mentors and head coaches book a Zoom call with one player (or, since 2026-11-14, a group of
+players from one team). The call happens
 on a GGG.Cafe page (`/calls/<id>`), not in a separate Zoom window, and her parents are invited
 to every call.
 
@@ -13,14 +14,25 @@ to every call.
   - can drop in on any call on the team;
   - can cancel any call;
   - decide whether mentors can book calls (Switchboard → Mentors → Video calls, off at first).
-- **Mentors** book calls on a player's page (`/mentor/players/<id>`). This needs both the
-  admin's switch and the head coach's switch to be on, for every one of her current teams.
+- **Mentors** book calls on a player's page (`/mentor/players/<id>`), or from the Video Calls board on their
+  dashboard (`/mentor`, user 2026-11-14). This needs both the admin's switch and the head coach's switch to be
+  on, for every one of her current teams.
+- **Group calls** (user, 2026-11-14; migration 20261114224959): the dashboard's form, and the Dugout Calendar's,
+  tick one player or several (up to 12, `CALL_MAX_PLAYERS`), all on one team (picking one greys out the other
+  teams). `video_calls.player_id` stays the first player; `video_call_players` lists everyone invited (a trigger
+  adds the first, so every call has its list) and `group_size` how many. Booking is one step,
+  `book_video_call()`, which checks every player as the insert rules do (a mentor: her approved roster too).
+  Every invited player and her parents read the call, join it (`video_call_role`), are told (a notice as each
+  is invited) and emailed (`jobs_video_call_email`: one row per player, each family's email names their own
+  daughter). A player or parent reads only her own invite row, so lists and calendars say "Group call · 3
+  players" and never name the other children; coaches and the host see who's on it.
+  Where calls are listed, a player's are found through her invites (`callsForPlayers`, `src/lib/video-call-data.ts`).
 - **The player and her approved parents** are told of every booking and cancellation (the bell).
   They see coming calls on her dashboard and on the family page, and join from the call page.
 - **Assistants and viewers** see the calls on the Calendar but can't book or join them.
 - **Which calendars show a call** (user, 2026-11-14; migration 20261114160922, `video_calls.calendars`):
-  picked on the booking form's "Show on calendars" dropdown, all ticked to start: Her week (This Week on
-  her player page), Her parents' calendar (the family Calendar) and, for a mentor's call, the Coaches
+  picked on the booking form's "Show on calendars" dropdown, all ticked to start: Players' weeks (This Week
+  on each invited player's page), Parents' calendars (the family Calendar) and, for a mentor's call, the Coaches
   Dugout calendar. The booker's own calendar always shows it: a head coach's is the Dugout calendar (the
   database requires `coaches` on a coach's call), a mentor's is their mentor calendar (every call they
   host). Each entry links to the call page (`src/lib/call-events.ts`; on her week, a "Video call" line
@@ -85,7 +97,7 @@ to every call.
   - **Mentor's player page:** the Video calls panel, shown only when calls are on for her or
     calls already exist.
   - **Dugout Calendar:** the Video calls section, and on the month grid when booked to show there.
-  - **Her week, the family Calendar, the mentor calendar:** see "Which calendars show a call" above.
+  - **Her week (This Week), the family Calendar, the mentor calendar:** see "Which calendars show a call" above.
   - **Player dashboard:** coming calls, above her menu.
   - **Family page:** a Video calls card.
   - **Switchboard:** the admin's switch and the mentors' switch.
@@ -159,5 +171,5 @@ into the call.
 - (Done 2026-11-13: the job worker emails her approved parents when a call is booked or cancelled,
   once Resend and the jobs secret are set up; docs/architecture/jobs.md. A cancelled call's Zoom
   meeting is also deleted by a job, with retries.)
-- Team-wide calls: every call is with one player.
+- Team-wide calls: a group call has up to 12 players from one team (2026-11-14); there's no whole-team broadcast.
 - Calls at the same time (see "One call at a time" under Rules).

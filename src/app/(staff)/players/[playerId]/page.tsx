@@ -17,7 +17,8 @@ import { loadLeaderCertificate, loadLeadership } from "./leadership-data";
 import { signedPhotoUrls } from "@/lib/player-photos";
 import { playerTeamLogo } from "@/lib/team-logos";
 import { MESSAGE_COLUMNS, signedMessagePhotoUrls, type MentorMessage } from "@/lib/message-photos";
-import { VIDEO_CALL_COLUMNS, VideoCallList, type VideoCallRow } from "@/components/video-calls";
+import { VideoCallList } from "@/components/video-calls";
+import { callsForPlayers } from "@/lib/video-call-data";
 import { comingSinceISO, isComing } from "@/lib/video-calls";
 
 export const metadata: Metadata = { title: "Player · GGG.Cafe" };
@@ -61,21 +62,14 @@ export default async function PlayerDashboardPage({ params, searchParams }: Page
   // the Switchboard: what her head coach turned off (coaches see everything)
   const off = access.user.staff ? new Set<SwitchKey>() : await getPlayerFeaturesOff(player.id);
   const offNotice = isSwitchKey(offParam) && off.has(offParam) ? switchLabel(offParam) : null;
-  const [leadership, photos, messagePhotos, { data: callRows }] = await Promise.all([
+  const [leadership, photos, messagePhotos, { calls: callRows }] = await Promise.all([
     loadLeadership(supabase, player.id, advanced.unlocked),
     player.photo_path ? signedPhotoUrls(supabase, [player.photo_path]) : Promise.resolve(null),
     signedMessagePhotoUrls(supabase, unread.map((m) => m.photo_path)),
-    // video calls booked with her (user, 2026-11-12), still ahead or happening now
-    supabase
-      .from("video_calls")
-      .select(VIDEO_CALL_COLUMNS)
-      .eq("player_id", player.id)
-      .is("cancelled_at", null)
-      .gte("starts_at", comingSinceISO())
-      .order("starts_at")
-      .limit(5),
+    // video calls she's invited to (user, 2026-11-12; group calls 2026-11-14), still ahead or happening now
+    callsForPlayers(supabase, [player.id], { since: comingSinceISO(), limit: 5 }),
   ]);
-  const calls = ((callRows ?? []) as VideoCallRow[]).filter((c) => isComing(c));
+  const calls = callRows.filter((c) => isComing(c));
   const photoUrl = player.photo_path ? (photos?.get(player.photo_path) ?? null) : null;
 
   const callPanel = calls.length > 0 && (

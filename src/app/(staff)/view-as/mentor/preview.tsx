@@ -20,6 +20,7 @@ export function MentorPreview({
   calendarHref,
   sessions,
   messages,
+  calls = [],
 }: {
   name: string;
   line: string;
@@ -29,6 +30,8 @@ export function MentorPreview({
   calendarHref: string;
   sessions: PreviewLine[];
   messages: PreviewLine[];
+  /** the video calls they booked that are ahead (user, 2026-11-14) */
+  calls?: PreviewLine[];
 }) {
   const [first, ...rest] = name.split(" ");
   const total = players.length;
@@ -58,7 +61,7 @@ export function MentorPreview({
       {total > 0 && <ComingUpCard items={upcoming} calendarHref={calendarHref} subtitle="The next two weeks" />}
       {total > 0 && (
         <section aria-label="Mentor menu" className="grid gap-8 md:grid-cols-2">
-          <MenuPanel number={1} title="My Roster" subtitle={`${total} player${total === 1 ? "" : "s"} · goals, Pop Report, Mental GP`} variant="outlineNeon" wide>
+          <MenuPanel number={1} title="Mentor Roster" subtitle={`${total} player${total === 1 ? "" : "s"} · goals, Pop Report, Mental GP`} variant="outlineNeon" wide>
             <div className="flex flex-col gap-6">
               {byTeam.map((team) => (
                 <div key={team}>
@@ -91,7 +94,18 @@ export function MentorPreview({
               ))}
             </div>
           </MenuPanel>
-          <MenuPanel number={2} title="Training on Their Weeks" subtitle="In their This Week in Softball" variant="pink" cta={{ label: "Add & manage" }}>
+          <MenuPanel number={2} title="Video Calls" subtitle="One player, or a group from one team" variant="navy" wide>
+            {calls.length === 0 ? (
+              <p className={note}>No calls booked. They schedule one here: tick one player, or several from one team for a group call.</p>
+            ) : (
+              <div className="flex flex-col gap-4">
+                {calls.map((c) => (
+                  <MenuItem key={c.key} name={c.name} value={c.value} note={c.note} />
+                ))}
+              </div>
+            )}
+          </MenuPanel>
+          <MenuPanel number={3} title="Training on Their Weeks" subtitle="In their This Week in Softball" variant="pink" cta={{ label: "Add & manage" }}>
             {sessions.length === 0 ? (
               <p className={note}>Nothing coming up. Add a lesson, a bullpen or a hitting session to their weeks.</p>
             ) : (
@@ -102,7 +116,7 @@ export function MentorPreview({
               </div>
             )}
           </MenuPanel>
-          <MenuPanel number={3} title="Messages You Sent" subtitle="Seen when she opens them" variant="navy">
+          <MenuPanel number={4} title="Messages You Sent" subtitle="Seen when she opens them" variant="navy">
             {messages.length === 0 ? (
               <p className={note}>Nothing sent yet.</p>
             ) : (
@@ -113,7 +127,7 @@ export function MentorPreview({
               </div>
             )}
           </MenuPanel>
-          <MenuPanel number={4} title="Work With More Players" subtitle="A player or a whole team" variant="outlinePink" wide>
+          <MenuPanel number={5} title="Work With More Players" subtitle="A player or a whole team" variant="outlinePink" wide>
             <p className={note}>Ask with the team code. Her parents approve you for one player; the head coach approves you for the whole team.</p>
           </MenuPanel>
         </section>

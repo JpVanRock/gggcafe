@@ -11,31 +11,36 @@ import { createClient } from "@/lib/supabase/server";
 import { friendlyDbError, invalid, text, type FormState } from "@/lib/form";
 import { STALE, failed, runAction } from "@/lib/actions";
 import { isUuid, playerName } from "@/lib/softball";
-import { callCalendars, callState, cleanCallInput } from "@/lib/video-calls";
+import { CALL_MAX_PLAYERS, callCalendars, callState, cleanCallInput } from "@/lib/video-calls";
 import { ZOOM_NOT_CONNECTED, createZoomMeeting, deleteZoomMeeting, zoomConfigured, zoomJoinDetails, type JoinDetails } from "@/lib/zoom";
 
 const OFF_FOR_HER = "Video calls are off for her team. A site admin turns them on for the team, and the head coach for mentors (the Switchboard).";
+const OFF_FOR_ONE = "Video calls are off for one of these players' teams. A site admin turns them on for a team, and the head coach for mentors (the Switchboard).";
 
 export async function scheduleVideoCall(_prev: FormState, fd: FormData): Promise<FormState> {
   return runAction(async () => {
     const user = await getCurrentUser();
     if (!user) return failed("Your session has ended. Sign in again.");
-    const playerId = text(fd, "player_id");
-    if (!isUuid(playerId)) return invalid("player_id", "Pick who the call is with.");
+    // one player, or several on one team for a group call (user, 2026-11-14)
+    const playerIds = [...new Set(fd.getAll("player_id").filter((v): v is string => typeof v === "string" && isUuid(v)))];
+    if (!playerIds.length) return invalid("player_id", "Pick who the call is with.");
+    if (playerIds.length > CALL_MAX_PLAYERS) return invalid("player_id", `A call can have up to ${CALL_MAX_PLAYERS} players.`);
     const clean = cleanCallInput({ startsAt: fd.get("starts_at"), minutes: fd.get("minutes"), topic: fd.get("topic") });
     // the form's day-and-time box is "when"; the browser turns it into starts_at
     if (!clean.ok) return invalid(clean.field === "starts_at" ? "when" : clean.field, clean.error);
 
-    // who's calling: a head coach, on the team they picked, or one of her mentors, on her team
+    // who's calling: a head coach, on the team they picked, or the players' mentor, on their team
     const coach = user.staff && isHeadCoach(user.staff.role) ? user.staff : null;
     const mentor = coach ? null : await getMentor();
     if (!coach && !mentor) return failed("Only mentors and head coaches can schedule video calls.");
     const supabase = await createClient();
-    const { data: herTeam, error } = await supabase.rpc("video_call_team", { p_player_id: playerId });
-    if (error) return failed(error.code === "42501" ? "You can only schedule calls with your own players." : "Couldn't check that. Try again.");
-    if (!herTeam) return failed(OFF_FOR_HER);
-    const teamId = coach ? text(fd, "team_id") : herTeam;
-    if (!isUuid(teamId)) return failed(STALE);
+    const teams = await Promise.all(playerIds.map((id) => supabase.rpc("video_call_team", { p_player_id: id })));
+    const refused = teams.find((t) => t.error);
+    if (refused?.error) return failed(refused.error.code === "42501" ? "You can only schedule calls with your own players." : "Couldn't check that. Try again.");
+    if (teams.some((t) => !t.data)) return failed(playerIds.length > 1 ? OFF_FOR_ONE : OFF_FOR_HER);
+    const formTeam = text(fd, "team_id");
+    const teamId = coach && isUuid(formTeam) ? formTeam : teams[0].data!;
+    if (!coach && new Set(teams.map((t) => t.data)).size > 1) return invalid("player_id", "A group call is for players on one team. Pick players from one team.");
     if (!zoomConfigured()) return failed(ZOOM_NOT_CONNECTED);
     // each booking is a call to Zoom: at most 4 an hour per person (user, 2026-11-13; the database limits the bookings too)
     const { data: allowed } = await supabase.rpc("rate_limit_hit", { p_bucket: "zoom.book", p_max: 4, p_window_seconds: 3600 });
@@ -43,17 +48,17 @@ export async function scheduleVideoCall(_prev: FormState, fd: FormData): Promise
 
     const meeting = await createZoomMeeting({ startsAt: clean.call.startsAt, minutes: clean.call.minutes });
     if (!meeting.ok) return failed(meeting.error);
-    const { error: saveError } = await supabase.from("video_calls").insert({
-      team_id: teamId,
-      player_id: playerId,
-      host_kind: coach ? "coach" : "mentor",
-      host_name: (coach?.displayName ?? mentor?.displayName ?? "").slice(0, 80),
-      topic: clean.call.topic,
-      starts_at: clean.call.startsAt,
-      minutes: clean.call.minutes,
-      zoom_meeting_id: meeting.value,
+    // the call and its invites in one step (book_video_call checks every player again)
+    const { error: saveError } = await supabase.rpc("book_video_call", {
+      p_team_id: teamId,
+      p_player_ids: playerIds,
+      p_host_name: (coach?.displayName ?? mentor?.displayName ?? "").slice(0, 80),
+      p_topic: clean.call.topic,
+      p_starts_at: clean.call.startsAt,
+      p_minutes: clean.call.minutes,
+      p_zoom_meeting_id: meeting.value,
       // which calendars show it (user, 2026-11-14); the booker's own always does
-      calendars: callCalendars(fd.getAll("calendars"), coach ? "coach" : "mentor"),
+      p_calendars: callCalendars(fd.getAll("calendars"), coach ? "coach" : "mentor"),
     });
     if (saveError) {
       // nothing was booked here, so take it off Zoom too
@@ -61,7 +66,8 @@ export async function scheduleVideoCall(_prev: FormState, fd: FormData): Promise
       if (saveError.code === "P0008") return invalid("when", "Another video call is booked then. Pick another time.");
       if (saveError.code === "P0007") return invalid("when", "Pick a time that's still ahead.");
       if (saveError.code === "P0009") return failed("You can book up to 4 video calls an hour. Try again later.");
-      if (saveError.code === "42501") return failed(OFF_FOR_HER);
+      if (saveError.code === "22023") return invalid("player_id", `Pick 1 to ${CALL_MAX_PLAYERS} players.`);
+      if (saveError.code === "42501") return failed(playerIds.length > 1 ? OFF_FOR_ONE : OFF_FOR_HER);
       return failed(friendlyDbError(saveError));
     }
     refresh();
@@ -118,14 +124,17 @@ export async function joinVideoCall(callId: string): Promise<JoinResult> {
   const host = role === "host";
   const details = await zoomJoinDetails(call.zoom_meeting_id, host);
   if (!details.ok) return { error: details.error };
-  return { join: { ...details.value, userName: host ? call.host_name : await guestName(user, call.player_id), host } };
+  return { join: { ...details.value, userName: host ? call.host_name : await guestName(user, callId), host } };
 }
 
 /** How a guest shows in the call: her own name, "Name (parent)" or "Name (coach)". */
-async function guestName(user: NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>, playerId: string): Promise<string> {
+async function guestName(user: NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>, callId: string): Promise<string> {
   if (user.staff) return `${user.staff.displayName} (coach)`;
   const supabase = await createClient();
-  if ((await getMyPlayerIds()).includes(playerId)) {
+  // her own invite on this call (a player reads only her own; a group call has several)
+  const [mine, { data: invites }] = await Promise.all([getMyPlayerIds(), supabase.from("video_call_players").select("player_id").eq("call_id", callId)]);
+  const playerId = (invites ?? []).map((r) => r.player_id).find((id) => mine.includes(id));
+  if (playerId) {
     const { data } = await supabase.from("players").select("first_name, preferred_name, last_name").eq("id", playerId).maybeSingle();
     if (data) return playerName(data);
   }

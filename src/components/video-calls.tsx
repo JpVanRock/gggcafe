@@ -6,7 +6,7 @@ import { ConfirmSubmit } from "@/components/confirm-submit";
 import { badgeClass } from "@/components/ui";
 import { APP_TIME_ZONE } from "@/lib/dates";
 import { playerName } from "@/lib/softball";
-import { CALL_STATE_LABEL, callState, formatCallTime, isComing, type CallTimes } from "@/lib/video-calls";
+import { CALL_STATE_LABEL, callState, formatCallTime, groupLabel, isComing, type CallTimes } from "@/lib/video-calls";
 import { cancelVideoCall } from "@/app/calls/actions";
 
 export type VideoCallRow = CallTimes & {
@@ -18,26 +18,33 @@ export type VideoCallRow = CallTimes & {
   topic: string;
   /** which calendars show it besides the host's own (lib/video-calls CALL_CALENDARS) */
   calendars: string[];
+  /** how many players are invited (video_call_players; 1 for one-on-one) */
+  group_size: number;
   player?: { first_name: string; preferred_name: string | null; last_name: string } | null;
 };
 
 /** The columns VideoCallList reads (with the player's name). */
 export const VIDEO_CALL_COLUMNS =
-  "id, player_id, host_id, host_kind, host_name, topic, starts_at, minutes, cancelled_at, calendars, player:players(first_name, preferred_name, last_name)" as const;
+  "id, player_id, host_id, host_kind, host_name, topic, starts_at, minutes, cancelled_at, calendars, group_size, player:players(first_name, preferred_name, last_name)" as const;
 
 export function VideoCallList({
   calls,
   showPlayer = false,
+  playerLabel,
   canCancel = () => false,
   empty,
 }: {
   calls: VideoCallRow[];
   showPlayer?: boolean;
+  /** who the call is with, when it isn't simply its first player (a family's own daughters on a group call) */
+  playerLabel?: (call: VideoCallRow) => string | null;
   canCancel?: (call: VideoCallRow) => boolean;
   empty?: string;
 }) {
   if (!calls.length) return empty ? <p className="text-sm text-muted">{empty}</p> : null;
   const now = new Date();
+  // who it's with: the given label, else its first player; a group call also says how many players
+  const who = (c: VideoCallRow) => (showPlayer ? (playerLabel?.(c) ?? (c.player ? playerName(c.player) : null)) : null);
   return (
     <ul className="flex flex-col divide-y divide-navy-800">
       {calls.map((c) => {
@@ -50,7 +57,7 @@ export function VideoCallList({
             <span className="w-full min-w-0 sm:w-auto sm:flex-1">
               <span className={`block font-semibold ${coming ? "" : "text-muted"}`}>{c.topic}</span>
               <span className="block text-xs text-muted">
-                {showPlayer && c.player ? `${playerName(c.player)} · ` : ""}
+                {[who(c), groupLabel(c.group_size)].filter(Boolean).map((t) => `${t} · `)}
                 {c.host_name} ({c.host_kind === "mentor" ? "mentor" : "head coach"}) · {c.minutes} min
               </span>
             </span>
