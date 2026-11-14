@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getCurrentUser, getMentor, getMentorAccess } from "@/lib/auth";
+import { getCurrentUser, getMentor, getMentorAccess, getPlayerFeaturesOff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ActionForm } from "@/components/action-form";
 import { ConfirmSubmit } from "@/components/confirm-submit";
@@ -86,6 +86,8 @@ export default async function MentorHome() {
   ];
   const waiting = links.filter((l) => l.status !== "approved");
   const total = access.menteeIds.length;
+  // what each player's head coach turned off for mentors (the roster's Goals / Pop Report / Mental GP links)
+  const off = new Map(await Promise.all(access.menteeIds.map(async (id) => [id, await getPlayerFeaturesOff(id)] as const)));
 
   return (
     <div className="flex flex-col gap-8">
@@ -120,31 +122,43 @@ export default async function MentorHome() {
 
       {total === 0 && waiting.length > 0 && <EmptyState>Once you&apos;re approved, your players show up here.</EmptyState>}
 
-      {teams.map((t) => {
-        const roster = access.rosters.find((r) => r.teamId === t.id)?.players ?? [];
-        return (
-          <section key={t.id} aria-label={t.name}>
-            <div className="mb-3 flex flex-wrap items-baseline justify-between gap-3">
-              <h2 className="text-2xl leading-tight font-bold tracking-wide text-highlight uppercase">
-                {t.name} <span className="font-mono text-xs tracking-wider text-muted normal-case">· whole team · {roster.length} players</span>
-              </h2>
-              <Link href={`/mentor/teams/${t.id}`} className={buttonStyles("link")}>
-                Team focus &amp; notes →
-              </Link>
+      {/* every player she mentors, by team, then her one-on-one players (user, 2026-11-13) */}
+      {total > 0 && (
+        <section aria-labelledby="roster" className="flex flex-col gap-6">
+          <div className="flex flex-wrap items-baseline justify-between gap-3">
+            <h2 id="roster" className="text-2xl leading-tight font-bold tracking-wide text-highlight uppercase">
+              My roster <span className="font-mono text-xs tracking-wider text-muted normal-case">· {total} player{total === 1 ? "" : "s"}</span>
+            </h2>
+            <Link href="/mentor/calendar" className={buttonStyles("link")}>
+              My calendar →
+            </Link>
+          </div>
+          {teams.map((t) => {
+            const roster = access.rosters.find((r) => r.teamId === t.id)?.players ?? [];
+            return (
+              <div key={t.id}>
+                <div className="mb-3 flex flex-wrap items-baseline justify-between gap-3">
+                  <h3 className="font-display text-xl font-bold tracking-wide uppercase">
+                    {t.name} <span className="font-mono text-xs tracking-wider text-muted normal-case">· whole team · {roster.length} players</span>
+                  </h3>
+                  <Link href={`/mentor/teams/${t.id}`} className={buttonStyles("link")}>
+                    Team focus &amp; notes →
+                  </Link>
+                </div>
+                {roster.length === 0 ? (
+                  <p className="text-sm text-muted">No one on the roster yet.</p>
+                ) : (
+                  <PlayerTiles cards={roster.flatMap((p) => (cards.has(p.id) ? [cards.get(p.id)!] : []))} off={off} />
+                )}
+              </div>
+            );
+          })}
+          {individual.length > 0 && (
+            <div>
+              {teams.length > 0 && <h3 className="mb-3 font-display text-xl font-bold tracking-wide uppercase">One-on-one</h3>}
+              <PlayerTiles cards={individual.map((id) => cards.get(id)!)} off={off} />
             </div>
-            {roster.length === 0 ? (
-              <p className="text-sm text-muted">No one on the roster yet.</p>
-            ) : (
-              <PlayerTiles cards={roster.flatMap((p) => (cards.has(p.id) ? [cards.get(p.id)!] : []))} />
-            )}
-          </section>
-        );
-      })}
-
-      {individual.length > 0 && (
-        <section aria-label="Your players">
-          <h2 className="mb-3 text-2xl leading-tight font-bold tracking-wide text-highlight uppercase">{teams.length ? "My players" : "Your players"}</h2>
-          <PlayerTiles cards={individual.map((id) => cards.get(id)!)} />
+          )}
         </section>
       )}
 

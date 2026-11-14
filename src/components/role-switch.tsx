@@ -1,6 +1,7 @@
-// Coaches who are parents (user, 2026-11-12): one login, two homes. The header's switch
-// takes a coach with a parent link (any status) between the Coach page (/dashboard) and
-// the Parent page (/family). Nobody else sees it.
+// Coaches who are parents (user, 2026-11-12): one login, two homes. The switch takes a coach
+// with a parent link (any status) between the Coach page (/dashboard) and the Parent page
+// (/family). Nobody else sees it. It sits under the main menu, left of the Switchboard pill
+// (components/switchboard-pill.tsx; user, 2026-11-13), on the Coach and family pages alike.
 import Link from "next/link";
 import { cache } from "react";
 import { getCurrentUser } from "@/lib/auth";

@@ -55,3 +55,13 @@ Where a site admin turned video calls on for her team and the head coach switche
 player page has a Video calls panel: book a Zoom call with her, held on GGG.Cafe; her parents are told and can
 join, and head coaches can drop in. Mentors get the notifications bell (a head coach cancelling one of their
 calls). docs/features/video-calls.md.
+
+## My roster and calendar (user, 2026-11-13)
+- `/mentor` groups every player she mentors under "My roster" (by whole-team team, then One-on-one). Each tile opens the
+  player's page and has links straight to her Goals, Pop Report and Mental GP (`MENTOR_SECTIONS` in `mentor/parts.tsx`,
+  `#goals`, `#pop`, `#mental` on `/mentor/players/[id]`, which also has those links under her name). A link goes when
+  the head coach turned that section off for mentors (`getPlayerFeaturesOff` per player).
+- `/mentor/calendar` ("Calendar" in the mentor menu): her own month, view only, in the Dugout's `CalendarView`: the
+  training she put on her players' weeks (`trainingDates` in `src/lib/mentors.ts`; a session sent to several players
+  is one entry naming them) and the video calls she booked (`callDateAndClock` in `src/lib/video-calls.ts`). Team
+  practices and games aren't on it: mentors can't read the team calendar.

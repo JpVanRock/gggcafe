@@ -10,8 +10,9 @@
 - Where it applies:
   - Players: `requirePlayerPage(playerId, key)` on every section page sends a player or parent back to her menu
     (`?off=key`, which says so); the menu boards, the section bar and the From the Dugout strip leave out what's off.
-  - Parents: the family page (budget, packet, questionnaire, View as, Yearbook; `requirePlayerPage` also sends a parent home
-    when View as player is off), the family Yearbook page and its menu link.
+  - Parents: the family page (budget, packet, questionnaire, View as, Yearbook, and since 2026-11-13 Calendar, Team
+    Standards & Culture and Her goals; `requirePlayerPage` also sends a parent home when View as player is off), the family
+    Yearbook and Calendar pages and the Yearbook's menu link. Her goals also hide when Goals is off for players.
   - Mentors: the mentor player and team pages hide the panels; the mentor actions refuse (`switchedOff()` in auth.ts); the
     database also refuses mentor messages and mentor training when off (restrictive policies on `mentor_messages` and
     `player_activities`).

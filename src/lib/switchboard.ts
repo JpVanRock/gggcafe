@@ -32,6 +32,10 @@ export const SWITCHES = [
   { key: "parent.questionnaire", audience: "parents", label: "Preseason questionnaire", detail: "Sizes, numbers, positions, goals" },
   { key: "parent.view_as", audience: "parents", label: "View as player", detail: "Her player pages, read only" },
   { key: "parent.yearbook", audience: "parents", label: "Yearbook", detail: "Season photos, and adding their own" },
+  // the team on the family page (user, 2026-11-13)
+  { key: "parent.calendar", audience: "parents", label: "Calendar", detail: "Coming up on the family page, and the month calendar" },
+  { key: "parent.team", audience: "parents", label: "Team Standards & Culture", detail: "Standards, team culture and season goals" },
+  { key: "parent.goals", audience: "parents", label: "Her goals", detail: "Her goals and her team commitment, view only (also off when Goals is off for players)" },
   // mentors: what they can do with your players
   { key: "mentor.messages", audience: "mentors", label: "Message players", detail: "Messages, photos and drills to players" },
   { key: "mentor.training", audience: "mentors", label: "Add training", detail: "Sessions on players' weeks (TWIS)" },

@@ -34,7 +34,9 @@ src/lib/supabase/        server.ts (Server Components/Actions), client.ts (brows
 src/components/main-nav.tsx  top menu: staff get Dashboard/Coaches Dugout (opens Roster)/Teams/Players on every page,
                          including /me and /family; players get "My profile". Every header is <SiteHeader>
                          (site-header.tsx): on phones the links fold behind a Menu button. Headers carry only our
-                         logo. The team's logo sits large beside the home page titles (user, 2026-11-13): the Coaches
+                         logo. The coach/parent switch sits under the menu, left of the Switchboard pill
+                         (`switchboard-pill.tsx`, Coach and family pages alike). The team's logo sits large (128px, 192px
+                         from tablets; twice the first size) beside the home page titles (user, 2026-11-13): the Coaches
                          Dugout and the family page (`MyTeamLogo`, `myTeamLogo()`), and top right of the player dashboard
                          (`TeamLogoMark`, `playerTeamLogo()`); components/team-logo.tsx, lib/team-logos.ts; parents get
                          it from `parent_team_logos()`

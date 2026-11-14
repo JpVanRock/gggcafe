@@ -15,3 +15,11 @@
 - Her login card on /family also carries verified parental consent for a daughter under 13 (signed form upload or a video
   call, checked by an admin; withdraw deletes her login): see player-accounts.md. Without a birth date on her profile the
   card asks the parent to have the head coach add it.
+- The team on /family (user, 2026-11-13), each behind its own parent switch (the Switchboard):
+  - Coming up (`parent.calendar`): the next 8 team events and games in three weeks, by day (`loadComingUp` in
+    `family/team-data.ts`, `comingUp`/`byDay` in `src/lib/family.ts`), and "Full calendar →" `/family/calendar`: the
+    Dugout's month calendar (`CalendarView`) read only, one approved team at a time (`?team=`, `?month=`).
+  - Team Standards & Culture (`parent.team`): standards, the culture statement and season goals, as on her Team page.
+  - Her goals (`parent.goals`, and off when Goals is off for players): her dashboard's goal summary (Harada or SMART)
+    and her commitment to each team (pledge line, signed or not), with "All her goals →" unless View as player is off.
+  Parents read all of it through the "(parent view)" rules (no new access). Sections: `family/team-sections.tsx`.

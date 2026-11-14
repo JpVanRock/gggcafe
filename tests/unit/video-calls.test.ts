@@ -4,8 +4,15 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
 import {
-  BOOK_AHEAD_DAYS, CALL_MINUTES, TOPIC_MAX, callEnds, callState, cleanCallInput, comingSinceISO, formatCallTime, isComing,
+  BOOK_AHEAD_DAYS, CALL_MINUTES, TOPIC_MAX, callDateAndClock, callEnds, callState, cleanCallInput, comingSinceISO, formatCallTime, isComing,
 } from "../../src/lib/video-calls.ts";
+
+test("a call's day and clock in the team's time zone (the mentor's calendar)", () => {
+  // 00:30 UTC on the 18th is 7:30 PM on the 17th in New York
+  assert.deepEqual(callDateAndClock("2026-11-18T00:30:00Z", "America/New_York"), { date: "2026-11-17", clock: "19:30" });
+  assert.deepEqual(callDateAndClock("2026-11-18T00:30:00Z", "UTC"), { date: "2026-11-18", clock: "00:30" });
+  assert.deepEqual(callDateAndClock("2026-07-04T16:05:00Z", "America/Los_Angeles"), { date: "2026-07-04", clock: "09:05" });
+});
 import { meetingSdkSignature } from "../../src/lib/zoom-signature.ts";
 
 const now = new Date("2026-11-20T23:00:00Z");

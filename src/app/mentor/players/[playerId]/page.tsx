@@ -30,13 +30,15 @@ import { addMentorFocus, addMentorNote, removeMentorFocus, removeMentorNote, set
 import { VIDEO_CALL_COLUMNS, VideoCallList, type VideoCallRow } from "@/components/video-calls";
 import { VideoCallForm } from "@/components/video-call-form";
 import { zoomConfigured } from "@/lib/zoom";
-import { TrainingList, loadTraining } from "../../parts";
+import { MENTOR_SECTIONS, TrainingList, loadTraining } from "../../parts";
+import { ScrollToHash } from "@/components/scroll-to-hash";
+import { pillQuietClass } from "@/components/ui";
 
 export const metadata: Metadata = { title: "Player · Mentor · GGG.Cafe" };
 
-function Panel({ title, children }: { title: string; children: React.ReactNode }) {
+function Panel({ title, id, children }: { title: string; id?: string; children: React.ReactNode }) {
   return (
-    <section className="flex flex-col gap-4 rounded-2xl border border-navy-700 bg-navy-900/70 p-5 sm:p-6">
+    <section id={id} className="flex scroll-mt-24 flex-col gap-4 rounded-2xl border border-navy-700 bg-navy-900/70 p-5 sm:p-6">
       <h2 className="text-2xl leading-tight font-bold tracking-wide text-highlight uppercase">{title}</h2>
       {children}
     </section>
@@ -138,6 +140,17 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
           </p>
         </div>
       </header>
+      {/* straight to her goals, Pop Report and Mental GP (user, 2026-11-13); the roster links here too */}
+      {MENTOR_SECTIONS.some((x) => !off.has(x.key)) && (
+        <nav aria-label={`${first}'s pages`} className="-mt-4 flex flex-wrap gap-2">
+          {MENTOR_SECTIONS.filter((x) => !off.has(x.key)).map((x) => (
+            <a key={x.hash} href={`#${x.hash}`} className={pillQuietClass}>
+              {x.label}
+            </a>
+          ))}
+        </nav>
+      )}
+      <ScrollToHash />
 
       {!off.has("mentor.messages") && (
         <Panel title={`Message ${first}`}>
@@ -240,7 +253,7 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
       )}
 
       {!off.has("mentor.goals") && (
-        <Panel title={`${first}'s Goals`}>
+        <Panel id="goals" title={`${first}'s Goals`}>
           <BestVersion playerId={player.id} answers={(best?.answers ?? {}) as BestVersionAnswers} canEdit={false} safety={null} />
           <p className="-mt-2 font-mono text-xs tracking-[0.2em] text-pink-soft uppercase">{GOAL_METHOD_LABEL[method]}</p>
           {method === "smart" ? (
@@ -252,7 +265,7 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
       )}
 
       {!off.has("mentor.pop") && (
-        <Panel title={`${first}'s Pop Report`}>
+        <Panel id="pop" title={`${first}'s Pop Report`}>
           <PopDetail
             player={player}
             pop={pop}
@@ -274,7 +287,7 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
       )}
 
       {!off.has("mentor.mental") && (
-        <Panel title="Mental GP">
+        <Panel id="mental" title="Mental GP">
           <MentalDetail playerId={player.id} plan={mental} canEdit={false} />
           <MentalTools playerId={player.id} plan={mental} {...mentalTools} today={todayISO()} canEdit={false} />
         </Panel>

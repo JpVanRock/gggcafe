@@ -12,8 +12,12 @@ export default function MentorLayout({ children }: { children: ReactNode }) {
         home={{ href: "/mentor", label: "GGG.Cafe mentor home" }}
         nav={
           <nav aria-label="Main" className={navClass}>
-            <NavLink href="/mentor" className={navItemClass}>
+            <NavLink href="/mentor" exact className={navItemClass}>
               My players
+            </NavLink>
+            {/* her training and video calls by month (user, 2026-11-13) */}
+            <NavLink href="/mentor/calendar" className={navItemClass}>
+              Calendar
             </NavLink>
             {/* a head coach cancelling one of their video calls (user, 2026-11-12) */}
             <Suspense fallback={null}>

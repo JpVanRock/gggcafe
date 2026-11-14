@@ -1,7 +1,32 @@
 // Run with: npm run test:unit
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { PACKET_STARTERS, cleanMedical, cleanQuestionnaire, medicalOnFile } from "../../src/lib/family.ts";
+import { PACKET_STARTERS, byDay, cleanMedical, cleanQuestionnaire, comingUp, medicalOnFile, type ComingUpItem } from "../../src/lib/family.ts";
+
+test("coming up on the family page: by day and time (no time last), games first at the same time, each once", () => {
+  const item = (key: string, date: string, start: string | null, game = false): ComingUpItem => ({ key, teamId: "t", date, start, title: key, place: null, game });
+  const items = [
+    item("late", "2026-11-14", "18:00"),
+    item("no-time", "2026-11-13", null),
+    item("game", "2026-11-13", "09:00", true),
+    item("practice", "2026-11-13", "09:00"),
+    item("early", "2026-11-13", "07:30"),
+    item("early", "2026-11-13", "07:30"),
+  ];
+  const sorted = comingUp(items, 10);
+  assert.deepEqual(
+    sorted.map((i) => i.key),
+    ["early", "game", "practice", "no-time", "late"],
+  );
+  assert.equal(comingUp(items, 2).length, 2);
+  assert.deepEqual(
+    byDay(sorted).map((d) => [d.date, d.items.length]),
+    [
+      ["2026-11-13", 4],
+      ["2026-11-14", 1],
+    ],
+  );
+});
 
 test("questionnaire: sizes, numbers, positions", () => {
   const q = cleanQuestionnaire({ top_size: "AM", bottom_size: "XL", sock_size: "YL", jacket_size: "AL", numbers: ["7", "7", "00", "21", "3"], positions: ["SS", "P", "XX", "SS"], goals: "  Start at short  " });

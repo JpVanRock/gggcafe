@@ -89,3 +89,30 @@ export const PACKET_STARTERS: { title: string; body: string }[] = [
   { title: "Fuel and sleep", body: "Tournament weekends are long. Water, real meals, snacks between games and a full night's sleep before game days matter as much as practice." },
   { title: "Let her own it", body: "Let her carry her bag, check her gear and talk to her coach herself. Players who handle their own business grow faster on and off the field." },
 ];
+
+// ---------------------------------------------------------------------------
+// Coming up on the family page (user, 2026-11-13): the team's next events and games
+// ---------------------------------------------------------------------------
+
+/** One line of "Coming up": a team event (practice, workout…) or a game. `start` is "HH:MM" or null. */
+export type ComingUpItem = { key: string; teamId: string; date: string; start: string | null; title: string; place: string | null; game: boolean };
+
+/** Events and games together, by day then start time (no time last that day), each once, the first `limit`. */
+export function comingUp(items: ComingUpItem[], limit: number): ComingUpItem[] {
+  const seen = new Set<string>();
+  return items
+    .filter((i) => !seen.has(i.key) && Boolean(seen.add(i.key)))
+    .sort((a, b) => a.date.localeCompare(b.date) || (a.start ?? "99").localeCompare(b.start ?? "99") || Number(b.game) - Number(a.game))
+    .slice(0, limit);
+}
+
+/** Groups the lines by day, in order. */
+export function byDay(items: ComingUpItem[]): { date: string; items: ComingUpItem[] }[] {
+  const days: { date: string; items: ComingUpItem[] }[] = [];
+  for (const item of items) {
+    const last = days[days.length - 1];
+    if (last?.date === item.date) last.items.push(item);
+    else days.push({ date: item.date, items: [item] });
+  }
+  return days;
+}

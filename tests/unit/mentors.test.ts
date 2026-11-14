@@ -1,7 +1,22 @@
 // Run with: npm run test:unit
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { cleanFocus, cleanMentorNote, cleanMentorRequest, cleanMessage, cleanNewDrill, mentorTraining } from "../../src/lib/mentors.ts";
+import { cleanFocus, cleanMentorNote, cleanMentorRequest, cleanMessage, cleanNewDrill, mentorTraining, trainingDates } from "../../src/lib/mentors.ts";
+
+test("training on the mentor's calendar: its weekdays, inside the month shown", () => {
+  // Tuesdays and Thursdays (2, 4) from Tue Nov 3 through Thu Nov 26, 2026
+  const weekly = { days: [2, 4], starts_on: "2026-11-03", ends_on: "2026-11-26" };
+  assert.deepEqual(trainingDates(weekly, "2026-10-26", "2026-12-06"), [
+    "2026-11-03", "2026-11-05", "2026-11-10", "2026-11-12", "2026-11-17", "2026-11-19", "2026-11-24", "2026-11-26",
+  ]);
+  assert.deepEqual(trainingDates(weekly, "2026-11-11", "2026-11-18"), ["2026-11-12", "2026-11-17"]);
+  assert.deepEqual(trainingDates(weekly, "2026-12-01", "2026-12-31"), []);
+  // one day (as mentorTraining saves it)
+  const once = mentorTraining({ title: "Bullpen", date: "2026-11-14" }, "Coach K");
+  assert.ok(!("error" in once));
+  assert.deepEqual(trainingDates(once, "2026-11-01", "2026-11-30"), ["2026-11-14"]);
+  assert.deepEqual(trainingDates({ days: [6], starts_on: "2026-11-14", ends_on: null }, "2026-11-01", "2026-11-30"), ["2026-11-14"]);
+});
 
 const me = "cccccccc-0000-0000-0000-000000000001";
 

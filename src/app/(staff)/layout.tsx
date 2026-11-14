@@ -3,7 +3,6 @@ import { getCurrentUser } from "@/lib/auth";
 import { ROLE_LABEL } from "@/lib/roles";
 import { SignOutButton, SiteHeader } from "@/components/site-header";
 import { MainNav, MenuCount, NonStaffNav } from "@/components/main-nav";
-import { RoleSwitch } from "@/components/role-switch";
 import { SwitchboardPill } from "@/components/switchboard-pill";
 
 export default function StaffLayout({ children }: { children: ReactNode }) {
@@ -33,10 +32,11 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
           </Suspense>
         }
       />
-      {/* head coaches: the Switchboard, under the main menu (user, 2026-11-12). The team logo sits
-          under it, beside the Coaches Dugout title (dugout/layout.tsx; user, 2026-11-13). */}
+      {/* under the main menu: the Coach / Parent switch (a coach who is also a parent here), left of the
+          Switchboard (head coaches) (user, 2026-11-12 and 11-13). The team logo sits under them, beside
+          the Coaches Dugout title (dugout/layout.tsx). */}
       <Suspense fallback={null}>
-        <SwitchboardPill />
+        <SwitchboardPill current="coach" />
       </Suspense>
       <main id="main" className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">{children}</main>
     </div>
@@ -48,8 +48,6 @@ async function UserMenu() {
   if (!user) return null;
   return (
     <div className="flex w-full flex-wrap items-center justify-between gap-3 sm:w-auto">
-      {/* a coach who is also a parent here switches between the Coach and Parent pages */}
-      <RoleSwitch current="coach" />
       {user.staff && (
         <span className="text-sm text-muted">
           {user.staff.displayName} · {ROLE_LABEL[user.staff.role]}

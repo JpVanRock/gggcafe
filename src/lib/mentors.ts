@@ -69,6 +69,22 @@ export function mentorTraining(
   return { title, details, days, starts_on: date, ends_on: input.until, source: "mentor" };
 }
 
+/**
+ * The days between `from` and `to` (YYYY-MM-DD, both included) a training session lands on: its
+ * weekdays from its first day through its last (the mentor's calendar, user 2026-11-13).
+ */
+export function trainingDates(t: { days: number[]; starts_on: string; ends_on: string | null }, from: string, to: string): string[] {
+  const last = t.ends_on ?? t.starts_on;
+  const start = t.starts_on > from ? t.starts_on : from;
+  const end = last < to ? last : to;
+  const out: string[] = [];
+  for (let ms = Date.parse(`${start}T00:00:00Z`); ms <= Date.parse(`${end}T00:00:00Z`); ms += DAY) {
+    const date = new Date(ms).toISOString().slice(0, 10);
+    if (t.days.includes(weekday(date))) out.push(date);
+  }
+  return out;
+}
+
 // ---------------------------------------------------------------------------
 // Asking to mentor, and working with the coaches
 // ---------------------------------------------------------------------------

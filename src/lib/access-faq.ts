@@ -170,7 +170,9 @@ export const FAQ: { q: string; a: string[] }[] = [
   },
   {
     q: "What do parents see?",
-    a: ["Parents with an approved request see their team's budget totals only (no other families' names). They can't open player menus."],
+    a: [
+      "Parents with an approved request see, on their family page: what's coming up on the team calendar (and the month calendar), the team's standards, culture and season goals, their daughter's goals and team commitment, and the budget totals (no other families' names). They can view their own daughter's player menu, read only, but no one else's.",
+    ],
   },
   {
     q: "What can view-only staff do?",

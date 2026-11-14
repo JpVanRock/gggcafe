@@ -4,7 +4,8 @@ import { Suspense } from "react";
 import { MainNav, MenuCount } from "@/components/main-nav";
 import { NavLink } from "@/components/nav-link";
 import { SignOutButton, SiteHeader, navClass, navItemClass } from "@/components/site-header";
-import { RoleSwitch, isStaffParent } from "@/components/role-switch";
+import { isStaffParent } from "@/components/role-switch";
+import { SwitchboardPill } from "@/components/switchboard-pill";
 import { createClient } from "@/lib/supabase/server";
 import { getAdminTeamIds, getCurrentUser } from "@/lib/auth";
 import { yearbookTeams } from "@/lib/yearbook-data";
@@ -66,26 +67,25 @@ async function FamilyMenu() {
 
 export function FamilyHeader() {
   return (
-    <SiteHeader
-      home={{ href: "/family", label: "GGG.Cafe family home" }}
-      nav={
-        <Suspense fallback={areaLabel}>
-          <FamilyMenu />
-        </Suspense>
-      }
-      account={
-        <div className="flex w-full flex-wrap items-center justify-between gap-3 sm:w-auto">
-          <Suspense fallback={null}>
-            <RoleSwitch current="parent" />
+    <>
+      <SiteHeader
+        home={{ href: "/family", label: "GGG.Cafe family home" }}
+        nav={
+          <Suspense fallback={areaLabel}>
+            <FamilyMenu />
           </Suspense>
-          <SignOutButton />
-        </div>
-      }
-      count={
-        <Suspense fallback={null}>
-          <MenuCount />
-        </Suspense>
-      }
-    />
+        }
+        account={<SignOutButton />}
+        count={
+          <Suspense fallback={null}>
+            <MenuCount />
+          </Suspense>
+        }
+      />
+      {/* a coach who is also a parent: the Coach / Parent switch under the menu, as on the Coach pages (user, 2026-11-13) */}
+      <Suspense fallback={null}>
+        <SwitchboardPill current="parent" />
+      </Suspense>
+    </>
   );
 }

@@ -91,13 +91,13 @@ export const SECTIONS: { title: string; rows: Row[] }[] = [
         "Assistants get their own view: this week's calendar, practice plans for the next two weeks, their drafts, and player claims to approve."),
       row("Player menu", "The cafe-menu dashboard: TWIS, Goals, Pop Report, Mental GP, Softball IQ, Trophy Room.", ["yes", "yes", "own", "view", "part"],
         "Coaches open every player's menu. Parents view their daughter's, read only (View as on the family page). Mentors read Goals, the Pop Report and Mental GP of the players they're approved for."),
-      row("Family page", "Their daughter's team, team budget totals (no names), her login, the Yearbook with G3 Advanced.", ["part", "part", "no", "yes", "no"],
+      row("Family page", "Their daughter's team: coming up on the calendar (and the month calendar), team standards, culture and season goals, her goals and team commitment, team budget totals (no names), her login, the Yearbook with G3 Advanced.", ["part", "part", "no", "yes", "no"],
         "A coach who is also a parent here claims their daughter from the dashboard (a head coach's claim is approved at once, an assistant's waits for the head coach) and gets this page too, with the Coach / Parent switch at the top."),
       row("My Journal", "Her notes and voice memos from mentor sessions (a pill in Mental GP).", ["no", "no", "own", "view", "part"],
         "Hers: her parents read it; a mentor reads only the entries she shares with them; coaches don't see it (the user's choice)."),
       row("Video calls", "Zoom calls with one player, held on GGG.Cafe and never recorded.", ["yes", "view", "part", "part", "part"],
         "Off until a site admin turns them on for a team; then the head coach switches them on for mentors (the Switchboard). Head coaches and her mentors book them; she and her parents are told and join; head coaches can drop in; assistants see them on the Calendar."),
-      row("Mentor page", "The team's roster or her approved players, messages with a photo or a drill (shared with coaches if she chooses), training for one player or a group, notes and focus areas with the coaches.", ["no", "no", "no", "no", "yes"]),
+      row("Mentor page", "My roster: the team's roster or her approved players, each with links to Goals, the Pop Report and Mental GP; a calendar of her training and video calls; messages with a photo or a drill (shared with coaches if she chooses), training for one player or a group, notes and focus areas with the coaches.", ["no", "no", "no", "no", "yes"]),
     ],
   },
   {
@@ -223,7 +223,7 @@ export const QUESTIONS: { q: string; a: string[] }[] = [
   {
     q: "What does the Switchboard turn off?",
     a: [
-      "Head coaches (and admins) open it from the Switchboard pill under the main menu. For one team, it turns off features for Players (Goals, Pop Report, Mental GP, My Journal, Training, Softball IQ, Trophy Room, Leaderboard, + Activity, Team page, Yearbook), Parents (Team Budget, welcome packet, questionnaire, View as player, Yearbook) and Mentors (messages, training, notes, what they can see, and video calls once a site admin turns calls on for the team).",
+      "Head coaches (and admins) open it from the Switchboard pill under the main menu. For one team, it turns off features for Players (Goals, Pop Report, Mental GP, My Journal, Training, Softball IQ, Trophy Room, Leaderboard, + Activity, Team page, Yearbook), Parents (Team Budget, welcome packet, questionnaire, View as player, Yearbook, Calendar, Team Standards & Culture, Her goals) and Mentors (messages, training, notes, what they can see, and video calls once a site admin turns calls on for the team).",
       "Off hides it on the site and stops new posts; nothing saved is deleted, and switching it back on brings it all back. Some things stay on for safety or the law: TWIS, the medical card, her login and consent, and parents' oversight of mentors. A player on two teams loses a feature if either team turns it off.",
     ],
   },

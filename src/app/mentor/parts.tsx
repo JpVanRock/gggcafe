@@ -7,6 +7,7 @@ import { buttonStyles } from "@/components/ui";
 import { formatDay } from "@/lib/dates";
 import { signedPhotoUrls } from "@/lib/player-photos";
 import { playerName, type Player } from "@/lib/softball";
+import type { SwitchKey } from "@/lib/switchboard";
 import type { createClient } from "@/lib/supabase/server";
 import { removeMentorTraining } from "./actions";
 
@@ -32,30 +33,50 @@ export async function loadMentees(supabase: Supabase, ids: string[]): Promise<Ma
   );
 }
 
-export function PlayerTiles({ cards }: { cards: MenteeCard[] }) {
+/** What a mentor opens from her roster (user, 2026-11-13): sections of the player's page, each behind its switch. */
+export const MENTOR_SECTIONS = [
+  { hash: "goals", key: "mentor.goals", label: "Goals" },
+  { hash: "pop", key: "mentor.pop", label: "Pop Report" },
+  { hash: "mental", key: "mentor.mental", label: "Mental GP" },
+] as const satisfies readonly { hash: string; key: SwitchKey; label: string }[];
+
+/**
+ * Her roster: a tile per player (to her page), with links straight to her Goals, Pop Report and
+ * Mental GP. `off` holds what the head coach turned off for mentors, per player; those links go.
+ */
+export function PlayerTiles({ cards, off }: { cards: MenteeCard[]; off?: Map<string, Set<SwitchKey>> }) {
   return (
     <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-      {cards.map(({ player: p, jersey, team, photo }) => (
-        <li key={p.id}>
-          <Link
-            href={`/mentor/players/${p.id}`}
-            className="flex items-center gap-4 rounded-2xl border border-navy-600 p-4 transition hover:border-pink hover:bg-navy-800"
-          >
-            {photo ? (
-              // eslint-disable-next-line @next/next/no-img-element -- short-lived signed Storage URL
-              <img src={photo} alt="" className="size-14 shrink-0 rounded-full border-2 border-neon object-cover" />
-            ) : (
-              <span className="grid size-14 shrink-0 place-items-center rounded-full border-2 border-navy-600 font-display text-xl font-bold text-highlight">
-                {jersey ?? p.primary_position ?? "–"}
+      {cards.map(({ player: p, jersey, team, photo }) => {
+        const sections = MENTOR_SECTIONS.filter((x) => !off?.get(p.id)?.has(x.key));
+        return (
+          <li key={p.id} className="flex flex-col rounded-2xl border border-navy-600 transition hover:border-pink">
+            <Link href={`/mentor/players/${p.id}`} className="flex items-center gap-4 rounded-2xl p-4 transition hover:bg-navy-800">
+              {photo ? (
+                // eslint-disable-next-line @next/next/no-img-element -- short-lived signed Storage URL
+                <img src={photo} alt="" className="size-14 shrink-0 rounded-full border-2 border-neon object-cover" />
+              ) : (
+                <span className="grid size-14 shrink-0 place-items-center rounded-full border-2 border-navy-600 font-display text-xl font-bold text-highlight">
+                  {jersey ?? p.primary_position ?? "–"}
+                </span>
+              )}
+              <span className="min-w-0">
+                <span className="block truncate font-display text-xl font-bold tracking-wide uppercase">{playerName(p)}</span>
+                <span className="block truncate font-mono text-xs text-muted">{[jersey && `#${jersey}`, p.primary_position, team].filter(Boolean).join(" · ")}</span>
               </span>
+            </Link>
+            {sections.length > 0 && (
+              <nav aria-label={`${playerName(p)}: open`} className="flex flex-wrap gap-x-4 gap-y-1 border-t border-navy-700 px-4 py-2.5">
+                {sections.map((x) => (
+                  <Link key={x.hash} href={`/mentor/players/${p.id}#${x.hash}`} className="text-sm font-semibold text-link hover:underline">
+                    {x.label}
+                  </Link>
+                ))}
+              </nav>
             )}
-            <span className="min-w-0">
-              <span className="block truncate font-display text-xl font-bold tracking-wide uppercase">{playerName(p)}</span>
-              <span className="block truncate font-mono text-xs text-muted">{[jersey && `#${jersey}`, p.primary_position, team].filter(Boolean).join(" · ")}</span>
-            </span>
-          </Link>
-        </li>
-      ))}
+          </li>
+        );
+      })}
     </ul>
   );
 }

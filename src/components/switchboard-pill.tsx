@@ -1,13 +1,21 @@
-// The Switchboard's pill under the main menu (user, 2026-11-12): head coaches and admins only.
+// The row under the main menu (user, 2026-11-12; 2026-11-13): the Coach / Parent switch for a coach
+// who is also a parent here, to the left of the Switchboard pill (head coaches and admins). It sits
+// under the menu on the Coach pages and the family pages alike, so the switch stays in one place
+// whichever page you're on, and phones see it without opening the menu.
 import { getCurrentUser, isHeadCoach } from "@/lib/auth";
 import { SwitchboardLink } from "@/components/switchboard-link";
+import { RoleSwitch, isStaffParent } from "@/components/role-switch";
 
-export async function SwitchboardPill() {
+export async function SwitchboardPill({ current }: { current: "coach" | "parent" }) {
   const user = await getCurrentUser();
-  if (!user?.staff || !isHeadCoach(user.staff.role)) return null;
+  if (!user?.staff) return null;
+  const head = isHeadCoach(user.staff.role);
+  const parent = await isStaffParent();
+  if (!head && !parent) return null;
   return (
-    <div className="mx-auto flex w-full max-w-5xl justify-end px-4 pt-3">
-      <SwitchboardLink />
+    <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-end gap-3 px-4 pt-3">
+      {parent && <RoleSwitch current={current} />}
+      {head && <SwitchboardLink />}
     </div>
   );
 }

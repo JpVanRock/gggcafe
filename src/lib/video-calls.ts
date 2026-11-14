@@ -73,6 +73,15 @@ export function formatCallClock(startsAt: string, timeZone: string): string {
   return new Intl.DateTimeFormat("en-US", { timeZone, hour: "numeric", minute: "2-digit" }).format(new Date(startsAt));
 }
 
+/** The call's day ("2026-11-17") and 24-hour clock ("19:00") in the team's time zone, for calendars. */
+export function callDateAndClock(startsAt: string, timeZone: string): { date: string; clock: string } {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+  }).formatToParts(new Date(startsAt));
+  const part = (type: Intl.DateTimeFormatPartTypes) => parts.find((p) => p.type === type)?.value ?? "00";
+  return { date: `${part("year")}-${part("month")}-${part("day")}`, clock: `${part("hour")}:${part("minute")}` };
+}
+
 /** "Tue, Nov 17 · 7:00 PM" in the team's time zone. */
 export function formatCallTime(startsAt: string, timeZone: string): string {
   return `${formatCallDay(startsAt, timeZone)} · ${formatCallClock(startsAt, timeZone)}`;

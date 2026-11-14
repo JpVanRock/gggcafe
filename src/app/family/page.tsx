@@ -24,6 +24,8 @@ import type { SwitchKey } from "@/lib/switchboard";
 import { VIDEO_CALL_COLUMNS, VideoCallList, type VideoCallRow } from "@/components/video-calls";
 import { comingSinceISO, isComing } from "@/lib/video-calls";
 import { MyTeamLogo } from "@/components/team-logo";
+import { loadComingUp, loadDaughterGoals, loadTeamCulture } from "./team-data";
+import { ComingUpCard, DaughterGoalsCard, TeamCultureSection, hasTeamCulture } from "./team-sections";
 
 export const metadata: Metadata = { title: "Family · GGG.Cafe" };
 
@@ -107,6 +109,22 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
   const firstName = (account?.display_name ?? metaName).split(" ")[0];
   // team admin (user, 2026-11-12): the head coach let them run the calendar, GameDay and measurements
   const adminTeams = approvedTeams.filter((l) => adminTeamIds.includes(l.team_id));
+  // the team on the family page (user, 2026-11-13), each behind its own switch
+  const teamOf = (l: Link_) => ({ id: l.team_id, name: l.team_name });
+  const calendarTeams = approvedTeams.filter((l) => !offOn(l.team_id, "parent.calendar")).map(teamOf);
+  const cultureTeams = approvedTeams.filter((l) => !offOn(l.team_id, "parent.team")).map(teamOf);
+  // her goals: off when her team turned them off for parents, or turned Goals off for players
+  const goalDaughters = daughters.filter((d) => d.on_roster && !offForDaughter(d, "parent.goals") && !offForDaughter(d, "player.goals"));
+  const [comingUpItems, teamCulture, daughterGoals] = await Promise.all([
+    loadComingUp(supabase, calendarTeams),
+    loadTeamCulture(supabase, cultureTeams),
+    Promise.all(
+      goalDaughters.map(async (d) => ({
+        daughter: d,
+        goals: await loadDaughterGoals(supabase, d.player_id, approvedTeams.filter((l) => l.team_name === d.team_name).map(teamOf)),
+      })),
+    ),
+  ]);
   const [yearbooks, { data: callRows }] = await Promise.all([
     yearbookTeams(supabase, approvedTeams.filter((l) => !offOn(l.team_id, "parent.yearbook")).map((l) => l.team_id)),
     // video calls booked with their daughters (user, 2026-11-12): parents are invited to every one
@@ -128,7 +146,7 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
       {/* their team's logo on the right, beside the title (user, 2026-11-13) */}
       <div className="mb-6 flex items-center justify-between gap-4 [&>header]:mb-0">
         <PageHeader title={firstName ? `Welcome, ${firstName}` : "Welcome"} description={user.email ?? undefined}>
-          {/* a coach who is a parent here has the header's Coach / Parent switch instead */}
+          {/* a coach who is a parent here has the Coach / Parent switch under the menu instead */}
           {user.staff && !(await isStaffParent()) && (
             <Link href="/dashboard" className={secondaryButtonClass}>
               Coach dashboard →
@@ -152,6 +170,8 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
           <VideoCallList calls={calls} showPlayer />
         </Card>
       )}
+
+      {calendarTeams.length > 0 && <ComingUpCard items={comingUpItems} teams={calendarTeams} calendarHref="/family/calendar" />}
 
       {links.length > 0 && (
         <Card title="Your teams">
@@ -277,6 +297,19 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
           </ul>
         </Card>
       )}
+
+      {daughterGoals.map(({ daughter: d, goals }) => (
+        <DaughterGoalsCard
+          key={`goals-${d.player_id}`}
+          first={d.player_name.split(" ")[0]}
+          goals={goals}
+          fullHref={offForDaughter(d, "parent.view_as") ? null : `/players/${d.player_id}/goals`}
+        />
+      ))}
+
+      {teamCulture.filter(hasTeamCulture).map((t) => (
+        <TeamCultureSection key={`culture-${t.team.id}`} data={t} />
+      ))}
 
       {packet.length > 0 && (
         <Card title={`Welcome packet · ${packet.filter((i) => readIds.has(i.id)).length} of ${packet.length} read`}>
