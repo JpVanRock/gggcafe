@@ -69,3 +69,11 @@ calls). docs/features/video-calls.md.
   calendar rows for her players' current teams (whole-team links, and her one-on-one players' teams this season) with
   the opponent's name. The Switchboard's "See the team calendar" (`mentor.calendar`) hides a team's, in the database.
   DB tests: `tests/db/mentors.test.sql`.
+
+## The mentor menu (user, 2026-11-13)
+/mentor looks like the player dashboard's menu: the media-day header ("Mentor menu", her name, specialty and players),
+her requests, Coming up (the next two weeks of her calendar: `loadMentorCalendar` / `asComingUp` in
+`mentor/calendar-data.ts`, shared with `/mentor/calendar`), then numbered boards: My Roster (team by team, then one-on-one;
+Goals, Pop Report and Mental GP links per player), Training on Their Weeks (the next sessions; "Add & manage" opens
+`/mentor/training` with the form and the full list), Messages You Sent (the last five, seen or new) and Work With More
+Players (the request form). Helpers in `mentor/parts.tsx`: `trainingGroups`, `oneOnOne`, `menteeLabel`.

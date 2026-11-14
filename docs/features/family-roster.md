@@ -23,3 +23,13 @@
   - Her goals (`parent.goals`, and off when Goals is off for players): her dashboard's goal summary (Harada or SMART)
     and her commitment to each team (pledge line, signed or not), with "All her goals →" unless View as player is off.
   Parents read all of it through the "(parent view)" rules (no new access). Sections: `family/team-sections.tsx`.
+- The family menu (user, 2026-11-13: cleaner and organized like the player dashboard's menu). /family is the media-day
+  header (`MenuHeader`: "Family menu", their name, the team logo), the Yearbook banner first (user's choice), "Needs you"
+  (`NeedsYou`: her consent, the medical card, the questionnaire, unread packet items, mentor requests, each linking to
+  where it's done), video calls, Coming up, then numbered boards (`MenuPanel`): her goals (one per daughter), Team
+  Standards & Culture, Team Budget, Season forms, Mentors, Welcome packet, Logins & teams, Team admin. Each board shows a
+  short summary and opens its own page: `/family/team`, `/family/budget`, `/family/forms` (questionnaire and medical
+  card), `/family/packet`, `/family/logins` (her login and consent, their teams, join another team), `/family/mentors`
+  (now with approving or declining a mentor's request at the top). Shared: `family/family-data.ts` (`loadFamily`: links,
+  daughters, approved teams, switches; once per request) and `family/shell.tsx` (`FamilyShell`, `SectionTitle`). A
+  parent with no team yet still sees the join form on /family.

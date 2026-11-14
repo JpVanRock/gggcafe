@@ -125,7 +125,7 @@ export function ConsentSteps({
         <input type="hidden" name="player_id" value={playerId} />
         <input type="hidden" name="method" value="signed_form" />
         <input type="hidden" name="form_path" value={upload?.path ?? ""} />
-        <div className="flex flex-col gap-1.5 sm:col-span-2">
+        <div className="flex min-w-0 flex-col gap-1.5 sm:col-span-2">
           <label htmlFor={`consent-file-${playerId}`} className="text-sm font-medium">
             Signed form
           </label>
@@ -135,7 +135,7 @@ export function ConsentSteps({
             accept="image/*,application/pdf"
             onChange={(e) => pick(e.target.files?.[0])}
             disabled={uploading}
-            className="text-sm file:mr-3 file:rounded-full file:border file:border-navy-600 file:bg-navy-800 file:px-4 file:py-1.5 file:text-sm file:text-ink"
+            className="w-full max-w-full min-w-0 text-sm file:mr-3 file:rounded-full file:border file:border-navy-600 file:bg-navy-800 file:px-4 file:py-1.5 file:text-sm file:text-ink"
           />
           <p aria-live="polite" className={`text-xs ${uploadError ? "text-danger" : "text-muted"}`}>
             {uploadError ?? (uploading ? "Uploading…" : upload ? `Uploaded: ${upload.name}` : "A phone photo is fine. Only you and GGG.Cafe staff can see it.")}

@@ -9,6 +9,8 @@ import { MESSAGE_COLUMNS, signedMessagePhotoUrls, type MentorMessage } from "@/l
 import { Badge, EmptyState, Loading } from "@/components/ui";
 import { FocusBoard, NotesThread, type FocusItem, type MentorNote } from "@/components/mentor-work";
 import { FamilyHeader } from "../header";
+import { DaughterMentors, loadFamilyMentors } from "../mentors";
+import { loadFamily } from "../family-data";
 
 export const metadata: Metadata = { title: "Mentors · GGG.Cafe" };
 
@@ -47,6 +49,9 @@ async function FamilyMentors({ searchParams }: Pick<PageProps<"/family/mentors">
   }
   const daughter = daughters.find((d) => d.player_id === player) ?? daughters[0];
   const first = daughter.player_name.split(" ")[0];
+  const [family, familyMentors] = await Promise.all([loadFamily(), loadFamilyMentors(supabase)]);
+  const { teamsOf } = family;
+  const famDaughter = family.daughters.find((d) => d.player_id === daughter.player_id);
   const [{ data: msgRows }, { data: focusRows }, { data: noteRows }, { data: mentorRows }] = await Promise.all([
     supabase.from("mentor_messages").select(MESSAGE_COLUMNS).eq("player_id", daughter.player_id).order("created_at", { ascending: false }).limit(50),
     supabase.from("mentor_focus").select("id, mentor_id, title, details, status, updated_at").eq("player_id", daughter.player_id).order("created_at"),
@@ -68,7 +73,7 @@ async function FamilyMentors({ searchParams }: Pick<PageProps<"/family/mentors">
   return (
     <div className="flex flex-col gap-8">
       <Link href="/family" className="self-start text-sm text-muted hover:text-ink">
-        ← Your page
+        <span aria-hidden="true">←</span> Family menu
       </Link>
       <header>
         <p className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">Mentors</p>
@@ -90,6 +95,9 @@ async function FamilyMentors({ searchParams }: Pick<PageProps<"/family/mentors">
           </nav>
         )}
       </header>
+
+      {/* her mentors: approve or decline a request, remove one (user, 2026-11-13: moved here from the family page) */}
+      {famDaughter && <DaughterMentors daughter={famDaughter} teams={teamsOf(famDaughter)} links={familyMentors.links} mentors={familyMentors.mentors} />}
 
       <section aria-label="Focus areas">
         <h2 className={heading}>What they&apos;re working on with {first}</h2>

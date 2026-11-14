@@ -10,6 +10,8 @@ import { playerName, type Player } from "@/lib/softball";
 import type { SwitchKey } from "@/lib/switchboard";
 import type { createClient } from "@/lib/supabase/server";
 import { removeMentorTraining } from "./actions";
+import type { TrainingGroup } from "./mentor-client";
+import type { MentorAccess } from "@/lib/auth";
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
@@ -79,6 +81,30 @@ export function PlayerTiles({ cards, off }: { cards: MenteeCard[]; off?: Map<str
       })}
     </ul>
   );
+}
+
+/** "#7 Kendall Brooks" */
+export function menteeLabel(cards: Map<string, MenteeCard>, id: string) {
+  const c = cards.get(id);
+  return c ? [c.jersey && `#${c.jersey}`, playerName(c.player)].filter(Boolean).join(" ") : "A player";
+}
+
+/** Her one-on-one players who aren't already on a team she mentors as a whole. */
+export function oneOnOne(access: MentorAccess, cards: Map<string, MenteeCard>) {
+  const onTeams = new Set(access.rosters.flatMap((r) => r.players.map((p) => p.id)));
+  return access.playerIds.filter((id) => cards.has(id) && !onTeams.has(id));
+}
+
+/** The groups "+ Add training" offers: each whole team, then her one-on-one players. */
+export function trainingGroups(access: MentorAccess, teams: { id: string; name: string }[], cards: Map<string, MenteeCard>): TrainingGroup[] {
+  const individual = oneOnOne(access, cards);
+  return [
+    ...access.rosters.map((r) => ({
+      name: teams.find((t) => t.id === r.teamId)?.name ?? "Team",
+      players: r.players.map((p) => ({ id: p.id, label: menteeLabel(cards, p.id) })),
+    })),
+    ...(individual.length ? [{ name: access.teamIds.length ? "One-on-one" : "Your players", players: individual.map((id) => ({ id, label: menteeLabel(cards, id) })) }] : []),
+  ];
 }
 
 export type TrainingRow = { id: string; player_id: string; title: string; details: string | null; days: number[]; starts_on: string; ends_on: string | null };

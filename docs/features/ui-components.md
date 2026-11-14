@@ -48,6 +48,8 @@ fills, `text-pink-soft` for small pink labels. No zinc/gray/slate and no `dark:`
 | `NavLink` (`nav-link.tsx`) | `href`, `section?`, `exact?` | Header links; the current section is highlighted and `aria-current="page"`. `exact` for a home link. |
 | `SkipLink` | | First thing a keyboard user reaches; jumps to `<main id="main">`. Every layout's `<main>` has `id="main"`. |
 | `PageHeader`, `FormMessage`, `ShowAllLink`, `PillNav`, `Modal` | | Unchanged. |
+| `MenuBoard`, `MenuPanel`, `MenuItem`, `MenuHeader`, `NeedsYou` (`menu-board.tsx`) | | The cafe-menu look (player dashboard, family and mentor menus, user 2026-11-13). `MenuBoard`: a numbered board that is one big link to its section. `MenuPanel`: the same board when it holds its own links or forms (a roster), with an optional `cta` ("Full details →"). `MenuItem`: a menu line (name, value, note) in the board's colors. `MenuHeader`: the media-day page header ("/// FAMILY MENU ///", the name in two tones, `aside` for the team logo). `NeedsYou`: what's waiting on this person, each with where to do it. |
+| `ComingUpCard` (`coming-up.tsx`) | `items`, `calendarHref`, `teams?`, `subtitle?`, `empty?` | The next weeks of a calendar, by day, as a board with "Full calendar →" (family and mentor menus). |
 
 ## Field errors
 

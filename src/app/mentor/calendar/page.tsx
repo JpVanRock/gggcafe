@@ -5,14 +5,11 @@ import { getCurrentUser, getMentor, getMentorAccess } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { pillQuietClass } from "@/components/ui";
 import { monthGrid, monthLabel, monthOf, shiftMonth } from "@/lib/dugout";
-import { APP_TIME_ZONE, addDays, todayISO } from "@/lib/dates";
-import { trainingDates } from "@/lib/mentors";
-import { callDateAndClock, callEnds } from "@/lib/video-calls";
 import { playerName } from "@/lib/softball";
-import { VIDEO_CALL_COLUMNS, type VideoCallRow } from "@/components/video-calls";
-import { CalendarView, type CalEvent, type CalGame } from "@/app/(staff)/dugout/calendar/calendar";
-import { EVENT_KINDS, type EventKind } from "@/lib/dugout";
+import { todayISO } from "@/lib/dates";
+import { CalendarView } from "@/app/(staff)/dugout/calendar/calendar";
 import { loadMentees } from "../parts";
+import { loadMentorCalendar } from "../calendar-data";
 
 export const metadata: Metadata = { title: "My calendar · Mentor · GGG.Cafe" };
 
@@ -33,110 +30,18 @@ export default async function MentorCalendarPage({ searchParams }: PageProps<"/m
   const [from, to] = [days[0], days[days.length - 1]];
 
   const supabase = await createClient();
-  const access = await getMentorAccess();
-  const [cards, { data: trainingRows }, { data: callRows }, { data: teamRows }] = await Promise.all([
-    loadMentees(supabase, access.menteeIds),
-    supabase
-      .from("player_activities")
-      .select("id, player_id, title, details, days, starts_on, ends_on")
-      .eq("source", "mentor")
-      .eq("created_by", mentor.userId)
-      .lte("starts_on", to)
-      .gte("ends_on", from),
-    // a day either side, for time zones
-    supabase
-      .from("video_calls")
-      .select(VIDEO_CALL_COLUMNS)
-      .eq("host_id", mentor.userId)
-      .is("cancelled_at", null)
-      .gte("starts_at", `${addDays(from, -1)}T00:00:00Z`)
-      .lte("starts_at", `${addDays(to, 1)}T23:59:59Z`)
-      .order("starts_at"),
-    // her players' team practices, events and games (nothing for a mentor not approved yet)
-    supabase.rpc("mentor_calendar", { p_from: from, p_to: to }),
-  ]);
+  const cards = await loadMentees(supabase, (await getMentorAccess()).menteeIds);
   const nameOf = (id: string) => {
     const c = cards.get(id);
     return c ? playerName(c.player) : "A player";
   };
-
-  // a session sent to several players is one entry per day, naming them all
-  const sessions = new Map<string, NonNullable<typeof trainingRows>>();
-  for (const r of trainingRows ?? []) {
-    const key = [r.title, r.details, r.starts_on, r.ends_on, r.days.join(",")].join("|");
-    sessions.set(key, [...(sessions.get(key) ?? []), r]);
-  }
-  const training: CalEvent[] = [...sessions.values()].flatMap((group) => {
-    const r = group[0];
-    const who = group.map((x) => nameOf(x.player_id)).join(", ");
-    return trainingDates(r, from, to).map((date) => ({
-      id: `${r.id}-${date}`,
-      kind: "lesson" as const,
-      title: r.title,
-      date,
-      start: null,
-      end: null,
-      location: null,
-      notes: r.details,
-      seriesId: null,
-      byline: `Your training · for ${who}`,
-      planId: null,
-    }));
-  });
-
-  // the team schedule: practices and other events, and games; with more than one team, each says whose
-  const hhmm = (t: string | null) => (t ? t.slice(0, 5) : null);
-  const schedule = teamRows ?? [];
-  const manyTeams = new Set(schedule.map((r) => r.team_id)).size > 1;
-  const whose = (team: string, text: string) => (manyTeams ? `${team}: ${text}` : text);
-  const teamEvents: CalEvent[] = schedule.flatMap((r) => {
-    const kind = EVENT_KINDS.find((k) => k === r.kind);
-    if (r.item !== "event" || !kind) return [];
-    return [
-      {
-        id: r.id,
-        kind: kind as EventKind,
-        title: manyTeams ? whose(r.team_name, r.title || kind) : r.title,
-        date: r.on_date,
-        start: hhmm(r.start_time),
-        end: hhmm(r.end_time),
-        location: r.place,
-        notes: r.notes,
-        seriesId: null,
-        byline: `${r.team_name} team calendar`,
-        planId: null,
-      },
-    ];
-  });
-  const games: CalGame[] = schedule
-    .filter((r) => r.item === "game")
-    .map((r) => ({ id: r.id, date: r.on_date, start: hhmm(r.start_time), label: whose(r.team_name, r.title), place: r.place }));
-  const calls: CalEvent[] = ((callRows ?? []) as VideoCallRow[]).flatMap((c) => {
-    const start = callDateAndClock(c.starts_at, APP_TIME_ZONE);
-    if (start.date < from || start.date > to) return [];
-    const first = c.player ? c.player.preferred_name || c.player.first_name : "a player";
-    return [
-      {
-        id: c.id,
-        kind: "meeting" as const,
-        title: `Video call · ${first}`,
-        date: start.date,
-        start: start.clock,
-        end: callDateAndClock(callEnds(c).toISOString(), APP_TIME_ZONE).clock,
-        location: "On GGG.Cafe (Zoom)",
-        notes: c.topic,
-        seriesId: null,
-        byline: null,
-        planId: null,
-      },
-    ];
-  });
+  const { events, games } = await loadMentorCalendar(supabase, mentor.userId, nameOf, from, to);
 
   const link = (m: string) => `/mentor/calendar?month=${m}`;
   return (
     <div className="flex flex-col gap-6">
       <Link href="/mentor" className="self-start text-sm text-muted hover:text-ink">
-        ← My players
+        <span aria-hidden="true">←</span> Mentor menu
       </Link>
       <CalendarView
         key={month}
@@ -144,7 +49,7 @@ export default async function MentorCalendarPage({ searchParams }: PageProps<"/m
         month={month}
         days={days}
         today={today}
-        events={[...teamEvents, ...training, ...calls]}
+        events={events}
         games={games}
         canEdit={false}
         heading={

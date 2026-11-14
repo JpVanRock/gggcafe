@@ -20,7 +20,7 @@ HOSTING:  Vercel team "GGG", project `gggcafe`, https://www.ggg.cafe (main addre
 
 ## Layout
 ```
-src/app/                 pages (App Router): /, /login and /register are public (sign-up needs a team code); /family is the parents' home,
+src/app/                 pages (App Router): /, /login and /register are public (sign-up needs a team code); /family is the parents' home (the family menu: boards that open /family/team, budget, forms, packet, logins, mentors, calendar, yearbook),
                          /me the players' home (claims; then her dashboard at /players/[id])
 src/app/(staff)/         signed-in area with shared nav: dashboard (own view per role), teams, players
                          (each feature folder has page.tsx, actions.ts, client forms)
