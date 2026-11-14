@@ -35,8 +35,8 @@ src/components/main-nav.tsx  top menu: staff get Dashboard/Coaches Dugout (opens
                          including /me and /family; players get "My profile". Every header is <SiteHeader>
                          (site-header.tsx): on phones the links fold behind a Menu button. Headers carry only our
                          logo. The coach/parent switch sits under the menu, left of the Switchboard pill
-                         (`switchboard-pill.tsx`, Coach and family pages alike). The team's logo sits large (128px, 192px
-                         from tablets; twice the first size) right of the page title, tops lined up (user, 2026-11-13): the
+                         (`switchboard-pill.tsx`, Coach and family pages alike). The team's logo sits large (104px, 152px from tablets: the 2026-11-13 size made 20% smaller,
+                         user 2026-11-14, with less space around it) right of the page title, tops lined up (user, 2026-11-13): the
                          Coaches Dugout, the coaches' main pages (Dashboard, Teams, Players, Switchboard, Notifications, FAQ,
                          Health, View as) and the family page (wrap the <PageHeader> in `<TitleWithTeamLogo>`; `MyTeamLogo`,
                          `myTeamLogo()`), and top right of the player dashboard

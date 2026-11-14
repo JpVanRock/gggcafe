@@ -14,12 +14,13 @@ export async function SwitchboardPill({ current }: { current: "coach" | "parent"
   const parent = await isStaffParent();
   if (!head && !parent) return null;
   return (
-    // -mb-4: the page below starts closer under this row (user, 2026-11-13: less empty space above the title).
+    // -mb-5: the page below starts closer under this row (user, 2026-11-13: less empty space above the title;
+    // 2026-11-14: less again above the team logo, about 12px).
     // relative z-10: the page then overlaps the row's bottom 16px, and a later flex item paints (and takes
     // taps) on top, which left the lower half of the pills dead (user, 2026-11-14: "the switchboard button
     // does not function"); the row stays above it.
     // empty:hidden: nothing left in it (a View as preview without the switch) means no row at all
-    <div className="relative z-10 mx-auto -mb-4 flex w-full max-w-5xl flex-wrap items-center justify-end gap-3 px-4 pt-3 empty:hidden">
+    <div className="relative z-10 mx-auto -mb-5 flex w-full max-w-5xl flex-wrap items-center justify-end gap-3 px-4 pt-3 empty:hidden">
       {parent && <RoleSwitch current={current} />}
       {head && <SwitchboardLink />}
     </div>

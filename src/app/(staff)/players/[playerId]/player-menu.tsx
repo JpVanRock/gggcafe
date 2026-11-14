@@ -202,14 +202,17 @@ export function PlayerMenu({
             ← Players
           </Link>
         )}
-        {/* her team's logo, top right, across from "← Players" (user, 2026-11-13; twice as big the same day): on its
-            own row above her photo and name until the page is wide enough for it to sit in the corner beside them */}
-        <TeamLogoMark logo={teamLogo} sizeClass="h-28 w-28 sm:h-48 sm:w-48" className="relative z-10 ml-auto block lg:absolute lg:top-0 lg:right-0" />
+        {/* her team's logo, top right, across from "← Players" (user, 2026-11-13; twice as big the same day, then 20%
+            smaller, 2026-11-14): on its own row above her photo and name until the page is wide enough for it to sit
+            in the corner beside them */}
+        <TeamLogoMark logo={teamLogo} sizeClass="h-22 w-22 sm:h-38 sm:w-38" className="relative z-10 ml-auto block lg:absolute lg:top-0 lg:right-0" />
         {/* Jersey number behind the name, media-day style */}
         <OutlineText className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[11rem] tracking-tighter sm:text-[15rem]">
           {team?.jersey_number ?? player.primary_position ?? ""}
         </OutlineText>
-        <div className="relative pt-6 sm:pt-10">
+        {/* lg:px-42: with the logo in the corner (152px), her name, badge and trophies keep clear of it on both
+            sides, so they stay centered and wrap instead of running under it (user, 2026-11-14) */}
+        <div className={`relative pt-6 sm:pt-10 ${teamLogo ? "lg:px-42" : ""}`}>
           {photoUrl && (
             // eslint-disable-next-line @next/next/no-img-element -- short-lived signed Storage URL
             <img
