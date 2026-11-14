@@ -17,14 +17,16 @@ const BOARD = {
     numeral: "rgb(0 10 45 / 0.28)",
   },
   pink: {
-    board: "bg-pink text-on-accent [--menu-value:var(--color-on-accent)] [--menu-note:rgb(0_10_45/0.8)]",
-    subtitle: "text-on-accent/75",
+    // notes and subtitle at 92% / 90% navy: 5:1 on the pink (75-80% fell under 4.5:1; CI, 2026-11-13)
+    board: "bg-pink text-on-accent [--menu-value:var(--color-on-accent)] [--menu-note:rgb(0_10_45/0.92)]",
+    subtitle: "text-on-accent/90",
     cta: "text-on-accent",
     numeral: "rgb(0 10 45 / 0.3)",
   },
   navy: {
     board: "bg-navy-700 text-ink [--menu-value:var(--color-highlight)] [--menu-note:var(--color-muted)]",
-    subtitle: "text-pink-soft",
+    // Day Game's pink text is 4.2:1 on this board's light fill: the highlight (navy by day) instead
+    subtitle: "text-pink-soft day:text-highlight",
     cta: "text-highlight",
     numeral: "color-mix(in srgb, var(--color-highlight) 35%, transparent)",
   },
