@@ -23,13 +23,15 @@ import { loadComingUp, loadDaughterGoals, loadTeamCulture } from "./team-data";
 import { GoalsBoardSummary, hasTeamCulture } from "./team-sections";
 import { ComingUpCard } from "@/components/coming-up";
 import { FamilyShell } from "./shell";
+import { PageMenu, type PageMenuItem } from "@/components/page-menu";
 
 export const metadata: Metadata = { title: "Family · GGG.Cafe" };
 
 // The family menu (user, 2026-11-13: cleaner and organized like the player dashboard's menu): the
 // media-day header, the Yearbook at the top, "Needs you" (what's waiting on the parent, with where to do
 // it), video calls, Coming up, then numbered menu boards, each with a short summary and its own page
-// (Team Standards & Culture, Team Budget, Season forms, Mentors, Welcome packet, Logins & teams).
+// (Team Standards & Culture, Team Budget, Mentors, Welcome packet). Season forms and Logins & teams are in
+// the page's hamburger menu, top left (user, 2026-11-13).
 export default function FamilyPage({ searchParams }: PageProps<"/family">) {
   return (
     <FamilyShell>
@@ -221,29 +223,6 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
   }
   if (daughters.length) {
     boards.push({
-      key: "forms",
-      title: "Season Forms",
-      subtitle: "Questionnaire · medical card",
-      variant: "outlineNeon",
-      cta: { href: "/family/forms", label: "Open the forms" },
-      body: (
-        <div className="flex flex-col gap-4">
-          {daughters.map((d) => {
-            const f = formOf(d.player_id);
-            const quiz = !offForDaughter(d, "parent.questionnaire");
-            return (
-              <MenuItem
-                key={d.player_id}
-                name={firstOf(d.player_name)}
-                value={(f?.medical ? 1 : 0) + (quiz && f?.questionnaire ? 1 : 0) === (quiz ? 2 : 1) ? "Done" : "To do"}
-                note={[quiz && `Questionnaire ${f?.questionnaire ? "✓" : "to do"}`, `Medical card ${f?.medical ? "✓ on file" : "to do"}`].filter(Boolean).join(" · ")}
-              />
-            );
-          })}
-        </div>
-      ),
-    });
-    boards.push({
       key: "mentors",
       title: "Mentors",
       subtitle: "Who works with her",
@@ -289,34 +268,6 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
       ),
     });
   }
-  if (daughters.length) {
-    boards.push({
-      key: "logins",
-      title: "Logins & Teams",
-      subtitle: "Her login · consent · your teams",
-      variant: "outlineNeon",
-      cta: { href: "/family/logins", label: "Manage" },
-      body: (
-        <div className="flex flex-col gap-4">
-          {daughters.map((d) => {
-            const step = consentStep(consents.get(d.player_id));
-            const status = d.username
-              ? ["Username", d.username]
-              : d.has_account
-                ? ["Own account", "Signs in with her email"]
-                : !d.on_roster
-                  ? ["Waiting", "Not on the current roster yet"]
-                  : step === "needed"
-                    ? ["Consent", "Needs your consent first"]
-                    : step === "pending"
-                      ? ["Checking", "Your consent is being checked"]
-                      : ["No login", "Make her a username and password"];
-            return <MenuItem key={d.player_id} name={firstOf(d.player_name)} value={status[0]} note={status[1]} />;
-          })}
-        </div>
-      ),
-    });
-  }
   if (adminTeams.length) {
     boards.push({
       key: "admin",
@@ -347,6 +298,18 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
     });
   }
 
+  // the page's hamburger menu (user, 2026-11-13): Season forms and Logins & teams, with a badge when they need the parent
+  const formsToDo = daughters.filter((d) => {
+    const f = formOf(d.player_id);
+    return f && (!f.medical || (!f.questionnaire && !offForDaughter(d, "parent.questionnaire")));
+  }).length;
+  const consentNeeded = daughters.some((d) => d.on_roster && !d.username && !d.has_account && consentStep(consents.get(d.player_id)) === "needed");
+  const menuItems: PageMenuItem[] = [
+    ...(daughters.length
+      ? [{ href: "/family/forms", label: "Season Forms", note: "Preseason questionnaire · medical & emergency card", badge: formsToDo ? `${formsToDo} to do` : null }]
+      : []),
+    { href: "/family/logins", label: "Logins & Teams", note: "Her login and consent · your teams · join a team", badge: consentNeeded ? "Consent" : null },
+  ];
   const waiting = links.filter((l) => l.status !== "approved");
   return (
     <div className="flex flex-col gap-10">
@@ -355,6 +318,7 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
         first={nameFirst || "Welcome"}
         last={nameRest.join(" ") || undefined}
         line={[teams.map((t) => t.name).join(" · "), user.email].filter(Boolean).join(" · ")}
+        start={links.length > 0 && <PageMenu items={menuItems} />}
         aside={
           <Suspense fallback={null}>
             <MyTeamLogo />

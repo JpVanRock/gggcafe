@@ -171,14 +171,16 @@ export function MenuPanel({
 
 /**
  * A home page's media-day header (the family and mentor menus): "/// FAMILY MENU ///", the name
- * big in two tones, a line under it; `aside` (the team logo) sits top right, on its own row on
- * phones; `actions` (a link or two) go under the name.
+ * big in two tones, a line under it. `start` (a page menu) sits top left and `aside` (the team
+ * logo) top right: their own row on phones, over the header's corners on wide screens. `actions`
+ * (a link or two) go under the name.
  */
 export function MenuHeader({
   eyebrow,
   first,
   last,
   line,
+  start,
   aside,
   actions,
 }: {
@@ -186,12 +188,18 @@ export function MenuHeader({
   first: string;
   last?: string;
   line?: ReactNode;
+  start?: ReactNode;
   aside?: ReactNode;
   actions?: ReactNode;
 }) {
   return (
     <header className="relative pt-2 text-center">
-      {aside && <div className="relative z-10 ml-auto block w-fit lg:absolute lg:top-0 lg:right-0">{aside}</div>}
+      {(start || aside) && (
+        <div className="pointer-events-none relative z-20 mb-4 flex items-start justify-between gap-4 lg:absolute lg:inset-x-0 lg:top-0 lg:mb-0">
+          <div className="pointer-events-auto">{start}</div>
+          <div className="pointer-events-auto">{aside}</div>
+        </div>
+      )}
       <p className="flex items-center justify-center gap-3 font-mono text-xs tracking-[0.35em] text-pink-soft uppercase">
         <SpeedStripes className="h-3 w-9 text-link" />
         {eyebrow}

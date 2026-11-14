@@ -5,7 +5,10 @@ import { usePathname } from "next/navigation";
 
 /** The pill itself: filled while you're on the Switchboard. */
 export function SwitchboardLink() {
-  const here = usePathname().startsWith("/switchboard");
+  const path = usePathname();
+  // not over a View as preview of a parent's or a mentor's page (user, 2026-11-13)
+  if (/^\/view-as\/(parent|mentor)\//.test(path)) return null;
+  const here = path.startsWith("/switchboard");
   return (
     <Link
       href="/switchboard"

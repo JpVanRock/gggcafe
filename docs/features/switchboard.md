@@ -7,12 +7,14 @@
   Everything is on until switched off. Off hides it on the site and stops new posts; nothing saved is deleted.
 - A player on several teams loses a feature when any of her current teams switches it off: `player_features_off(player)`
   (her, her parents, her mentors, staff), `private.feature_off_for_player()`. Coaches and admins always see everything.
+- The Switchboard pill is for coaches: it shows under the menu on the Coach pages only, never on the family pages or
+  over a View as preview of a parent's or a mentor's page (user, 2026-11-13). The Coach / Parent switch stays.
 - Where it applies:
   - Players: `requirePlayerPage(playerId, key)` on every section page sends a player or parent back to her menu
     (`?off=key`, which says so); the menu boards, the section bar and the From the Dugout strip leave out what's off.
   - Parents: the family page (budget, packet, questionnaire, View as, Yearbook, and since 2026-11-13 Calendar, Team
     Standards & Culture and Her goals; `requirePlayerPage` also sends a parent home when View as player is off), the family
-    Yearbook and Calendar pages and the Yearbook's menu link. Her goals also hide when Goals is off for players.
+    Yearbook and Calendar pages and the Yearbook banner on the family menu. Her goals also hide when Goals is off for players.
   - Mentors: the mentor player and team pages hide the panels; the mentor actions refuse (`switchedOff()` in auth.ts); the
     database also refuses mentor messages and mentor training when off (restrictive policies on `mentor_messages` and
     `player_activities`). "See the team calendar" (`mentor.calendar`, 2026-11-13) is checked inside `mentor_calendar()`, so

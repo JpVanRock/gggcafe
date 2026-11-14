@@ -1,39 +1,27 @@
-// The family pages' header: logo, the menu (Home, and Yearbook when one of their
-// teams has it), theme, sign out. Staff see their own menu instead.
+// The family pages' header: logo, the menu (Home; the Coaches Dugout for a team admin), the bell,
+// theme, sign out. Staff see their own menu instead.
 import { Suspense } from "react";
 import { MainNav, MenuCount } from "@/components/main-nav";
 import { NavLink } from "@/components/nav-link";
 import { SignOutButton, SiteHeader, navClass, navItemClass } from "@/components/site-header";
 import { isStaffParent } from "@/components/role-switch";
 import { SwitchboardPill } from "@/components/switchboard-pill";
-import { createClient } from "@/lib/supabase/server";
 import { getAdminTeamIds, getCurrentUser } from "@/lib/auth";
-import { yearbookTeams } from "@/lib/yearbook-data";
 import { NotificationBell } from "@/components/notification-bell";
 
-/** Parents' menu: Home, plus Yearbook when a daughter on one of their teams has G3 Advanced. */
+/**
+ * Parents' menu: Home, the Coaches Dugout for a team admin, and the bell. The Yearbook isn't here: its
+ * banner tops the family menu (user, 2026-11-13).
+ */
 async function FamilyNav() {
   const user = await getCurrentUser();
   if (!user) return null;
-  const supabase = await createClient();
-  const { data } = await supabase.rpc("parent_home");
-  const teamIds = [...new Set(((data ?? []) as { team_id: string; status: string }[]).filter((l) => l.status === "approved").map((l) => l.team_id))];
-  const [{ data: offRows }, adminTeams] = await Promise.all([
-    teamIds.length ? supabase.from("team_features_off").select("team_id").eq("feature", "parent.yearbook").in("team_id", teamIds) : Promise.resolve({ data: [] }),
-    getAdminTeamIds(),
-  ]);
-  const closed = new Set((offRows ?? []).map((r) => r.team_id));
-  const withYearbook = await yearbookTeams(supabase, teamIds.filter((t) => !closed.has(t)));
+  const adminTeams = await getAdminTeamIds();
   return (
     <nav aria-label="Main" className={navClass}>
       <NavLink href="/family" exact className={navItemClass}>
         Home
       </NavLink>
-      {withYearbook.length > 0 && (
-        <NavLink href="/family/yearbook" className={navItemClass}>
-          Yearbook
-        </NavLink>
-      )}
       {/* a team admin's Dugout: Calendar, GameDay, Measurements (user, 2026-11-12) */}
       {adminTeams.length > 0 && (
         <NavLink href="/dugout/calendar" className={navItemClass}>

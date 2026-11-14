@@ -27,7 +27,9 @@
   header (`MenuHeader`: "Family menu", their name, the team logo), the Yearbook banner first (user's choice), "Needs you"
   (`NeedsYou`: her consent, the medical card, the questionnaire, unread packet items, mentor requests, each linking to
   where it's done), video calls, Coming up, then numbered boards (`MenuPanel`): her goals (one per daughter), Team
-  Standards & Culture, Team Budget, Season forms, Mentors, Welcome packet, Logins & teams, Team admin. Each board shows a
+  Standards & Culture, Team Budget, Mentors, Welcome packet, Team admin. Season forms and Logins & teams are in the page's
+  hamburger menu, top left (`PageMenu` in `components/page-menu.tsx`, a badge when they need the parent; user, same
+  day), and the header's menu no longer lists the Yearbook (its banner tops the page). Each board shows a
   short summary and opens its own page: `/family/team`, `/family/budget`, `/family/forms` (questionnaire and medical
   card), `/family/packet`, `/family/logins` (her login and consent, their teams, join another team), `/family/mentors`
   (now with approving or declining a mentor's request at the top). Shared: `family/family-data.ts` (`loadFamily`: links,
