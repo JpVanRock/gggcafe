@@ -44,9 +44,10 @@ export function SiteFooter() {
       <Link href="/" aria-label="GGG.Cafe home" className="keep-night shrink-0 self-end rounded-xl bg-navy-950 px-3 py-2 opacity-90 transition hover:opacity-100">
         <Wordmark className="w-36 sm:w-44" />
       </Link>
-      <div className="border-t border-navy-700 pt-4 text-xs leading-relaxed text-muted">
+      {/* centered on phones and in the installed app (user, 2026-11-13); left-aligned on wider screens */}
+      <div className="border-t border-navy-700 pt-4 text-center text-xs leading-relaxed text-muted sm:text-left standalone:text-center">
         <p>{FOOTER_DISCLAIMER}</p>
-        <nav aria-label="Legal" className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+        <nav aria-label="Legal" className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1 sm:justify-start standalone:justify-center">
           <Link href="/terms" className={legalLink}>
             Terms of Service
           </Link>

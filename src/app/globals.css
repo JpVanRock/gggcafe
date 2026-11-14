@@ -10,6 +10,8 @@
  */
 /* Day Game: `day:` styles apply while the white background is on (html[data-theme="day"]). */
 @custom-variant day (&:where([data-theme="day"], [data-theme="day"] *));
+/* the installed phone/tablet app (home screen icon), at any width */
+@custom-variant standalone (@media (display-mode: standalone));
 
 @theme {
   --color-navy-950: #000a2d; /* brand kit navy: the page */
