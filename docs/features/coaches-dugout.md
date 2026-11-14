@@ -50,6 +50,20 @@
   - The general expense/income form leaves out "Out-of-pocket reimbursement" (`ENTRY_FORM_CATEGORIES`): repayments come
     from the coaches' ledger. Parents' totals (`team_budget_summary`) include reimbursements as ordinary income and
     expenses; tournament credits and the coaches' ledger aren't shown to parents.
+  - Import from a spreadsheet (user, 2026-11-13; head coaches/admins, full width under the forms): upload an Excel
+    (.xlsx) or CSV file of player payments, expenses and income for the season shown. "Download the template"
+    (`budget/template/route.ts`) gives a workbook with the columns (Date, Type, Category, Amount, Player, Method,
+    Description), dropdowns with this season's roster, and a How to sheet. Coaches' own sheets work when a row in the
+    first 15 names a date and an amount (or money in / money out) column; Type can be left out when a player, a money
+    in/out column, the category or a negative amount says it. Uploading shows every line first (nothing is saved),
+    the rows that need fixing by row number, and lines already in the budget (same kind, date, amount, player,
+    category and description), which are left out so the same file twice adds nothing twice; Import saves the rest in
+    one insert. Categories the budget doesn't have, and everyday words ("hotel", "raffle"), map to its categories or
+    Other (the original word kept as the description). Tournament credit, discounts and out-of-pocket items aren't
+    imported (their own forms). Rules in `src/lib/budget-import.ts` (no imports; unit-tested), the actions in
+    `budget/import-actions.ts` (every line checked again on import: `validLine`), the panel `budget/import-panel.tsx`.
+    Excel files are read and written by `src/lib/spreadsheet.ts` (no dependencies; zip and XML with node:zlib, with
+    size limits against zip bombs). Up to 500 lines and 1 MB per file; .xls and Numbers files get a "save as .xlsx" message.
   - Last updated (user, 2026-11-12): `budget_changes` keeps, per team and season, when anything in the budget last
     changed (registration costs, discounts, ledger lines added, changed or removed), written only by the trigger
     `note_budget_change` (staff read it; nobody sets it). `team_budget_summary()` returns it as `updated_at`, and

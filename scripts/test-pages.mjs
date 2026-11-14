@@ -5,6 +5,7 @@
 //   npm run test:pages -- --build (builds first)
 import { spawnSync } from "node:child_process";
 import { ROOT, samplePages, samplePdfRoutes, startSampleSite } from "./lib/sample-site.mjs";
+import { readXlsx } from "../src/lib/spreadsheet.ts";
 
 const PORT = Number(process.env.TEST_PAGES_PORT ?? 3157);
 
@@ -46,6 +47,16 @@ async function check(route) {
   }
   if (r.status !== 200) return { route, ok: false, why: `HTTP ${r.status}`, ms };
   if (route.includes("/pdf")) return type.includes("application/pdf") ? { route, ok: true, ms } : { route, ok: false, why: `not a PDF (${type})`, ms };
+  if (route.includes("/budget/template")) {
+    // an Excel workbook that reads back with the import's headings
+    if (!type.includes("spreadsheetml")) return { route, ok: false, why: `not an Excel workbook (${type})`, ms };
+    try {
+      const first = readXlsx(new Uint8Array(await r.arrayBuffer()))[0];
+      return first?.rows[0]?.[0] === "Date" ? { route, ok: true, ms } : { route, ok: false, why: "the template's first sheet has no headings", ms };
+    } catch (e) {
+      return { route, ok: false, why: `the template doesn't read back (${e instanceof Error ? e.message : e})`, ms };
+    }
+  }
   const body = await r.text();
   const marker = ERROR_MARKERS.find((m) => body.includes(m));
   if (marker) return { route, ok: false, why: `error in the page (${marker})`, ms };

@@ -17,6 +17,7 @@ import { NoOwnTeam, TeamPicker } from "../team-picker";
 import { deleteCoachExpense, deleteCredit, deleteEntry, undoCoachRepayment } from "./actions";
 import { AdjustmentForm, CoachExpenseForm, CreditForm, EditPaymentForm, EntryForm, FeesForm, PaymentForm, RepayForm, type BudgetPlayer } from "./forms";
 import { ActionForm } from "@/components/action-form";
+import { BudgetImport } from "./import-panel";
 
 export const metadata: Metadata = { title: "Team Budget · Coaches Dugout · GGG.Cafe" };
 
@@ -265,6 +266,13 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
           </div>
         )}
       </div>
+
+      {/* many lines at once from Excel or CSV (user, 2026-11-13; import-panel.tsx) */}
+      {editor && (
+        <Disclosure summary="Import from a spreadsheet">
+          <BudgetImport scope={scope} templateHref={`/dugout/budget/template?team=${team.id}&season=${season.id}`} />
+        </Disclosure>
+      )}
 
       <Card title={`Player payments (${players.length})`}>
         {players.length === 0 ? (

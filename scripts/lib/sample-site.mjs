@@ -51,8 +51,10 @@ export function samplePages() {
   return [...new Set([...pages, ...light])].sort();
 }
 
-/** The PDF routes (not pages, so not found by samplePages). */
+/** The PDF routes and file downloads (not pages, so not found by samplePages). */
 export const samplePdfRoutes = () => [
+  // the Team Budget import template (an Excel workbook)
+  `/dugout/budget/template?team=${ID.team}&season=${ID.season}`,
   `/dugout/gameday/${ID.lineup}/pdf`,
   `/dugout/gameday/${ID.lineup}/pdf?card=umpire`,
   `/dugout/plans/${ID.plan}/pdf`,

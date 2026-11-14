@@ -81,6 +81,8 @@ tests/unit/              node --test unit tests (npm run test:unit)
   (`player-achievements.ts`). Softball IQ UI: `iq-quiz-client.tsx` (practice quiz, question bank) and
   `iq-tests-client.tsx` (level tests), shared bits in `iq-shared.ts`.
 - Names: `playerName()` in `src/lib/softball.ts`.
+- Spreadsheets in and out (Excel .xlsx and CSV): `src/lib/spreadsheet.ts` (`readXlsx`, `readCsv`, `writeXlsx`; no dependencies).
+  First use: the Team Budget import (`src/lib/budget-import.ts`, docs/features/coaches-dugout.md).
 - The site's address: links made during a request use `requestOrigin()` (`src/lib/request-origin.ts`), so they match
   the address the visitor is on; fixed text (emails, PDFs) uses `SITE_URL` (`src/lib/site.ts`). Never hard-code a host.
 - Rosters: `src/lib/roster.ts`. A team's players: `loadRoster(supabase, teamId, { seasonId?, order? })` (active, current
