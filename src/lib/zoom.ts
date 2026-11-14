@@ -13,8 +13,11 @@ import { meetingSdkSignature } from "@/lib/zoom-signature";
 const API = "https://api.zoom.us/v2";
 const KEYS = ["ZOOM_ACCOUNT_ID", "ZOOM_CLIENT_ID", "ZOOM_CLIENT_SECRET", "ZOOM_SDK_KEY", "ZOOM_SDK_SECRET", "ZOOM_HOST_EMAIL"] as const;
 
+/** A Zoom key from Vercel, without the space or line break a paste can bring along (user, 2026-11-14). */
+const key = (name: (typeof KEYS)[number]) => (process.env[name] ?? "").trim();
+
 export function zoomConfigured(): boolean {
-  return KEYS.every((name) => Boolean(process.env[name]));
+  return KEYS.every((name) => Boolean(key(name)));
 }
 
 export const ZOOM_NOT_CONNECTED = "Video calls aren't connected to Zoom yet. A site admin adds the Zoom keys in Vercel first.";
@@ -44,13 +47,20 @@ let token: { value: string; expires: number } | null = null;
 
 async function accessToken(): Promise<string> {
   if (token && token.expires > Date.now() + 60_000) return token.value;
-  const basic = Buffer.from(`${process.env.ZOOM_CLIENT_ID}:${process.env.ZOOM_CLIENT_SECRET}`).toString("base64");
+  const basic = Buffer.from(`${key("ZOOM_CLIENT_ID")}:${key("ZOOM_CLIENT_SECRET")}`).toString("base64");
   const res = await fetch(
-    `https://zoom.us/oauth/token?grant_type=account_credentials&account_id=${encodeURIComponent(process.env.ZOOM_ACCOUNT_ID ?? "")}`,
+    `https://zoom.us/oauth/token?grant_type=account_credentials&account_id=${encodeURIComponent(key("ZOOM_ACCOUNT_ID"))}`,
     { method: "POST", headers: { Authorization: `Basic ${basic}` }, cache: "no-store" },
   );
   const body = (await res.json().catch(() => null)) as { access_token?: string; expires_in?: number; reason?: string } | null;
-  if (!res.ok || !body?.access_token) throw new ZoomError(`Zoom didn't accept the app keys (${body?.reason ?? res.status}). Check them in Vercel.`);
+  if (!res.ok || !body?.access_token) {
+    const reason = body?.reason ?? String(res.status);
+    // "unsupported grant type": the Client ID and Secret are the Meeting SDK app's, not the Server-to-Server app's
+    const hint = /grant/i.test(reason)
+      ? "ZOOM_CLIENT_ID and ZOOM_CLIENT_SECRET must be the Server-to-Server OAuth app's, not the Meeting SDK app's."
+      : "Check ZOOM_ACCOUNT_ID, ZOOM_CLIENT_ID and ZOOM_CLIENT_SECRET in Vercel, and that the Server-to-Server app is activated.";
+    throw new ZoomError(`Zoom didn't accept the app keys (${reason}). ${hint}`);
+  }
   token = { value: body.access_token, expires: Date.now() + (body.expires_in ?? 3600) * 1000 };
   return token.value;
 }
@@ -68,7 +78,7 @@ async function zoom<T>(path: string, init: { method?: "GET" | "POST" | "DELETE";
   return body;
 }
 
-const hostUser = () => encodeURIComponent(process.env.ZOOM_HOST_EMAIL ?? "");
+const hostUser = () => encodeURIComponent(key("ZOOM_HOST_EMAIL"));
 
 /**
  * Books a meeting under the host account. Waiting room on, nobody in before the host, everyone
@@ -134,8 +144,8 @@ export function zoomJoinDetails(meetingId: string, asHost: boolean) {
     }
     return {
       signature: meetingSdkSignature({
-        sdkKey: process.env.ZOOM_SDK_KEY ?? "",
-        sdkSecret: process.env.ZOOM_SDK_SECRET ?? "",
+        sdkKey: key("ZOOM_SDK_KEY"),
+        sdkSecret: key("ZOOM_SDK_SECRET"),
         meetingNumber: meetingId,
         role: asHost ? 1 : 0,
       }),
