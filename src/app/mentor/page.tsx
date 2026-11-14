@@ -212,7 +212,8 @@ export default async function MentorHome() {
             )}
           </MenuPanel>
 
-          <MenuPanel number={4} title="Work With More Players" subtitle="A player or a whole team" variant="outlinePink">
+          {/* the last of three half-width boards: across the page, not alone in a half row (user, 2026-11-13) */}
+          <MenuPanel number={4} title="Work With More Players" subtitle="A player or a whole team" variant="outlinePink" wide>
             <p className={`mb-4 ${menuNote}`}>Ask with the team code. Her parents approve you for one player; the head coach approves you for the whole team.</p>
             <Disclosure summary="Ask to work with another player or team">
               <RequestForm />

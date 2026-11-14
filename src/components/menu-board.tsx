@@ -170,10 +170,11 @@ export function MenuPanel({
 }
 
 /**
- * A home page's media-day header (the family and mentor menus): "/// FAMILY MENU ///", the name
- * big in two tones, a line under it. `start` (a page menu) sits top left and `aside` (the team
- * logo) top right: their own row on phones, over the header's corners on wide screens. `actions`
- * (a link or two) go under the name.
+ * A home page's media-day header (the family and mentor menus): "/// FAMILY MENU ///", the name big
+ * in two tones, a line under it. `start` (a page menu) and `aside` (the team logo) sit on either
+ * side: their own row above the name on phones (the menu centered against the logo), and three
+ * columns from wide screens, menu | name | logo, all centered on one line so nothing hangs over the
+ * page below (user, 2026-11-13). `actions` (a link or two) go under the name.
  */
 export function MenuHeader({
   eyebrow,
@@ -192,25 +193,29 @@ export function MenuHeader({
   aside?: ReactNode;
   actions?: ReactNode;
 }) {
+  const sides = Boolean(start || aside);
   return (
-    <header className="relative pt-2 text-center">
-      {(start || aside) && (
-        <div className="pointer-events-none relative z-20 mb-4 flex items-start justify-between gap-4 lg:absolute lg:inset-x-0 lg:top-0 lg:mb-0">
-          <div className="pointer-events-auto">{start}</div>
-          <div className="pointer-events-auto">{aside}</div>
+    <header className={`grid items-center gap-6 pt-1 ${sides ? "lg:grid-cols-[1fr_auto_1fr] lg:gap-8" : ""}`}>
+      {sides && (
+        // phones: one row; wide screens: its two children become the grid's outer columns
+        <div className="flex items-center justify-between gap-4 lg:contents">
+          <div className="lg:col-start-1 lg:row-start-1 lg:justify-self-start">{start}</div>
+          <div className="lg:col-start-3 lg:row-start-1 lg:justify-self-end">{aside}</div>
         </div>
       )}
-      <p className="flex items-center justify-center gap-3 font-mono text-xs tracking-[0.35em] text-pink-soft uppercase">
-        <SpeedStripes className="h-3 w-9 text-link" />
-        {eyebrow}
-        <SpeedStripes className="h-3 w-9 text-link" />
-      </p>
-      <h1 className="mt-3 text-5xl leading-none font-bold tracking-tight text-highlight uppercase sm:text-7xl">
-        {first}
-        {last && <span className="text-ink"> {last}</span>}
-      </h1>
-      {line && <p className="mx-auto mt-4 max-w-2xl font-mono text-sm text-muted">{line}</p>}
-      {actions && <div className="mt-4 flex flex-wrap justify-center gap-3">{actions}</div>}
+      <div className={`text-center ${sides ? "lg:col-start-2 lg:row-start-1" : ""}`}>
+        <p className="flex items-center justify-center gap-3 font-mono text-xs tracking-[0.35em] text-pink-soft uppercase">
+          <SpeedStripes className="h-3 w-9 text-link" />
+          {eyebrow}
+          <SpeedStripes className="h-3 w-9 text-link" />
+        </p>
+        <h1 className="mt-3 text-5xl leading-none font-bold tracking-tight text-highlight uppercase sm:text-7xl">
+          {first}
+          {last && <span className="text-ink"> {last}</span>}
+        </h1>
+        {line && <p className="mx-auto mt-4 max-w-2xl font-mono text-sm text-muted">{line}</p>}
+        {actions && <div className="mt-4 flex flex-wrap justify-center gap-3">{actions}</div>}
+      </div>
     </header>
   );
 }

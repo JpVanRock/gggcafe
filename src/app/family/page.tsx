@@ -298,6 +298,11 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
     });
   }
 
+  // a board left alone in its row stretches across the page (user, 2026-11-13: the Mentors board on its own).
+  // The wide ones (her goals) come first, so the half-width ones pair up after them.
+  const halves = boards.filter((b) => !b.wide);
+  if (halves.length % 2 === 1) halves[halves.length - 1].wide = true;
+
   // the page's hamburger menu (user, 2026-11-13): Season forms and Logins & teams, with a badge when they need the parent
   const formsToDo = daughters.filter((d) => {
     const f = formOf(d.player_id);
