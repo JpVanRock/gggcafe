@@ -378,4 +378,5 @@ $$;
 - **Tenancy is the riskiest migration**, because it touches every staff policy. Do it behind tests
   that prove no organization can read another's rows.
 - **Third-party limits:** Zoom licenses mean one call at a time per host user, and email volume
-  needs custom SMTP. Plan the hosts and senders before the second club.
+  is capped by Supabase's auth email rate limit and the Resend plan (auth email goes through Resend
+  SMTP since 2026-11-13). Plan the hosts and senders before the second club.

@@ -9,8 +9,9 @@ SITE:     Next.js 16 App Router + TypeScript + Tailwind, `src/`.
 HOSTING:  Vercel team "GGG", project `gggcafe`, https://www.ggg.cafe (main address; ggg.cafe redirects to it; domain
           and DNS at GoDaddy; gggcafe.vercel.app still works). Every push to main deploys to production.
           Vercel env vars: NEXT_PUBLIC_SUPABASE_URL and
-          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY (never the DB password). Optional, server-only, for
-          emailing practice plans: RESEND_API_KEY + EMAIL_FROM (see src/lib/email.ts); for video
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY (never the DB password). Server-only, for email (practice
+          plans, lineups, parents' video-call emails; set up 2026-11-13, domain ggg.cafe verified in Resend with its DNS
+          records at GoDaddy): RESEND_API_KEY + EMAIL_FROM = `GGG Cafe <noreply@ggg.cafe>` (src/lib/email.ts); for video
           calls: ZOOM_ACCOUNT_ID, ZOOM_CLIENT_ID, ZOOM_CLIENT_SECRET, ZOOM_SDK_KEY, ZOOM_SDK_SECRET,
           ZOOM_HOST_EMAIL (src/lib/zoom.ts, docs/features/video-calls.md); for the job worker:
           JOBS_SECRET (also in Supabase Vault as jobs_secret, with jobs_worker_url; docs/architecture/jobs.md).
@@ -256,8 +257,9 @@ like a sports brand or media-day graphics. Never childish or preschool.
   `?token_hash=&type=`; /reset-password sets the new password. The Supabase "Reset Password" email template links straight to
   `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password` (user, 2026-11-09):
   the default `{{ .ConfirmationURL }}` (PKCE `?code=`) only works in the browser that asked and within ~5 minutes.
-  Supabase's built-in email sends about 2 emails an hour for the whole project (resets + sign-up confirmations);
-  more needs custom SMTP in Supabase Auth settings. Per person: 4 reset emails per address every 20 minutes
+  Sign-up confirmations and resets go out through Resend (custom SMTP in Supabase Auth, user 2026-11-13: smtp.resend.com,
+  port 465, user `resend`, its own Resend key `supabase-auth`), from `GGG Cafe <noreply@ggg.cafe>`. The whole site's cap is
+  Supabase's Authentication → Rate Limits (emails per hour), within the Resend plan's daily limit. Per person: 4 reset emails per address every 20 minutes
   (`allow_password_reset()`, signed-out callable; keeps only a SHA-256 of the address, for a day). Supabase Auth URL config (user, 2026-11-13): Site URL
   https://www.ggg.cafe, Redirect URLs https://www.ggg.cafe/** and https://gggcafe.vercel.app/** (localhost isn't listed).
 - Auth: `getCurrentUser()` in `src/lib/auth.ts` (verified claims + staff record). `src/proxy.ts`

@@ -42,8 +42,8 @@ export async function requestPasswordReset(
     // Supabase: one email per address per minute ("…only request this after 42 seconds")
     const seconds = /after (\d+) seconds?/i.exec(error.message)?.[1];
     if (seconds) return { sent: false, error: `Wait ${seconds} seconds, then try again.`, email };
-    // Supabase's built-in email sends only a few emails an hour for the whole site
-    // (resets and sign-up confirmations together)
+    // the whole site's hourly email cap (Supabase Authentication → Rate Limits; resets and
+    // sign-up confirmations together, sent through Resend since 2026-11-13)
     return { sent: false, error: "The site has sent too many emails in the last hour. Try again later; it can take up to an hour.", email };
   }
   // Same answer whether or not the email has an account, so the form can't be
