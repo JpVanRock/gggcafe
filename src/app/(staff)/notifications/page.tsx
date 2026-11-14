@@ -5,6 +5,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { EmptyState, PageHeader, eyebrowClass } from "@/components/ui";
 import { MarkRead } from "./mark-read";
+import { TitleWithTeamLogo } from "@/components/team-logo";
 
 export const metadata: Metadata = { title: "Notifications · GGG.Cafe" };
 
@@ -33,7 +34,9 @@ export default async function NotificationsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Notifications" description={unread ? `${unread} new` : "You're all caught up."} />
+      <TitleWithTeamLogo>
+        <PageHeader title="Notifications" description={unread ? `${unread} new` : "You're all caught up."} />
+      </TitleWithTeamLogo>
       {notes.length === 0 ? (
         <EmptyState>Nothing yet. New Players of the Week and video calls booked or cancelled show up here.</EmptyState>
       ) : (

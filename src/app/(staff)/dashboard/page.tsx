@@ -14,6 +14,7 @@ import { SubmitButton } from "@/components/submit-button";
 import { fieldClass } from "@/components/ui";
 import { loadOwnTeams } from "../dugout/data";
 import { claimDaughter } from "./actions";
+import { TitleWithTeamLogo } from "@/components/team-logo";
 
 export const metadata: Metadata = { title: "Dashboard · GGG.Cafe" };
 
@@ -55,7 +56,9 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title={`Welcome, ${staffUser.staff.displayName}`} description={ROLE_NOTE[role]} />
+      <TitleWithTeamLogo>
+        <PageHeader title={`Welcome, ${staffUser.staff.displayName}`} description={ROLE_NOTE[role]} />
+      </TitleWithTeamLogo>
       <Approvals waiting={waiting} staffRequests={staffRequests} />
       {editor && <CheckIns />}
       {role === "assistant" ? <AssistantHome user={staffUser} /> : <HeadCoachHome role={role} />}

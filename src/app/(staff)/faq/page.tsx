@@ -5,6 +5,7 @@ import { FAQ, FEATURE_SECTIONS, TIERS, type Access } from "@/lib/access-faq";
 import { Softball } from "@/components/softball-icon";
 import { Disclosure, PageHeader, eyebrowClass } from "@/components/ui";
 import { FaqNav } from "./faq-nav";
+import { TitleWithTeamLogo } from "@/components/team-logo";
 
 export const metadata: Metadata = { title: "Access FAQ · GGG.Cafe" };
 
@@ -27,7 +28,9 @@ export default async function FaqPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <PageHeader title="Access FAQ" description="Admins only · what a player gets with Standard and Advanced Access, side by side" />
+      <TitleWithTeamLogo>
+        <PageHeader title="Access FAQ" description="Admins only · what a player gets with Standard and Advanced Access, side by side" />
+      </TitleWithTeamLogo>
       <FaqNav current="/faq" />
 
       <div className="grid gap-3 sm:grid-cols-2">

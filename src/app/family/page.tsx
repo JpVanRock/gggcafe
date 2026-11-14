@@ -23,9 +23,9 @@ import { isStaffParent } from "@/components/role-switch";
 import type { SwitchKey } from "@/lib/switchboard";
 import { VIDEO_CALL_COLUMNS, VideoCallList, type VideoCallRow } from "@/components/video-calls";
 import { comingSinceISO, isComing } from "@/lib/video-calls";
-import { MyTeamLogo } from "@/components/team-logo";
 import { loadComingUp, loadDaughterGoals, loadTeamCulture } from "./team-data";
 import { ComingUpCard, DaughterGoalsCard, TeamCultureSection, hasTeamCulture } from "./team-sections";
+import { TitleWithTeamLogo } from "@/components/team-logo";
 
 export const metadata: Metadata = { title: "Family · GGG.Cafe" };
 
@@ -144,7 +144,7 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
   return (
     <div className="flex flex-col gap-8">
       {/* their team's logo on the right, beside the title (user, 2026-11-13) */}
-      <div className="mb-6 flex items-center justify-between gap-4 [&>header]:mb-0">
+      <TitleWithTeamLogo>
         <PageHeader title={firstName ? `Welcome, ${firstName}` : "Welcome"} description={user.email ?? undefined}>
           {/* a coach who is a parent here has the Coach / Parent switch under the menu instead */}
           {user.staff && !(await isStaffParent()) && (
@@ -153,8 +153,7 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
             </Link>
           )}
         </PageHeader>
-        <MyTeamLogo />
-      </div>
+      </TitleWithTeamLogo>
 
       {code === "invalid" && (
         <p role="alert" className="rounded-lg border border-pink/60 bg-pink/10 p-4 text-sm">

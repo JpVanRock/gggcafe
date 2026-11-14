@@ -5,6 +5,7 @@ import { ACCOUNT_TYPES, QUESTIONS, SECTIONS, type Level } from "@/lib/account-ty
 import { Softball } from "@/components/softball-icon";
 import { Disclosure, PageHeader, eyebrowClass } from "@/components/ui";
 import { FaqNav } from "../faq-nav";
+import { TitleWithTeamLogo } from "@/components/team-logo";
 
 export const metadata: Metadata = { title: "Account types · FAQ · GGG.Cafe" };
 
@@ -31,7 +32,9 @@ export default async function AccountTypesPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <PageHeader title="Account types" description="Admins only · the five ways to register and what each dashboard can use, side by side" />
+      <TitleWithTeamLogo>
+        <PageHeader title="Account types" description="Admins only · the five ways to register and what each dashboard can use, side by side" />
+      </TitleWithTeamLogo>
       <FaqNav current="/faq/accounts" />
 
       <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

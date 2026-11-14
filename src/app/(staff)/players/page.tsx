@@ -6,13 +6,16 @@ import { createClient } from "@/lib/supabase/server";
 import { AGE_GROUPS, POSITION_LABEL, ageGroupOf, batsThrows, playerName, type AgeGroup, type Player } from "@/lib/softball";
 import { Card, EmptyState, Loading, PageHeader, buttonClass, inputClass, tableClass, tdClass, thClass, TableScroll } from "@/components/ui";
 import { TabRow } from "@/components/tab-row";
+import { TitleWithTeamLogo } from "@/components/team-logo";
 
 export const metadata: Metadata = { title: "Players · GGG.Cafe" };
 
 export default function PlayersPage({ searchParams }: PageProps<"/players">) {
   return (
     <>
-      <PageHeader title="Players" description="Everyone in the database: your players and the opponents you track." />
+      <TitleWithTeamLogo>
+        <PageHeader title="Players" description="Everyone in the database: your players and the opponents you track." />
+      </TitleWithTeamLogo>
       <Suspense fallback={<Loading />}>
         <PlayersContent searchParams={searchParams} />
       </Suspense>

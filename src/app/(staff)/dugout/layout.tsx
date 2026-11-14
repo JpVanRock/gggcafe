@@ -1,9 +1,9 @@
 import { Suspense, type ReactNode } from "react";
 import { PageHeader } from "@/components/ui";
-import { MyTeamLogo } from "@/components/team-logo";
 import { DugoutTabs, TabList } from "./tabs";
 import { canEdit, getAdminTeamIds, getCurrentUser } from "@/lib/auth";
 import { getWaitingCount } from "@/lib/approvals";
+import { TitleWithTeamLogo } from "@/components/team-logo";
 
 /** The tabs for her role, with how many approvals are waiting on the Roster tab (coaches). */
 async function TabsWithCounts() {
@@ -19,12 +19,9 @@ export default function DugoutLayout({ children }: { children: ReactNode }) {
     <div className="flex flex-col gap-8">
       <div>
         {/* the team logo on the right, beside the title (user, 2026-11-13); it never wraps under it */}
-        <div className="mb-6 flex items-center justify-between gap-4 [&>header]:mb-0">
+        <TitleWithTeamLogo>
           <PageHeader title="Coaches Dugout" description="Organize your team: standards, culture, calendar, drills and practice plans." />
-          <Suspense fallback={null}>
-            <MyTeamLogo />
-          </Suspense>
-        </div>
+        </TitleWithTeamLogo>
         {/* until her role is known, only the tabs every coach has */}
         <Suspense fallback={<TabList role="assistant" />}>
           <TabsWithCounts />

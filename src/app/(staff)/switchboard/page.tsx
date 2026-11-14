@@ -12,6 +12,7 @@ import { NoOwnTeam, TeamPicker } from "../dugout/team-picker";
 import { setAudience, setFeature, setMentorVideo, setTeamVideo } from "./actions";
 import { zoomConfigured } from "@/lib/zoom";
 import type { FormState } from "@/lib/form";
+import { TitleWithTeamLogo } from "@/components/team-logo";
 
 export const metadata: Metadata = { title: "Switchboard · GGG.Cafe" };
 
@@ -73,10 +74,12 @@ export default async function SwitchboardPage({ searchParams }: PageProps<"/swit
 
   return (
     <div className="flex flex-col gap-8">
-      <PageHeader
-        title="Switchboard"
-        description={`What players, parents and mentors on ${team.name} can use. Everything starts on. Off hides it on the site and stops new posts; nothing saved is lost, and switching it back on brings it all back.`}
-      />
+      <TitleWithTeamLogo>
+        <PageHeader
+          title="Switchboard"
+          description={`What players, parents and mentors on ${team.name} can use. Everything starts on. Off hides it on the site and stops new posts; nothing saved is lost, and switching it back on brings it all back.`}
+        />
+      </TitleWithTeamLogo>
       <TeamPicker teams={teams} current={team.id} basePath="/switchboard" />
 
       <div className="flex flex-wrap items-center gap-x-6 gap-y-2 rounded-2xl border border-navy-700 bg-navy-900/60 px-4 py-3 text-sm">

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Card, EmptyState, PageHeader } from "@/components/ui";
 import { requireAdminPage } from "./parts";
+import { TitleWithTeamLogo } from "@/components/team-logo";
 
 export const metadata: Metadata = { title: "View as · GGG.Cafe" };
 
@@ -29,10 +30,12 @@ export default async function ViewAsPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <PageHeader
-        title="View as"
-        description="See a parent's or a mentor's page as they see it, to help with their questions. Read only: nothing can be changed from it."
-      />
+      <TitleWithTeamLogo>
+        <PageHeader
+          title="View as"
+          description="See a parent's or a mentor's page as they see it, to help with their questions. Read only: nothing can be changed from it."
+        />
+      </TitleWithTeamLogo>
       <div className="grid items-start gap-6 lg:grid-cols-2">
         <Card title={`Parents (${(parents ?? []).length})`}>
           {(parents ?? []).length === 0 ? (

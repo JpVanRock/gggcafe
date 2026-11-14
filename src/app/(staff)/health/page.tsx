@@ -9,6 +9,7 @@ import { ActionForm } from "@/components/action-form";
 import { SubmitButton } from "@/components/submit-button";
 import { Badge, Card, EmptyState, PageHeader, TableScroll, tableClass, tdClass, thClass } from "@/components/ui";
 import { resolveError } from "./actions";
+import { TitleWithTeamLogo } from "@/components/team-logo";
 
 export const metadata: Metadata = { title: "Site health · GGG.Cafe" };
 
@@ -37,7 +38,9 @@ export default async function HealthPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <PageHeader title="Site health" description={open.length ? `${open.length} open error ${open.length === 1 ? "group" : "groups"} in the last 7 days.` : "No open errors in the last 7 days."} />
+      <TitleWithTeamLogo>
+        <PageHeader title="Site health" description={open.length ? `${open.length} open error ${open.length === 1 ? "group" : "groups"} in the last 7 days.` : "No open errors in the last 7 days."} />
+      </TitleWithTeamLogo>
 
       <Card title="Connected services">
         <ul className="flex flex-col divide-y divide-navy-800">

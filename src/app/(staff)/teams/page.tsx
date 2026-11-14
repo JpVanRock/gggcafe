@@ -6,13 +6,16 @@ import { createClient } from "@/lib/supabase/server";
 import { FORMAT_LABEL, type Team } from "@/lib/softball";
 import { Card, Disclosure, EmptyState, Loading, PageHeader, tableClass, tdClass, thClass, TableScroll } from "@/components/ui";
 import { TeamForm } from "./forms";
+import { TitleWithTeamLogo } from "@/components/team-logo";
 
 export const metadata: Metadata = { title: "Teams · GGG.Cafe" };
 
 export default function TeamsPage() {
   return (
     <>
-      <PageHeader title="Teams" description="Your teams and the opponents you scout." />
+      <TitleWithTeamLogo>
+        <PageHeader title="Teams" description="Your teams and the opponents you scout." />
+      </TitleWithTeamLogo>
       <Suspense fallback={<Loading />}>
         <TeamsContent />
       </Suspense>

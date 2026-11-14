@@ -13,7 +13,8 @@ export async function SwitchboardPill({ current }: { current: "coach" | "parent"
   const parent = await isStaffParent();
   if (!head && !parent) return null;
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-end gap-3 px-4 pt-3">
+    // -mb-4: the page below starts closer under this row (user, 2026-11-13: less empty space above the title)
+    <div className="mx-auto -mb-4 flex w-full max-w-5xl flex-wrap items-center justify-end gap-3 px-4 pt-3">
       {parent && <RoleSwitch current={current} />}
       {head && <SwitchboardLink />}
     </div>
