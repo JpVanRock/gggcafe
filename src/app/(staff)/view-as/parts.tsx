@@ -32,6 +32,33 @@ export function ViewBanner({ who, role, children }: { who: string; role: "parent
   );
 }
 
+/**
+ * Coach view | Parent view (or Mentor view), for admins (user, 2026-11-14): on the Dugout's Parents and
+ * Mentors tabs, and over a Parent or Mentor View to go back. `viewHref` null when there's nobody to show.
+ */
+export function ViewToggle({ kind, current, coachHref, viewHref }: { kind: "parent" | "mentor"; current: "coach" | "view"; coachHref: string; viewHref: string | null }) {
+  const item = "inline-flex min-h-10 items-center rounded-full px-4 transition";
+  const on = "bg-pink text-on-accent";
+  const off = "text-muted hover:text-ink";
+  const label = kind === "parent" ? "Parent view" : "Mentor view";
+  return (
+    <nav aria-label={`Coach view or ${label.toLowerCase()}`} className="inline-flex self-start rounded-full border border-navy-600 p-0.5 text-sm font-semibold tracking-wider uppercase">
+      <Link href={coachHref} aria-current={current === "coach" ? "page" : undefined} className={`${item} ${current === "coach" ? on : off}`}>
+        Coach view
+      </Link>
+      {viewHref ? (
+        <Link href={viewHref} aria-current={current === "view" ? "page" : undefined} className={`${item} ${current === "view" ? on : off}`}>
+          {label}
+        </Link>
+      ) : (
+        <span className={`${item} text-muted`} title={kind === "parent" ? "No approved parents on this team yet" : "No mentors on this team yet"}>
+          {label}
+        </span>
+      )}
+    </nav>
+  );
+}
+
 const when = (t: string | null) => (t ? formatLongDateAt(t) : "Never");
 
 export function AccountFacts({ account }: { account: ViewAccount }) {

@@ -10,6 +10,7 @@ import { SubmitButton } from "@/components/submit-button";
 import { Badge, Card, Disclosure, EmptyState, buttonStyles } from "@/components/ui";
 import { loadDugoutTeam } from "../data";
 import { NoOwnTeam, TeamPicker } from "../team-picker";
+import { ViewToggle } from "../../view-as/parts";
 import { decideMentorRequest, removeMentor, removeMentorLink, removeMentorMessage } from "./actions";
 
 export const metadata: Metadata = { title: "Mentors · Coaches Dugout · GGG.Cafe" };
@@ -96,6 +97,15 @@ export default async function MentorsPage({ searchParams }: PageProps<"/dugout/m
   return (
     <div className="flex flex-col gap-8">
       <TeamPicker teams={teams} current={team.id} basePath="/dugout/mentors" />
+      {/* admins: what this team's mentors see, drawn like their mentor page (user, 2026-11-14) */}
+      {admin && (
+        <ViewToggle
+          kind="mentor"
+          current="coach"
+          coachHref={`/dugout/mentors?team=${team.id}`}
+          viewHref={working.length ? `/view-as/mentor/${working[0]}?team=${team.id}` : null}
+        />
+      )}
       <div className="flex flex-col gap-4">
         <div>
           <h2 className="text-3xl leading-tight font-bold tracking-tight text-highlight uppercase">Mentors</h2>
@@ -120,11 +130,6 @@ export default async function MentorsPage({ searchParams }: PageProps<"/dugout/m
             </li>
           ))}
         </ol>
-        {admin && (
-          <Link href="/view-as" className="self-start text-sm font-semibold text-link hover:underline">
-            View as a parent or mentor <span aria-hidden="true">→</span>
-          </Link>
-        )}
         <Disclosure summary="How mentoring works">
           <p className="max-w-3xl text-sm text-muted">
             Mentors and skill coaches (pitching, hitting, catching…) ask with the team code. You approve a mentor for the whole team; a player&apos;s parents

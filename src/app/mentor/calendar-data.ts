@@ -20,6 +20,11 @@ export async function loadMentorCalendar(
   nameOf: (playerId: string) => string,
   from: string,
   to: string,
+  /**
+   * her players' team schedule comes from mentor_calendar(), which answers for whoever is signed in: an
+   * admin's Mentor View (user, 2026-11-14) passes false and loads the mentor's teams' schedule itself
+   */
+  { teamSchedule = true }: { teamSchedule?: boolean } = {},
 ): Promise<{ events: CalEvent[]; games: CalGame[] }> {
   const [{ data: trainingRows }, { data: callRows }, { data: teamRows }] = await Promise.all([
     supabase
@@ -39,7 +44,7 @@ export async function loadMentorCalendar(
       .lte("starts_at", `${addDays(to, 1)}T23:59:59Z`)
       .order("starts_at"),
     // her players' team practices, events and games (nothing for a mentor not approved yet)
-    supabase.rpc("mentor_calendar", { p_from: from, p_to: to }),
+    teamSchedule ? supabase.rpc("mentor_calendar", { p_from: from, p_to: to }) : Promise.resolve({ data: [] }),
   ]);
   // a session sent to several players is one entry per day, naming them all
   const sessions = new Map<string, NonNullable<typeof trainingRows>>();

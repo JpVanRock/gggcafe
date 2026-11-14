@@ -26,13 +26,17 @@ export async function MyTeamLogo() {
  * 2026-11-13): the Coaches Dugout, the coaches' other main pages (Dashboard, Teams, Players...)
  * and the family page, so the logo is in the same spot on each. Nothing extra without a logo.
  */
-export function TitleWithTeamLogo({ children }: { children: ReactNode }) {
+export function TitleWithTeamLogo({ children, logo }: { children: ReactNode; /** a page about one chosen team (the Switchboard) passes that team's logo, or null for none */ logo?: TeamLogo | null }) {
   return (
     <div className="mb-6 flex items-start justify-between gap-4 [&>header]:mb-0">
       {children}
-      <Suspense fallback={null}>
-        <MyTeamLogo />
-      </Suspense>
+      {logo !== undefined ? (
+        <TeamLogoMark logo={logo} />
+      ) : (
+        <Suspense fallback={null}>
+          <MyTeamLogo />
+        </Suspense>
+      )}
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { ConfirmSubmit } from "@/components/confirm-submit";
 import { Card, EmptyState, Disclosure, badgeClass, eyebrowClass } from "@/components/ui";
 import { loadDugoutTeam } from "../data";
 import { NoOwnTeam, TeamPicker } from "../team-picker";
+import { ViewToggle } from "../../view-as/parts";
 import { removeParentLink, setTeamAdmin } from "./actions";
 import { TeamCodeCard } from "../team-code";
 import { PendingParentList } from "../approvals";
@@ -56,13 +57,17 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
   return (
     <div className="flex flex-col gap-8">
       <TeamPicker teams={teams} current={team.id} basePath="/dugout/parents" />
+      {/* admins: what this team's parents see, drawn like their family page (user, 2026-11-14) */}
+      {admin && (
+        <ViewToggle
+          kind="parent"
+          current="coach"
+          coachHref={`/dugout/parents?team=${team.id}`}
+          viewHref={approved.length && parentOf.get(approved[0].link_id) ? `/view-as/parent/${parentOf.get(approved[0].link_id)}?team=${team.id}` : null}
+        />
+      )}
 
       <TeamCodeCard team={team} code={code} head />
-      {admin && (
-        <Link href="/view-as" className="-mt-4 self-start text-sm font-semibold text-link hover:underline">
-          View as a parent or mentor <span aria-hidden="true">→</span>
-        </Link>
-      )}
 
       <Card title={`Waiting for approval (${pending.length})`}>
         {pending.length === 0 ? (

@@ -143,10 +143,12 @@ export function MenuPanel({
   subtitle?: ReactNode;
   variant: BoardVariant;
   wide?: boolean;
-  cta?: { href: string; label: string } | null;
+  /** the link at the bottom; without an href it shows the label only (an admin's preview of someone's page) */
+  cta?: { href?: string; label: string } | null;
   children: ReactNode;
 }) {
   const style = BOARD[variant];
+  const ctaClass = `relative mt-6 self-start font-mono text-xs tracking-widest uppercase ${style.cta}`;
   return (
     <article className={`relative ${wide ? "md:col-span-2" : ""}`}>
       <div className={`relative flex h-full flex-col overflow-hidden rounded-2xl p-6 sm:p-8 ${style.board}`}>
@@ -156,14 +158,15 @@ export function MenuPanel({
         <h2 className="relative pr-20 text-3xl leading-none font-bold tracking-wide uppercase sm:pr-28 sm:text-4xl">{title}</h2>
         {subtitle && <p className={`relative mt-2 font-mono text-xs tracking-[0.2em] uppercase ${style.subtitle}`}>{subtitle}</p>}
         <div className="relative mt-6 flex-1">{children}</div>
-        {cta && (
-          <Link
-            href={cta.href}
-            className={`relative mt-6 self-start font-mono text-xs tracking-widest uppercase hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-pink ${style.cta}`}
-          >
+        {cta?.href ? (
+          <Link href={cta.href} className={`${ctaClass} hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-pink`}>
             {cta.label} <span aria-hidden="true">→</span>
           </Link>
-        )}
+        ) : cta ? (
+          <p className={ctaClass}>
+            {cta.label} <span aria-hidden="true">→</span>
+          </p>
+        ) : null}
       </div>
     </article>
   );

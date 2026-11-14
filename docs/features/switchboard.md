@@ -2,6 +2,15 @@
 - A pill under the main menu (`components/switchboard-pill.tsx`, staff layout), head coaches and admins only, opens
   `/switchboard?team=`: per team, three groups (Players, Parents, Mentors) of on/off switches, "All on" / "All off" per
   group, the "Always on" items and why, and the team-code sign-up status (changed on the Roster tab).
+- Who (user, 2026-11-14): only head coaches (role `coach`) and admins have the Switchboard. Parents and mentors never
+  do: no pill (it's only in the staff layout; the family header shows just the Coach / Parent switch), `/switchboard`
+  is staff-only and 404s for anyone else, the actions use `headCoachCheck()` / `adminCheck()`, and the database lets
+  only head coaches and admins write `team_features_off` (parents, players and mentors only read their teams' rows).
+- Which team (user, 2026-11-14): a pink-edged card at the top names the team being adjusted (name, age group,
+  organization), and the logo beside the title is that team's (`TitleWithTeamLogo logo=`), not the coach's first team.
+  Admins, and a coach with several teams, get a "Switch team" dropdown of every registered team (our teams, not
+  opponents), each with its age group, organization and how many switches are off (`components/team-select.tsx`;
+  picking one opens `?team=`, a GET form with a Go button when scripts are off).
 - Keys, labels and groups: `src/lib/switchboard.ts` (`SWITCHES`, `ALWAYS_ON`, `SECTION_SWITCH`; unit-tested). Table
   `team_features_off` (a row = off; head-coach writes; staff read; players, parents (both ways) and mentors read their teams').
   Everything is on until switched off. Off hides it on the site and stops new posts; nothing saved is deleted.

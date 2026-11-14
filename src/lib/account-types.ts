@@ -163,7 +163,7 @@ export const SECTIONS: { title: string; rows: Row[] }[] = [
       row("Welcome packet", "The coach's letter, team policies and how-to-help tips on the family page.", ["yes", "no", "no", "view", "no"],
         "Head coaches write it (Parents tab); approved parents read it and mark each item read."),
       row("Change roles, remove staff", "Head Coach, Assistant Coach or Viewer, on the Roster tab.", ["no", "no", "no", "no", "no"], "Admins only."),
-      row("View as a parent or mentor", "See their family page or mentor home as they see it, read only, to help with their questions.", ["no", "no", "no", "no", "no"],
+      row("View as a parent or mentor", "See their family page or mentor home as they see it, read only, to help with their questions: Parent view and Mentor view toggles on the Dugout's Parents and Mentors tabs.", ["no", "no", "no", "no", "no"],
         "Admins only: Coaches Dugout → Parents or Mentors, or the View as page."),
     ],
   },
@@ -223,7 +223,7 @@ export const QUESTIONS: { q: string; a: string[] }[] = [
   {
     q: "What does the Switchboard turn off?",
     a: [
-      "Head coaches (and admins) open it from the Switchboard pill under the main menu. For one team, it turns off features for Players (Goals, Pop Report, Mental GP, My Journal, Training, Softball IQ, Trophy Room, Leaderboard, + Activity, Team page, Yearbook), Parents (Team Budget, welcome packet, questionnaire, View as player, Yearbook, Calendar, Team Standards & Culture, Her goals) and Mentors (messages, training, notes, what they can see, and video calls once a site admin turns calls on for the team).",
+      "Head coaches (and admins) open it from the Switchboard pill under the main menu. The card at the top names the team being changed; admins pick any registered team from its dropdown. For one team, it turns off features for Players (Goals, Pop Report, Mental GP, My Journal, Training, Softball IQ, Trophy Room, Leaderboard, + Activity, Team page, Yearbook), Parents (Team Budget, welcome packet, questionnaire, View as player, Yearbook, Calendar, Team Standards & Culture, Her goals) and Mentors (messages, training, notes, what they can see, and video calls once a site admin turns calls on for the team).",
       "Off hides it on the site and stops new posts; nothing saved is deleted, and switching it back on brings it all back. Some things stay on for safety or the law: TWIS, the medical card, her login and consent, and parents' oversight of mentors. A player on two teams loses a feature if either team turns it off.",
     ],
   },
