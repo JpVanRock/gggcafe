@@ -112,6 +112,9 @@ tests/unit/              node --test unit tests (npm run test:unit)
 - Every new table: `select private.apply_staff_rls('public.<table>');` (staff read, coach/admin write).
   Exceptions need their own explicit policies and a reason.
 - Every view: `with (security_invoker = true)`, so RLS applies to the caller.
+- A plpgsql `return query` must match its declared column types exactly. Supabase's `auth.users` text columns
+  (email and others) are `varchar(255)`: cast them (`u.email::text`). The test stub (`tests/db/00_supabase_stub.sql`)
+  uses the same types, so `db:test` catches a mismatch when a test calls the function.
 - Security-definer functions go in the `private` schema (not exposed by the API) with `set search_path = ''`, check
   the caller first, and get their public wrapper and grants from `select private.expose('private.fn(args)')`
   (add `array['anon', 'authenticated']` only for signed-out pages). Start one with `npm run db:new:definer <name>`

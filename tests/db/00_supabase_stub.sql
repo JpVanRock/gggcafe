@@ -6,21 +6,23 @@ create role authenticated nologin noinherit;
 create role service_role nologin noinherit bypassrls;
 
 create schema auth;
+-- Column types as on Supabase: most of auth.users' text columns are varchar(255) there, and a plpgsql
+-- "return query" must match its declared types exactly (cast: u.email::text).
 create table auth.users (
   id                 uuid primary key default gen_random_uuid(),
-  email              text unique,
+  email              varchar(255) unique,
   raw_user_meta_data jsonb not null default '{}'::jsonb,  -- sign-up data (display_name, role...)
   created_at         timestamptz not null default now(),
   -- columns create_player_login() fills (parent-made username logins)
   instance_id            uuid,
-  aud                    text,
-  role                   text,
-  encrypted_password     text,
+  aud                    varchar(255),
+  role                   varchar(255),
+  encrypted_password     varchar(255),
   email_confirmed_at     timestamptz,
-  confirmation_token     text,
-  recovery_token         text,
-  email_change_token_new text,
-  email_change           text,
+  confirmation_token     varchar(255),
+  recovery_token         varchar(255),
+  email_change_token_new varchar(255),
+  email_change           varchar(255),
   raw_app_meta_data      jsonb,
   updated_at             timestamptz
 );
