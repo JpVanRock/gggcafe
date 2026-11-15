@@ -33,6 +33,7 @@ export function VideoCallList({
   playerLabel,
   canCancel = () => false,
   empty,
+  linkClass = "text-link",
 }: {
   calls: VideoCallRow[];
   showPlayer?: boolean;
@@ -40,6 +41,8 @@ export function VideoCallList({
   playerLabel?: (call: VideoCallRow) => string | null;
   canCancel?: (call: VideoCallRow) => boolean;
   empty?: string;
+  /** the call page link's color: pink by default; on a navy menu board its highlight (user, 2026-11-14: pink fails contrast there) */
+  linkClass?: string;
 }) {
   if (!calls.length) return empty ? <p className="text-sm text-muted">{empty}</p> : null;
   const now = new Date();
@@ -63,7 +66,7 @@ export function VideoCallList({
             </span>
             <span className={badgeClass(state === "open" ? "neon" : state === "cancelled" ? "danger" : "neutral")}>{CALL_STATE_LABEL[state]}</span>
             {coming && (
-              <Link href={`/calls/${c.id}`} className="text-sm font-semibold text-link hover:underline">
+              <Link href={`/calls/${c.id}`} className={`text-sm font-semibold ${linkClass} hover:underline`}>
                 {state === "open" ? "Join now →" : "Call page →"}
               </Link>
             )}

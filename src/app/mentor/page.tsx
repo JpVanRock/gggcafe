@@ -190,7 +190,7 @@ export default async function MentorHome() {
           {/* video calls from the dashboard (user, 2026-11-14): one player, or a group from one team */}
           <MenuPanel number={2} title="Video Calls" subtitle="One player, or a group from one team" variant="navy" wide>
             <div className="flex flex-col gap-5">
-              <VideoCallList calls={myCalls} showPlayer canCancel={() => true} empty="No calls booked. Schedule one below." />
+              <VideoCallList calls={myCalls} showPlayer canCancel={() => true} linkClass="text-highlight" empty="No calls booked. Schedule one below." />
               {callable.length === 0 ? (
                 <p className={menuNote}>
                   Video calls aren&apos;t on for your players&apos; teams yet. A site admin turns them on for a team, then the head coach lets mentors book them
