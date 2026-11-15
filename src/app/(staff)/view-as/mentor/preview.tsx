@@ -1,7 +1,7 @@
 // A mentor's home drawn like their mentor menu, read only, for admins (user, 2026-11-14): one mentor's
 // own (View as → a mentor) and the example of a new whole-team mentor when a team has none yet
 // (example/page.tsx). Links are left out: labels show where a mentor would tap.
-import { Badge } from "@/components/ui";
+import { Badge, buttonStyles } from "@/components/ui";
 import { MenuHeader, MenuItem, MenuPanel } from "@/components/menu-board";
 import { ComingUpCard } from "@/components/coming-up";
 import type { ComingUpItem } from "@/lib/family";
@@ -95,15 +95,25 @@ export function MentorPreview({
             </div>
           </MenuPanel>
           <MenuPanel number={2} title="Video Calls" subtitle="One player, or a group from one team" variant="navy" wide>
-            {calls.length === 0 ? (
-              <p className={note}>No calls booked. They schedule one here: tick one player, or several from one team for a group call.</p>
-            ) : (
-              <div className="flex flex-col gap-4">
-                {calls.map((c) => (
-                  <MenuItem key={c.key} name={c.name} value={c.value} note={c.note} />
-                ))}
-              </div>
-            )}
+            <div className="flex flex-col gap-5">
+              {/* the mentor's own button, shown here but not clickable (user, 2026-11-14) */}
+              <span className={buttonStyles("pill", "self-start")}>
+                <span aria-hidden="true">+</span> Schedule a video call
+              </span>
+              {calls.length === 0 ? (
+                <p className={note}>No calls booked yet.</p>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  {calls.map((c) => (
+                    <MenuItem key={c.key} name={c.name} value={c.value} note={c.note} />
+                  ))}
+                </div>
+              )}
+              <p className="text-xs text-[var(--menu-note)]">
+                The mentor taps the button to book a call with one player, or a group from one team. It shows once video calls are on for their players&apos; team
+                and the head coach allows mentors&apos; calls.
+              </p>
+            </div>
           </MenuPanel>
           <MenuPanel number={3} title="Training on Their Weeks" subtitle="In their This Week in Softball" variant="pink" cta={{ label: "Add & manage" }}>
             {sessions.length === 0 ? (

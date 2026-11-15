@@ -190,7 +190,7 @@ export default async function MentorHome() {
           {/* video calls from the dashboard (user, 2026-11-14): one player, or a group from one team */}
           <MenuPanel number={2} title="Video Calls" subtitle="One player, or a group from one team" variant="navy" wide>
             <div className="flex flex-col gap-5">
-              <VideoCallList calls={myCalls} showPlayer canCancel={() => true} linkClass="text-highlight" empty="No calls booked. Schedule one below." />
+              {/* a clear button first (user, 2026-11-14: "I do not see an actual link ... to schedule a call"); the form opens under it */}
               {callable.length === 0 ? (
                 <p className={menuNote}>
                   Video calls aren&apos;t on for your players&apos; teams yet. A site admin turns them on for a team, then the head coach lets mentors book them
@@ -199,10 +199,20 @@ export default async function MentorHome() {
               ) : !zoomConfigured() ? (
                 <p className={menuNote}>Video calls aren&apos;t connected to Zoom yet. A site admin adds the Zoom keys first.</p>
               ) : (
-                <Disclosure summary="Schedule a video call">
-                  <VideoCallForm players={callable} />
-                </Disclosure>
+                <details className="group">
+                  <summary className={buttonStyles("pill", "cursor-pointer list-none [&::-webkit-details-marker]:hidden")}>
+                    <span aria-hidden="true" className="group-open:hidden">
+                      +
+                    </span>
+                    <span className="group-open:hidden">Schedule a video call</span>
+                    <span className="hidden group-open:inline">Close the form</span>
+                  </summary>
+                  <div className="mt-4 rounded-xl border border-navy-600 bg-navy-900 p-4 sm:p-5">
+                    <VideoCallForm players={callable} />
+                  </div>
+                </details>
               )}
+              <VideoCallList calls={myCalls} showPlayer canCancel={() => true} linkClass="text-highlight" empty="No calls booked yet." />
               <p className="text-xs text-[var(--menu-note)]">
                 Held here on GGG.Cafe. Every player&apos;s parents are invited and told; head coaches can drop in; nothing is recorded.
               </p>
