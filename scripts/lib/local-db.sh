@@ -16,13 +16,16 @@ trap cleanup EXIT
 
 run() { psql -h localhost -p "$PORT" -U postgres -d postgres -X -q -v ON_ERROR_STOP=1 "$@"; }
 
-# local_db_start [quiet]: boot the server and apply the stub + every migration.
+# local_db_start [quiet]: boot the server and apply the stub + every migration (only those up to
+# MIGRATIONS_UPTO, a version like 20261116030522, when it's set: the backup check uses that).
 local_db_start() {
   "$PGBIN/initdb" -D "$WORK/data" -U postgres --auth=trust >/dev/null
   "$PGBIN/pg_ctl" -D "$WORK/data" -l "$WORK/postgres.log" -w \
     -o "-p $PORT -c listen_addresses=localhost -c unix_socket_directories=''" start >/dev/null
   run -o /dev/null -f "$ROOT/tests/db/00_supabase_stub.sql"
   for f in "$ROOT"/supabase/migrations/*.sql; do
+    local v="$(basename "$f")"; v="${v%%_*}"
+    [[ -n "${MIGRATIONS_UPTO:-}" && "$v" > "$MIGRATIONS_UPTO" ]] && continue
     [[ "${1:-}" == quiet ]] || echo "migrate  $(basename "$f")"
     run -o /dev/null -f "$f"
   done

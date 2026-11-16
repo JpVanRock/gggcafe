@@ -59,7 +59,10 @@ src/app/manifest.ts      the phone app (installable web app, "GGG Cafe" under th
 supabase/migrations/     schema, applied in filename order
 supabase/seed.sql        fictional sample data — local tests only, never pushed
 tests/db/                SQL checks run by npm run db:test
-scripts/                 db-test.sh, db-push.sh, db-check.sh, db-types.sh (+ lib/env.sh)
+scripts/                 db-test.sh, db-push.sh, db-check.sh, db-types.sh (+ lib/env.sh); db-backup.sh, db-restore.sh
+                         (npm run db:backup: a dated copy of the live data and files in ~/GGG.Cafe-backups, test-loaded,
+                         30 days kept; needs brew postgresql@17; runs daily on this Mac via backup-schedule.sh, a launchd
+                         agent; docs/architecture/backups.md)
 tests/unit/              node --test unit tests (npm run test:unit)
 ```
 
@@ -201,6 +204,7 @@ tests/unit/              node --test unit tests (npm run test:unit)
 | State machines | `docs/architecture/state-machines.md` | Every lifecycle and runner, where it's declared and enforced, adding one |
 | Error tracking and logs | `docs/architecture/observability.md` | Structured logs, error groups, /health, browser errors, log drain setup |
 | Outbox and job worker | `docs/architecture/jobs.md` | Jobs table, worker, retries, the jobs secret, setup, adding a job kind |
+| Backups | `docs/architecture/backups.md` | `npm run db:backup` (data, files, test load, 30 days), restoring into a new project, what's rebuilt by hand |
 | Video calls | `docs/features/video-calls.md` | Zoom calls inside the site: admin and head-coach switches, booking, joining, safeguards, Zoom and Vercel setup |
 
 ## Softball conventions

@@ -17,7 +17,7 @@ npm run db:check                # confirms the database connection
 npm run dev                     # http://localhost:3000
 ```
 
-Tools: Node 20+, [Supabase CLI](https://supabase.com/docs/guides/cli), Homebrew Postgres (`brew install postgresql@16`, only for `npm run db:test`).
+Tools: Node 20+, [Supabase CLI](https://supabase.com/docs/guides/cli), Homebrew Postgres (`brew install postgresql@16`, only for `npm run db:test`; `postgresql@17` for `npm run db:backup`).
 
 ## Scripts
 
@@ -28,6 +28,9 @@ Tools: Node 20+, [Supabase CLI](https://supabase.com/docs/guides/cli), Homebrew 
 | `npm run db:check` | Test the connection to the live database and list applied migrations |
 | `npm run db:test` | Apply all migrations + sample data to a throwaway local Postgres and check stat math and access rules. Run before every push. |
 | `npm run db:push` | Apply new migrations to the live database (never loads sample data) |
+| `npm run db:backup` | Save a dated copy of the live data (and uploaded files) to `~/GGG.Cafe-backups`, test-load it, keep 30 days ([backups](docs/architecture/backups.md)) |
+| `npm run db:backup:schedule -- status` | The daily backup on this Mac: whether it's on, its last run (`install` / `remove` to turn it on or off) |
+| `npm run db:restore -- <folder>` | Load a backup into a new, empty Supabase project (refuses one in use) |
 | `npm run db:new <name>` | Create a new migration file in `supabase/migrations/` |
 | `npm run db:types` | Regenerate TypeScript types from the live schema (needs `supabase login` once) |
 
