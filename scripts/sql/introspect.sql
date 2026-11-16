@@ -43,6 +43,16 @@ funcs as (
     from pg_proc p join pg_namespace n on n.oid = p.pronamespace
    where n.nspname = 'public' and p.prokind = 'f' and p.prorettype <> 'trigger'::regtype
 ),
+-- one-column CHECK constraints, so gen-types.py can type `x text check (x in ('a', 'b'))` as 'a' | 'b'
+checks as (
+  select coalesce(jsonb_agg(jsonb_build_object(
+           'rel', cl.relname, 'col', a.attname, 'def', pg_get_constraintdef(con.oid)
+         ) order by cl.relname, a.attname, con.conname), '[]')
+    from pg_constraint con
+    join pg_class cl on cl.oid = con.conrelid join pg_namespace n on n.oid = cl.relnamespace
+    join pg_attribute a on a.attrelid = con.conrelid and a.attnum = con.conkey[1]
+   where con.contype = 'c' and n.nspname = 'public' and array_length(con.conkey, 1) = 1
+),
 enum_values as (
   select coalesce(jsonb_object_agg(x.oid, x.vals), '{}')
     from (select e.enumtypid::text as oid, jsonb_agg(e.enumlabel order by e.enumsortorder) as vals
@@ -50,4 +60,4 @@ enum_values as (
 )
 select jsonb_build_object('types', (select * from types), 'rels', (select * from rels),
                           'fks', (select * from fks), 'funcs', (select * from funcs),
-                          'enum_values', (select * from enum_values));
+                          'enum_values', (select * from enum_values), 'checks', (select * from checks));

@@ -27,7 +27,8 @@ src/app/(staff)/         signed-in area with shared nav: dashboard (own view per
 src/components/ui.tsx    shared page/form/table building blocks
 src/lib/auth.ts          getCurrentUser, requireStaffPage, canEdit, editorCheck, isHeadCoach, headCoachCheck
 src/lib/roles.ts         staff roles (Head Coach / Assistant Coach / Admin / Viewer), Dugout tabs per role
-src/lib/form.ts          FormData readers + friendlyDbError for server actions
+src/lib/form.ts          FormData readers (`oneOf`, `inList`) + friendlyDbError for server actions
+src/lib/lifecycles.ts    every stored status lifecycle (states, labels, tones, moves), docs/architecture/state-machines.md
 src/lib/softball.ts      positions, bats/throws, formats, row types (must match DB enums)
 src/lib/supabase/        server.ts (Server Components/Actions), client.ts (browser),
                          env.ts, database.types.ts (generated from the migrations: npm run db:types)
@@ -87,6 +88,11 @@ tests/unit/              node --test unit tests (npm run test:unit)
   (`player-achievements.ts`). Softball IQ UI: `iq-quiz-client.tsx` (practice quiz, question bank) and
   `iq-tests-client.tsx` (level tests), shared bits in `iq-shared.ts`.
 - Names: `playerName()` in `src/lib/softball.ts`.
+- Anything that moves through stages (docs/architecture/state-machines.md): a status column is declared once in
+  `src/lib/lifecycles.ts` (labels and badge tones come from there); actions move only from the move's `from` states
+  (`.in("status", X.moves.approve.from).select("id")`) and say so when the row has moved on (`ALREADY_DECIDED`);
+  a state computed from rows or the clock has one function (`callState`, `chapterStatus`); a runner inside a page has
+  one `Phase` union and drops server replies for an attempt that's no longer on screen.
 - Spreadsheets in and out (Excel .xlsx and CSV): `src/lib/spreadsheet.ts` (`readXlsx`, `readCsv`, `writeXlsx`; no dependencies).
   First use: the Team Budget import (`src/lib/budget-import.ts`, docs/features/coaches-dugout.md).
 - The site's address: links made during a request use `requestOrigin()` (`src/lib/request-origin.ts`), so they match
@@ -133,13 +139,18 @@ tests/unit/              node --test unit tests (npm run test:unit)
   `has_player_access()`) has a read-only "(parent view)" twin using `my_child_ids()` / `my_child_team_ids()` /
   `has_child_access()`. A new player-read rule needs its twin in the same migration (`tests/db/zz_parent_view.test.sql`
   fails without it), and a read function player pages call needs a parent branch; write functions stay the player's.
+- A status column whose wrong or stale change would do harm gets a lifecycle guard in its migration:
+  `create trigger x_lifecycle before update of status on public.x for each row when (old.status is distinct from
+  new.status) execute function private.guard_transition('status', 'pending>approved', ...)` (raises P0010), with the
+  same moves in `src/lib/lifecycles.ts` and `guarded: true`; `tests/unit/lifecycles.test.ts` fails when they differ.
 - Run `npm run db:test` before `npm run db:push`. It checks stat math, RLS on every table,
   security_invoker on every view, and the viewer/coach/admin access rules.
 - Never edit an applied migration; add a new one (`npm run db:new <name>`).
 - The app is typed from the schema: `src/lib/supabase/database.types.ts` is generated from the migrations by
   `npm run db:types` (`scripts/gen-types.py` over a throwaway local Postgres; no Docker or `supabase login`). Run it
   after adding a migration: `db:test` fails while the types are out of date. Typed JSON columns are listed in
-  `scripts/json-types.json`. Keep `.select()` strings literal (one string, not built) so results are typed, and
+  `scripts/json-types.json`; a text column with `check (x in ('a', 'b'))` is typed `"a" | "b"` (narrow form input with
+  `oneOf`/`inList`). Keep `.select()` strings literal (one string, not built) so results are typed, and
   don't use `as unknown as`: a plain `as` is checked against the inferred type.
 - Never print or commit `.env.local`. The database password lives only there.
 
@@ -187,6 +198,7 @@ tests/unit/              node --test unit tests (npm run test:unit)
 | Team Yearbook | `docs/features/yearbook.md` | Season photos, who can add and view, the viewer |
 | Team playbook & scouting | `docs/features/playbook-scouting.md` | Depth chart, call sheet and flashcards, team quizzes, scouting |
 | UI components | `docs/features/ui-components.md` | Type scale, shared components and props, states, accessibility rules |
+| State machines | `docs/architecture/state-machines.md` | Every lifecycle and runner, where it's declared and enforced, adding one |
 | Error tracking and logs | `docs/architecture/observability.md` | Structured logs, error groups, /health, browser errors, log drain setup |
 | Outbox and job worker | `docs/architecture/jobs.md` | Jobs table, worker, retries, the jobs secret, setup, adding a job kind |
 | Video calls | `docs/features/video-calls.md` | Zoom calls inside the site: admin and head-coach switches, booking, joining, safeguards, Zoom and Vercel setup |

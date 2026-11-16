@@ -7,6 +7,7 @@ import { friendlyDbError, text, type FormState, invalid } from "@/lib/form";
 import { PACKET_KINDS, PACKET_STARTERS } from "@/lib/family";
 import { isUuid } from "@/lib/softball";
 import { STALE, failed, must, runAction } from "@/lib/actions";
+import { ALREADY_DECIDED, PARENT_LINK } from "@/lib/lifecycles";
 
 /** Approves a request (matched to one of the team's players) or declines it. */
 export async function decideParentLink(_prev: FormState, fd: FormData): Promise<FormState> {
@@ -20,15 +21,20 @@ export async function decideParentLink(_prev: FormState, fd: FormData): Promise<
     if (approve && !isUuid(playerId)) return failed(STALE);
     const user = await getCurrentUser();
     const supabase = await createClient();
-    must(await supabase
+    const move = PARENT_LINK.moves[approve ? "approve" : "decline"];
+    // only while it waits: a page left open can't flip another decision
+    const decided = must(await supabase
       .from("parent_links")
       .update({
-        status: approve ? "approved" : "declined",
+        status: move.to,
         player_id: approve ? playerId : null,
         decided_by: user?.id ?? null,
         decided_at: new Date().toISOString(),
       })
-      .eq("id", id));
+      .eq("id", id)
+      .in("status", move.from)
+      .select("id"));
+    if (!decided.data?.length) return failed(ALREADY_DECIDED);
     refresh();
   });
 }
@@ -112,8 +118,8 @@ export async function addStarterTips(_prev: FormState, fd: FormData): Promise<Fo
     const supabase = await createClient();
     const { data } = await supabase.from("parent_packet_items").select("title").eq("team_id", teamId);
     const have = new Set(((data ?? []) as { title: string }[]).map((r) => r.title));
-    const rows = PACKET_STARTERS.filter((t) => !have.has(t.title)).map((t, i) => ({ team_id: teamId, kind: "tip", title: t.title, body: t.body, position: 2000 + i }));
-    if (rows.length) await supabase.from("parent_packet_items").insert(rows);
+    const rows = PACKET_STARTERS.filter((t) => !have.has(t.title)).map((t, i) => ({ team_id: teamId, kind: "tip" as const, title: t.title, body: t.body, position: 2000 + i }));
+    if (rows.length) must(await supabase.from("parent_packet_items").insert(rows));
     refresh();
   });
 }

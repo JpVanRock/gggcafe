@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 import { checkbox, friendlyDbError, isoDate, oneOf, text, wholeNumber, type FormState, invalid } from "@/lib/form";
 import { BATS, FORMATS, POSITIONS, THROWS, isUuid } from "@/lib/softball";
 import { STALE, failed, must, runAction } from "@/lib/actions";
+import { ALREADY_DECIDED, PLAYER_CLAIM } from "@/lib/lifecycles";
 
 const JERSEY = /^\d{1,2}$/;
 const DUPLICATE_TEAM = "A team with that name and age group already exists.";
@@ -304,20 +305,24 @@ export async function decidePlayerClaim(_prev: FormState, fd: FormData): Promise
     if (approve && !isUuid(entry)) return failed(STALE);
     const supabase = await createClient();
     const { data: auth } = await supabase.auth.getClaims();
+    const move = PLAYER_CLAIM.moves[approve ? "approve" : "decline"];
+    // only while it waits: a page left open can't flip another coach's decision
     const result = await supabase
       .from("player_claims")
       .update({
-        status: approve ? "approved" : "declined",
+        status: move.to,
         ...(approve ? { roster_entry_id: entry } : {}),
         decided_by: auth?.claims?.sub ?? null,
         decided_at: new Date().toISOString(),
       })
-      .eq("id", id);
+      .eq("id", id)
+      .in("status", move.from)
+      .select("id");
     // under 13 without verified parental consent (COPPA): the database refuses
     if (result.error?.code === "P0008") {
       return failed("She's under 13, so she can't have her own account yet. Decline this claim: her parent gives verified consent on the family page, then makes her login.");
     }
-    must(result);
+    if (!must(result).data?.length) return failed(ALREADY_DECIDED);
     refresh();
   });
 }

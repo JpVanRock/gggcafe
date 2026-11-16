@@ -237,7 +237,10 @@ export const QUESTIONS: { q: string; a: string[] }[] = [
   },
   {
     q: "How do I change someone's role or remove them?",
-    a: ["Coaches Dugout → Roster → Coaching staff. Admins can switch anyone between Head Coach, Assistant Coach and Viewer, or remove them from the staff."],
+    a: [
+      "Coaches Dugout → Roster → Coaching staff. Admins can switch anyone between Head Coach, Assistant Coach and Viewer, or remove them from the staff.",
+      "Someone removed keeps their account; their dashboard says \"No coach access\" instead of asking them to wait for approval.",
+    ],
   },
   {
     q: "What does everyone agree to?",

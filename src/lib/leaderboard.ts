@@ -81,7 +81,9 @@ export type RaceStatus = "eligible" | "named-this-round" | "cooldown";
 /**
  * This week's race for Player of the Week, best chance first: eligible players by
  * points (her week's points so far), then those already named this round, then
- * those still waiting out six weeks. Mirrors the database's pick.
+ * those still waiting out six weeks. Ties go the way the database's pick breaks them
+ * (migration 20261108150000): fewest times named, then named longest ago (never first),
+ * then player id, so the player shown first is the one who would be named.
  */
 export function weekRace(rows: LeaderRow[], weeks: PotwWeek[], weekStart: string) {
   const { named } = currentRound(rows, weeks);
@@ -94,7 +96,14 @@ export function weekRace(rows: LeaderRow[], weeks: PotwWeek[], weekStart: string
   const order: Record<RaceStatus, number> = { eligible: 0, "named-this-round": 1, cooldown: 2 };
   return rows
     .map((r) => ({ ...r, ...status(r) }))
-    .sort((a, b) => order[a.status] - order[b.status] || b.week_points - a.week_points || byName(a, b));
+    .sort(
+      (a, b) =>
+        order[a.status] - order[b.status] ||
+        b.week_points - a.week_points ||
+        a.times_named - b.times_named ||
+        (a.last_named ?? "").localeCompare(b.last_named ?? "") ||
+        (a.player_id < b.player_id ? -1 : a.player_id > b.player_id ? 1 : 0),
+    );
 }
 
 /** The latest week with a Player of the Week, if any. */

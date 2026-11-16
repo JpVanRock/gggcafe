@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { buttonClass, inputClass, secondaryButtonClass, cardClass } from "@/components/ui";
 
 import { POSITION_LABEL, type FieldPosition } from "@/lib/softball";
@@ -94,6 +94,7 @@ function needed(total: number) {
 /** Next unanswered question from `from` (wrapping), on one shelf if given, else anywhere. */
 function nextOpen(questions: LevelQuestion[], done: Answered, from: number, shelf: string | null = null): number {
   const open = (q: LevelQuestion) => !done[q.id] && (!shelf || q.section === shelf);
+  from = Math.min(Math.max(from, 0), questions.length); // "Finish test" on a fully answered test starts past the end
   for (let i = from; i < questions.length; i++) if (open(questions[i])) return i;
   for (let i = 0; i < from; i++) if (open(questions[i])) return i;
   return shelf ? nextOpen(questions, done, from) : questions.length; // shelf done: carry on anywhere
@@ -408,8 +409,13 @@ export function IqTests({
   const [hint, setHint] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  // The attempt on screen. A server reply for any other one (she left, or opened another test while
+  // it was on its way) is dropped, so it can't reopen a test she has closed.
+  const live = useRef<string | null>(null);
+  const stillOn = (attemptId: string) => live.current === attemptId;
 
   function exit() {
+    live.current = null;
     setSession(null);
     setFeedback(null);
     setResult(null);
@@ -425,6 +431,7 @@ export function IqTests({
       const res = await startIqLevel({ playerId, track: key.track, level: key.level, position: key.position, restart });
       if (res.error || !res.attemptId || !res.questions) return setError(res.error ?? "Couldn't start the test.");
       const done = res.answered ?? {};
+      live.current = res.attemptId;
       setSession({ ...key, mode: "test", attemptId: res.attemptId, questions: res.questions, done, index: nextOpen(res.questions, done, 0), shelf: null });
       setFeedback(null);
       setResult(null);
@@ -438,7 +445,9 @@ export function IqTests({
       if (res.error || !res.questions) return setError(res.error ?? "Couldn't open the review.");
       const done = res.reviewed ?? {};
       const index = nextOpen(res.questions, done, 0);
+      live.current = attemptId;
       setSession({ ...key, mode: "review", attemptId, questions: res.questions, done, index, shelf: null });
+      setResult(null);
       setReviewDone(index >= res.questions.length);
       setFeedback(null);
       setHint(null);
@@ -465,6 +474,7 @@ export function IqTests({
               chosenIndex: chosen,
               hintUsed: hint !== null,
             });
+      if (!stillOn(session.attemptId)) return;
       if (res.error) return setError(res.error);
       setError(null);
       setSession({ ...session, done: { ...session.done, [q.id]: { correct: Boolean(res.correct) } } });
@@ -483,6 +493,7 @@ export function IqTests({
     if (session.mode === "review") return setReviewDone(true);
     startTransition(async () => {
       const res = await finishIqLevel({ attemptId: session.attemptId });
+      if (!stillOn(session.attemptId)) return;
       if (res.error) return setError(res.error);
       setResult({ correct: res.correct ?? 0, total: res.total ?? 0, passed: Boolean(res.passed), awardEarned: Boolean(res.awardEarned) });
     });
@@ -493,6 +504,7 @@ export function IqTests({
     const q = session.questions[session.index];
     startTransition(async () => {
       const res = await getIqHint({ questionId: q.id });
+      if (!stillOn(session.attemptId)) return;
       if (res.error) return setError(res.error);
       setHint(res.hint ?? "");
     });

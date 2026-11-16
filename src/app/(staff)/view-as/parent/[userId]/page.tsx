@@ -12,7 +12,8 @@ import { ComingUpCard } from "@/components/coming-up";
 import { PACKET_KIND_LABEL, medicalOnFile, type PacketKind } from "@/lib/family";
 import { signedLogoUrl } from "@/lib/team-logos";
 import type { SwitchKey } from "@/lib/switchboard";
-import { LINK_STATUS, loginStatus, type ParentView } from "@/lib/view-as";
+import { loginStatus, type ParentView } from "@/lib/view-as";
+import { PARENT_LINK } from "@/lib/lifecycles";
 import { FamilyBoards, YearbookBanner, familyMenu, type ConsentStep } from "@/app/family/menu-content";
 import { loadComingUp, loadDaughterGoals, loadTeamCulture } from "@/app/family/team-data";
 import { AccountFacts, ViewBanner, ViewToggle, requireAdminPage } from "../../parts";
@@ -159,7 +160,7 @@ export default async function ViewAsParentPage({ params, searchParams }: PagePro
                         {!l.player_name && l.status !== "approved" && ` (typed as "${l.child_name}")`}
                       </p>
                     </div>
-                    <span className={badgeClass(l.status === "approved" ? "neon" : l.status === "pending" ? "pink" : "neutral")}>{LINK_STATUS[l.status]}</span>
+                    <span className={badgeClass(PARENT_LINK.tone[l.status])}>{PARENT_LINK.label[l.status]}</span>
                   </li>
                 ))}
               </ul>

@@ -8,6 +8,7 @@ import { isUuid } from "@/lib/softball";
 import { isValidUsername, normalizeUsername } from "@/lib/player-logins";
 import { cleanMedical, cleanQuestionnaire } from "@/lib/family";
 import { STALE, failed, must, runAction } from "@/lib/actions";
+import { ALREADY_DECIDED } from "@/lib/lifecycles";
 import { RELATIONSHIPS } from "@/lib/consent";
 import { TERMS_VERSION } from "@/lib/legal";
 
@@ -206,7 +207,7 @@ export async function decideMentorForDaughter(_prev: FormState, fd: FormData): P
     const supabase = await createClient();
     const { error } = await supabase.rpc("decide_mentor_link", { p_link_id: id, p_approve: decision === "approve" });
     if (error) {
-      if (error.code === "P0002") return failed("That request was already decided. Reload the page.");
+      if (error.code === "P0002") return failed(ALREADY_DECIDED);
       if (error.code === "42501") return failed("Only her approved parents can decide this.");
       return failed("Couldn't save that. Try again.");
     }

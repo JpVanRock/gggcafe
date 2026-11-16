@@ -8,16 +8,21 @@ import { buttonStyles } from "@/components/ui";
 import { joinVideoCall, type JoinResult } from "../actions";
 
 type Details = Extract<JoinResult, { join: unknown }>["join"];
-type Phase = "idle" | "connecting" | "in" | "left" | "error";
+/**
+ * idle → asking (the server checks she may join and signs her in) → connecting (the Zoom frame is up)
+ * → in. Leave, or Zoom ending the call, goes to left from any of those; a refusal or a Zoom error
+ * goes to error. Join again starts a new attempt: a server reply for an older one is dropped.
+ */
+type Phase = "idle" | "asking" | "connecting" | "in" | "left" | "error";
 
 export function CallRoom({ callId, host }: { callId: string; host: boolean }) {
   const [phase, setPhase] = useState<Phase>("idle");
   const [error, setError] = useState<string | null>(null);
   const [appUrl, setAppUrl] = useState<string | null>(null);
-  // the frame is up while there are join details to hand it
-  const [live, setLive] = useState(false);
   const frame = useRef<HTMLIFrameElement>(null);
+  // the join details the frame gets when it says it's ready; the attempt they belong to
   const details = useRef<Details | null>(null);
+  const attempt = useRef(0);
 
   useEffect(() => {
     function onMessage(event: MessageEvent) {
@@ -34,11 +39,9 @@ export function CallRoom({ callId, host }: { callId: string; host: boolean }) {
         setPhase("in");
       } else if (data.type === "ended") {
         details.current = null;
-        setLive(false);
         setPhase("left");
       } else if (data.type === "error") {
         details.current = null;
-        setLive(false);
         setError(typeof data.detail === "string" ? data.detail : "Couldn't join the call.");
         setPhase("error");
       }
@@ -48,9 +51,17 @@ export function CallRoom({ callId, host }: { callId: string; host: boolean }) {
   }, []);
 
   async function join() {
-    setPhase("connecting");
+    const mine = ++attempt.current;
+    details.current = null;
+    setPhase("asking");
     setError(null);
-    const result = await joinVideoCall(callId);
+    let result: JoinResult;
+    try {
+      result = await joinVideoCall(callId);
+    } catch {
+      result = { error: "Couldn't reach GGG.Cafe. Check your connection and try again." };
+    }
+    if (attempt.current !== mine) return; // she left (or tried again) while this was on its way
     if ("error" in result) {
       setError(result.error);
       setPhase("error");
@@ -58,26 +69,26 @@ export function CallRoom({ callId, host }: { callId: string; host: boolean }) {
     }
     details.current = result.join;
     setAppUrl(result.join.appUrl);
-    setLive(true);
+    setPhase("connecting");
   }
 
   function leave() {
+    attempt.current++;
     details.current = null;
-    setLive(false);
     setPhase("left");
   }
 
-  const showFrame = live && (phase === "connecting" || phase === "in");
+  const showFrame = phase === "connecting" || phase === "in";
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
-        {phase === "in" || phase === "connecting" ? (
+        {phase === "asking" || phase === "connecting" || phase === "in" ? (
           <button type="button" onClick={leave} className={buttonStyles("secondary")}>
             Leave the call
           </button>
         ) : (
           <button type="button" onClick={join} className={buttonStyles("primary")}>
-            {host ? "Start the call" : phase === "left" ? "Join again" : "Join the call"}
+            {phase === "left" ? "Join again" : host ? "Start the call" : "Join the call"}
           </button>
         )}
         {appUrl && (
@@ -87,7 +98,7 @@ export function CallRoom({ callId, host }: { callId: string; host: boolean }) {
         )}
       </div>
       <p role="status" className={`text-sm ${phase === "error" ? "text-danger" : "text-muted"}`}>
-        {phase === "connecting" && "Connecting… Allow the camera and microphone when your browser asks."}
+        {(phase === "asking" || phase === "connecting") && "Connecting… Allow the camera and microphone when your browser asks."}
         {phase === "in" && (host ? "You're the host: let people in from the waiting room." : "You're in. The host lets people in from the waiting room.")}
         {phase === "left" && "You left the call."}
         {phase === "error" && error}

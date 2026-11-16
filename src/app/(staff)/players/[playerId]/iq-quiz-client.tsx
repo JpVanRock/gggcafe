@@ -138,9 +138,17 @@ export function QuizRunner({ playerId, quizzes, canEdit }: { playerId: string; q
       </ol>
 
       {error && (
-        <p role="alert" className="mt-3 text-sm text-danger">
-          {error}
-        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <p role="alert" className="text-sm text-danger">
+            {error}
+          </p>
+          {/* the way out when a question can't be answered (Stop otherwise appears after an answer) */}
+          {!feedback && (
+            <button type="button" onClick={() => setRun(null)} className={secondaryButtonClass}>
+              Stop
+            </button>
+          )}
+        </div>
       )}
 
       {feedback && (

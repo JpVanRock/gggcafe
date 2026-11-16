@@ -29,7 +29,7 @@ export type ParentView = {
   consent: { player_id: string; under_13: boolean; status: string | null; method: string | null; submitted_at: string | null; reviewed_at: string | null }[];
   packet: { id: string; team_id: string; kind: string; title: string }[];
   packet_read: string[];
-  mentor_links: { mentor_id: string; team_id: string | null; player_id: string | null; status: string }[];
+  mentor_links: { mentor_id: string; team_id: string | null; player_id: string | null; status: "pending" | "approved" | "declined" }[];
   mentors: { user_id: string; display_name: string; specialty: string | null }[];
   budgets: unknown[];
   yearbook_teams: string[];
@@ -39,16 +39,13 @@ export type ParentView = {
 export type MentorView = {
   account: ViewAccount;
   mentor: { display_name: string; specialty: string | null; approved_at: string } | null;
-  links: { id: string; team_id: string | null; team_name: string | null; player_id: string | null; player_name: string | null; status: string; requested_at: string }[];
+  links: { id: string; team_id: string | null; team_name: string | null; player_id: string | null; player_name: string | null; status: "pending" | "approved" | "declined"; requested_at: string }[];
   players: { id: string; name: string; position: string | null; team: string | null; jersey: string | null }[];
   messages: { player_id: string; body: string | null; drill_name: string | null; has_photo: boolean; created_at: string; read_at: string | null; shared_with_coaches: boolean }[];
   training: { player_id: string; title: string; starts_on: string; ends_on: string }[];
   notes: number;
   focus: number;
 };
-
-/** "Approved" / "Waiting for coach" / "Not approved": how the parent sees a team request. */
-export const LINK_STATUS: Record<string, string> = { approved: "Approved", pending: "Waiting for coach", declined: "Not approved" };
 
 /** How a parent's page describes a daughter's login. */
 export function loginStatus(d: ParentView["daughters"][number]) {

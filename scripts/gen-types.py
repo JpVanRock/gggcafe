@@ -6,6 +6,7 @@ every .from(), .select() (including embedded relations), .insert() and .rpc() ca
 Usage: python3 scripts/gen-types.py schema.json > database.types.ts
 """
 import json
+import re
 import sys
 
 schema = json.load(open(sys.argv[1]))
@@ -74,9 +75,35 @@ def relationships(rel_name: str) -> str:
     return "\n".join(out)
 
 
+# text columns limited to a list (`x text check (x in ('a', 'b'))`, which Postgres stores as
+# CHECK ((x = ANY (ARRAY['a'::text, 'b'::text])))) are typed as that list: "a" | "b"
+CHECK_IN = re.compile(r"^CHECK \(\((\w+) = ANY \(ARRAY\[(.*)\]\)\)\)$")
+CHECK_ITEM = re.compile(r"^'((?:[^']|'')*)'::text$")
+
+
+def check_lists() -> dict[str, list[str]]:
+    out: dict[str, list[str]] = {}
+    for c in schema.get("checks", []):
+        m = CHECK_IN.match(c["def"])
+        if not m or m.group(1) != c["col"]:
+            continue
+        items = [CHECK_ITEM.match(i.strip()) for i in m.group(2).split(", ")]
+        if items and all(items):
+            out[f"{c['rel']}.{c['col']}"] = [i.group(1).replace("''", "'") for i in items]
+    return out
+
+
+CHECK_COLUMNS = check_lists()
+
+
 def col_type(rel: dict, c: dict) -> str:
     known = JSON_COLUMNS.get(f"{rel['name']}.{c['name']}")
-    return known["type"] if known else ts_type(c["type"])
+    if known:
+        return known["type"]
+    listed = CHECK_COLUMNS.get(f"{rel['name']}.{c['name']}")
+    if listed and TYPES.get(str(c["type"]), {}).get("name") == "text":
+        return " | ".join(json.dumps(v) for v in listed)
+    return ts_type(c["type"])
 
 
 def table_block(rel: dict) -> list[str]:

@@ -7,6 +7,7 @@
 import { refresh } from "next/cache";
 import { adminCheck, headCoachCheck } from "@/lib/auth";
 import { STALE, failed, must, runAction } from "@/lib/actions";
+import { ALREADY_DECIDED } from "@/lib/lifecycles";
 import { friendlyDbError, invalid, text, type FormState } from "@/lib/form";
 import { MESSAGE_PHOTO_BUCKET, cleanMentorNote } from "@/lib/mentors";
 import { isUuid } from "@/lib/softball";
@@ -23,7 +24,7 @@ export async function decideMentorRequest(_prev: FormState, fd: FormData): Promi
     const supabase = await createClient();
     const { error } = await supabase.rpc("decide_mentor_link", { p_link_id: id, p_approve: decision === "approve" });
     if (error) {
-      if (error.code === "P0002") return failed("That request was already decided. Reload the page.");
+      if (error.code === "P0002") return failed(ALREADY_DECIDED);
       if (error.code === "42501") return failed("A player's parents approve a mentor for her. Head coaches approve mentors for the whole team.");
       return failed(friendlyDbError(error));
     }

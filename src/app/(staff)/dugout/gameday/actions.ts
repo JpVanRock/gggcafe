@@ -4,7 +4,7 @@ import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { dugoutCheck, getCurrentUser, headCoachCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { friendlyDbError, isoDate, text, wholeNumber, type FormState, invalid } from "@/lib/form";
+import { friendlyDbError, inList, isoDate, text, wholeNumber, type FormState, invalid } from "@/lib/form";
 import { formatDay, formatLongDate } from "@/lib/dates";
 import { isUuid } from "@/lib/softball";
 import {
@@ -23,6 +23,7 @@ import { emailConfigured, escapeHtml, sendEmail } from "@/lib/email";
 import { lineupFilename, renderLineupPdf } from "@/lib/pdf/lineup-pdf";
 import type { ShareResult } from "../plans/actions";
 import { STALE, failed, must, runAction } from "@/lib/actions";
+import { GAMEDAY_LINEUP, canMove } from "@/lib/lifecycles";
 import { requestOrigin } from "@/lib/request-origin";
 
 // ---------------------------------------------------------------------------
@@ -59,8 +60,8 @@ export async function saveGamedayCards(_prev: FormState, fd: FormData): Promise<
       team_id: teamId,
       season_id: seasonId,
       player_id: id,
-      hitting_type: (HITTING_TYPES as readonly string[]).includes(types[i]) ? types[i] : null,
-      base_running: (BASE_RUNNING as readonly string[]).includes(running[i]) ? running[i] : null,
+      hitting_type: inList(types[i], HITTING_TYPES),
+      base_running: inList(running[i], BASE_RUNNING),
       avg,
       obp,
       k_pct: k,
@@ -203,9 +204,9 @@ export async function finalizeLineup(lineupId: string): Promise<{ error: string 
   const supabase = await createClient();
   const { error } = await supabase
     .from("gameday_lineups")
-    .update({ status: "final", finalized_at: new Date().toISOString() })
+    .update({ status: GAMEDAY_LINEUP.moves.finalize.to, finalized_at: new Date().toISOString() })
     .eq("id", lineupId)
-    .eq("status", "draft");
+    .in("status", GAMEDAY_LINEUP.moves.finalize.from);
   if (error) return { error: friendlyDbError(error) };
   refresh();
   return { error: null };
@@ -218,7 +219,7 @@ export async function reopenLineup(_prev: FormState, fd: FormData): Promise<Form
     const id = text(fd, "id");
     if (!isUuid(id)) return failed(STALE);
     const supabase = await createClient();
-    must(await supabase.from("gameday_lineups").update({ status: "draft", finalized_at: null }).eq("id", id));
+    must(await supabase.from("gameday_lineups").update({ status: GAMEDAY_LINEUP.moves.reopen.to, finalized_at: null }).eq("id", id).in("status", GAMEDAY_LINEUP.moves.reopen.from));
     refresh();
   });
 }
@@ -247,11 +248,12 @@ export async function shareLineup(lineupId: string, recipientIds: string[], note
   const supabase = await createClient();
   const lineup = await loadLineup(supabase, lineupId);
   if (!lineup) return { error: "This lineup was deleted." };
-  if (lineup.status === "draft") {
+  if (canMove(GAMEDAY_LINEUP, lineup.status, "finalize")) {
     const { error } = await supabase
       .from("gameday_lineups")
-      .update({ status: "final", finalized_at: new Date().toISOString() })
-      .eq("id", lineupId);
+      .update({ status: GAMEDAY_LINEUP.moves.finalize.to, finalized_at: new Date().toISOString() })
+      .eq("id", lineupId)
+      .in("status", GAMEDAY_LINEUP.moves.finalize.from);
     if (error) return { error: friendlyDbError(error) };
   }
 

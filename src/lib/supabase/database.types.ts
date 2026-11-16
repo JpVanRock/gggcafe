@@ -244,7 +244,7 @@ export type Database = {
           created_by: string | null
           created_at: string
           updated_at: string
-          paid_by_role: string
+          paid_by_role: "coach" | "parent"
         }
         Insert: {
           id?: string
@@ -260,7 +260,7 @@ export type Database = {
           created_by?: string | null
           created_at?: string
           updated_at?: string
-          paid_by_role?: string
+          paid_by_role?: "coach" | "parent"
         }
         Update: {
           id?: string
@@ -276,7 +276,7 @@ export type Database = {
           created_by?: string | null
           created_at?: string
           updated_at?: string
-          paid_by_role?: string
+          paid_by_role?: "coach" | "parent"
         }
         Relationships: [
           {
@@ -308,7 +308,7 @@ export type Database = {
           team_id: string
           season_id: string
           entry_date: string
-          kind: string
+          kind: "won" | "used"
           amount: number
           description: string
           created_by: string | null
@@ -319,7 +319,7 @@ export type Database = {
           team_id: string
           season_id: string
           entry_date: string
-          kind: string
+          kind: "won" | "used"
           amount: number
           description: string
           created_by?: string | null
@@ -330,7 +330,7 @@ export type Database = {
           team_id?: string
           season_id?: string
           entry_date?: string
-          kind?: string
+          kind?: "won" | "used"
           amount?: number
           description?: string
           created_by?: string | null
@@ -820,7 +820,7 @@ export type Database = {
           updated_at: string
           category: Database["public"]["Enums"]["training_category"] | null
           guide: string | null
-          focus: string | null
+          focus: "speed" | "agility" | "core" | "power" | "med-ball" | "landing" | null
         }
         Insert: {
           id?: string
@@ -833,7 +833,7 @@ export type Database = {
           updated_at?: string
           category?: Database["public"]["Enums"]["training_category"] | null
           guide?: string | null
-          focus?: string | null
+          focus?: "speed" | "agility" | "core" | "power" | "med-ball" | "landing" | null
         }
         Update: {
           id?: string
@@ -846,7 +846,7 @@ export type Database = {
           updated_at?: string
           category?: Database["public"]["Enums"]["training_category"] | null
           guide?: string | null
-          focus?: string | null
+          focus?: "speed" | "agility" | "core" | "power" | "med-ball" | "landing" | null
         }
         Relationships: []
       }
@@ -1112,8 +1112,8 @@ export type Database = {
           team_id: string
           season_id: string
           player_id: string
-          hitting_type: string | null
-          base_running: string | null
+          hitting_type: "power" | "contact" | "gap" | null
+          base_running: "pure" | "intelligent" | "average" | null
           avg: number | null
           obp: number | null
           k_pct: number | null
@@ -1124,8 +1124,8 @@ export type Database = {
           team_id: string
           season_id: string
           player_id: string
-          hitting_type?: string | null
-          base_running?: string | null
+          hitting_type?: "power" | "contact" | "gap" | null
+          base_running?: "pure" | "intelligent" | "average" | null
           avg?: number | null
           obp?: number | null
           k_pct?: number | null
@@ -1136,8 +1136,8 @@ export type Database = {
           team_id?: string
           season_id?: string
           player_id?: string
-          hitting_type?: string | null
-          base_running?: string | null
+          hitting_type?: "power" | "contact" | "gap" | null
+          base_running?: "pure" | "intelligent" | "average" | null
           avg?: number | null
           obp?: number | null
           k_pct?: number | null
@@ -1362,45 +1362,45 @@ export type Database = {
         Row: {
           id: string
           player_id: string
-          hands_height: string | null
-          hands_depth: string | null
-          hands_reach: string | null
-          feet_width: string | null
-          feet_angle: string | null
-          weight: string | null
-          load_stride: string | null
-          weight_shift: string | null
-          foot_down: string | null
+          hands_height: "high" | "low" | null
+          hands_depth: "forward" | "back" | null
+          hands_reach: "proximal" | "distal" | null
+          feet_width: "wide" | "narrow" | null
+          feet_angle: "open" | "closed" | "neutral" | null
+          weight: "forward" | "centered" | "back" | null
+          load_stride: "leg_lift" | "toe_tap" | "no_stride" | "open_to_close" | null
+          weight_shift: "shift" | "no_shift" | null
+          foot_down: "toe_to_heel" | "heel_to_toe" | "simultaneous" | null
           recorded_by: string | null
           recorded_at: string
         }
         Insert: {
           id?: string
           player_id: string
-          hands_height?: string | null
-          hands_depth?: string | null
-          hands_reach?: string | null
-          feet_width?: string | null
-          feet_angle?: string | null
-          weight?: string | null
-          load_stride?: string | null
-          weight_shift?: string | null
-          foot_down?: string | null
+          hands_height?: "high" | "low" | null
+          hands_depth?: "forward" | "back" | null
+          hands_reach?: "proximal" | "distal" | null
+          feet_width?: "wide" | "narrow" | null
+          feet_angle?: "open" | "closed" | "neutral" | null
+          weight?: "forward" | "centered" | "back" | null
+          load_stride?: "leg_lift" | "toe_tap" | "no_stride" | "open_to_close" | null
+          weight_shift?: "shift" | "no_shift" | null
+          foot_down?: "toe_to_heel" | "heel_to_toe" | "simultaneous" | null
           recorded_by?: string | null
           recorded_at?: string
         }
         Update: {
           id?: string
           player_id?: string
-          hands_height?: string | null
-          hands_depth?: string | null
-          hands_reach?: string | null
-          feet_width?: string | null
-          feet_angle?: string | null
-          weight?: string | null
-          load_stride?: string | null
-          weight_shift?: string | null
-          foot_down?: string | null
+          hands_height?: "high" | "low" | null
+          hands_depth?: "forward" | "back" | null
+          hands_reach?: "proximal" | "distal" | null
+          feet_width?: "wide" | "narrow" | null
+          feet_angle?: "open" | "closed" | "neutral" | null
+          weight?: "forward" | "centered" | "back" | null
+          load_stride?: "leg_lift" | "toe_tap" | "no_stride" | "open_to_close" | null
+          weight_shift?: "shift" | "no_shift" | null
+          foot_down?: "toe_to_heel" | "heel_to_toe" | "simultaneous" | null
           recorded_by?: string | null
           recorded_at?: string
         }
@@ -1486,11 +1486,11 @@ export type Database = {
         Row: {
           id: string
           team_id: string
-          category: string
+          category: "position" | "situation"
           group_name: string
           title: string
-          status: string
-          iq_track: string | null
+          status: "not_started" | "taught" | "repped" | "game_ready"
+          iq_track: "defense" | "baserunning" | "offense" | "battery" | "position" | null
           position: number
           updated_at: string
           play_id: string | null
@@ -1498,11 +1498,11 @@ export type Database = {
         Insert: {
           id?: string
           team_id: string
-          category: string
+          category: "position" | "situation"
           group_name: string
           title: string
-          status?: string
-          iq_track?: string | null
+          status?: "not_started" | "taught" | "repped" | "game_ready"
+          iq_track?: "defense" | "baserunning" | "offense" | "battery" | "position" | null
           position?: number
           updated_at?: string
           play_id?: string | null
@@ -1510,11 +1510,11 @@ export type Database = {
         Update: {
           id?: string
           team_id?: string
-          category?: string
+          category?: "position" | "situation"
           group_name?: string
           title?: string
-          status?: string
-          iq_track?: string | null
+          status?: "not_started" | "taught" | "repped" | "game_ready"
+          iq_track?: "defense" | "baserunning" | "offense" | "battery" | "position" | null
           position?: number
           updated_at?: string
           play_id?: string | null
@@ -2043,7 +2043,7 @@ export type Database = {
           id: string
           player_id: string
           checked_on: string
-          context: string
+          context: "game" | "practice" | "other"
           level: number
           adjustment: string | null
           created_by: string | null
@@ -2053,7 +2053,7 @@ export type Database = {
           id?: string
           player_id: string
           checked_on: string
-          context?: string
+          context?: "game" | "practice" | "other"
           level: number
           adjustment?: string | null
           created_by?: string | null
@@ -2063,7 +2063,7 @@ export type Database = {
           id?: string
           player_id?: string
           checked_on?: string
-          context?: string
+          context?: "game" | "practice" | "other"
           level?: number
           adjustment?: string | null
           created_by?: string | null
@@ -2119,7 +2119,7 @@ export type Database = {
           team_id: string | null
           title: string
           details: string | null
-          status: string
+          status: "working_on" | "working"
           created_at: string
           updated_at: string
         }
@@ -2130,7 +2130,7 @@ export type Database = {
           team_id?: string | null
           title: string
           details?: string | null
-          status?: string
+          status?: "working_on" | "working"
           created_at?: string
           updated_at?: string
         }
@@ -2141,7 +2141,7 @@ export type Database = {
           team_id?: string | null
           title?: string
           details?: string | null
-          status?: string
+          status?: "working_on" | "working"
           created_at?: string
           updated_at?: string
         }
@@ -2293,12 +2293,12 @@ export type Database = {
           mentor_id: string
           player_id: string | null
           team_id: string | null
-          kind: string
+          kind: "summary" | "note"
           discussed_on: string | null
           body: string
           author_id: string | null
           author_name: string
-          author_role: string
+          author_role: "mentor" | "coach" | "admin"
           created_at: string
         }
         Insert: {
@@ -2306,12 +2306,12 @@ export type Database = {
           mentor_id: string
           player_id?: string | null
           team_id?: string | null
-          kind?: string
+          kind?: "summary" | "note"
           discussed_on?: string | null
           body: string
           author_id?: string | null
           author_name?: string
-          author_role?: string
+          author_role?: "mentor" | "coach" | "admin"
           created_at?: string
         }
         Update: {
@@ -2319,12 +2319,12 @@ export type Database = {
           mentor_id?: string
           player_id?: string | null
           team_id?: string | null
-          kind?: string
+          kind?: "summary" | "note"
           discussed_on?: string | null
           body?: string
           author_id?: string | null
           author_name?: string
-          author_role?: string
+          author_role?: "mentor" | "coach" | "admin"
           created_at?: string
         }
         Relationships: [
@@ -2406,48 +2406,48 @@ export type Database = {
         Row: {
           id: string
           player_id: string
-          move_style: string | null
-          power_side: string | null
-          dial_one: string | null
-          breathing: string | null
-          twist: string | null
-          flex: string | null
-          space: string | null
-          focus_line: string | null
-          motor_shoulder: string | null
-          motor_eye: string | null
+          move_style: "aerial" | "terrestrial" | null
+          power_side: "right" | "left" | null
+          dial_one: "left_front" | "right_front" | "left_heel" | "right_heel" | null
+          breathing: "in" | "out" | null
+          twist: "associated" | "disassociated" | null
+          flex: "double_flexion" | "flexion" | "extension" | "double_extension" | null
+          space: "axial" | "large" | null
+          focus_line: "vertical" | "horizontal" | null
+          motor_shoulder: "left" | "right" | null
+          motor_eye: "left" | "right" | null
           recorded_by: string | null
           recorded_at: string
         }
         Insert: {
           id?: string
           player_id: string
-          move_style?: string | null
-          power_side?: string | null
-          dial_one?: string | null
-          breathing?: string | null
-          twist?: string | null
-          flex?: string | null
-          space?: string | null
-          focus_line?: string | null
-          motor_shoulder?: string | null
-          motor_eye?: string | null
+          move_style?: "aerial" | "terrestrial" | null
+          power_side?: "right" | "left" | null
+          dial_one?: "left_front" | "right_front" | "left_heel" | "right_heel" | null
+          breathing?: "in" | "out" | null
+          twist?: "associated" | "disassociated" | null
+          flex?: "double_flexion" | "flexion" | "extension" | "double_extension" | null
+          space?: "axial" | "large" | null
+          focus_line?: "vertical" | "horizontal" | null
+          motor_shoulder?: "left" | "right" | null
+          motor_eye?: "left" | "right" | null
           recorded_by?: string | null
           recorded_at?: string
         }
         Update: {
           id?: string
           player_id?: string
-          move_style?: string | null
-          power_side?: string | null
-          dial_one?: string | null
-          breathing?: string | null
-          twist?: string | null
-          flex?: string | null
-          space?: string | null
-          focus_line?: string | null
-          motor_shoulder?: string | null
-          motor_eye?: string | null
+          move_style?: "aerial" | "terrestrial" | null
+          power_side?: "right" | "left" | null
+          dial_one?: "left_front" | "right_front" | "left_heel" | "right_heel" | null
+          breathing?: "in" | "out" | null
+          twist?: "associated" | "disassociated" | null
+          flex?: "double_flexion" | "flexion" | "extension" | "double_extension" | null
+          space?: "axial" | "large" | null
+          focus_line?: "vertical" | "horizontal" | null
+          motor_shoulder?: "left" | "right" | null
+          motor_eye?: "left" | "right" | null
           recorded_by?: string | null
           recorded_at?: string
         }
@@ -2465,7 +2465,7 @@ export type Database = {
         Row: {
           id: string
           user_id: string
-          kind: string
+          kind: "player-of-the-week" | "video-call"
           title: string
           body: string | null
           href: string | null
@@ -2477,7 +2477,7 @@ export type Database = {
         Insert: {
           id?: string
           user_id: string
-          kind: string
+          kind: "player-of-the-week" | "video-call"
           title: string
           body?: string | null
           href?: string | null
@@ -2489,7 +2489,7 @@ export type Database = {
         Update: {
           id?: string
           user_id?: string
-          kind?: string
+          kind?: "player-of-the-week" | "video-call"
           title?: string
           body?: string | null
           href?: string | null
@@ -2729,7 +2729,7 @@ export type Database = {
         Row: {
           id: string
           team_id: string
-          kind: string
+          kind: "letter" | "policy" | "tip"
           title: string
           body: string
           position: number
@@ -2739,7 +2739,7 @@ export type Database = {
         Insert: {
           id?: string
           team_id: string
-          kind?: string
+          kind?: "letter" | "policy" | "tip"
           title: string
           body: string
           position?: number
@@ -2749,7 +2749,7 @@ export type Database = {
         Update: {
           id?: string
           team_id?: string
-          kind?: string
+          kind?: "letter" | "policy" | "tip"
           title?: string
           body?: string
           position?: number
@@ -2804,10 +2804,10 @@ export type Database = {
           id: string
           player_id: string
           parent_id: string
-          method: string
-          status: string
+          method: "signed_form" | "video_call"
+          status: "pending" | "verified" | "declined" | "withdrawn"
           parent_name: string
-          relationship: string
+          relationship: "parent" | "guardian"
           form_path: string | null
           notice_version: string
           submitted_at: string
@@ -2820,10 +2820,10 @@ export type Database = {
           id?: string
           player_id: string
           parent_id: string
-          method: string
-          status?: string
+          method: "signed_form" | "video_call"
+          status?: "pending" | "verified" | "declined" | "withdrawn"
           parent_name: string
-          relationship: string
+          relationship: "parent" | "guardian"
           form_path?: string | null
           notice_version: string
           submitted_at?: string
@@ -2836,10 +2836,10 @@ export type Database = {
           id?: string
           player_id?: string
           parent_id?: string
-          method?: string
-          status?: string
+          method?: "signed_form" | "video_call"
+          status?: "pending" | "verified" | "declined" | "withdrawn"
           parent_name?: string
-          relationship?: string
+          relationship?: "parent" | "guardian"
           form_path?: string | null
           notice_version?: string
           submitted_at?: string
@@ -2985,7 +2985,7 @@ export type Database = {
           illegal_pitches: number
           pitches: number | null
           strikes: number | null
-          decision: string | null
+          decision: "W" | "L" | "S" | null
           source: Database["public"]["Enums"]["stat_source"]
           created_at: string
           updated_at: string
@@ -3009,7 +3009,7 @@ export type Database = {
           illegal_pitches?: number
           pitches?: number | null
           strikes?: number | null
-          decision?: string | null
+          decision?: "W" | "L" | "S" | null
           source?: Database["public"]["Enums"]["stat_source"]
           created_at?: string
           updated_at?: string
@@ -3033,7 +3033,7 @@ export type Database = {
           illegal_pitches?: number
           pitches?: number | null
           strikes?: number | null
-          decision?: string | null
+          decision?: "W" | "L" | "S" | null
           source?: Database["public"]["Enums"]["stat_source"]
           created_at?: string
           updated_at?: string
@@ -3068,7 +3068,7 @@ export type Database = {
           game_id: string
           seq: number
           inning: number
-          half: string
+          half: "top" | "bottom"
           batting_team_id: string
           batter_id: string
           pitcher_id: string | null
@@ -3092,7 +3092,7 @@ export type Database = {
           game_id: string
           seq: number
           inning: number
-          half: string
+          half: "top" | "bottom"
           batting_team_id: string
           batter_id: string
           pitcher_id?: string | null
@@ -3116,7 +3116,7 @@ export type Database = {
           game_id?: string
           seq?: number
           inning?: number
-          half?: string
+          half?: "top" | "bottom"
           batting_team_id?: string
           batter_id?: string
           pitcher_id?: string | null
@@ -3402,19 +3402,19 @@ export type Database = {
       player_advanced_access: {
         Row: {
           player_id: string
-          source: string
+          source: "admin" | "coach" | "subscription"
           granted_by: string | null
           granted_at: string
         }
         Insert: {
           player_id: string
-          source?: string
+          source?: "admin" | "coach" | "subscription"
           granted_by?: string | null
           granted_at?: string
         }
         Update: {
           player_id?: string
-          source?: string
+          source?: "admin" | "coach" | "subscription"
           granted_by?: string | null
           granted_at?: string
         }
@@ -3663,21 +3663,21 @@ export type Database = {
         Row: {
           id: string
           player_id: string
-          award: string
+          award: "world-series" | "all-ten"
           earned_on: string
           created_at: string
         }
         Insert: {
           id?: string
           player_id: string
-          award: string
+          award: "world-series" | "all-ten"
           earned_on?: string
           created_at?: string
         }
         Update: {
           id?: string
           player_id?: string
-          award?: string
+          award?: "world-series" | "all-ten"
           earned_on?: string
           created_at?: string
         }
@@ -3756,19 +3756,19 @@ export type Database = {
           player_id: string
           granted_by: string | null
           granted_at: string
-          program: string
+          program: "full" | "light"
         }
         Insert: {
           player_id: string
           granted_by?: string | null
           granted_at?: string
-          program?: string
+          program?: "full" | "light"
         }
         Update: {
           player_id?: string
           granted_by?: string | null
           granted_at?: string
-          program?: string
+          program?: "full" | "light"
         }
         Relationships: [
           {
@@ -3787,7 +3787,7 @@ export type Database = {
           awarded_at: string
           awarded_by: string | null
           coach_name: string | null
-          program: string
+          program: "full" | "light"
         }
         Insert: {
           player_id: string
@@ -3795,7 +3795,7 @@ export type Database = {
           awarded_at?: string
           awarded_by?: string | null
           coach_name?: string | null
-          program?: string
+          program?: "full" | "light"
         }
         Update: {
           player_id?: string
@@ -3803,7 +3803,7 @@ export type Database = {
           awarded_at?: string
           awarded_by?: string | null
           coach_name?: string | null
-          program?: string
+          program?: "full" | "light"
         }
         Relationships: [
           {
@@ -4077,8 +4077,8 @@ export type Database = {
           player_id: string
           team_id: string
           season_id: string
-          top_size: string | null
-          bottom_size: string | null
+          top_size: "YS" | "YM" | "YL" | "YXL" | "AS" | "AM" | "AL" | "AXL" | "A2XL" | "A3XL" | null
+          bottom_size: "YS" | "YM" | "YL" | "YXL" | "AS" | "AM" | "AL" | "AXL" | "A2XL" | "A3XL" | null
           numbers: string[]
           positions: string[]
           experience: string | null
@@ -4086,14 +4086,14 @@ export type Database = {
           notes: string | null
           updated_by: string | null
           updated_at: string
-          sock_size: string | null
+          sock_size: "YS" | "YM" | "YL" | "YXL" | "AS" | "AM" | "AL" | "AXL" | "A2XL" | "A3XL" | null
         }
         Insert: {
           player_id: string
           team_id: string
           season_id: string
-          top_size?: string | null
-          bottom_size?: string | null
+          top_size?: "YS" | "YM" | "YL" | "YXL" | "AS" | "AM" | "AL" | "AXL" | "A2XL" | "A3XL" | null
+          bottom_size?: "YS" | "YM" | "YL" | "YXL" | "AS" | "AM" | "AL" | "AXL" | "A2XL" | "A3XL" | null
           numbers?: string[]
           positions?: string[]
           experience?: string | null
@@ -4101,14 +4101,14 @@ export type Database = {
           notes?: string | null
           updated_by?: string | null
           updated_at?: string
-          sock_size?: string | null
+          sock_size?: "YS" | "YM" | "YL" | "YXL" | "AS" | "AM" | "AL" | "AXL" | "A2XL" | "A3XL" | null
         }
         Update: {
           player_id?: string
           team_id?: string
           season_id?: string
-          top_size?: string | null
-          bottom_size?: string | null
+          top_size?: "YS" | "YM" | "YL" | "YXL" | "AS" | "AM" | "AL" | "AXL" | "A2XL" | "A3XL" | null
+          bottom_size?: "YS" | "YM" | "YL" | "YXL" | "AS" | "AM" | "AL" | "AXL" | "A2XL" | "A3XL" | null
           numbers?: string[]
           positions?: string[]
           experience?: string | null
@@ -4116,7 +4116,7 @@ export type Database = {
           notes?: string | null
           updated_by?: string | null
           updated_at?: string
-          sock_size?: string | null
+          sock_size?: "YS" | "YM" | "YL" | "YXL" | "AS" | "AM" | "AL" | "AXL" | "A2XL" | "A3XL" | null
         }
         Relationships: [
           {
@@ -4867,7 +4867,7 @@ export type Database = {
         Row: {
           id: string
           team_id: string
-          phase: string
+          phase: "practice" | "pregame" | "game" | "postgame" | "season"
           duty: string
           owner: string | null
           position: number
@@ -4875,7 +4875,7 @@ export type Database = {
         Insert: {
           id?: string
           team_id: string
-          phase: string
+          phase: "practice" | "pregame" | "game" | "postgame" | "season"
           duty: string
           owner?: string | null
           position?: number
@@ -4883,7 +4883,7 @@ export type Database = {
         Update: {
           id?: string
           team_id?: string
-          phase?: string
+          phase?: "practice" | "pregame" | "game" | "postgame" | "season"
           duty?: string
           owner?: string | null
           position?: number
@@ -4902,10 +4902,10 @@ export type Database = {
         Row: {
           user_id: string
           display_name: string
-          role: string
+          role: "coach" | "assistant"
           team_id: string | null
           note: string | null
-          status: string
+          status: "pending" | "approved" | "declined"
           requested_at: string
           decided_by: string | null
           decided_at: string | null
@@ -4913,10 +4913,10 @@ export type Database = {
         Insert: {
           user_id?: string
           display_name: string
-          role: string
+          role: "coach" | "assistant"
           team_id?: string | null
           note?: string | null
-          status?: string
+          status?: "pending" | "approved" | "declined"
           requested_at?: string
           decided_by?: string | null
           decided_at?: string | null
@@ -4924,10 +4924,10 @@ export type Database = {
         Update: {
           user_id?: string
           display_name?: string
-          role?: string
+          role?: "coach" | "assistant"
           team_id?: string | null
           note?: string | null
-          status?: string
+          status?: "pending" | "approved" | "declined"
           requested_at?: string
           decided_by?: string | null
           decided_at?: string | null
@@ -5127,7 +5127,7 @@ export type Database = {
         Row: {
           id: string
           team_id: string
-          phase: string
+          phase: "preseason" | "early" | "mid" | "late" | "postseason" | "season"
           title: string
           target: number | null
           current: number | null
@@ -5140,7 +5140,7 @@ export type Database = {
         Insert: {
           id?: string
           team_id: string
-          phase?: string
+          phase?: "preseason" | "early" | "mid" | "late" | "postseason" | "season"
           title: string
           target?: number | null
           current?: number | null
@@ -5153,7 +5153,7 @@ export type Database = {
         Update: {
           id?: string
           team_id?: string
-          phase?: string
+          phase?: "preseason" | "early" | "mid" | "late" | "postseason" | "season"
           title?: string
           target?: number | null
           current?: number | null
@@ -5607,7 +5607,7 @@ export type Database = {
       team_throwing_programs: {
         Row: {
           team_id: string
-          grp: string
+          grp: "outies" | "innies" | "catchers"
           intro: string | null
           steps: ThrowStep[]
           updated_by: string | null
@@ -5615,7 +5615,7 @@ export type Database = {
         }
         Insert: {
           team_id: string
-          grp: string
+          grp: "outies" | "innies" | "catchers"
           intro?: string | null
           steps?: ThrowStep[]
           updated_by?: string | null
@@ -5623,7 +5623,7 @@ export type Database = {
         }
         Update: {
           team_id?: string
-          grp?: string
+          grp?: "outies" | "innies" | "catchers"
           intro?: string | null
           steps?: ThrowStep[]
           updated_by?: string | null
@@ -5817,7 +5817,7 @@ export type Database = {
         Row: {
           id: string
           team_id: string
-          kind: string
+          kind: "testing" | "build" | "sport" | "preseason" | "inseason" | "recovery"
           name: string
           starts_on: string
           ends_on: string
@@ -5828,7 +5828,7 @@ export type Database = {
         Insert: {
           id?: string
           team_id: string
-          kind: string
+          kind: "testing" | "build" | "sport" | "preseason" | "inseason" | "recovery"
           name: string
           starts_on: string
           ends_on: string
@@ -5839,7 +5839,7 @@ export type Database = {
         Update: {
           id?: string
           team_id?: string
-          kind?: string
+          kind?: "testing" | "build" | "sport" | "preseason" | "inseason" | "recovery"
           name?: string
           starts_on?: string
           ends_on?: string
@@ -5955,7 +5955,7 @@ export type Database = {
           team_id: string
           player_id: string
           host_id: string
-          host_kind: string
+          host_kind: "coach" | "mentor"
           host_name: string
           topic: string
           starts_at: string
@@ -5972,7 +5972,7 @@ export type Database = {
           team_id: string
           player_id: string
           host_id?: string
-          host_kind: string
+          host_kind: "coach" | "mentor"
           host_name: string
           topic: string
           starts_at: string
@@ -5989,7 +5989,7 @@ export type Database = {
           team_id?: string
           player_id?: string
           host_id?: string
-          host_kind?: string
+          host_kind?: "coach" | "mentor"
           host_name?: string
           topic?: string
           starts_at?: string

@@ -17,6 +17,7 @@ import { emailConfigured, escapeHtml, sendEmail } from "@/lib/email";
 import { NOTE_LIMITS, cleanNote } from "@/lib/install";
 import { practicePlanFilename, renderPracticePlanPdf } from "@/lib/pdf/practice-plan-pdf";
 import { STALE, failed, must, runAction } from "@/lib/actions";
+import { PRACTICE_PLAN } from "@/lib/lifecycles";
 import { requestOrigin } from "@/lib/request-origin";
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
@@ -168,9 +169,9 @@ async function finalize(supabase: Supabase, plan: PracticePlan): Promise<string 
   if (problems.length) return problems.join(" ");
   const { error } = await supabase
     .from("practice_plans")
-    .update({ status: "final", finalized_at: new Date().toISOString() })
+    .update({ status: PRACTICE_PLAN.moves.finalize.to, finalized_at: new Date().toISOString() })
     .eq("id", plan.id)
-    .eq("status", "draft");
+    .in("status", PRACTICE_PLAN.moves.finalize.from);
   return error ? friendlyDbError(error) : null;
 }
 
@@ -193,7 +194,7 @@ export async function reopenPracticePlan(_prev: FormState, fd: FormData): Promis
     const denied = await planEditCheck(id);
     if (denied) return failed(denied);
     const supabase = await createClient();
-    must(await supabase.from("practice_plans").update({ status: "draft", finalized_at: null }).eq("id", id));
+    must(await supabase.from("practice_plans").update({ status: PRACTICE_PLAN.moves.reopen.to, finalized_at: null }).eq("id", id).in("status", PRACTICE_PLAN.moves.reopen.from));
     refresh();
   });
 }

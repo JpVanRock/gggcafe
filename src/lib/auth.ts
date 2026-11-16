@@ -229,7 +229,8 @@ export async function requirePlayerPage(playerId: string, feature?: SwitchKey): 
   const isSelf = mine.includes(playerId);
   // her approved parent: what she sees, read only (the database gives parents no writes)
   const isParent = !isSelf && (await getMyChildIds()).includes(playerId);
-  if (!isSelf && !isParent) redirect(mine.length ? "/me" : "/family");
+  // not hers to see: the dashboard sends each account to its own home (player, parent, mentor, coach sign-up)
+  if (!isSelf && !isParent) redirect(mine.length ? "/me" : "/dashboard");
   const off = await getPlayerFeaturesOff(playerId);
   // her head coach turned off parents' View as player
   if (isParent && off.has("parent.view_as")) redirect("/family");

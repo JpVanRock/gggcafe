@@ -9,6 +9,7 @@ import { friendlyDbError, invalid, text, type FormState } from "@/lib/form";
 import { cleanMedical } from "@/lib/family";
 import { isUuid } from "@/lib/softball";
 import { STALE, failed, must, runAction } from "@/lib/actions";
+import { ALREADY_DECIDED } from "@/lib/lifecycles";
 
 export async function decideStaffRequest(_prev: FormState, fd: FormData): Promise<FormState> {
   return runAction(async () => {
@@ -17,7 +18,10 @@ export async function decideStaffRequest(_prev: FormState, fd: FormData): Promis
     const id = text(fd, "user_id");
     if (!isUuid(id)) return failed(STALE);
     const supabase = await createClient();
-    must(await supabase.rpc("decide_staff_request", { p_user_id: id, p_approve: fd.get("decision") === "approve" }));
+    const { error } = await supabase.rpc("decide_staff_request", { p_user_id: id, p_approve: fd.get("decision") === "approve" });
+    // decided already (another admin or head coach, another tab)
+    if (error?.code === "P0002") return failed(ALREADY_DECIDED);
+    must({ error });
     refresh();
   });
 }
@@ -42,7 +46,7 @@ export async function reviewParentalConsent(_prev: FormState, fd: FormData): Pro
       if (error.code === "22023") {
         return invalid("note", error.message.includes("video") ? "Note when the video call happened and who you spoke with." : "Say why it wasn't accepted; the parent sees this.");
       }
-      if (error.code === "P0002") return failed("Someone already decided this one. Reload the page.");
+      if (error.code === "P0002") return failed(ALREADY_DECIDED);
       return failed(friendlyDbError(error));
     }
     refresh();

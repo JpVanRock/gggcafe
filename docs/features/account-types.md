@@ -16,6 +16,9 @@
   confirming calls `request_staff_access()` (table `staff_requests`); `staff_requests_to_decide()` /
   `decide_staff_request()` (admins any, head coaches assistants) add the `staff` row. Roster tab: "Coaches signing up"
   plus "Coaching staff" (admins change roles/remove, `roster/actions.ts`). Counts in `countWaiting()` (approvals.ts).
+  The sign-up page (`NotStaff` in dashboard/page.tsx) shows where the request stands: waiting, not approved, or
+  "No coach access" (approved, then removed from the staff: the request row stays approved). Every request is
+  decided once (`STAFF_REQUEST` in `src/lib/lifecycles.ts`, guarded in the database; docs/architecture/state-machines.md).
 - Assistants: `private.can_edit()` includes them, `private.is_head_coach()` doesn't. Head-coach-only writes
   (`private.apply_head_coach_writes`): team_culture/standards, gameday_*, the Team Budget (budget_*); parent links, parent emails
   (`team_parent_links`), the team code (trigger), approving whole-team mentors (`decide_mentor_link`; a player's parents approve one for her, see mentors.md). Practice plans: everyone reads; assistants

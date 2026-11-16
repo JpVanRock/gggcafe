@@ -1,5 +1,7 @@
 # Dugout Roster tab (`/dugout/roster`)
-- "Waiting for approval" first (player claims + parent requests for the team, approve/decline in place),
+- "Waiting for approval" first (player claims + parent requests for the team, approve/decline in place; a request
+  is decided once: a page left open after another coach decided it says so and changes nothing, `PLAYER_CLAIM` /
+  `PARENT_LINK` in `src/lib/lifecycles.ts`, docs/architecture/state-machines.md),
   then the team code card for coaches (`dugout/team-code.tsx`: the code players, parents and assistant coaches sign up
   with; head coaches make a new one or turn sign-up off), then the season's roster with each player's account status (Claimed / Waiting) and approved parents,
   and an Edit link per row for coaches and admins (user, 2026-11-13): `dugout/roster/players/[playerId]` (`?team=&season=`)

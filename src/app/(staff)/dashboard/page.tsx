@@ -15,6 +15,7 @@ import { fieldClass } from "@/components/ui";
 import { loadOwnTeams } from "../dugout/data";
 import { claimDaughter } from "./actions";
 import { TitleWithTeamLogo } from "@/components/team-logo";
+import { PARENT_LINK } from "@/lib/lifecycles";
 
 export const metadata: Metadata = { title: "Dashboard · GGG.Cafe" };
 
@@ -84,7 +85,6 @@ async function ParentSide({ userId, head }: { userId: string; head: boolean }) {
   // the daughter named at sign-up, if one matches
   const typed = String((jwt?.claims?.user_metadata as { coach_child?: string } | undefined)?.coach_child ?? "").trim().toLowerCase();
   const suggested = typed ? rosters.flatMap((r) => r.players).find((p) => p.name.toLowerCase() === typed)?.id : undefined;
-  const statusLabel = { approved: "Approved", pending: "Waiting for the head coach", declined: "Not approved" } as const;
 
   return (
     <section aria-labelledby="parent-side" className="flex flex-col gap-3">
@@ -99,7 +99,7 @@ async function ParentSide({ userId, head }: { userId: string; head: boolean }) {
                 <span className="font-semibold">{l.child_name}</span>
                 <span className="text-sm text-muted"> · {l.team?.name}</span>
               </span>
-              <span className="text-sm text-muted">{statusLabel[l.status]}</span>
+              <span className="text-sm text-muted">{PARENT_LINK.label[l.status]}</span>
             </li>
           ))}
         </ul>
@@ -161,16 +161,21 @@ async function NotStaff({ userId, email }: { userId: string; email: string | nul
     });
     const assistant = meta.role === "assistant-coach";
     if (status === "staff") redirect("/dashboard");
+    // where her sign-up stands (STAFF_REQUEST in lib/lifecycles.ts): waiting, not approved, or
+    // approved and later taken off the staff (removeStaff deletes the staff row; the request stays)
     const declined = status === "declined";
+    const removed = status === "approved";
     return (
       <>
-        <PageHeader title={declined ? "Not approved" : "Waiting for approval"} description={email ?? undefined} />
-        <div className={`rounded-2xl border p-5 ${declined ? "border-navy-600" : "border-pink/50 bg-pink/10"}`}>
+        <PageHeader title={removed ? "No coach access" : declined ? "Not approved" : "Waiting for approval"} description={email ?? undefined} />
+        <div className={`rounded-2xl border p-5 ${declined || removed ? "border-navy-600" : "border-pink/50 bg-pink/10"}`}>
           <p className="font-display text-xl font-bold tracking-wide uppercase">{assistant ? "Assistant Coach" : "Head Coach"}</p>
           <p className="mt-2 text-ink">
             {error
               ? "We couldn't send your request. Sign out and back in, or ask your head coach to add you."
-              : declined
+              : removed
+                ? "Your coach access was removed. If that's a mistake, talk to your head coach or the GGG.Cafe admin."
+                : declined
                 ? "Your coach sign-up wasn't approved. If that's a mistake, talk to your head coach or the GGG.Cafe admin."
                 : assistant
                   ? "Your email is confirmed. A head coach approves assistant coaches; once they do, your Coaches Dugout opens here."

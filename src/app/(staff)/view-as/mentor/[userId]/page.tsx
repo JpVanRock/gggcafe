@@ -17,10 +17,10 @@ import { VIDEO_CALL_COLUMNS, type VideoCallRow } from "@/components/video-calls"
 import { comingSinceISO, formatCallTime, groupLabel, isComing } from "@/lib/video-calls";
 import { APP_TIME_ZONE } from "@/lib/dates";
 import { playerName as fullName } from "@/lib/softball";
+import { MENTOR_LINK } from "@/lib/lifecycles";
 
 export const metadata: Metadata = { title: "Mentor view · GGG.Cafe" };
 
-const STATUS: Record<string, string> = { approved: "Approved", pending: "Waiting", declined: "Declined" };
 
 /**
  * Admins: a mentor's home as the mentor sees it, read only (user, 2026-11-12), drawn like the mentor
@@ -154,7 +154,7 @@ export default async function ViewAsMentorPage({ params, searchParams }: PagePro
                     {l.player_id ? `${l.player_name ?? "A player"} (one player)` : "The whole team"} · {l.team_name ?? "a team"}
                     <span className="text-muted"> · asked {formatDay(l.requested_at.slice(0, 10))}</span>
                   </span>
-                  <Badge tone={l.status === "approved" ? "neon" : l.status === "pending" ? "pink" : "neutral"}>{STATUS[l.status] ?? l.status}</Badge>
+                  <Badge tone={MENTOR_LINK.tone[l.status]}>{MENTOR_LINK.label[l.status]}</Badge>
                 </li>
               ))}
             </ul>

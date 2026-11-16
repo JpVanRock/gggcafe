@@ -82,16 +82,17 @@ select set_config('request.jwt.claims', '{"sub":"e5e5e5e5-0000-0000-0000-0000000
 select pg_temp.expect('not the other team''s side', pg_temp.err($$select public.save_box_score('00000000-0000-0000-0000-0000000000e1', '00000000-0000-0000-0000-0000000000b2', '{}')$$), '42501');
 reset role;
 
--- The role lapses with the parent link
-update public.parent_links set status = 'declined' where parent_id = 'e5e5e5e5-0000-0000-0000-000000000003';
+-- The role lapses with the parent link (the head coach removes the parent: the row goes)
+delete from public.parent_links where parent_id = 'e5e5e5e5-0000-0000-0000-000000000003';
 set role authenticated;
 select set_config('request.jwt.claims', '{"sub":"e5e5e5e5-0000-0000-0000-000000000003"}', false);
 select pg_temp.expect('no longer a team admin', (select count(*) from public.my_admin_team_ids()), 0::bigint);
 select pg_temp.expect('the calendar closes', pg_temp.err($$insert into public.team_events (team_id, event_date) values ('00000000-0000-0000-0000-0000000000b1', '2026-12-02')$$), '42501');
 reset role;
 
--- The head coach takes it back
-update public.parent_links set status = 'approved' where parent_id = 'e5e5e5e5-0000-0000-0000-000000000003';
+-- The head coach takes it back (the parent is approved again first)
+insert into public.parent_links (parent_id, team_id, child_name, player_id, status, decided_at) values
+  ('e5e5e5e5-0000-0000-0000-000000000003', '00000000-0000-0000-0000-0000000000b1', 'Avery Lopez', '00000000-0000-0000-0000-0000000000c1', 'approved', now());
 set role authenticated;
 select set_config('request.jwt.claims', '{"sub":"e5e5e5e5-0000-0000-0000-000000000001"}', false);
 select public.set_team_admin('00000000-0000-0000-0000-0000000000b1', 'e5e5e5e5-0000-0000-0000-000000000003', false);

@@ -47,6 +47,19 @@ test("this week's race: in the running first, then named this round, then waitin
   assert.equal(weekRace(back, [week("2026-09-28", "a")], "2026-11-09").find((r) => r.first_name === "Ava")?.status, "named-this-round");
 });
 
+test("a tie in the race goes the way the database breaks it", () => {
+  const rows = [
+    row("c", "Ava", 0, { week_points: 20, times_named: 1, last_named: "2026-08-03" }),
+    row("b", "Bea", 0, { week_points: 20 }),
+    row("a", "Cam", 0, { week_points: 20, times_named: 1, last_named: "2026-07-27" }),
+  ];
+  // never named beats named once; of those named once, the longer wait goes first
+  assert.deepEqual(weekRace(rows, [], "2026-11-09").map((r) => r.first_name), ["Bea", "Cam", "Ava"]);
+  // all else equal: the lower player id, as the database orders
+  const even = [row("z", "Ann", 0, { week_points: 5 }), row("y", "Zoe", 0, { week_points: 5 })];
+  assert.deepEqual(weekRace(even, [], "2026-11-09").map((r) => r.first_name), ["Zoe", "Ann"]);
+});
+
 test("latest winner skips weeks nobody won", () => {
   assert.equal(latestWinner([week("2026-11-02", "a"), week("2026-11-09", null)])?.player_id, "a");
   assert.equal(latestWinner([week("2026-11-09", null)]), null);
