@@ -414,14 +414,23 @@ export function IqTests({
   const live = useRef<string | null>(null);
   const stillOn = (attemptId: string) => live.current === attemptId;
 
-  function exit() {
-    live.current = null;
-    setSession(null);
+  /** Everything on screen from the last test or review, cleared, so a new one starts blank. */
+  function clearRun() {
     setFeedback(null);
     setResult(null);
     setReviewDone(false);
     setHint(null);
-    router.refresh();
+    setError(null);
+  }
+
+  function exit() {
+    live.current = null;
+    setSession(null);
+    clearRun();
+    // The cards still show what was true when the page loaded until this refresh lands. As a
+    // transition it keeps `pending` on, so their buttons wait for it: a stale "Start" or "Retake"
+    // can't be tapped and quietly bring back the test she just left.
+    startTransition(() => router.refresh());
   }
 
   async function start(key: TestKey, restart = false) {
@@ -432,9 +441,8 @@ export function IqTests({
       if (res.error || !res.attemptId || !res.questions) return setError(res.error ?? "Couldn't start the test.");
       const done = res.answered ?? {};
       live.current = res.attemptId;
+      clearRun();
       setSession({ ...key, mode: "test", attemptId: res.attemptId, questions: res.questions, done, index: nextOpen(res.questions, done, 0), shelf: null });
-      setFeedback(null);
-      setResult(null);
     });
   }
 
@@ -446,11 +454,9 @@ export function IqTests({
       const done = res.reviewed ?? {};
       const index = nextOpen(res.questions, done, 0);
       live.current = attemptId;
+      clearRun();
       setSession({ ...key, mode: "review", attemptId, questions: res.questions, done, index, shelf: null });
-      setResult(null);
       setReviewDone(index >= res.questions.length);
-      setFeedback(null);
-      setHint(null);
     });
   }
 

@@ -74,11 +74,11 @@ Each of these has one function. Use it rather than re-deriving the state.
 
 | Runner | File | Phases and guards |
 |---|---|---|
-| IQ level tests | `players/[playerId]/iq-tests-client.tsx` | picker → question ⇄ feedback → all answered → grading → result; review mode. `live` holds the attempt on screen, and a reply for any other attempt is dropped. `nextOpen` never reads past the last question |
+| IQ level tests | `players/[playerId]/iq-tests-client.tsx` | picker → question ⇄ feedback → all answered → grading → result; review mode. `live` holds the attempt on screen, and a reply for any other attempt is dropped. `clearRun` blanks everything when a test or review starts or ends, so Start over looks like a test never started. Leaving refreshes the cards as a transition, so their buttons wait for the fresh state. `nextOpen` never reads past the last question |
 | Video call room | `calls/[callId]/call-room.tsx` + `public/zoom-call.html` | idle → asking → connecting → in; any → left / error. `attempt` drops a join reply that arrives after Leave |
-| Practice quiz | `players/[playerId]/iq-quiz-client.tsx` | list → question → feedback → score. Stop shows after an error too |
-| Scorebook chapter | `scorebook-client.tsx` (`ChapterRunner`) | lesson → ready → quiz → result |
-| Scorebook game | `GameRunner` | intro → play → line → result |
+| Practice quiz | `players/[playerId]/iq-quiz-client.tsx` | list → question → feedback → score. Stop shows after an error too. `runs` drops an answer's reply that lands after Stop |
+| Scorebook chapter | `scorebook-client.tsx` (`ChapterRunner`) | lesson → ready → quiz → result. `openQuiz` is the page-load `quizOpen` until a quiz starts here, then open until it's graded, so Save & exit offers Resume and Start over |
+| Scorebook game | `GameRunner` | intro → play → line → result. A start or restart clears the line score and its "doesn't match" note |
 | Guided mental session | `session-client.tsx` | intro → run → done |
 | Course, team quiz, bullpen | `course-client.tsx`, `playbook-client.tsx`, bullpen runner | step index plus shown/answered flags |
 
@@ -96,6 +96,5 @@ Each of these has one function. Use it rather than re-deriving the state.
   - Saving a committed plan doesn't re-check that it's complete.
   - The menu's "leader" comes from the certificate, while the coach view goes by the sign-off. They differ after a program switch, by design: the certificate stays.
 - **Scorebook:**
-  - "Save & exit" in a chapter shows the ready screen with the page-load quiz state until the page reloads.
   - A clean game that's being replayed shows as clean, not playing.
   - "All chapters done" is computed in four places (`scorebook.tsx`, `game/page.tsx`, `game/[n]/page.tsx`, `player-menu.tsx`). One helper would be better.

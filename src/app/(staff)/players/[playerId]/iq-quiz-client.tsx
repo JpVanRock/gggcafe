@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState, useTransition } from "react";
+import { useActionState, useRef, useState, useTransition } from "react";
 import { Field, FormMessage, buttonClass, inputClass, secondaryButtonClass, cardClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import { POSITIONS, POSITION_LABEL } from "@/lib/softball";
@@ -29,6 +29,25 @@ export function QuizRunner({ playerId, quizzes, canEdit }: { playerId: string; q
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  // Counts runs: an answer's reply that lands after she stopped (or started another quiz) belongs to
+  // a run that's gone, and is dropped, so it can't score or show feedback in the new one.
+  const runs = useRef(0);
+
+  function begin(quiz: QuizInfo) {
+    runs.current += 1;
+    setRun({ label: quiz.label, questions: quiz.questions.slice(0, QUIZ_LENGTH) });
+    setIndex(0);
+    setScore(0);
+    setFeedback(null);
+    setError(null);
+  }
+
+  function stop() {
+    runs.current += 1;
+    setRun(null);
+    setFeedback(null);
+    setError(null);
+  }
 
   if (!run) {
     return (
@@ -47,13 +66,7 @@ export function QuizRunner({ playerId, quizzes, canEdit }: { playerId: string; q
             <button
               type="button"
               disabled={!canEdit || quiz.questions.length === 0}
-              onClick={() => {
-                setRun({ label: quiz.label, questions: quiz.questions.slice(0, QUIZ_LENGTH) });
-                setIndex(0);
-                setScore(0);
-                setFeedback(null);
-                setError(null);
-              }}
+              onClick={() => begin(quiz)}
               className={buttonClass}
             >
               {quiz.questions.length === 0 ? "No questions yet" : `Start · ${plural(Math.min(quiz.questions.length, QUIZ_LENGTH), "question", "questions")}`}
@@ -76,7 +89,7 @@ export function QuizRunner({ playerId, quizzes, canEdit }: { playerId: string; q
         <p className="mt-1 text-sm text-muted">
           {score === run.questions.length ? "Perfect score." : "Missed questions come up first next time."}
         </p>
-        <button type="button" onClick={() => setRun(null)} className={`${buttonClass} mt-5`}>
+        <button type="button" onClick={stop} className={`${buttonClass} mt-5`}>
           Back to quizzes
         </button>
       </div>
@@ -85,8 +98,10 @@ export function QuizRunner({ playerId, quizzes, canEdit }: { playerId: string; q
 
   const q = run.questions[index];
   function choose(chosen: number) {
+    const mine = runs.current;
     startTransition(async () => {
       const result = await answerIqQuestion({ playerId, questionId: q.id, chosenIndex: chosen });
+      if (runs.current !== mine) return;
       if (result.error) {
         setError(result.error);
         return;
@@ -144,7 +159,7 @@ export function QuizRunner({ playerId, quizzes, canEdit }: { playerId: string; q
           </p>
           {/* the way out when a question can't be answered (Stop otherwise appears after an answer) */}
           {!feedback && (
-            <button type="button" onClick={() => setRun(null)} className={secondaryButtonClass}>
+            <button type="button" onClick={stop} className={secondaryButtonClass}>
               Stop
             </button>
           )}
@@ -166,7 +181,7 @@ export function QuizRunner({ playerId, quizzes, canEdit }: { playerId: string; q
             >
               {index + 1 < run.questions.length ? "Next question" : "See score"}
             </button>
-            <button type="button" onClick={() => setRun(null)} className={secondaryButtonClass}>
+            <button type="button" onClick={stop} className={secondaryButtonClass}>
               Stop
             </button>
           </div>

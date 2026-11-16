@@ -199,6 +199,10 @@ export function ChapterRunner({
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [result, setResult] = useState<{ correct: number; total: number; passed: boolean; awardEarned: boolean } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Whether a quiz is saved unfinished. `quizOpen` is from page load; once she starts one here, this
+  // runner knows better: open until it's graded. (After "Save & exit" the page-load value would offer
+  // "Start the quiz" and hide "Start over", and starting would bring back her saved answers.)
+  const openQuiz = quiz ? result === null : quizOpen;
   const [pending, startTransition] = useTransition();
 
   function go(to: number) {
@@ -418,9 +422,9 @@ export function ChapterRunner({
             {best && <p className="mt-1 text-xs text-muted">Best so far: {best.correct}/{best.total}</p>}
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <button type="button" onClick={() => startQuiz()} disabled={!canEdit || pending} className={buttonClass}>
-                {quizOpen ? "Resume the quiz" : earnedOn ? "Retake the quiz" : "Start the quiz"}
+                {openQuiz ? "Resume the quiz" : earnedOn ? "Retake the quiz" : "Start the quiz"}
               </button>
-              {quizOpen && (
+              {openQuiz && (
                 <button
                   type="button"
                   onClick={async () => (await confirmAction("Start the quiz over? The saved answers will be cleared.")) && startQuiz(true)}

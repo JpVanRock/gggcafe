@@ -268,7 +268,9 @@ export function GameRunner({
     startTransition(async () => {
       const res = await startScorebookGame({ playerId, game: n, restart });
       if (res.error || !res.run) return setError(res.error ?? "Couldn't start the game.");
+      // a new or restarted game starts blank: nothing from the last book's line score carries over
       setLine({ V: ["", ""], H: ["", ""] });
+      setLineWrong(false);
       setResult(null);
       openPlay(res.run);
     });
