@@ -138,7 +138,7 @@ export function MentorPreview({
             )}
           </MenuPanel>
           <MenuPanel number={5} title="Work With More Players" subtitle="A player or a whole team" variant="outlinePink" wide>
-            <p className={note}>Ask with the team code. Her parents approve you for one player; the head coach approves you for the whole team.</p>
+            <p className={note}>Ask with the parent code. Her parents approve you for one player; the head coach approves you for the whole team.</p>
           </MenuPanel>
         </section>
       )}

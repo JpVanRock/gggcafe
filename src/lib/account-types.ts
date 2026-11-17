@@ -6,8 +6,6 @@
 
 export const SIGNUP_TYPES = ["head-coach", "assistant-coach", "player", "parent", "mentor"] as const;
 export type SignupType = (typeof SIGNUP_TYPES)[number];
-/** The account types that sign up with a code: the team code (teams.team_code), or for parents the parent code (team_parent_codes). */
-export const CODE_TYPES: readonly SignupType[] = ["player", "parent", "assistant-coach", "mentor"];
 
 export const SIGNUP_LABEL: Record<SignupType, string> = {
   "head-coach": "Head Coach",
@@ -36,25 +34,25 @@ export const ACCOUNT_TYPES: AccountType[] = [
   {
     key: "assistant-coach",
     label: "Assistant Coach",
-    signup: "Signs up with an email and the team code from the head coach, and confirms the email; a head coach of that team (or an admin) approves.",
+    signup: "Signs up with an email and confirms it, then enters the team's parent code from the head coach; a head coach (or an admin) approves.",
     home: "Assistant dashboard: this week, practice plans, their Dugout tabs",
   },
   {
     key: "player",
     label: "Player",
-    signup: "Signs up with an email and the team code, then claims her spot on the roster (a coach approves), or her parent creates a username login for her. Under 13: her parent's verified consent comes first.",
+    signup: "Doesn't sign up: her parent makes her username login on the family page, with no email and nothing to confirm. Players never get the code. Under 13: her parent's verified consent comes first. (Players who signed up with an email before 2026-11-16 keep their accounts.)",
     home: "Her player menu",
   },
   {
     key: "parent",
     label: "Parent",
-    signup: "Signs up with an email, the parent code and the daughter's name, and is in at once when the name matches a player on the current roster (the head coach is notified). The team code still works, but then a head coach matches the parent to her.",
+    signup: "Signs up with an email and confirms it, then enters the parent code and the daughter's name, and is in at once when the name matches a player on the current roster (the head coach is notified). A name that matches no one waits for the head coach.",
     home: "Family page",
   },
   {
     key: "mentor",
     label: "Mentor",
-    signup: "Mentors and skill coaches sign up with the team code and confirm their email; a player's parents approve them for her, or the head coach for the whole team.",
+    signup: "Mentors and skill coaches sign up and confirm their email, then enter the team's parent code and ask for one player (her parents approve) or the whole team (the head coach approves).",
     home: "Mentor page: the team's roster or her approved players",
   },
 ];
@@ -176,17 +174,17 @@ export const QUESTIONS: { q: string; a: string[] }[] = [
     q: "Why does every sign-up confirm an email first?",
     a: [
       "So only real people with a working inbox get in. The link in the email finishes the sign-up; until it's opened, the account can't sign in.",
-      "After confirming, most accounts wait for a person to approve them: an admin for head coaches, a head coach for assistant coaches, a coach for players, and a player's parents (one player) or the head coach (the whole team) for mentors.",
-      "Parents with the parent code don't wait: they're in as soon as the daughter's name they typed matches one player on the team's current roster, and head coaches and admins are notified. A name that matches no one, or the team code, waits for the head coach.",
+      "Signing up doesn't open anything. After confirming, each account joins its team with the parent code on its own page, then waits for a person to approve it: an admin for head coaches (no code), a head coach for assistant coaches, and a player's parents (one player) or the head coach (the whole team) for mentors.",
+      "Parents don't wait: they're in as soon as the daughter's name they typed matches one player on the team's current roster, and head coaches and admins are notified. A name that matches no one waits for the head coach.",
     ],
   },
   {
-    q: "What is the team code, and who gets it?",
+    q: "What is the parent code, and who gets it?",
     a: [
-      "Each team has a six-character team code. Players, assistant coaches and mentors choose their account type on the sign-up page and enter it; head coaches don't need one (an admin approves them).",
-      "Parents get a second code, the parent code, which lets them in without waiting for approval. Give it to parents only: anyone with it can join as a parent of a girl on the roster. Players can't see it.",
-      "Coaches see the team code in Coaches Dugout → Roster and the parent code in Coaches Dugout → Parents. A head coach turns each on, makes a new one (the old one stops working) or turns it off; everyone already approved keeps access. If someone joined as a parent who shouldn't have, remove them and make a new parent code.",
-      "The team code only lets someone ask to join: those sign-ups wait for approval. Signed-out visitors can't see the list of teams.",
+      "Each team has one six-character code to join, the parent code (the old team code is retired). Parents, assistant coaches and mentors sign up, confirm their email, then enter it on their own page; head coaches don't need one (an admin approves them).",
+      "Never give it to players: anyone with it can join as a parent of a girl on the roster. Players don't sign up at all: a parent makes each player's login. Players can't see the code.",
+      "Coaches see it in Coaches Dugout → Parents and Roster. A head coach turns it on, makes a new one (the old one stops working) or turns it off; everyone already approved keeps access. If someone joined as a parent who shouldn't have, remove them and make a new code.",
+      "Signed-out visitors can't see the list of teams.",
     ],
   },
   {

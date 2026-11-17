@@ -6,8 +6,8 @@ import { FixNameForm } from "./join-form";
 
 /**
  * Requests still waiting (user, 2026-11-16). With the parent code her name matched no one (or two
- * players) on the current roster, so the parent fixes it here; with the team code, the head coach
- * approves them, or they join again with the parent code.
+ * players) on the current roster, so the parent fixes it here; a request made with the old, retired team
+ * code waits for the head coach, or they join again with the parent code.
  */
 export async function WaitingRequests({ links }: { links: FamilyLink[] }) {
   const supabase = await createClient();

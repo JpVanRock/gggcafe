@@ -4,7 +4,7 @@ import { SITE_URL } from "@/lib/site";
 
 /**
  * This request's origin, such as "https://www.ggg.cafe" or "http://localhost:3000", for links
- * in emails and on pages (sign-up and reset links, shared plans and lineups, the team code).
+ * in emails and on pages (sign-up and reset links, shared plans and lineups, the parent code).
  * Falls back to the main address when the request names no host.
  */
 export async function requestOrigin(): Promise<string> {

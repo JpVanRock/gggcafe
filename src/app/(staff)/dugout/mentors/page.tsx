@@ -130,7 +130,7 @@ export default async function MentorsPage({ searchParams }: PageProps<"/dugout/m
         </ol>
         <Disclosure summary="How mentoring works">
           <p className="max-w-3xl text-sm text-muted">
-            Mentors and skill coaches (pitching, hitting, catching…) ask with the team code. You approve a mentor for the whole team; a player&apos;s parents
+            Mentors and skill coaches (pitching, hitting, catching…) ask with the parent code. You approve a mentor for the whole team; a player&apos;s parents
             approve one for their daughter. Mentors read her Goals, Pop Report and Mental GP, message her, add training to her week, and keep notes here with
             you: what they&apos;re working on, what&apos;s working, and what you talked about. Messages to players are private to the player, her parents and the
             admins unless the mentor shares one with you.
@@ -142,7 +142,7 @@ export default async function MentorsPage({ searchParams }: PageProps<"/dugout/m
         <h3 className={heading}>Waiting for approval ({pendingTeam.length})</h3>
         {pendingTeam.length === 0 && pendingPlayer.length === 0 ? (
           <p className="text-sm text-muted">
-            Nobody waiting. Mentors sign up at <span className="font-mono">/register</span>, pick &quot;Mentor&quot; and enter the team code.
+            Nobody waiting. Mentors sign up at <span className="font-mono">/register</span>, pick &quot;Mentor&quot; and enter the parent code.
           </p>
         ) : (
           <ul className="flex flex-col gap-3">

@@ -15,7 +15,7 @@ import { TERMS_VERSION } from "@/lib/legal";
 
 /**
  * Creates her parent profile if needed, then joins a team: with the parent code, approved at once
- * when her name matches the roster; with the team code, the head coach approves. Then the family menu.
+ * when her name matches the roster (an old, retired team code waits for the head coach). Then the family menu.
  */
 export async function joinTeam(_prev: FormState, fd: FormData): Promise<FormState> {
   const user = await getCurrentUser();

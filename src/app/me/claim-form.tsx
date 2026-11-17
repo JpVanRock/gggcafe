@@ -2,8 +2,7 @@
 
 import { useActionState } from "react";
 import { Field, FormMessage, inputClass } from "@/components/ui";
-import { claimSpot, findTeam, type ClaimState } from "./actions";
-import { initialFormState } from "@/lib/form";
+import { claimSpot, type ClaimState } from "./actions";
 import { SubmitButton } from "@/components/submit-button";
 
 const initial: ClaimState = { error: null };
@@ -27,20 +26,3 @@ export function ClaimForm({ teamId, defaultName, defaultJersey }: { teamId: stri
   );
 }
 
-/** No team yet: the team code from her coach finds it. */
-export function TeamCodeForm() {
-  const [state, action] = useActionState(findTeam, initialFormState);
-  return (
-    <form action={action} className="flex flex-wrap items-end gap-3">
-      <div className="min-w-60 flex-1">
-        <Field label="Team code" hint="Six letters and numbers from your coach">
-          <input name="code" required maxLength={10} autoComplete="off" autoCapitalize="characters" placeholder="ABC-234" className={`${inputClass} font-display tracking-[0.2em] uppercase`} />
-        </Field>
-      </div>
-      <SubmitButton variant="secondary" pendingLabel="Checking…">Continue →</SubmitButton>
-      <div className="basis-full">
-        <FormMessage error={state.error} fields={state.fields} />
-      </div>
-    </form>
-  );
-}

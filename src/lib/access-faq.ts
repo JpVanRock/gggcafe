@@ -157,7 +157,7 @@ export const FAQ: { q: string; a: string[] }[] = [
   {
     q: "What can a mentor see and do?",
     a: [
-      "Mentors (a mentor, a pitching or hitting coach…) sign up, pick \"Mentor\" and enter the team code, then ask to work with one player (by name) or the whole team. A player's approved parents approve a mentor for her on the family page; a head coach approves one for the whole team in Coaches Dugout → Mentors. Admins can approve either.",
+      "Mentors (a mentor, a pitching or hitting coach…) sign up, pick \"Mentor\", confirm their email and enter the team's parent code, then ask to work with one player (by name) or the whole team. A player's approved parents approve a mentor for her on the family page; a head coach approves one for the whole team in Coaches Dugout → Mentors. Admins can approve either.",
       "A mentor sees only the players she's approved for (the whole team's current roster, or that one player): their Goals, Pop Report (Movement Preferences only with G3 Advanced) and Mental GP, read-only. She can message them with a photo or a drill (from the Drill Library, or one she adds to it), and add training to their This Week in Softball for one player or a group, once or every week.",
       "Messages to a player are private to the player, her parents and the admins unless the mentor shares one with the coaches. Head coaches can remove a shared message; admins any message.",
       "Mentors keep notes with the coaches: discussion summaries, what they're working on and what's working, about a player or the whole team. Coaches read them and head coaches reply. The player's parents read the ones about her; players don't see them.",

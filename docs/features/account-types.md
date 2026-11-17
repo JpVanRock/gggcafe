@@ -1,31 +1,37 @@
 # Account types (user, 2026-11-08; migrations 20261108210000 + 20261108210100)
-- Five sign-ups at /register, each confirms its email first (Supabase Auth "Confirm email" is on; keep it on), each with
+- Four sign-ups at /register, each confirms its email first (Supabase Auth "Confirm email" is on; keep it on), each with
   its own home: Head Coach (staff role `coach`, an admin approves) and Assistant Coach (role `assistant`, a head coach or
-  admin approves) → /dashboard; Player → /me; Parent → /family; Mentor → /mentor. Admin (`admin`) isn't
-  a sign-up: head coach + staff, mentors, G3 Advanced, FAQ. `viewer` stays as read-only staff (admins set it).
-- Every sign-up checks the Terms of Service box, and players confirm they're 13 or older (younger players get a
-  parent-made login); accounts without an agreement are asked once on /terms/accept (`docs/features/legal.md`).
-- Account type is a dropdown (players and parents first). Team code (user, 2026-11-09; migration 20261109140000): one
-  6-character code per team (`teams.team_code`, unique, no 0/O/1/I; `CODE_TYPES` in account-types.ts). Players, parents
-  and assistant coaches enter it at sign-up; the action checks it with `signup_team(code)` (the only function signed-out
-  visitors call: returns that one team, nothing for a wrong code; there's no team list) and saves the team in the
-  account's metadata (`team`; parents also `team_code` + `child`, which the first /family visit joins with). Coaches see the
-  code on the Roster and Parents tabs (`dugout/team-code.tsx`); head coaches make a new one or turn sign-up off
-  (`setTeamCode`, guarded by the `guard_team_code` trigger). Players without a team enter the code on /me (`findTeam`).
-- Parent code (user, 2026-11-16; migration 20261117010048): "If they have a team code they should not also need coach
-  confirmation." Players share the team code, so parents get their own: `team_parent_codes` (one per team; staff read it,
-  head coaches change it on the Parents tab, `setParentCode`, `ParentCodeCard`; players never see it; a code is never both
-  a team and a parent code, `guard_signup_code`). Sign-up checks it signed out with `signup_parent_team(code)` (then
-  `signup_team`, so the team code still works for parents). `request_parent_link` marks a request `via_parent_code`, and
+  admin approves) → /dashboard; Parent → /family; Mentor → /mentor. Players don't sign up (user, 2026-11-16): a parent
+  makes every player's login (below); players who signed up earlier keep /me. Admin (`admin`) isn't a sign-up: head
+  coach + staff, mentors, G3 Advanced, FAQ. `viewer` stays as read-only staff (admins set it).
+- Every sign-up checks the Terms of Service box; accounts without an agreement are asked once on /terms/accept
+  (`docs/features/legal.md`).
+- One code to join, entered after signing in (user, 2026-11-16: "Lets go with one code the parents code to join a team.
+  Players will never be given this code"; "It just needs to be when you are first logged in and joining a team";
+  migrations 20261117010048 + 20261117013057). Sign-up asks for no code. The team's one code is the parent code
+  (`team_parent_codes`: one per team, 6 characters, no 0/O/1/I; staff read it, head coaches change it on the Parents and
+  Roster tabs, `setParentCode`, `ParentCodeCard` in `dugout/team-code.tsx`; players never see it). Parents enter it with
+  the daughter's name on /family (in at once on a name match, below), assistant coaches on /dashboard
+  (`requestAssistantAccess`: `signup_parent_team(code)` finds the team, then `request_staff_access`), mentors on /mentor
+  (`request_mentor`). Never give it to players: anyone with it can join as a parent of a girl on the roster.
+  `signup_parent_team` is callable signed out, like `signup_team` (one team for a right code, nothing for a wrong one;
+  there's no team list).
+- The team code (`teams.team_code`, user 2026-11-09) is retired: players had it, so migration 20261117013057 cleared
+  every team's, and the app no longer makes one (`setTeamCode`, `TeamCodeCard`, /me's `findTeam` are gone). The column,
+  `signup_team` and the team-code branches in `request_parent_link` / `request_mentor` stay for the database tests; a
+  code is never both (`guard_signup_code`).
+- Parent code matching (user, 2026-11-16, migration 20261117010048: "If they have a team code they should not also need
+  coach confirmation"). `request_parent_link` marks a request `via_parent_code`, and
   `private.match_parent_link` approves it at once when the daughter's name (`private.name_key`: case, accents,
   apostrophes and spacing ignored; first or preferred name + last name) matches exactly one player on the team's current
   roster, and notifies head coaches and admins (`parent-joined`, the bell). Everything else waits for the head coach: no
-  match or two, the team code, or a parent declined on that team before. At most 6 requests per parent per team (54000).
+  match or two, or a parent declined on that team before. At most 6 requests per parent per team (54000).
   Player accounts (a player login, or a claim that isn't declined) can't join as parents (P0011). `rematch_parent_link`:
   a parent fixes the name on a waiting request. Removing a wrong parent: Remove access, and make a new parent code.
   DB tests: `tests/db/parent_codes.test.sql`.
-- Coach sign-ups: metadata `role` head-coach/assistant-coach (+ `team`, `note`); the first /dashboard visit after
-  confirming calls `request_staff_access()` (table `staff_requests`); `staff_requests_to_decide()` /
+- Coach sign-ups: metadata `role` head-coach/assistant-coach (+ `note`; older accounts `team`); the first /dashboard visit
+  after confirming calls `request_staff_access()` (table `staff_requests`; an assistant with no team yet gets the
+  "Join your team" code form, `AssistantJoin`, first); `staff_requests_to_decide()` /
   `decide_staff_request()` (admins any, head coaches assistants) add the `staff` row. Roster tab: "Coaches signing up"
   plus "Coaching staff" (admins change roles/remove, `roster/actions.ts`). Counts in `countWaiting()` (approvals.ts).
   The sign-up page (`NotStaff` in dashboard/page.tsx) shows where the request stands: waiting, not approved, or
@@ -33,7 +39,7 @@
   decided once (`STAFF_REQUEST` in `src/lib/lifecycles.ts`, guarded in the database; docs/architecture/state-machines.md).
 - Assistants: `private.can_edit()` includes them, `private.is_head_coach()` doesn't. Head-coach-only writes
   (`private.apply_head_coach_writes`): team_culture/standards, gameday_*, the Team Budget (budget_*); parent links, parent emails
-  (`team_parent_links`), the team code (trigger), approving whole-team mentors (`decide_mentor_link`; a player's parents approve one for her, see mentors.md). Practice plans: everyone reads; assistants
+  (`team_parent_links`), the parent code (`team_parent_codes`), approving whole-team mentors (`decide_mentor_link`; a player's parents approve one for her, see mentors.md). Practice plans: everyone reads; assistants
   change only plans they created (`private.can_edit_plan`, `canEditPlanRole`); others show "View only".
   App: `src/lib/roles.ts` (labels, `dugoutTabsFor` hides Culture/GameDay/Parents/Mentors from assistants),
   `requireHeadCoachPage()` (404 for assistants) and `headCoachCheck()` in auth.ts. Bell: head coaches/admins only.

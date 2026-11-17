@@ -82,7 +82,7 @@ export default async function ViewAsMentorPage({ params, searchParams }: PagePro
       <section aria-label={`${name}'s mentor page`} className="flex flex-col gap-10 rounded-2xl border-2 border-navy-700 p-4 sm:p-6">
         {!v.mentor ? (
           <EmptyState title="Ask to work with a player or a team">
-            No mentor profile yet: they haven&apos;t sent a request with a team code, so their home shows only the request form.
+            No mentor profile yet: they haven&apos;t sent a request with the parent code, so their home shows only the request form.
           </EmptyState>
         ) : (
           <>

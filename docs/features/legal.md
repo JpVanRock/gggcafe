@@ -24,8 +24,8 @@ the release for minors, the under-13 consent and the dispute terms.
 - Footer on every page (`SiteFooter` in `components/brand.tsx`): the GGG.CAFE wordmark at the right, then
   the short disclaimer, links to both documents and the © line across the full page width (user, 2026-11-12). Small (`text-xs`) and quiet but full-contrast `text-muted`.
 - Clickwrap at sign-up (`/register`): an unchecked, required box (`AgreementCheckbox`) with both
-  documents one tap away in a new tab; players also confirm they're 13 or older (younger players
-  get a parent-made login). The action refuses without them and puts `terms_version` in the new
+  documents one tap away in a new tab. Players don't sign up (user, 2026-11-16): a parent makes
+  each player's login. The action refuses without the box and puts `terms_version` in the new
   account's metadata.
 - Contextual notes (`components/legal.tsx`): `SafetyNote` ("Train smart.") on Performance Training
   (player), Dugout Drills, Practice plans (list and each plan) and Training (coach); a line in the

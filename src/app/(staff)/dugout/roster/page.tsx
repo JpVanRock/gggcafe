@@ -13,7 +13,7 @@ import { LeaderBadge } from "@/components/leader-badge";
 import { AdvancedAccessToggle } from "../../players/[playerId]/advanced-client";
 import { loadLeaderBadges } from "@/lib/leader-badges";
 import { PendingStaffList, StaffList, type StaffMember } from "./staff";
-import { TeamCodeCard } from "../team-code";
+import { ParentCodeCard } from "../team-code";
 import { MoveTeamForm, type MoveTeam } from "../../players/move-form";
 import { PendingConsentList } from "./consents";
 import { CONSENT_BUCKET } from "@/lib/consent";
@@ -46,7 +46,7 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
     editor ? loadTeamApprovals(supabase, team.id) : Promise.resolve(null),
     head ? loadStaffRequests(supabase) : Promise.resolve([]),
     supabase.from("staff").select("user_id, display_name, role"),
-    editor ? supabase.from("teams").select("team_code").eq("id", team.id).maybeSingle() : Promise.resolve({ data: null }),
+    editor ? supabase.from("team_parent_codes").select("code").eq("team_id", team.id).maybeSingle() : Promise.resolve({ data: null }),
     // teams a coach can move a player to (Move a player to another team)
     editor
       ? supabase.from("teams").select("id, name, organization, age_group, is_own_team").order("is_own_team", { ascending: false }).order("name")
@@ -174,7 +174,7 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
         </section>
       )}
 
-      {editor && <TeamCodeCard team={team} code={codeResult.data?.team_code ?? null} head={head} />}
+      {editor && <ParentCodeCard team={team} code={codeResult.data?.code ?? null} head={head} />}
 
       <Card title={`${season?.name ?? ""} roster (${roster.filter((r) => r.active).length})`}>
         {roster.length === 0 ? (

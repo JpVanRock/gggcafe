@@ -89,12 +89,12 @@ export function trainingDates(t: { days: number[]; starts_on: string; ends_on: s
 // Asking to mentor, and working with the coaches
 // ---------------------------------------------------------------------------
 
-/** A request to mentor: the team code, and her name for one player (none = the whole team). */
+/** A request to mentor: the team's parent code, and her name for one player (none = the whole team). */
 export function cleanMentorRequest(input: { code?: unknown; scope?: unknown; player?: unknown }):
   | { code: string; playerName: string | null }
   | { field: string; error: string } {
   const code = typeof input.code === "string" ? input.code.trim() : "";
-  if (!code) return { field: "code", error: "Enter the team code from the coach or a parent." };
+  if (!code) return { field: "code", error: "Enter the parent code from the head coach or a parent." };
   if (input.scope !== "team" && input.scope !== "player") return { field: "scope", error: "Choose the whole team or one player." };
   if (input.scope === "team") return { code, playerName: null };
   const player = typeof input.player === "string" ? input.player.trim().replace(/\s+/g, " ") : "";

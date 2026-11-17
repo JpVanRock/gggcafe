@@ -62,15 +62,17 @@ export default async function SwitchboardPage({ searchParams }: PageProps<"/swit
   const supabase = await createClient();
   // our teams (not opponents), with what tells them apart in the dropdown, and every team's switched-off rows
   const [{ data: teamRows }, { data: allOff }] = await Promise.all([
-    supabase.from("teams").select("id, name, age_group, organization, format, logo_path, team_code").eq("is_own_team", true).order("name"),
+    supabase.from("teams").select("id, name, age_group, organization, format, logo_path").eq("is_own_team", true).order("name"),
     supabase.from("team_features_off").select("team_id, feature, turned_off_at"),
   ]);
   const teams = teamRows ?? [];
   if (!teams.length) return <NoOwnTeam />;
   const team = pickTeam(teams, teamParam);
-  const [{ data: video }, logoUrl] = await Promise.all([
+  const [{ data: video }, logoUrl, { data: joinCode }] = await Promise.all([
     supabase.from("team_video_access").select("mentors_on").eq("team_id", team.id).maybeSingle(),
     signedLogoUrl(supabase, team.logo_path),
+    // the team's one join code (user, 2026-11-16)
+    supabase.from("team_parent_codes").select("code").eq("team_id", team.id).maybeSingle(),
   ]);
   // video calls (user, 2026-11-12): a site admin turns them on per team; then the head coach decides for mentors
   const admin = user.staff.role === "admin";
@@ -115,13 +117,13 @@ export default async function SwitchboardPage({ searchParams }: PageProps<"/swit
 
       <div className="flex flex-wrap items-center gap-x-6 gap-y-2 rounded-2xl border border-navy-700 bg-navy-900/60 px-4 py-3 text-sm">
         <span>
-          <span className={eyebrowClass}>Sign-up with the team code</span>{" "}
-          <span className={badgeClass(team.team_code ? "neon" : "neutral")}>{team.team_code ? "On" : "Off"}</span>
+          <span className={eyebrowClass}>Joining with the parent code</span>{" "}
+          <span className={badgeClass(joinCode ? "neon" : "neutral")}>{joinCode ? "On" : "Off"}</span>
         </span>
         <span className="text-muted">
-          New players, parents, assistant coaches and mentors join with it.{" "}
-          <Link href={`/dugout/roster?team=${team.id}`} className="text-link underline underline-offset-2">
-            Change it on the Roster tab →
+          Parents, assistant coaches and mentors join with it; players get their login from a parent.{" "}
+          <Link href={`/dugout/parents?team=${team.id}`} className="text-link underline underline-offset-2">
+            Change it on the Parents tab →
           </Link>
         </span>
         <span className="ml-auto font-display text-sm text-muted tabular-nums">{offCount ? `${offCount} switched off on ${team.name}` : `Everything on for ${team.name}`}</span>

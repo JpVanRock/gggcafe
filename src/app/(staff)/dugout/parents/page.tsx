@@ -71,8 +71,8 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
 
       <Card title={`Waiting for approval (${pending.length})`}>
         <p className="-mt-1 mb-3 text-sm text-muted">
-          Parents who join with the parent code and their daughter&apos;s name as it is on the roster don&apos;t wait here. These used the team
-          code, typed a name that matches no one on the current roster, or were declined before: pick her, or decline.
+          Parents who join with the parent code and their daughter&apos;s name as it is on the roster don&apos;t wait here. These typed a name
+          that matches no one on the current roster, or were declined before: pick her, or decline.
         </p>
         {pending.length === 0 ? (
           <EmptyState>No requests waiting.</EmptyState>

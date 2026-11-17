@@ -1,6 +1,6 @@
 "use server";
 
-// Mentor actions: ask to work with a team or one player (team code), message a player (text,
+// Mentor actions: ask to work with a team or one player (the parent code), message a player (text,
 // a photo, a suggested drill; shared with the coaches only if she chooses), training on her
 // players' weeks (one player or a group), and notes and focus areas for the coaches. The
 // database checks all of it again (her players only; names and authors from the database).
@@ -26,7 +26,7 @@ export async function requestMentor(_prev: FormState, fd: FormData): Promise<For
     const supabase = await createClient();
     const { error } = await supabase.rpc("request_mentor", { p_code: req.code, p_player_name: req.playerName ?? "" });
     if (error) {
-      if (error.code === "P0006") return invalid("code", "That team code doesn't match a team. Check it with the coach or a parent.");
+      if (error.code === "P0006") return invalid("code", "That code doesn't match a team. Check the parent code with the head coach or a parent.");
       if (error.code === "P0007") return invalid("player", "She isn't on that team's roster under that name. Use her name as the team has it.");
       if (error.code === "P0008") return invalid("player", "Two players on that team have that name. Ask her parents which name to use.");
       if (error.code === "42501") return failed("Only mentor accounts can ask. Sign up as a mentor first.");

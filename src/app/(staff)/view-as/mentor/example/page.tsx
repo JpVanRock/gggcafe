@@ -34,7 +34,7 @@ export default async function ExampleMentorViewPage({ searchParams }: PageProps<
         <p className="text-lg font-semibold text-ink">What a mentor sees on {team.name}</p>
         <p className="text-sm text-muted">
           {team.name} has no mentors yet, so this is an example: a mentor the head coach approved for the whole team, with your real roster and
-          schedule. Mentors sign up with the team code, then ask to work with one player (her parents approve) or the whole team (the head coach
+          schedule. Mentors sign up, enter the parent code, then ask to work with one player (her parents approve) or the whole team (the head coach
           approves). Once one is approved, Mentor view shows them instead.
         </p>
       </div>

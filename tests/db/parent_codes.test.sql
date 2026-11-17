@@ -29,7 +29,8 @@ insert into auth.users (id, email, raw_user_meta_data) values
   ('fcfcfcfc-0000-0000-0000-000000000003', 'pc-pat@example.test', '{"role": "parent"}'),
   ('fcfcfcfc-0000-0000-0000-000000000004', 'pc-sam@example.test', '{"role": "parent"}'),
   ('fcfcfcfc-0000-0000-0000-000000000005', 'pc-player@example.test', '{"role": "player"}'),
-  ('fcfcfcfc-0000-0000-0000-000000000006', 'pc-declined@example.test', '{"role": "parent"}');
+  ('fcfcfcfc-0000-0000-0000-000000000006', 'pc-declined@example.test', '{"role": "parent"}'),
+  ('fcfcfcfc-0000-0000-0000-000000000007', 'pc-mentor@example.test', '{"role": "mentor"}');
 insert into public.staff (user_id, display_name, role) values
   ('fcfcfcfc-0000-0000-0000-000000000001', 'Hana Head', 'coach'),
   ('fcfcfcfc-0000-0000-0000-000000000002', 'Sam Assist', 'assistant');
@@ -170,6 +171,19 @@ select pg_temp.expect('the date is on her profile',
   (select birth_date from public.players where id = '00000000-0000-0000-0000-0000000000c2'), '2011-05-01'::date);
 
 -- -----------------------------------------------------------------------------
+-- The one code for staff and mentors too (migration 20261117013057): an assistant coach finds the
+-- team by it signed in, and a mentor asks with it and waits for the head coach
+-- -----------------------------------------------------------------------------
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"fcfcfcfc-0000-0000-0000-000000000007"}', false);
+select pg_temp.expect('signed in, the parent code finds the team', (select name from public.signup_parent_team('PAR234')), 'Sample Squad 14U');
+select pg_temp.expect('a mentor asks with the parent code', public.request_mentor('par-234', ''), 'Sample Squad 14U');
+select pg_temp.expect('a wrong code', pg_temp.err($$select public.request_mentor('NOPE99', '')$$), 'P0006');
+reset role;
+select pg_temp.expect('the mentor waits for the head coach',
+  (select status::text from public.mentor_links where mentor_id = 'fcfcfcfc-0000-0000-0000-000000000007'), 'pending');
+
+-- -----------------------------------------------------------------------------
 -- Clean up
 -- -----------------------------------------------------------------------------
 select set_config('request.jwt.claims', '', false);
@@ -177,6 +191,8 @@ delete from public.notifications where kind = 'parent-joined';
 delete from public.parent_links where parent_id::text like 'fcfcfcfc-%';
 delete from public.parent_accounts where user_id::text like 'fcfcfcfc-%';
 delete from public.player_claims where user_id::text like 'fcfcfcfc-%';
+delete from public.mentor_links where mentor_id::text like 'fcfcfcfc-%';
+delete from public.mentors where user_id::text like 'fcfcfcfc-%';
 update public.players set birth_date = (select birth_date from saved_birth) where id = '00000000-0000-0000-0000-0000000000c2';
 delete from public.team_parent_codes where team_id = '00000000-0000-0000-0000-0000000000b1';
 insert into public.team_parent_codes select * from saved_parent_code;

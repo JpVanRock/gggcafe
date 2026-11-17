@@ -42,5 +42,6 @@
   `loadFamily` sends player accounts to /me (metadata role `player` or a player-login address: players see only the player
   view) and, on a parent's first visit (no `parent_accounts` row yet), joins with the code and name from sign-up, so
   there's no second form. A request that's still waiting shows "Waiting to join" on /family (`waiting-requests.tsx`):
-  with the parent code, a form to fix her name to match the roster (`rematchParentLink`); with the team code, a link to
-  join again with the parent code.
+  with the parent code, a form to fix her name to match the roster (`rematchParentLink`); for an old request made with
+  the retired team code, a link to join again with the parent code. Since 2026-11-16 sign-up asks for no code: the
+  family page's join form is where parents enter it.

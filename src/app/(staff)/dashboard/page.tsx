@@ -13,7 +13,7 @@ import { ActionForm } from "@/components/action-form";
 import { SubmitButton } from "@/components/submit-button";
 import { fieldClass } from "@/components/ui";
 import { loadOwnTeams } from "../dugout/data";
-import { claimDaughter } from "./actions";
+import { claimDaughter, requestAssistantAccess } from "./actions";
 import { TitleWithTeamLogo } from "@/components/team-logo";
 import { PARENT_LINK } from "@/lib/lifecycles";
 
@@ -152,7 +152,12 @@ async function NotStaff({ userId, email }: { userId: string; email: string | nul
   if (parent || meta.role === "parent") redirect("/family");
 
   // Coaches who signed up: the request goes in on the first sign-in after confirming the email.
+  // Assistant coaches first enter the team's parent code (user, 2026-11-16: no code at sign-up).
   if (isCoachSignup(meta.role)) {
+    if (meta.role === "assistant-coach" && !(meta.team && /^[0-9a-f-]{36}$/.test(meta.team))) {
+      const { data: asked } = await supabase.from("staff_requests").select("status").eq("user_id", userId).maybeSingle();
+      if (!asked) return <AssistantJoin email={email} />;
+    }
     const { data: status, error } = await supabase.rpc("request_staff_access", {
       p_role: COACH_SIGNUP_ROLE[meta.role],
       p_name: (meta.display_name ?? email ?? "").slice(0, 80),
@@ -202,6 +207,36 @@ async function NotStaff({ userId, email }: { userId: string; email: string | nul
           Set up your family account →
         </Link>
       </p>
+    </>
+  );
+}
+
+/** An assistant coach's first sign-in: the team's code, then the head coach approves them. */
+function AssistantJoin({ email }: { email: string | null }) {
+  return (
+    <>
+      <PageHeader title="Join your team" description={email ?? undefined} />
+      <Card title="Assistant Coach">
+        <p className="mb-4 text-sm text-muted">
+          Enter the parent code from your head coach. That&apos;s the one code the team uses to join. Your head coach approves assistant coaches;
+          once they do, your Coaches Dugout opens here.
+        </p>
+        <ActionForm action={requestAssistantAccess} className="flex flex-wrap items-end gap-3">
+          <label className="flex flex-col gap-1.5 text-sm font-medium">
+            Parent code
+            <input
+              name="code"
+              required
+              maxLength={10}
+              autoComplete="off"
+              autoCapitalize="characters"
+              placeholder="ABC-234"
+              className={`${fieldClass} w-44 font-display tracking-[0.2em] uppercase`}
+            />
+          </label>
+          <SubmitButton pendingLabel="Sending…">Ask to join</SubmitButton>
+        </ActionForm>
+      </Card>
     </>
   );
 }
@@ -381,19 +416,14 @@ async function HeadCoachHome({ role }: { role: StaffRole }) {
               page, and the opponents you play.
             </li>
             <li>
-              Build the official roster with Player intake. Players claim, and parents join, only players on it; a parent can make a
-              login for a daughter without an email.
+              Build the official roster with Player intake. Parents join only for players on it, and make each player&apos;s login.
             </li>
             <li>
-              Turn on your team code in Coaches Dugout →{" "}
-              <Link href="/dugout/roster" className="underline">
-                Roster
-              </Link>{" "}
-              for players and the parent code in{" "}
+              Turn on your parent code in Coaches Dugout →{" "}
               <Link href="/dugout/parents" className="underline">
                 Parents
               </Link>{" "}
-              for their families.
+              and give it to parents, assistant coaches and mentors. Never to players.
             </li>
             <li>Assistant coaches sign up and pick your team; approve them on the Roster tab.</li>
           </ol>

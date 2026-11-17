@@ -46,13 +46,13 @@ export default async function MentorHome() {
         <PageHeader title={meta.display_name ? `Welcome, ${meta.display_name.split(" ")[0]}` : "Welcome, mentor"} description="GGG.Cafe mentor" />
         {user.staff ? (
           <p className="max-w-2xl rounded-2xl border border-pink/50 bg-pink/5 p-5">
-            This is the mentor area. Mentors ask with a team code here; a player&apos;s parents approve a mentor for her, and a head coach approves one for the
+            This is the mentor area. Mentors ask with the team&apos;s parent code here; a player&apos;s parents approve a mentor for her, and a head coach approves one for the
             whole team (Coaches Dugout → Mentors).
           </p>
         ) : (
           <Card title="Ask to work with a player or a team">
             <p className="mb-4 max-w-2xl text-sm text-muted">
-              Enter the team code. For one player, her parents approve you; for the whole team, the head coach does. You see the players you&apos;re approved for once
+              Enter the team&apos;s parent code. For one player, her parents approve you; for the whole team, the head coach does. You see the players you&apos;re approved for once
               they say yes.
             </p>
             <RequestForm defaults={defaults} />
@@ -260,7 +260,7 @@ export default async function MentorHome() {
 
           {/* across the page, under the two half-width boards (user, 2026-11-13) */}
           <MenuPanel number={5} title="Work With More Players" subtitle="A player or a whole team" variant="outlinePink" wide>
-            <p className={`mb-4 ${menuNote}`}>Ask with the team code. Her parents approve you for one player; the head coach approves you for the whole team.</p>
+            <p className={`mb-4 ${menuNote}`}>Ask with the parent code. Her parents approve you for one player; the head coach approves you for the whole team.</p>
             <Disclosure summary="Ask to work with another player or team">
               <RequestForm />
             </Disclosure>

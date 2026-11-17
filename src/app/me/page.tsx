@@ -9,7 +9,7 @@ import { MainNav, MenuCount } from "@/components/main-nav";
 import { SiteHeader } from "@/components/site-header";
 import { Card, Loading, PageHeader, secondaryButtonClass } from "@/components/ui";
 import { isUuid } from "@/lib/softball";
-import { ClaimForm, TeamCodeForm } from "./claim-form";
+import { ClaimForm } from "./claim-form";
 import { usernameFromEmail } from "@/lib/player-logins";
 
 export const metadata: Metadata = { title: "My profile · GGG.Cafe" };
@@ -164,9 +164,12 @@ async function Me({ searchParams }: Pick<PageProps<"/me">, "searchParams">) {
       )}
 
       {!welcome && pending.length === 0 && lapsedTeams.length === 0 && declined.length === 0 && !active && (
-        <Card title="Find your team">
-          <p className="mb-4 text-sm text-muted">Enter the team code from your coach to claim your player profile.</p>
-          <TeamCodeForm />
+        // players never get a code (user, 2026-11-16): her parent joins the team and makes her login
+        <Card title="Your login comes from a parent">
+          <p className="text-sm text-muted">
+            Players don&apos;t join a team on their own. Ask your parent to join your team on GGG.Cafe with the parent code from your coach, then
+            make your login from their family page (Logins &amp; Teams). You&apos;ll sign in with that username and password.
+          </p>
         </Card>
       )}
     </div>

@@ -355,7 +355,7 @@ export function RequestForm({ defaults }: { defaults?: { code?: string; scope?: 
   return (
     <ActionForm action={requestMentor} className="grid gap-4 sm:grid-cols-6">
       <div className="sm:col-span-2">
-        <Field label="Team code" hint="Six characters, from the coach or a parent">
+        <Field label="Parent code" hint="The team's code, from the head coach or a parent">
           <input name="code" defaultValue={defaults?.code} required autoComplete="off" className={`${inputClass} font-mono uppercase`} />
         </Field>
       </div>

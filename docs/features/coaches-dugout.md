@@ -69,9 +69,9 @@
     `note_budget_change` (staff read it; nobody sets it). `team_budget_summary()` returns it as `updated_at`, and
     `BudgetSummary` shows "Last updated" at its top, so parents (and the coaches' Parent view) see it.
 - Parents (user's choice: sign-in accounts, team totals only): parents sign up at `/register` (name,
-  email, password, parent code, daughter's name) and land on `/family`. The Parents tab shows the team's
-  parent code (`team_parent_codes`, user 2026-11-16; the team code for players, assistant coaches and mentors is on
-  the Roster tab, see account-types.md). A parent with the parent code whose daughter's name matches a player on the
+  email, password), confirm the email, and on `/family` enter the parent code and their daughter's name. The Parents
+  and Roster tabs show the team's parent code (`team_parent_codes`, user 2026-11-16: the team's one join code, for
+  parents, assistant coaches and mentors, never players; see account-types.md). A parent with the parent code whose daughter's name matches a player on the
   current roster is approved at once and the head coaches are notified; the head coach approves the rest by matching
   each to a player (`parent_links`, status pending/approved/declined). Parents are not staff and can read no
   app tables; they get data only through security-definer functions: `parent_home()` (their links)

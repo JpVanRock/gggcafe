@@ -20,7 +20,7 @@ HOSTING:  Vercel team "GGG", project `gggcafe`, https://www.ggg.cafe (main addre
 
 ## Layout
 ```
-src/app/                 pages (App Router): /, /login and /register are public (sign-up needs a team code, parents a parent code); /family is the parents' home (the family menu: boards that open /family/team, budget, forms, packet, logins, mentors, calendar, yearbook),
+src/app/                 pages (App Router): /, /login and /register are public (sign-up has no code: parents, assistant coaches and mentors join a team with its parent code once signed in; players don't sign up, a parent makes their login); /family is the parents' home (the family menu: boards that open /family/team, budget, forms, packet, logins, mentors, calendar, yearbook),
                          /me the players' home (claims; then her dashboard at /players/[id])
 src/app/(staff)/         signed-in area with shared nav: dashboard (own view per role), teams, players
                          (each feature folder has page.tsx, actions.ts, client forms)
@@ -165,8 +165,8 @@ tests/unit/              node --test unit tests (npm run test:unit)
   coaches/admins and the player; Pop Report coach notes for coaches only; teammates see each other only through
   definer functions (`team_leaderboard`, `team_yearbook`, `team_squads`); player photos are private (signed URLs); team
   logos are signed-in only (private bucket, `signedLogoUrl()` in `src/lib/team-logos.ts`); signed-out visitors can't list
-  teams (sign-up checks one code with `signup_team()` / `signup_parent_team()`); the parent code is staff-only
-  (`team_parent_codes`), never shown to players.
+  teams (`signup_parent_team()` checks one code); the parent code is staff-only (`team_parent_codes`), never shown to
+  players.
 - When a feature or its access changes, update `src/lib/access-faq.ts` and `src/lib/account-types.ts` (admin FAQ).
 - Copy for players: direct and confident, for teenage athletes; fastpitch terms (innings, the circle, the dugout).
 - Legal (`docs/features/legal.md`, words in `src/lib/legal.ts`): every page has the footer disclaimer; a page with
