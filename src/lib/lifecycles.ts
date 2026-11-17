@@ -154,6 +154,7 @@ export const PARENTAL_CONSENT = lifecycle<
 >({
   column: "public.parental_consents.status",
   states: ["pending", "verified", "declined", "withdrawn"],
+  // accepted online (user, 2026-11-16): accept_parental_consent() inserts it "verified" (no admin check)
   initial: "pending",
   label: { pending: "Waiting to be checked", verified: "Verified", declined: "Declined", withdrawn: "Withdrawn" },
   tone: { pending: "pink", verified: "neon", declined: "danger", withdrawn: "neutral" },

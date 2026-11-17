@@ -12,8 +12,8 @@
   Logic: `src/lib/family.ts` (unit-tested). DB tests: `tests/db/family.test.sql`.
 - Her mentors (user, 2026-11-11): a card per daughter on /family (approve or decline a mentor's request, remove one) and
   `/family/mentors` (every message, focus area and note about her). See `mentors.md`.
-- Her login card on /family also carries verified parental consent for a daughter under 13 (signed form upload or a video
-  call, checked by an admin; withdraw deletes her login): see player-accounts.md. Without a birth date on her profile the
+- Her login card on /family also carries parental consent for a daughter under 13 (since 2026-11-16 the parent reads the
+  notice and clicks Accept; withdraw deletes her login): see player-accounts.md. Without a birth date on her profile the
   card asks the parent for it (user, 2026-11-16; `set_daughter_birth_date`: an approved parent, only while it's missing,
   4 to 25 years ago; a date already there stays the coach's to change). Making her login has no email and no confirmation.
 - The team on /family (user, 2026-11-13), each behind its own parent switch (the Switchboard):

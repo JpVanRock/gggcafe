@@ -5,7 +5,7 @@ import { suggestUsername } from "@/lib/player-logins";
 import { consentStep } from "@/lib/consent";
 import { formatLongDateAt } from "@/lib/dates";
 import { BirthDateForm, CreatePlayerLoginForm, ResetPlayerPasswordForm } from "../player-login";
-import { ConsentOnFile, ConsentSteps } from "../consent";
+import { ConsentAccept, ConsentOnFile } from "../consent";
 import { firstOf, loadFamily } from "../family-data";
 import { FamilyShell, SectionHeading, SectionTitle } from "../shell";
 
@@ -88,16 +88,14 @@ async function FamilyLogins() {
                     </p>
                     <BirthDateForm playerId={d.player_id} firstName={first} />
                   </>
-                ) : step === "needed" ? (
-                  <ConsentSteps
+                ) : step === "needed" || step === "pending" ? (
+                  // a signed form or video call sent before 2026-11-16 and still waiting: accepting here replaces it
+                  <ConsentAccept
                     playerId={d.player_id}
                     firstName={first}
-                    userId={user.id}
-                    defaultName={account?.display_name ?? metaName}
+                    defaultName={consent?.parent_name ?? account?.display_name ?? metaName}
                     declinedNote={consent?.status === "declined" ? consent.review_note : null}
                   />
-                ) : step === "pending" && consent ? (
-                  <ConsentOnFile playerId={d.player_id} firstName={first} status="pending" method={consent.method} date={formatLongDateAt(consent.submitted_at)} />
                 ) : (
                   <>
                     {step === "verified" && consent?.reviewed_at && (

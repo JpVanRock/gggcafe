@@ -94,9 +94,9 @@ Open for the user and the attorney:
 - Register a DMCA designated agent with the U.S. Copyright Office (copyright.gov, small fee) for the
   copyright safe harbor; the Terms name the contact email.
 - COPPA's 2025 rule changes also expect a written information security program.
-- Parental consent method (fixed, user 2026-11-11): verifiable parental consent by a signed consent form returned as a
-  photo or scan, or a video call with our staff, both checked by a GGG.Cafe admin before an under-13 player can sign in
-  (details in player-accounts.md). For the attorney: confirm both methods and the form's notice (`CONSENT_NOTICE`).
+- Parental consent method: since 2026-11-16 the parent accepts online (see "Consent by clicking Accept" below). Before,
+  user 2026-11-11: a signed consent form returned as a photo or scan, or a video call with our staff, both checked by a
+  GGG.Cafe admin. For the attorney: the click method, and the notice (`CONSENT_NOTICE`).
 - Whether arbitration binds minors and how a minor's right to cancel a contract affects the Terms.
 
 ## Voice memos (user, 2026-11-12; version 2026-11-12, everyone agrees again)
@@ -121,3 +121,19 @@ each family only its own daughter's invitation (section 4), and the children's s
 notice say the same. Because that's a new way other families see a child, the version moved to 2026-11-14 and
 everyone agrees again. Signed parental consents stay on file under the version they were given; whether parents of
 players under 13 should sign again for group calls is for the attorney (the review page's video-call question).
+
+## Consent by clicking Accept (user, 2026-11-16; version 2026-11-16, everyone agrees again)
+"Please remove the physical consent sign form process. They should be able to click accept to provide consent. The
+database can record the IP address and timestamp with email they registered with as proof. Remove the Can't print
+section as well." Before building it, the user was told that a click to accept with IP, time and email likely isn't one
+of COPPA's recognized methods of verifiable parental consent when a child's information is shared with others in the
+service (signed form, video call, card transaction, ID check), and that with the parent code anyone holding the code can
+become a girl's parent with no one checking; the user chose the click method anyway, over holding it for the legal review
+or a card check. Now: on Logins & Teams the parent reads `CONSENT_NOTICE`, enters their full name and relationship,
+ticks `CONSENT_STATEMENT` and presses Accept (`acceptParentalConsent` → `accept_parental_consent`, migration
+20261117020138): status `verified` at once, method `online`, with `consent_email`, `consent_ip`, `consent_user_agent` and
+the time. The printable form (`/family/consent/[playerId]/pdf`), the upload and the "Can't print it? Ask for a video
+call" option are gone; requests still waiting from before are replaced when the parent accepts, or an admin can still
+check them on the Roster tab. The Terms ("Agreeing") and the Privacy notice's children's section describe the new method
+and the record kept, so the version moved to 2026-11-16 and everyone agrees again. For the attorney: whether this method
+is enough, or which verifiable method to add back.

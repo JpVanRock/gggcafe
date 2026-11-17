@@ -1,5 +1,6 @@
--- Verified parental consent (COPPA) for players under 13: a parent uploads a signed form (or asks
--- for a video call), a GGG.Cafe admin checks it, and only then can the parent make her login or a
+-- Parental consent (COPPA) for players under 13: since 2026-11-16 a parent accepts online (on file at once,
+-- with email, time, IP and browser kept); before, a parent uploaded a signed form (or asked for a video
+-- call) and a GGG.Cafe admin checked it. Only then can the parent make her login or a
 -- coach approve her profile claim. Coaches never read consent records or forms. Withdrawing ends
 -- her access. Own users, removed at the end.
 -- Seed: team b1 = c1 Avery #7, c2 Jordan Kim #21, c3 Riley #00, c4 Morgan #3 (season a1, current).
@@ -163,6 +164,36 @@ select pg_temp.expect('a video call needs a note', pg_temp.err($$select public.r
 select public.review_parental_consent((select id from consent_id), true, 'Video call Nov 12 with Robin Chen, her guardian; matched her ID to the account.');
 reset role;
 select pg_temp.expect('video call verified', (select status || '/' || relationship from public.parental_consents where id = (select id from consent_id)), 'verified/guardian');
+
+-- ---------------------------------------------------------------------------
+-- Accepting online (migration 20261117020138): on file at once, with the proof kept;
+-- it replaces a request that's still waiting
+-- ---------------------------------------------------------------------------
+set role authenticated;
+select pg_temp.as_user('abababab-0000-0000-0000-000000000001');
+select public.withdraw_parental_consent('00000000-0000-0000-0000-0000000000c3');
+select public.submit_parental_consent('00000000-0000-0000-0000-0000000000c3', 'video_call', 'Robin Chen', 'parent', null, '2026-11-11');
+select pg_temp.expect('online: a name is needed',
+  pg_temp.err($$select public.accept_parental_consent('00000000-0000-0000-0000-0000000000c3', ' ', 'parent', '2026-11-16', '203.0.113.7', 'Safari')$$), '22023');
+select pg_temp.expect('accepted online',
+  (select public.accept_parental_consent('00000000-0000-0000-0000-0000000000c3', ' Robin Chen ', 'parent', '2026-11-16', '203.0.113.7', 'Mozilla/5.0 Safari') is not null), true);
+select pg_temp.expect('on file at once, no admin check', (select status || '/' || method from public.parent_consent_status()), 'verified/online');
+select pg_temp.expect('online: only once',
+  pg_temp.err($$select public.accept_parental_consent('00000000-0000-0000-0000-0000000000c3', 'Robin Chen', 'parent', '2026-11-16', null, null)$$), '23505');
+reset role;
+select pg_temp.expect('the proof is kept: sign-in email, IP, browser, time',
+  (select consent_email || ' ' || consent_ip || ' ' || consent_user_agent || ' ' || (reviewed_at is not null)
+     from public.parental_consents where player_id = '00000000-0000-0000-0000-0000000000c3' and status = 'verified'),
+  'riley-parent@example.test 203.0.113.7 Mozilla/5.0 Safari true');
+select pg_temp.expect('the waiting video call request was replaced',
+  (select count(*) from public.parental_consents where player_id = '00000000-0000-0000-0000-0000000000c3' and status = 'pending'), 0::bigint);
+set role authenticated;
+select pg_temp.as_user('abababab-0000-0000-0000-000000000002');
+select pg_temp.expect('online: not for someone else''s daughter',
+  pg_temp.err($$select public.accept_parental_consent('00000000-0000-0000-0000-0000000000c3', 'Al Lopez', 'parent', '2026-11-16', null, null)$$), '42501');
+select pg_temp.expect('online: not needed at 13 or older',
+  pg_temp.err($$select public.accept_parental_consent('00000000-0000-0000-0000-0000000000c1', 'Al Lopez', 'parent', '2026-11-16', null, null)$$), '22023');
+reset role;
 
 -- ---------------------------------------------------------------------------
 -- Clean up

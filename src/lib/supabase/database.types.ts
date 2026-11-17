@@ -2807,7 +2807,7 @@ export type Database = {
           id: string
           player_id: string
           parent_id: string
-          method: "signed_form" | "video_call"
+          method: "signed_form" | "video_call" | "online"
           status: "pending" | "verified" | "declined" | "withdrawn"
           parent_name: string
           relationship: "parent" | "guardian"
@@ -2818,12 +2818,15 @@ export type Database = {
           reviewed_at: string | null
           review_note: string | null
           withdrawn_at: string | null
+          consent_email: string | null
+          consent_ip: string | null
+          consent_user_agent: string | null
         }
         Insert: {
           id?: string
           player_id: string
           parent_id: string
-          method: "signed_form" | "video_call"
+          method: "signed_form" | "video_call" | "online"
           status?: "pending" | "verified" | "declined" | "withdrawn"
           parent_name: string
           relationship: "parent" | "guardian"
@@ -2834,12 +2837,15 @@ export type Database = {
           reviewed_at?: string | null
           review_note?: string | null
           withdrawn_at?: string | null
+          consent_email?: string | null
+          consent_ip?: string | null
+          consent_user_agent?: string | null
         }
         Update: {
           id?: string
           player_id?: string
           parent_id?: string
-          method?: "signed_form" | "video_call"
+          method?: "signed_form" | "video_call" | "online"
           status?: "pending" | "verified" | "declined" | "withdrawn"
           parent_name?: string
           relationship?: "parent" | "guardian"
@@ -2850,6 +2856,9 @@ export type Database = {
           reviewed_at?: string | null
           review_note?: string | null
           withdrawn_at?: string | null
+          consent_email?: string | null
+          consent_ip?: string | null
+          consent_user_agent?: string | null
         }
         Relationships: [
           {
@@ -6333,6 +6342,7 @@ export type Database = {
       }
     }
     Functions: {
+      accept_parental_consent: { Args: { p_player_id: string | null; p_parent_name: string | null; p_relationship: string | null; p_notice_version: string | null; p_ip: string | null; p_user_agent: string | null }; Returns: string }
       admin_account: { Args: { p_user: string | null }; Returns: Json }
       admin_logs: { Args: { p_level?: string | null; p_search?: string | null; p_before?: number | null; p_limit?: number | null }; Returns: { id: number; at: string; level: string; event: string; route: string; message: string; fields: Json }[] }
       admin_view_mentor: { Args: { p_user: string | null }; Returns: Json }

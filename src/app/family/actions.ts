@@ -2,6 +2,7 @@
 
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { text, type FormState, invalid } from "@/lib/form";
@@ -128,40 +129,43 @@ export async function setDaughterBirthDate(_prev: FormState, fd: FormData): Prom
 }
 
 /**
- * Verified parental consent for a daughter under 13 (COPPA): the signed form she uploaded
- * (form_path, already in her folder of the consent-forms bucket) or a request for a video
- * call. A GGG.Cafe admin checks it before her login can be made.
+ * Parental consent for a daughter under 13 (COPPA), accepted online (user, 2026-11-16: "They should be able
+ * to click accept to provide consent. The database can record the IP address and timestamp with email they
+ * registered with as proof"). On file at once; the database adds their sign-in email and the time, and
+ * keeps the IP address and browser this request came from. Replaces a signed-form request still waiting.
  */
-export async function submitParentalConsent(_prev: FormState, fd: FormData): Promise<FormState> {
+export async function acceptParentalConsent(_prev: FormState, fd: FormData): Promise<FormState> {
   return runAction(async () => {
     const user = await getCurrentUser();
     if (!user) return failed("Your session has ended. Sign in again.");
     const playerId = text(fd, "player_id");
     if (!isUuid(playerId)) return failed(STALE);
-    const method = fd.get("method") === "video_call" ? "video_call" : "signed_form";
     const name = text(fd, "parent_name");
-    if (!name || name.length < 2) return invalid("parent_name", "Enter your full name, as you signed the form.");
+    if (!name || name.length < 2) return invalid("parent_name", "Enter your full name.");
     if (name.length > 120) return invalid("parent_name", "Keep your name to 120 characters.");
     const relationship = text(fd, "relationship");
     if (!relationship || !(RELATIONSHIPS as readonly string[]).includes(relationship)) return invalid("relationship", "Choose parent or legal guardian.");
-    if (fd.get("agree") !== "on") return invalid("agree", "Tick the box to confirm the consent statement.");
-    const formPath = text(fd, "form_path");
-    if (method === "signed_form" && !formPath) return failed("Upload a photo or scan of the signed form first.");
+    if (fd.get("agree") !== "on") return invalid("agree", "Tick the box to accept the consent statement.");
+
+    // where the request came from: Vercel puts the visitor's address first in x-forwarded-for
+    const h = await headers();
+    const ip = (h.get("x-forwarded-for")?.split(",")[0] ?? h.get("x-real-ip") ?? "").trim().slice(0, 64) || null;
+    const userAgent = (h.get("user-agent") ?? "").slice(0, 500) || null;
 
     const supabase = await createClient();
-    const { error } = await supabase.rpc("submit_parental_consent", {
+    const { error } = await supabase.rpc("accept_parental_consent", {
       p_player_id: playerId,
-      p_method: method,
       p_parent_name: name,
       p_relationship: relationship,
-      p_form_path: method === "signed_form" ? formPath : null,
       p_notice_version: TERMS_VERSION,
+      p_ip: ip ?? "",
+      p_user_agent: userAgent ?? "",
     });
     if (error) {
       if (error.code === "42501") return failed("Only her approved parent can give consent.");
-      if (error.code === "23505") return failed("Your consent is already on file or waiting to be checked.");
-      if (error.code === "22023") return failed(error.message.includes("upload") ? "Upload the signed form first." : "Check the form and try again.");
-      return failed("Couldn't send it. Try again.");
+      if (error.code === "23505") return failed("Your consent is already on file.");
+      if (error.code === "22023") return failed("Check the form and try again.");
+      return failed("Couldn't save it. Try again.");
     }
     refresh();
   });

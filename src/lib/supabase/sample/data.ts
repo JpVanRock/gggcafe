@@ -551,6 +551,6 @@ export function sampleRpc(name: string, args: Row = {}): unknown {
 /** Ids the page smoke test uses for dynamic routes. */
 export const SAMPLE_IDS = {
   player: maya, lightLeader: lila, team: T.us, opponent: T.storm, lineup: id("abab00", 1), game: G.g1, quiz: QZ, plan: PL,
-  bullpenScript: bullpen_scripts[0].id, spotlight: player_spotlights[0].id, mentor: U.admin, consentPlayer: emma,
+  bullpenScript: bullpen_scripts[0].id, spotlight: player_spotlights[0].id, mentor: U.admin,
   call: id("a0ca11", 1), season: S.fall,
 };

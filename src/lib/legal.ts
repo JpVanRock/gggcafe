@@ -8,10 +8,10 @@
  * them to /terms/accept); each agreement is recorded in public.terms_acceptances.
  */
 /** The version people agree to: the date it took effect (YYYY-MM-DD). */
-export const TERMS_VERSION = "2026-11-14";
+export const TERMS_VERSION = "2026-11-16";
 
 /** Shown at the top of both documents. */
-export const EFFECTIVE_DATE = "November 14, 2026";
+export const EFFECTIVE_DATE = "November 16, 2026";
 
 /** Who runs GGG.Cafe, whose law applies, and where to reach us (user, 2026-11-09). */
 export const LEGAL = {
@@ -61,7 +61,7 @@ export const TERMS_SECTIONS: LegalSection[] = [
     blocks: [
       "You accept these Terms when you create an account, check the box agreeing to them, or use the Service. Checking the box is your electronic signature and has the same effect as signing on paper. If you don't agree, don't use the Service.",
       "If you're under 18, your parent or legal guardian must read and agree to these Terms for you. A parent or guardian who lets a minor use the Service agrees to these Terms on the minor's behalf and on their own, and is responsible for the minor's use, including the assumption of risk, the release, the indemnity and the arbitration agreement below.",
-      "Children under 13 can't create their own account. Their parent or guardian first gives verified consent (a signed consent form or a short video call, checked by our staff), then makes the player's login from the family page, as our Privacy & Security Notice describes.",
+      "Children under 13 can't create their own account. Their parent or guardian first gives consent on the family page by reading our notice and accepting it, then makes the player's login there, as our Privacy & Security Notice describes.",
       "If you use the Service for a team, club, school or other organization, you confirm that you're allowed to accept these Terms for it, and these Terms bind both you and the organization. Either way, you're personally bound.",
       "You can't use the Service if the law doesn't allow you to, or if we've removed you from it before.",
     ],
@@ -418,7 +418,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     title: "Children's privacy (under 13)",
     blocks: [
       "GGG.Cafe is built for youth athletes, with parents involved. This section is our notice to parents under the Children's Online Privacy Protection Act (COPPA).",
-      "Children under 13 can't sign themselves up. Before a child under 13 can sign in, a parent or guardian (approved for that player on her team) gives verified consent in one of two ways: by signing our consent form by hand and uploading a photo or scan of it, or by a short video call with our staff. Our staff check the consent before the parent can create the child's login, and no coach can approve a profile claim for a child under 13 until it's checked. We keep the signed form, or a note of the call, as the record of consent while we keep the child's information, and afterward only as long as needed to show that consent was given. Coaches may also add a child's profile and stats to a team roster.",
+      "Children under 13 can't sign themselves up. Before a child under 13 can sign in, a parent or guardian (approved for that player on her team) reads our consent notice on the family page and accepts it, giving their full name and their relationship to the child. Only then can the parent create the child's login, and no coach can approve a profile claim for a child under 13 without it. As the record of consent we keep the parent's name and relationship, the email address of the account they gave it from, the time, and the IP address and browser it was given from (and, for consents given before November 16, 2026, the signed form or a note of the video call) while we keep the child's information, and afterward only as long as needed to show that consent was given. Coaches may also add a child's profile and stats to a team roster.",
       "What we collect from or about a child: the profile, training, goals, mental-game, journal (including voice memos she records), quiz, stats, photo and message information listed above, video calls a mentor or head coach books with her, alone or with a group of players from her team (her parents are invited to each one; on a group call, the other invited players and their parents can see and hear her; calls aren't recorded), and the medical card and questionnaire a parent adds. We use it only to provide the Service to the child and their team. We don't show it publicly, we don't use it for advertising, and we don't share it with third parties except our service providers and as the law requires. We don't ask a child for more information than a feature needs, and a child doesn't have to give more than that to take part.",
       "Parents can review their child's information, have it corrected or deleted, and refuse to let us collect or use any more of it, at any time, by contacting us or the head coach. A parent can also withdraw consent on the family page: that deletes the child's login right away, so she can't sign in. Deleting the information ends the child's access. We'll confirm a parent's identity and connection to the child before acting on a request.",
       "If we learn we collected information from a child under 13 without a parent's consent, we'll delete it.",
@@ -502,17 +502,17 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
 ];
 
 /**
- * Verified parental consent for players under 13 (COPPA; docs/features/legal.md). The family page and the
- * printable form (src/lib/pdf/consent-form-pdf.tsx) use these words; the form's version is TERMS_VERSION.
+ * Parental consent for players under 13 (COPPA; docs/features/legal.md): the notice and statement the
+ * family page shows before the parent accepts (user, 2026-11-16: accepted online, no printed form); the
+ * consent's version is TERMS_VERSION.
  */
 // SITE_URL (src/lib/site.ts) + /privacy; written out because this file has no runtime imports (the unit
 // tests load it directly), and tests/unit/legal.test.ts checks they match.
 export const PRIVACY_URL = "https://www.ggg.cafe/privacy";
-export const CONSENT_FORM_TITLE = "Parental Consent for a Player Under 13";
 export const CONSENT_NOTICE: { heading: string; text: string }[] = [
   {
     heading: "Why we're asking",
-    text: `${LEGAL.name} is run by ${LEGAL.owner}. A federal law, the Children's Online Privacy Protection Act (COPPA), requires a parent's verified consent before we collect personal information from a child under 13. Until we've checked your consent, we won't collect information from her and she can't sign in.`,
+    text: `${LEGAL.name} is run by ${LEGAL.owner}. A federal law, the Children's Online Privacy Protection Act (COPPA), requires a parent's consent before we collect personal information from a child under 13. Until you've given it, we won't collect information from her and she can't sign in.`,
   },
   {
     heading: "What she adds when she signs in",
@@ -527,15 +527,15 @@ export const CONSENT_NOTICE: { heading: string; text: string }[] = [
     text: `At any time you can review her information, have it corrected or deleted, and refuse to let us collect any more. Withdraw your consent on the family page (it deletes her login right away) or email ${LEGAL.contact}.`,
   },
   {
-    heading: "How we check it",
-    text: "Sign this form by hand and upload a photo or scan of it on your family page, or ask for a short video call with our staff instead. We compare it with your parent account before her login can be made, and keep the signed form (or a note of the call) as the record of your consent.",
+    heading: "How you give it",
+    text: "Enter your full name and your relationship to her, tick the statement below and press Accept on your family page. We keep a record of your consent: your name and relationship, your account's email address, the time, and the IP address and browser you accept from.",
   },
   {
     heading: "Full details",
     text: `Our Privacy & Security Notice, section 8, "Children's privacy (under 13)": ${PRIVACY_URL}`,
   },
 ];
-export const CONSENT_STATEMENT = `I am the parent or legal guardian of the player named on this form. I have read this notice and the ${LEGAL.name} Privacy & Security Notice. I consent to ${LEGAL.owner} collecting, using and storing my daughter's personal information through ${LEGAL.name} as described, including what she enters herself. I understand that I can review it, have it deleted, or withdraw this consent at any time.`;
+export const CONSENT_STATEMENT = `I am the parent or legal guardian of this player. I have read this notice and the ${LEGAL.name} Privacy & Security Notice. I consent to ${LEGAL.owner} collecting, using and storing my daughter's personal information through ${LEGAL.name} as described, including what she enters herself. I understand that I can review it, have it deleted, or withdraw this consent at any time.`;
 
 /** The site-wide footer disclaimer (every page). */
 export const FOOTER_DISCLAIMER =

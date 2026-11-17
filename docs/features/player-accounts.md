@@ -21,6 +21,11 @@
   answered ones for a player); `start_iq_level`/`finish_iq_level`/`iq_review_status` are private
   definer functions (behind `private.expose` wrappers) that check `private.can_act_for()`. Players can't write answers or awards directly.
 - DB tests: `tests/db/players.test.sql`.
+- Parental consent since 2026-11-16 (user; migration 20261117020138; legal.md "Consent by clicking Accept"): the parent
+  reads the notice on Logins & Teams and clicks Accept (`ConsentAccept` in `family/consent.tsx`, `acceptParentalConsent`,
+  `accept_parental_consent`): verified at once with their sign-in email, the time, IP address and browser; no admin
+  check, no printed form, no video call. The rest of this bullet is how it worked before, and what still handles older
+  requests.
 - Verified parental consent for players under 13 (COPPA; user, 2026-11-11; migration 20261111235221_parental_consent):
   a parent-made login, and any approved profile claim, for a player under 13 (by her profile's birth date) needs a
   verified `parental_consents` row first. On /family (`family/consent.tsx`) the parent downloads the consent form
