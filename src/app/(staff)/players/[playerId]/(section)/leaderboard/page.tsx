@@ -120,7 +120,7 @@ export default async function LeaderboardPage({ params, searchParams }: PageProp
   };
 
   return (
-    <SectionShell title="Leaderboard" subtitle={`${team.name} · Offseason Training · ${span}`} notice={<RewardsNote />}>
+    <SectionShell title="Leaderboard" subtitle={`${team.name} · Offseason Training · ${span}`} notice={<RewardsNote termsLink={false} />}>
       <div className="flex flex-col gap-10">
         {teamPills}
 

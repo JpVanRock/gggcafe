@@ -132,7 +132,7 @@ export function SafetyNote({
 
 /**
  * The short notice next to points, leaderboards, badges and awards. `termsLink={false}` leaves off the
- * "Terms, section 7" link (the Trophy Room, user 2026-11-16).
+ * "Terms, section 7" link (the Trophy Room and the Leaderboard, user 2026-11-16).
  */
 export function RewardsNote({ className = "", termsLink = true }: { className?: string; termsLink?: boolean }) {
   return (

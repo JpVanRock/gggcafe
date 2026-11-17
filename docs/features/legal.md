@@ -31,8 +31,8 @@ the release for minors, the under-13 consent and the dispute terms.
   (player), Dugout Drills, Practice plans (list and each plan) and Training (coach); a line in the
   new-routine form; the printed practice plan's footer. The Drill Library shows it without the "Terms, section 4" link
   (user, 2026-11-12; `termsLink={false}`). `RewardsNote` on the Leaderboard and the
-  Trophy Room (`SectionShell` takes a `notice`); the Trophy Room's leaves off the "Terms, section 7" link (user,
-  2026-11-16; `termsLink={false}`). New workout or reward pages get the same notes.
+  Trophy Room (`SectionShell` takes a `notice`); neither shows the "Terms, section 7" link any more (user,
+  2026-11-16: the Trophy Room, then the Leaderboard; `termsLink={false}`). New workout or reward pages get the same notes.
 
 ## Agreeing, and asking again
 - `public.terms_acceptances` (migration 20261109160000): one row per account and version, stamped
