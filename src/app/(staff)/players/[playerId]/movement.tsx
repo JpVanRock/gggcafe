@@ -156,7 +156,8 @@ export function HittingSection({
         {canWrite && (
           <Disclosure
             summary={coach ? (hasAny ? "Update the coach observation" : "Add the coach observation") : hasAny ? "Change my hitting style" : "Fill in my hitting style"}
-            open={!hasAny}
+            // the coach observation's form is open for coaches (user, 2026-11-16); they can collapse it
+            open={coach || !hasAny}
           >
             <StyleForm
               playerId={playerId}
