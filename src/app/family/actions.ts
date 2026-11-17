@@ -13,6 +13,7 @@ import { STALE, failed, must, runAction } from "@/lib/actions";
 import { ALREADY_DECIDED } from "@/lib/lifecycles";
 import { RELATIONSHIPS } from "@/lib/consent";
 import { TERMS_VERSION } from "@/lib/legal";
+import { logAndKeep } from "@/lib/log-drain";
 
 /**
  * Creates her parent profile if needed, then joins a team: with the parent code, approved at once
@@ -94,6 +95,8 @@ export async function createPlayerLogin(_prev: FormState, fd: FormData): Promise
   const supabase = await createClient();
   const { error } = await supabase.rpc("create_player_login", { p_player_id: playerId, p_username: username, p_password: String(fd.get("password")) });
   if (error) {
+    // why a parent couldn't make her login, for Site health (the code only: no username or password)
+    await logAndKeep("warn", "family.player_login_failed", { code: error.code ?? null });
     if (error.code === "23505") return { error: error.message.includes("taken") ? "That username is taken. Try another." : "She already has a login." };
     if (error.code === "P0006") return { error: "She isn't on the team's current roster yet. Ask your head coach to add her first." };
     if (error.code === "P0007") return { error: "She already has her own account. She signs in with her email." };

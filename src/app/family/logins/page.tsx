@@ -11,6 +11,8 @@ import { FamilyShell, SectionHeading, SectionTitle } from "../shell";
 
 export const metadata: Metadata = { title: "Logins & teams · GGG.Cafe" };
 
+const possessive = (name: string) => (/s$/i.test(name) ? `${name}'` : `${name}'s`);
+
 // The family menu's Logins & teams (user, 2026-11-13; they were on the family page): each daughter's
 // login (and verified parental consent under 13) and the parent's teams. Joining another team moved to
 // the family page's menu, and a button by the title goes back to the family dashboard (user, 2026-11-16).
@@ -101,10 +103,14 @@ async function FamilyLogins() {
                     {step === "verified" && consent?.reviewed_at && (
                       <ConsentOnFile playerId={d.player_id} firstName={first} status="verified" method={consent.method} date={formatLongDateAt(consent.reviewed_at)} />
                     )}
-                    <p className="text-sm text-muted">
-                      No email for {first}? Make her a username and password; she signs in with them instead of an email. If she has an email, she can sign up
-                      herself and claim her profile.
-                    </p>
+                    {/* the last step, unmistakable (user, 2026-11-16: the username didn't work because no login had been made) */}
+                    <div className="flex flex-col gap-1 rounded-xl border border-neon/60 bg-neon/5 p-4">
+                      <p className="font-semibold">{consent?.status === "verified" ? `Last step: create ${possessive(first)} login` : `Create ${possessive(first)} login`}</p>
+                      <p className="text-sm text-muted">
+                        Pick her username and password, then press &quot;Create {possessive(first)} login&quot;. She signs in with them on the sign-in page:
+                        no email needed. Her login doesn&apos;t exist until you press it.
+                      </p>
+                    </div>
                     <CreatePlayerLoginForm playerId={d.player_id} firstName={first} suggestion={suggestUsername(d.player_name)} />
                   </>
                 )}
