@@ -190,7 +190,8 @@ export const QUESTIONS: { q: string; a: string[] }[] = [
   {
     q: "A player has no email. How does she get in?",
     a: [
-      "Her parent signs up as a Parent with the parent code. Once approved (at once when her name matches the roster), Family menu → Logins & Teams shows \"Create her login\": the parent picks a username and password. There's no email and nothing to confirm: she signs in with them right away.",
+      "Her parent signs up as a Parent and joins with the parent code. Once approved (at once when her name matches the roster), the family page's \"Create Player Login\" button opens Logins & Teams, where the parent picks her username and password. There's no email and nothing to confirm: she signs in with them right away.",
+      "Then the family page has a Parent view / Player view toggle: Player view shows her pages as she sees them, read only, and the same toggle brings the parent back.",
       "It works only for a daughter on the official roster the head coach built for the current season, and only once per player. If her birth date isn't on her profile, the parent adds it there first. She signs in with the username instead of an email; her parent or a head coach can reset the password.",
       "Her login opens only her player pages. Player accounts can't open the family pages or join a team as a parent, so she never needs her parent's login.",
       "If she's under 13, the parent first gives verified consent on the family page: signs our consent form by hand and uploads a photo of it, or asks for a short video call. An admin checks it on the Roster tab, then \"Create her login\" appears. A coach can't approve an under-13 player's own profile claim until that consent is checked.",

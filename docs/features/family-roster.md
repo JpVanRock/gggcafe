@@ -45,3 +45,13 @@
   with the parent code, a form to fix her name to match the roster (`rematchParentLink`); for an old request made with
   the retired team code, a link to join again with the parent code. Since 2026-11-16 sign-up asks for no code: the
   family page's join form is where parents enter it.
+- Her login from the dashboard (user, 2026-11-16: "Create a button on parent dashboard to 'Create Player Login'. Once
+  created they should have a toggle view between parent view and player view"). The family page's header has a
+  "Create Player Login" button per daughter on the current roster without a login ("Create Maya's Login" when there are
+  several daughters), opening her card on Logins & Teams; the menu's Logins & Teams carries a "Her login" badge. Once she
+  has a login, `ParentPlayerToggle` (`components/parent-player-toggle.tsx`, `loadPlayerViews`) shows "Parent view |
+  Player view" ("Maya's view" per daughter when there are several): Player view is her pages read only (View as player),
+  and the banner on her pages (`parent-view-banner.tsx`) carries the same toggle back. Not shown when View as player is
+  off for her team. The parents' top menu says "Family menu" (it said Home), and sign-in sends parents straight to
+  /family (`signIn` in `login/actions.ts` picks each account's home: staff /dashboard, parents /family, mentors
+  /mentor, players /me).

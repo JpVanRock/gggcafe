@@ -81,7 +81,7 @@ export async function NonStaffNav() {
   return (
     <nav aria-label="Main" className={navClass}>
       <NavLink href="/family" exact className={navItemClass}>
-        Family home
+        Family menu
       </NavLink>
       {/* a team admin's Dugout: Calendar, GameDay, Measurements (user, 2026-11-12) */}
       {teamAdmin && (

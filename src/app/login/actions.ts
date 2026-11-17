@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { signInEmail } from "@/lib/player-logins";
+import { isPlayerLoginEmail, signInEmail } from "@/lib/player-logins";
 
 export type SignInState = { error: string | null; email: string };
 
@@ -20,7 +20,7 @@ export async function signIn(
   const supabase = await createClient();
   // A player whose parent made her login signs in with a username instead of an email.
   const username = !email.includes("@");
-  const { error } = await supabase.auth.signInWithPassword({ email: signInEmail(email), password });
+  const { data, error } = await supabase.auth.signInWithPassword({ email: signInEmail(email), password });
 
   if (error) {
     const message =
@@ -36,6 +36,22 @@ export async function signIn(
     return { error: message, email };
   }
 
+  // Straight to each account's home (user, 2026-11-16: "Login does not take you to the family menu"):
+  // parents to the family menu, mentors to theirs, players to theirs. Staff, coach sign-ups and anyone
+  // else go to /dashboard, which sends each account home too.
+  const role = (data.user?.user_metadata as { role?: string } | undefined)?.role;
+  const { data: staff } = data.user
+    ? await supabase.from("staff").select("user_id").eq("user_id", data.user.id).maybeSingle()
+    : { data: null };
+  const home = staff
+    ? "/dashboard"
+    : role === "parent"
+      ? "/family"
+      : role === "mentor"
+        ? "/mentor"
+        : role === "player" || isPlayerLoginEmail(data.user?.email)
+          ? "/me"
+          : "/dashboard";
   // Must stay outside any try/catch: redirect() works by throwing.
-  redirect("/dashboard");
+  redirect(home);
 }

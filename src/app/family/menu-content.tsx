@@ -69,6 +69,13 @@ export function familyMenu(input: FamilyMenuInput, { preview = false }: { previe
     ),
   });
   const consentNeededFor = (d: MenuDaughter) => d.on_roster && !d.username && !d.has_account && input.consentStepOf(d.player_id) === "needed";
+  // her login can be made now, or right after the parent adds her birth date (user, 2026-11-16: "there is no cue to
+  // create a player login"): the menu's Logins & Teams says so (the family page also has a "Create Player Login" button)
+  const loginToMake = (d: MenuDaughter) => {
+    if (!d.on_roster || d.username || d.has_account) return false;
+    const step = input.consentStepOf(d.player_id);
+    return step === "birth-date" || step === "not-needed" || step === "verified";
+  };
 
   // what's waiting on the parent, each with where to do it
   const needs: NeedsItem[] = daughters.flatMap((d) => {
@@ -78,6 +85,7 @@ export function familyMenu(input: FamilyMenuInput, { preview = false }: { previe
     if (consentNeededFor(d)) {
       items.push({ key: `consent-${d.player_id}`, text: `${first} is under 13: her login needs your consent first.`, href: href(`/family/logins#login-${d.player_id}`), action: "Start" });
     }
+
     if (f && !f.medical) items.push({ key: `medical-${d.player_id}`, text: `Add ${possessive(first)} medical & emergency card.`, href: href(`/family/forms#forms-${d.player_id}`), action: "Add" });
     if (f && !f.questionnaire && !offForDaughter(d, "parent.questionnaire")) {
       items.push({ key: `questionnaire-${d.player_id}`, text: `Fill in ${possessive(first)} preseason questionnaire.`, href: href(`/family/forms#forms-${d.player_id}`), action: "Fill in" });
@@ -257,7 +265,7 @@ export function familyMenu(input: FamilyMenuInput, { preview = false }: { previe
       href: preview ? "#logins" : "/family/logins",
       label: "Logins & Teams",
       note: "Her login and consent · your teams",
-      badge: daughters.some(consentNeededFor) ? "Consent" : null,
+      badge: daughters.some(consentNeededFor) ? "Consent" : daughters.some(loginToMake) ? "Her login" : null,
     },
     // user, 2026-11-16: moved here from the bottom of Logins & teams
     ...(preview ? [] : [{ href: "/family/join", label: "Join Another Team", note: "Another daughter or team: that team's parent code" }]),

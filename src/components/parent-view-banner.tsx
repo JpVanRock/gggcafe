@@ -1,6 +1,7 @@
 // Shown on a player's pages when her approved parent is viewing as her (user, 2026-11-12): what she
 // sees, read only. Nothing for anyone else.
 import Link from "next/link";
+import { ParentPlayerToggle, loadPlayerViews } from "@/components/parent-player-toggle";
 import { getCurrentUser, getMyChildIds, getMyPlayerIds } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -17,9 +18,13 @@ export async function ParentViewBanner({ playerId }: { playerId: string }) {
       <span>
         <strong className="text-highlight">Viewing as {first}.</strong> This is what she sees. Read only: nothing can be changed from here.
       </span>
-      <Link href="/family" className="font-semibold text-link hover:underline">
-        ← Family home
-      </Link>
+      {(await loadPlayerViews()).some((v) => v.playerId === playerId) ? (
+        <ParentPlayerToggle current={playerId} />
+      ) : (
+        <Link href="/family" className="font-semibold text-link hover:underline">
+          ← Family menu
+        </Link>
+      )}
     </div>
   );
 }

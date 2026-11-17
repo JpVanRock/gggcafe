@@ -10,7 +10,7 @@ import { getAdminTeamIds, getCurrentUser } from "@/lib/auth";
 import { NotificationBell } from "@/components/notification-bell";
 
 /**
- * Parents' menu: Home, the Coaches Dugout for a team admin, and the bell. The Yearbook isn't here: its
+ * Parents' menu: Family menu (user, 2026-11-16: it said Home), the Coaches Dugout for a team admin, and the bell. The Yearbook isn't here: its
  * banner tops the family menu (user, 2026-11-13).
  */
 async function FamilyNav() {
@@ -20,7 +20,7 @@ async function FamilyNav() {
   return (
     <nav aria-label="Main" className={navClass}>
       <NavLink href="/family" exact className={navItemClass}>
-        Home
+        Family menu
       </NavLink>
       {/* a team admin's Dugout: Calendar, GameDay, Measurements (user, 2026-11-12) */}
       {adminTeams.length > 0 && (

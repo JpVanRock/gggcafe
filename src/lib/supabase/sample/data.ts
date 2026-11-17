@@ -496,9 +496,12 @@ export function sampleRpc(name: string, args: Row = {}): unknown {
     // the sample admin is also a parent of Maya (a whole-team mentor) and Emma (a mentor asks), so the family page's mentor cards render
     case "parent_home":
       return [maya, emma].map((pid, i) => ({ link_id: id("agag00", i + 1), team_id: T.us, team_name: "GGG Sample 14U", child_name: playerFull(pid), player_name: playerFull(pid), status: "approved" }));
+    // the sample admin's daughters, as a parent (the Parent view / Player view toggle)
+    case "my_child_ids": return [maya, emma];
     case "parent_player_logins":
-      // Emma has no account yet: she's under 13, so the family page shows the parental-consent steps
-      return [maya, emma].map((pid) => ({ player_id: pid, player_name: playerFull(pid), team_name: "GGG Sample 14U", on_roster: true, username: null, has_account: pid === maya }));
+      // Maya has the login her parent made, so the family page shows Parent view / Player view (user, 2026-11-16);
+      // Emma has none: she's under 13, so "Create Player Login" leads to the parental-consent steps
+      return [maya, emma].map((pid) => ({ player_id: pid, player_name: playerFull(pid), team_name: "GGG Sample 14U", on_roster: true, username: pid === maya ? "mayatorres7" : null, has_account: pid === maya }));
     case "parent_consent_status":
       return [
         { player_id: maya, birth_date: "2010-03-14", under_13: false, consent_id: null, status: null, method: null, parent_name: null, submitted_at: null, reviewed_at: null, review_note: null },

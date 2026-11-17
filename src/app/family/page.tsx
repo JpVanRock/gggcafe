@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { getAdminTeamIds } from "@/lib/auth";
 import type { BudgetSummaryData } from "@/components/budget-summary";
-import { Card, secondaryButtonClass } from "@/components/ui";
+import { Card, buttonClass, secondaryButtonClass } from "@/components/ui";
 import { MenuHeader, NeedsYou } from "@/components/menu-board";
 import { MyTeamLogo } from "@/components/team-logo";
 import { isStaffParent } from "@/components/role-switch";
@@ -16,7 +16,8 @@ import { comingSinceISO, isComing } from "@/lib/video-calls";
 import { JoinForm } from "./join-form";
 import { WaitingRequests } from "./waiting-requests";
 import { loadFamilyMentors } from "./mentors";
-import { loadFamily } from "./family-data";
+import { firstOf, loadFamily } from "./family-data";
+import { ParentPlayerToggle } from "@/components/parent-player-toggle";
 import { loadComingUp, loadDaughterGoals, loadTeamCulture } from "./team-data";
 import { FamilyBoards, YearbookBanner, familyMenu } from "./menu-content";
 import { ComingUpCard } from "@/components/coming-up";
@@ -112,6 +113,8 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
     daughterGoals,
     budgets,
   });
+  // her login can be made (user, 2026-11-16: a "Create Player Login" button on the parent dashboard)
+  const loginToMake = daughters.filter((d) => d.on_roster && !d.username && !d.has_account);
   const pending = links.filter((l) => l.status === "pending");
   const declined = links.filter((l) => l.status === "declined");
   return (
@@ -128,13 +131,21 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
           </Suspense>
         }
         actions={
-          // a coach who is a parent here has the Coach / Parent switch under the menu instead
-          user.staff &&
-          !(await isStaffParent()) && (
-            <Link href="/dashboard" className={secondaryButtonClass}>
-              Coach dashboard →
-            </Link>
-          )
+          <>
+            {loginToMake.map((d) => (
+              <Link key={d.player_id} href={`/family/logins#login-${d.player_id}`} className={buttonClass}>
+                {daughters.length === 1 ? "Create Player Login" : `Create ${firstOf(d.player_name)}'s Login`}
+              </Link>
+            ))}
+            {/* once she has a login: Parent view / Player view (user, 2026-11-16) */}
+            <ParentPlayerToggle current="parent" />
+            {/* a coach who is a parent here has the Coach / Parent switch under the menu instead */}
+            {user.staff && !(await isStaffParent()) && (
+              <Link href="/dashboard" className={secondaryButtonClass}>
+                Coach dashboard →
+              </Link>
+            )}
+          </>
         }
       />
 
