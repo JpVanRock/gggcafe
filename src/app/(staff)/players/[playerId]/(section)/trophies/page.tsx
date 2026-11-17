@@ -23,7 +23,7 @@ export default async function TrophiesPage({ params }: PageProps<"/players/[play
   const training = summarizePerformance(performance, positions, todayISO());
   const room = buildTrophyRoom(iq, buildPositions(iq, positions), training.achievements, plateFor(player, pop));
   return (
-    <SectionShell title={`${possessive(firstName(player))} Trophy Room`} subtitle="Trophies · rings · Golden Gloves · MVP badges · achievements" notice={<RewardsNote />}>
+    <SectionShell title={`${possessive(firstName(player))} Trophy Room`} subtitle="Trophies · rings · Golden Gloves · MVP badges · achievements" notice={<RewardsNote termsLink={false} />}>
       <TrophyRoomDetail room={room} />
     </SectionShell>
   );

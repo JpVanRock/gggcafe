@@ -130,14 +130,22 @@ export function SafetyNote({
   );
 }
 
-/** The short notice next to points, leaderboards, badges and awards. */
-export function RewardsNote({ className = "" }: { className?: string }) {
+/**
+ * The short notice next to points, leaderboards, badges and awards. `termsLink={false}` leaves off the
+ * "Terms, section 7" link (the Trophy Room, user 2026-11-16).
+ */
+export function RewardsNote({ className = "", termsLink = true }: { className?: string; termsLink?: boolean }) {
   return (
     <p role="note" className={`text-sm text-muted ${className}`}>
-      Points, badges and awards are for fun and motivation. They have no cash value and aren&apos;t official rankings.{" "}
-      <Link href="/terms#rewards" className={linkClass}>
-        Terms, section 7
-      </Link>
+      Points, badges and awards are for fun and motivation. They have no cash value and aren&apos;t official rankings.
+      {termsLink && (
+        <>
+          {" "}
+          <Link href="/terms#rewards" className={linkClass}>
+            Terms, section 7
+          </Link>
+        </>
+      )}
     </p>
   );
 }
