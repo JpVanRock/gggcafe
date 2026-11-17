@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { getCurrentUser } from "@/lib/auth";
+import { familyAccount } from "../family-data";
 import { createClient } from "@/lib/supabase/server";
 import { EmptyState, Loading, pillQuietClass } from "@/components/ui";
 import { monthGrid, monthLabel, monthOf, shiftMonth } from "@/lib/dugout";
@@ -35,8 +34,7 @@ export default function FamilyCalendarPage({ searchParams }: PageProps<"/family/
 const hhmm = (t: string | null) => (t ? t.slice(0, 5) : null);
 
 async function FamilyCalendar({ searchParams }: Pick<PageProps<"/family/calendar">, "searchParams">) {
-  const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  await familyAccount(); // signed in, and not a player's own login
   const { team: teamParam, month: monthParam } = await searchParams;
   const supabase = await createClient();
   const { data } = await supabase.rpc("parent_home");

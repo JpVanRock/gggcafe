@@ -1,19 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Card, Disclosure, badgeClass } from "@/components/ui";
+import { Card, Disclosure, badgeClass, buttonClass } from "@/components/ui";
 import { suggestUsername } from "@/lib/player-logins";
 import { consentStep } from "@/lib/consent";
 import { formatLongDateAt } from "@/lib/dates";
-import { CreatePlayerLoginForm, ResetPlayerPasswordForm } from "../player-login";
+import { BirthDateForm, CreatePlayerLoginForm, ResetPlayerPasswordForm } from "../player-login";
 import { ConsentOnFile, ConsentSteps } from "../consent";
-import { JoinForm } from "../join-form";
 import { firstOf, loadFamily } from "../family-data";
 import { FamilyShell, SectionHeading, SectionTitle } from "../shell";
 
 export const metadata: Metadata = { title: "Logins & teams · GGG.Cafe" };
 
 // The family menu's Logins & teams (user, 2026-11-13; they were on the family page): each daughter's
-// login (and verified parental consent under 13), the parent's team requests, and joining another team.
+// login (and verified parental consent under 13) and the parent's teams. Joining another team moved to
+// the family page's menu, and a button by the title goes back to the family dashboard (user, 2026-11-16).
 export default function FamilyLoginsPage() {
   return (
     <FamilyShell>
@@ -23,20 +23,28 @@ export default function FamilyLoginsPage() {
 }
 
 async function FamilyLogins() {
-  const { supabase, user, links, daughters, offForDaughter } = await loadFamily();
-  const [{ data: account }, { data: claims }, { data: consentRows }] = await Promise.all([
+  const { supabase, user, meta, links, daughters, offForDaughter } = await loadFamily();
+  const [{ data: account }, { data: consentRows }] = await Promise.all([
     supabase.from("parent_accounts").select("display_name").eq("user_id", user.id).maybeSingle(),
-    supabase.auth.getClaims(),
     // verified parental consent for daughters under 13 (COPPA)
     supabase.rpc("parent_consent_status"),
   ]);
   const consents = new Map((consentRows ?? []).map((c) => [c.player_id, c]));
-  const meta = (claims?.claims?.user_metadata ?? {}) as { display_name?: string };
   const metaName = (meta.display_name ?? "").trim();
 
   return (
     <div className="flex flex-col gap-10">
-      <SectionTitle title="Logins & teams" line="Your daughter's login, parental consent for players under 13, and the teams you belong to." />
+      <SectionTitle
+        title="Logins & teams"
+        line="Your daughter's login, parental consent for players under 13, and the teams you belong to."
+        action={
+          links.length > 0 && (
+            <Link href="/family" className={buttonClass}>
+              Go to my dashboard <span aria-hidden="true">→</span>
+            </Link>
+          )
+        }
+      />
 
       {daughters.length > 0 && (
         <section aria-label="Their logins" className="flex flex-col gap-6">
@@ -74,7 +82,12 @@ async function FamilyLogins() {
                 ) : !d.on_roster ? (
                   <p className="text-sm text-muted">{first} isn&apos;t on the team&apos;s current roster yet. Once the head coach adds her, you can make her login here.</p>
                 ) : step === "birth-date" ? (
-                  <p className="text-sm text-muted">Her birth date isn&apos;t on her profile yet. Ask her head coach to add it; then you can make {first}&apos;s login here.</p>
+                  <>
+                    <p className="text-sm text-muted">
+                      Add {first}&apos;s birth date to make her login. Players under 13 need your verified consent first; the next step shows how.
+                    </p>
+                    <BirthDateForm playerId={d.player_id} firstName={first} />
+                  </>
                 ) : step === "needed" ? (
                   <ConsentSteps
                     playerId={d.player_id}
@@ -118,15 +131,20 @@ async function FamilyLogins() {
               </li>
             ))}
           </ul>
+          {links.some((l) => l.status === "pending") && (
+            <p className="mt-3 text-sm text-muted">
+              Waiting? Fix her name on your{" "}
+              <Link href="/family" className="font-semibold text-link hover:underline">
+                dashboard
+              </Link>{" "}
+              to match the roster, or your head coach approves you.
+            </p>
+          )}
           {links.some((l) => l.status === "declined") && (
-            <p className="mt-3 text-sm text-muted">If a request wasn&apos;t approved, check the team code and name with your coach.</p>
+            <p className="mt-3 text-sm text-muted">If a request wasn&apos;t approved, check the code and her name with your coach.</p>
           )}
         </Card>
       )}
-
-      <Disclosure summary="Join another team">
-        <JoinForm askName={!account} defaultName={metaName} />
-      </Disclosure>
     </div>
   );
 }

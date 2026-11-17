@@ -109,7 +109,11 @@ export const PARENT_LINK = lifecycle<Enum<"parent_link_status">, Decided>({
   label: { pending: "Waiting for the head coach", approved: "Approved", declined: "Not approved" },
   tone: { pending: "pink", approved: "neon", declined: "neutral" },
   moves: {
-    approve: { from: ["pending"], to: "approved", by: "the head coach: decideParentLink (dugout/parents/actions.ts)" },
+    approve: {
+      from: ["pending"],
+      to: "approved",
+      by: "the head coach: decideParentLink (dugout/parents/actions.ts); or the parent code, when her name matches one player on the roster: private.match_parent_link",
+    },
     decline: { from: ["pending"], to: "declined", by: "the head coach: decideParentLink (dugout/parents/actions.ts)" },
   },
   guarded: true,

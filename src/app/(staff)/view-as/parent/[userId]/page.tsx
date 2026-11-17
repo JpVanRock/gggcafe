@@ -117,7 +117,7 @@ export default async function ViewAsParentPage({ params, searchParams }: PagePro
         {!v.profile || v.links.length === 0 ? (
           <EmptyState title="Join your daughter's team">
             {!v.profile
-              ? "No parent profile yet: they signed up but never entered their name and team code, so their family page shows only this form."
+              ? "No parent profile yet: they signed up but never entered their name and parent code, so their family page shows only this form."
               : "No team requests yet, so their family page shows only the join form."}
           </EmptyState>
         ) : (

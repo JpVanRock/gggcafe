@@ -14,7 +14,8 @@
   `/family/mentors` (every message, focus area and note about her). See `mentors.md`.
 - Her login card on /family also carries verified parental consent for a daughter under 13 (signed form upload or a video
   call, checked by an admin; withdraw deletes her login): see player-accounts.md. Without a birth date on her profile the
-  card asks the parent to have the head coach add it.
+  card asks the parent for it (user, 2026-11-16; `set_daughter_birth_date`: an approved parent, only while it's missing,
+  4 to 25 years ago; a date already there stays the coach's to change). Making her login has no email and no confirmation.
 - The team on /family (user, 2026-11-13), each behind its own parent switch (the Switchboard):
   - Coming up (`parent.calendar`): the next 8 team events and games in three weeks, by day (`loadComingUp` in
     `family/team-data.ts`, `comingUp`/`byDay` in `src/lib/family.ts`), and "Full calendar →" `/family/calendar`: the
@@ -31,7 +32,15 @@
   hamburger menu, top left (`PageMenu` in `components/page-menu.tsx`, a badge when they need the parent; user, same
   day), and the header's menu no longer lists the Yearbook (its banner tops the page). Each board shows a
   short summary and opens its own page: `/family/team`, `/family/budget`, `/family/forms` (questionnaire and medical
-  card), `/family/packet`, `/family/logins` (her login and consent, their teams, join another team), `/family/mentors`
+  card), `/family/packet`, `/family/logins` (her login and consent, their teams; "Go to my dashboard →" right of the title, user
+  2026-11-16), `/family/join` (Join another team: in the hamburger menu since 2026-11-16), `/family/mentors`
   (now with approving or declining a mentor's request at the top). Shared: `family/family-data.ts` (`loadFamily`: links,
-  daughters, approved teams, switches; once per request) and `family/shell.tsx` (`FamilyShell`, `SectionTitle`). A
-  parent with no team yet still sees the join form on /family.
+  daughters, approved teams, switches; once per request) and `family/shell.tsx` (`FamilyShell`, `SectionTitle`, whose
+  `action` sits right of the title). A parent with no team yet still sees the join form on /family.
+- Joining (user, 2026-11-16: "If they have a team code they should not also need coach confirmation"; migration
+  20261117010048). Parents join with the parent code (`team_parent_codes`, see account-types.md) and the daughter's name.
+  `loadFamily` sends player accounts to /me (metadata role `player` or a player-login address: players see only the player
+  view) and, on a parent's first visit (no `parent_accounts` row yet), joins with the code and name from sign-up, so
+  there's no second form. A request that's still waiting shows "Waiting to join" on /family (`waiting-requests.tsx`):
+  with the parent code, a form to fix her name to match the roster (`rematchParentLink`); with the team code, a link to
+  join again with the parent code.

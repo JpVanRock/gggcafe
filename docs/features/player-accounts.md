@@ -31,6 +31,11 @@
   (P0008, shown in `decidePlayerClaim`). The parent can cancel or withdraw on /family (`withdraw_parental_consent`: her
   parent-made login is deleted and approved claims are declined). Status per daughter: `parent_consent_status`,
   `consentStep()` in `src/lib/consent.ts`. DB tests: `tests/db/parental_consent.test.sql`.
+- Player accounts see only the player view (user, 2026-11-16: "We only want players to see the player view"): the
+  family pages send a player's own login to /me (`loadFamily`), and `request_parent_link` refuses an account with a
+  player login or a claim that isn't declined (P0011). A parent-made login needs no email and no confirmation: it's made
+  confirmed, with an approved claim (`create_player_login`); the parent adds a missing birth date first
+  (`set_daughter_birth_date`). See account-types.md.
 - Parents "View as player" (user, 2026-11-12; migration 20261112012728): an approved parent opens her daughter's
   player pages from the family page ("View as {first} →", when she's on the current roster) and sees what the
   daughter sees, read only. `requirePlayerPage` lets her in with `isParent` (canAct and canManage false, so no

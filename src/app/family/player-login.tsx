@@ -3,9 +3,9 @@
 // Her login (family page): a parent creates a username login for a daughter
 // without an email, or sets a new password for one they made.
 import { useActionState } from "react";
-import { Field, FormMessage, buttonClass, inputClass } from "@/components/ui";
+import { Field, FormMessage, buttonClass, fieldClass, inputClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
-import { createPlayerLogin, resetPlayerPassword } from "./actions";
+import { createPlayerLogin, resetPlayerPassword, setDaughterBirthDate } from "./actions";
 import { SubmitButton } from "@/components/submit-button";
 
 function Passwords({ label }: { label: string }) {
@@ -63,6 +63,23 @@ export function ResetPlayerPasswordForm({ playerId, firstName }: { playerId: str
       <div className="sm:col-span-3">
         <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
+    </form>
+  );
+}
+
+/** Her birth date when it's missing from her profile: her login needs it (under 13, consent comes first). */
+export function BirthDateForm({ playerId, firstName }: { playerId: string; firstName: string }) {
+  const [state, action] = useActionState(setDaughterBirthDate, initialFormState);
+  return (
+    <form action={action} className="flex flex-col gap-3">
+      <input type="hidden" name="player_id" value={playerId} />
+      <div className="flex flex-wrap items-end gap-3">
+        <Field label={`${firstName}'s birth date`}>
+          <input type="date" name="birth_date" required className={`${fieldClass} w-48`} />
+        </Field>
+        <SubmitButton>Save</SubmitButton>
+      </div>
+      <FormMessage error={state.error} fields={state.fields} />
     </form>
   );
 }

@@ -1,6 +1,7 @@
 "use server";
 
 import { refresh } from "next/cache";
+import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { text, type FormState, invalid } from "@/lib/form";
@@ -12,13 +13,16 @@ import { ALREADY_DECIDED } from "@/lib/lifecycles";
 import { RELATIONSHIPS } from "@/lib/consent";
 import { TERMS_VERSION } from "@/lib/legal";
 
-/** Creates her parent profile if needed, then asks to join a team with its code. */
+/**
+ * Creates her parent profile if needed, then joins a team: with the parent code, approved at once
+ * when her name matches the roster; with the team code, the head coach approves. Then the family menu.
+ */
 export async function joinTeam(_prev: FormState, fd: FormData): Promise<FormState> {
   const user = await getCurrentUser();
   if (!user) return { error: "Your session has ended. Sign in again." };
   const code = text(fd, "code");
   const child = text(fd, "child");
-  if (!code) return invalid("code", "Enter the team code from your coach.");
+  if (!code) return invalid("code", "Enter the parent code from your coach.");
   if (!child) return invalid("child", "Enter your daughter's first and last name.");
 
   const supabase = await createClient();
@@ -31,12 +35,36 @@ export async function joinTeam(_prev: FormState, fd: FormData): Promise<FormStat
 
   const { error } = await supabase.rpc("request_parent_link", { p_code: code, p_child_name: child });
   if (error) {
-    if (error.code === "P0006") return invalid("code", "That team code doesn't match a team. Check it with your coach.");
+    if (error.code === "P0006") return invalid("code", "That code doesn't match a team. Check the parent code with your coach.");
     if (error.code === "P0005") return invalid("name", "Enter your name to set up your profile first.");
-    return { error: "Couldn't send the request. Try again." };
+    if (error.code === "P0011") return { error: "This is a player's login. Parents sign up with their own email." };
+    if (error.code === "54000") return { error: "That's a lot of requests for one team. Ask your coach." };
+    return { error: "Couldn't join the team. Try again." };
   }
-  refresh();
-  return { error: null, saved: true };
+  redirect("/family");
+}
+
+/** A request that's waiting: the parent fixes her name to match the roster (with the parent code, she's in). */
+export async function rematchParentLink(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const user = await getCurrentUser();
+    if (!user) return failed("Your session has ended. Sign in again.");
+    const id = text(fd, "link_id");
+    const child = text(fd, "child");
+    if (!isUuid(id)) return failed(STALE);
+    if (!child || child.length > 80) return invalid("child", "Enter her first and last name.");
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("rematch_parent_link", { p_link_id: id, p_child_name: child });
+    if (error) {
+      if (error.code === "P0002") return failed(ALREADY_DECIDED);
+      if (error.code === "23505") return invalid("child", "You already asked to join for that name.");
+      return failed("Couldn't check her name. Try again.");
+    }
+    refresh();
+    if (data !== "approved") {
+      return invalid("child", "Still no player with that name on the roster. Check the spelling with your coach, or wait for your head coach to approve you.");
+    }
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -69,13 +97,34 @@ export async function createPlayerLogin(_prev: FormState, fd: FormData): Promise
     if (error.code === "P0006") return { error: "She isn't on the team's current roster yet. Ask your head coach to add her first." };
     if (error.code === "P0007") return { error: "She already has her own account. She signs in with her email." };
     if (error.code === "P0008") return { error: "She's under 13, so your verified consent comes first. Use the consent steps above." };
-    if (error.code === "P0009") return { error: "Her birth date isn't on her profile yet. Ask her head coach to add it, then make her login." };
+    if (error.code === "P0009") return { error: "Her birth date isn't on her profile yet. Add it above, then make her login." };
     if (error.code === "42501") return { error: "Your coach needs to approve you as her parent first." };
     if (error.code === "22023") return { error: "Check the username and password." };
     return { error: "Couldn't create her login. Try again." };
   }
   refresh();
   return { error: null, saved: true };
+}
+
+/** Her birth date, when it's missing from her profile (her login needs it; a date already there stays the coach's). */
+export async function setDaughterBirthDate(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const user = await getCurrentUser();
+    if (!user) return failed("Your session has ended. Sign in again.");
+    const playerId = text(fd, "player_id");
+    const date = text(fd, "birth_date");
+    if (!isUuid(playerId)) return failed(STALE);
+    if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return invalid("birth_date", "Enter her birth date.");
+    const supabase = await createClient();
+    const { error } = await supabase.rpc("set_daughter_birth_date", { p_player_id: playerId, p_birth_date: date });
+    if (error) {
+      if (error.code === "22023") return invalid("birth_date", "Check her birth date.");
+      if (error.code === "P0002") return failed("Her birth date is already on her profile. Reload the page.");
+      if (error.code === "42501") return failed("Only her approved parent can do that.");
+      return failed("Couldn't save it. Try again.");
+    }
+    refresh();
+  });
 }
 
 /**

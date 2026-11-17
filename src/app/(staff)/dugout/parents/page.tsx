@@ -8,7 +8,7 @@ import { loadDugoutTeam } from "../data";
 import { NoOwnTeam, TeamPicker } from "../team-picker";
 import { ViewToggle } from "../../view-as/parts";
 import { removeParentLink, setTeamAdmin } from "./actions";
-import { TeamCodeCard } from "../team-code";
+import { ParentCodeCard } from "../team-code";
 import { PendingParentList } from "../approvals";
 import { loadTeamApprovals } from "@/lib/approvals";
 import { PACKET_KIND_LABEL, type PacketKind } from "@/lib/family";
@@ -37,7 +37,7 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
 
   const admin = user.staff.role === "admin";
   const [codeResult, approvals, parentIds, adminRows] = await Promise.all([
-    supabase.from("teams").select("team_code").eq("id", team.id).maybeSingle(),
+    supabase.from("team_parent_codes").select("code").eq("team_id", team.id).maybeSingle(),
     loadTeamApprovals(supabase, team.id),
     // whose account each request is: admins' "View as" and the team admin switch (user, 2026-11-12)
     supabase.from("parent_links").select("id, parent_id").eq("team_id", team.id),
@@ -45,7 +45,7 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
   ]);
   const teamAdmins = new Set((adminRows.data ?? []).map((a) => a.user_id));
   const parentOf = new Map(((parentIds.data ?? []) as { id: string; parent_id: string }[]).map((l) => [l.id, l.parent_id]));
-  const code = codeResult.data?.team_code ?? null;
+  const code = codeResult.data?.code ?? null;
   const links = approvals.parentLinks;
   const players = approvals.parentPlayers;
   const nameOf = new Map(players.map((p) => [p.id, p.label]));
@@ -67,9 +67,13 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
         />
       )}
 
-      <TeamCodeCard team={team} code={code} head />
+      <ParentCodeCard team={team} code={code} head />
 
       <Card title={`Waiting for approval (${pending.length})`}>
+        <p className="-mt-1 mb-3 text-sm text-muted">
+          Parents who join with the parent code and their daughter&apos;s name as it is on the roster don&apos;t wait here. These used the team
+          code, typed a name that matches no one on the current roster, or were declined before: pick her, or decline.
+        </p>
         {pending.length === 0 ? (
           <EmptyState>No requests waiting.</EmptyState>
         ) : (
@@ -129,7 +133,10 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
                 )}
                 <ActionForm action={removeParentLink}>
                   <input type="hidden" name="link_id" value={l.link_id} />
-                  <ConfirmSubmit message={`Remove ${l.parent_name}'s access to ${team.name}?`} className="text-xs text-danger hover:underline">
+                  <ConfirmSubmit
+                    message={`Remove ${l.parent_name}'s access to ${team.name}? If they shouldn't have had the parent code, make a new one too: they could join again with it.`}
+                    className="text-xs text-danger hover:underline"
+                  >
                     Remove access
                   </ConfirmSubmit>
                 </ActionForm>

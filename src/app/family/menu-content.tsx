@@ -244,7 +244,7 @@ export function familyMenu(input: FamilyMenuInput, { preview = false }: { previe
   const halves = boards.filter((b) => !b.wide);
   if (halves.length % 2 === 1) halves[halves.length - 1].wide = true;
 
-  // the page's hamburger menu (user, 2026-11-13): Season forms and Logins & teams, with a badge when they need the parent
+  // the page's hamburger menu (user, 2026-11-13): Season forms, Logins & teams and Join another team, with a badge when they need the parent
   const formsToDo = daughters.filter((d) => {
     const f = formOf(d.player_id);
     return f && (!f.medical || (!f.questionnaire && !offForDaughter(d, "parent.questionnaire")));
@@ -256,9 +256,11 @@ export function familyMenu(input: FamilyMenuInput, { preview = false }: { previe
     {
       href: preview ? "#logins" : "/family/logins",
       label: "Logins & Teams",
-      note: "Her login and consent · your teams · join a team",
+      note: "Her login and consent · your teams",
       badge: daughters.some(consentNeededFor) ? "Consent" : null,
     },
+    // user, 2026-11-16: moved here from the bottom of Logins & teams
+    ...(preview ? [] : [{ href: "/family/join", label: "Join Another Team", note: "Another daughter or team: that team's parent code" }]),
   ];
 
   return { needs, menuItems, boards };

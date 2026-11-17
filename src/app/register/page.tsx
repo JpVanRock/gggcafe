@@ -17,8 +17,9 @@ export default function RegisterPage() {
         <h1 className="mt-6 text-2xl font-semibold tracking-[0.08em] text-highlight uppercase">Sign up</h1>
         <span aria-hidden className="mt-2 block h-0.5 w-12 rounded-full bg-pink" />
         <p className="mt-3 text-sm text-muted">
-          Players, parents, assistant coaches and mentors need the team code. You confirm your email first, then a coach, a parent or
-          an admin approves you. No email? A parent can make a player&apos;s login from the family page.
+          Players, assistant coaches and mentors need the team code; parents, the parent code. You confirm your email first. Then a coach,
+          a parent or an admin approves you, except parents with the parent code, who are in right away. No email? A parent can make a
+          player&apos;s login from the family page.
         </p>
       </header>
 

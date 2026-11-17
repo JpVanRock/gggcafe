@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { getCurrentUser } from "@/lib/auth";
+import { familyAccount } from "../family-data";
 import { createClient } from "@/lib/supabase/server";
 import { loadYearbook, yearbookTeams } from "@/lib/yearbook-data";
 import { YearbookView } from "@/components/yearbook-view";
@@ -25,8 +24,7 @@ export default function FamilyYearbookPage({ searchParams }: PageProps<"/family/
 }
 
 async function FamilyYearbook({ searchParams }: Pick<PageProps<"/family/yearbook">, "searchParams">) {
-  const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  await familyAccount(); // signed in, and not a player's own login
   const { team: teamParam, season } = await searchParams;
   const supabase = await createClient();
   const { data } = await supabase.rpc("parent_home");

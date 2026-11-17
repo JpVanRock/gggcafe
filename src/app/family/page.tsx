@@ -14,6 +14,7 @@ import { medicalOnFile } from "@/lib/family";
 import { consentStep } from "@/lib/consent";
 import { comingSinceISO, isComing } from "@/lib/video-calls";
 import { JoinForm } from "./join-form";
+import { WaitingRequests } from "./waiting-requests";
 import { loadFamilyMentors } from "./mentors";
 import { loadFamily } from "./family-data";
 import { loadComingUp, loadDaughterGoals, loadTeamCulture } from "./team-data";
@@ -39,14 +40,13 @@ export default function FamilyPage({ searchParams }: PageProps<"/family">) {
 
 async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams">) {
   const { code } = await searchParams;
-  const { user, supabase, links, daughters, teams, offOn, offForDaughter, teamsOf, teamsWith } = await loadFamily();
+  const { user, supabase, meta, joinError, links, daughters, teams, offOn, offForDaughter, teamsOf, teamsWith } = await loadFamily();
 
   const calendarTeams = teamsWith("parent.calendar");
   // her goals: off when her team turned them off for parents, or turned Goals off for players
   const goalDaughters = daughters.filter((d) => d.on_roster && !offForDaughter(d, "parent.goals") && !offForDaughter(d, "player.goals"));
   const [
     { data: account },
-    { data: claims },
     { data: consentRows },
     forms,
     { data: packetRows },
@@ -61,7 +61,6 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
     { calls: callRows, invited },
   ] = await Promise.all([
     supabase.from("parent_accounts").select("display_name").eq("user_id", user.id).maybeSingle(),
-    supabase.auth.getClaims(),
     supabase.rpc("parent_consent_status"),
     Promise.all(
       daughters.map(async (d) => ({
@@ -88,7 +87,6 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
     callsForPlayers(supabase, daughters.map((d) => d.player_id), { since: comingSinceISO(), limit: 10 }),
   ]);
 
-  const meta = (claims?.claims?.user_metadata ?? {}) as { display_name?: string; team_code?: string; child?: string };
   const metaName = (meta.display_name ?? "").trim();
   // their name (a coach who is also a parent here may have no parent profile name)
   const fullName = (account?.display_name || metaName || user.staff?.displayName || "").trim();
@@ -114,7 +112,8 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
     daughterGoals,
     budgets,
   });
-  const waiting = links.filter((l) => l.status !== "approved");
+  const pending = links.filter((l) => l.status === "pending");
+  const declined = links.filter((l) => l.status === "declined");
   return (
     <div className="flex flex-col gap-10">
       <MenuHeader
@@ -139,9 +138,10 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
         }
       />
 
-      {code === "invalid" && (
+      {(code === "invalid" || joinError) && links.length === 0 && (
         <p role="alert" className="rounded-lg border border-pink/60 bg-pink/10 p-4 text-sm">
-          Your account is set up, but that team code didn&apos;t match a team. Check it with your coach and enter it below.
+          Your account is set up, but {joinError === "failed" ? "we couldn't join the team yet" : "that code didn't match a team"}. Check
+          the parent code with your coach and enter it below.
         </p>
       )}
 
@@ -163,18 +163,22 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
 
       {links.length === 0 ? (
         <Card title="Join your daughter's team">
-          <p className="mb-4 text-sm text-muted">Enter the team code from your coach. Your coach approves you, then your family menu fills in here.</p>
+          <p className="mb-4 text-sm text-muted">
+            Enter the parent code from your coach and your daughter&apos;s name as it is on the team roster. You&apos;re in right away, and your family
+            menu fills in here.
+          </p>
           <JoinForm askName={!account} defaultName={metaName} defaultCode={meta.team_code} defaultChild={meta.child} />
         </Card>
       ) : (
         <>
-          {waiting.length > 0 && teams.length === 0 && (
+          {pending.length > 0 && <WaitingRequests links={pending} />}
+          {declined.length > 0 && teams.length === 0 && (
             <Card title="Your teams">
               <ul className="flex flex-col gap-1 text-sm">
-                {waiting.map((l) => (
+                {declined.map((l) => (
                   <li key={l.link_id}>
-                    <span className="font-semibold">{l.team_name}</span> · parent of {l.player_name ?? l.child_name}:{" "}
-                    {l.status === "pending" ? "waiting for your coach to approve you" : "not approved; check the team code and name with your coach"}
+                    <span className="font-semibold">{l.team_name}</span> · parent of {l.child_name}: not approved; check the code and her name with your
+                    coach
                   </li>
                 ))}
               </ul>

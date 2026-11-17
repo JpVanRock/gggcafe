@@ -6,7 +6,7 @@
 
 export const SIGNUP_TYPES = ["head-coach", "assistant-coach", "player", "parent", "mentor"] as const;
 export type SignupType = (typeof SIGNUP_TYPES)[number];
-/** The account types that sign up with their team's code (teams.team_code). */
+/** The account types that sign up with a code: the team code (teams.team_code), or for parents the parent code (team_parent_codes). */
 export const CODE_TYPES: readonly SignupType[] = ["player", "parent", "assistant-coach", "mentor"];
 
 export const SIGNUP_LABEL: Record<SignupType, string> = {
@@ -48,7 +48,7 @@ export const ACCOUNT_TYPES: AccountType[] = [
   {
     key: "parent",
     label: "Parent",
-    signup: "Signs up with an email, the team code and the daughter's name; a head coach matches the parent to her on the roster.",
+    signup: "Signs up with an email, the parent code and the daughter's name, and is in at once when the name matches a player on the current roster (the head coach is notified). The team code still works, but then a head coach matches the parent to her.",
     home: "Family page",
   },
   {
@@ -119,7 +119,8 @@ export const SECTIONS: { title: string; rows: Row[] }[] = [
       row("Drill Library", "Every drill, tagged, with video links.", ["yes", "yes", "no", "no", "part"], "Mentors pick drills to suggest and can add new ones."),
       row("Budget", "Fees, payments, income and expenses (one at a time, or many at once from an Excel or CSV file), tournament credits, and out-of-pocket spending by coaches or parents and its repayment.", ["yes", "view", "no", "view", "no"],
         "Assistants see the whole budget but can't change it. Parents see team totals only, with no names."),
-      row("Parents", "The team code, parent requests and approved parents, and which of them is a team admin.", ["yes", "no", "no", "no", "no"]),
+      row("Parents", "The parent code, parent requests that didn't match the roster, approved parents, and which of them is a team admin.", ["yes", "no", "no", "no", "no"],
+        "Assistants and view-only staff can read the parent code; only head coaches change it. Players never see it."),
       row("Mentors", "Approve mentors for the whole team, read their notes and focus areas and reply, read the messages they share.", ["yes", "no", "no", "part", "no"],
         "Parents approve a mentor for their daughter and read every message, note and focus area about her (family page). Admins read every message."),
     ],
@@ -148,11 +149,12 @@ export const SECTIONS: { title: string; rows: Row[] }[] = [
       row("Approve head coaches", "New head coach sign-ups.", ["no", "no", "no", "no", "no"], "Admins only."),
       row("Approve assistant coaches", "Assistant sign-ups for the head coach's team.", ["yes", "no", "no", "no", "no"]),
       row("Approve player claims", "Match a player's claim to her roster spot.", ["yes", "yes", "no", "no", "no"]),
-      row("Approve parents", "Match a parent to the daughter on the roster.", ["yes", "no", "no", "no", "no"]),
+      row("Approve parents", "Match a parent to the daughter on the roster.", ["yes", "no", "no", "no", "no"],
+        "Only when it doesn't happen on its own: a parent with the parent code and her name as it is on the current roster is in at once, and head coaches and admins get a notification."),
       row("Make a parent team admin", "Let an approved parent change the team's calendar, GameDay and measurements.", ["yes", "no", "no", "no", "no"],
         "Coaches Dugout → Parents. The role ends if the parent's access is removed."),
       row("Create a player's login", "A username and password for a daughter without an email.", ["no", "no", "no", "own", "no"],
-        "An approved parent, for a daughter on the team's current roster with her birth date on her profile. Under 13: only after an admin verifies the parent's consent."),
+        "An approved parent, for a daughter on the team's current roster. If her birth date isn't on her profile, the parent adds it first. Under 13: only after an admin verifies the parent's consent. No email and no confirmation: she signs in right away."),
       row("Verify parental consent", "Check a parent's signed consent form, or hold a short video call, before a player under 13 can sign in (COPPA).", ["no", "no", "no", "own", "no"],
         "Parents give consent and can withdraw it on the family page. Admins check it on the Roster tab; coaches never see the forms."),
       row("Reset that login's password", "A new password for a parent-made player login.", ["yes", "no", "no", "own", "no"]),
@@ -174,22 +176,25 @@ export const QUESTIONS: { q: string; a: string[] }[] = [
     q: "Why does every sign-up confirm an email first?",
     a: [
       "So only real people with a working inbox get in. The link in the email finishes the sign-up; until it's opened, the account can't sign in.",
-      "After confirming, every account still waits for a person to approve it: an admin for head coaches, a head coach for assistant coaches and parents, a coach for players, and a player's parents (one player) or the head coach (the whole team) for mentors.",
+      "After confirming, most accounts wait for a person to approve them: an admin for head coaches, a head coach for assistant coaches, a coach for players, and a player's parents (one player) or the head coach (the whole team) for mentors.",
+      "Parents with the parent code don't wait: they're in as soon as the daughter's name they typed matches one player on the team's current roster, and head coaches and admins are notified. A name that matches no one, or the team code, waits for the head coach.",
     ],
   },
   {
     q: "What is the team code, and who gets it?",
     a: [
-      "Each team has one six-character code. Players, parents, assistant coaches and mentors choose their account type on the sign-up page and enter it; head coaches don't need one (an admin approves them).",
-      "Coaches see the code in Coaches Dugout → Roster (and Parents). A head coach turns sign-up on, makes a new code (the old one stops working) or turns it off; everyone already approved keeps access.",
-      "A code only lets someone ask to join: every sign-up still waits for approval. Signed-out visitors can't see the list of teams.",
+      "Each team has a six-character team code. Players, assistant coaches and mentors choose their account type on the sign-up page and enter it; head coaches don't need one (an admin approves them).",
+      "Parents get a second code, the parent code, which lets them in without waiting for approval. Give it to parents only: anyone with it can join as a parent of a girl on the roster. Players can't see it.",
+      "Coaches see the team code in Coaches Dugout → Roster and the parent code in Coaches Dugout → Parents. A head coach turns each on, makes a new one (the old one stops working) or turns it off; everyone already approved keeps access. If someone joined as a parent who shouldn't have, remove them and make a new parent code.",
+      "The team code only lets someone ask to join: those sign-ups wait for approval. Signed-out visitors can't see the list of teams.",
     ],
   },
   {
     q: "A player has no email. How does she get in?",
     a: [
-      "Her parent signs up as a Parent with the team code. Once a head coach approves the parent, the family page shows \"Create her login\": the parent picks a username and password.",
-      "It works only for a daughter on the official roster the head coach built for the current season, with her birth date on her profile, and only once per player. She signs in with the username instead of an email; her parent or a head coach can reset the password.",
+      "Her parent signs up as a Parent with the parent code. Once approved (at once when her name matches the roster), Family menu → Logins & Teams shows \"Create her login\": the parent picks a username and password. There's no email and nothing to confirm: she signs in with them right away.",
+      "It works only for a daughter on the official roster the head coach built for the current season, and only once per player. If her birth date isn't on her profile, the parent adds it there first. She signs in with the username instead of an email; her parent or a head coach can reset the password.",
+      "Her login opens only her player pages. Player accounts can't open the family pages or join a team as a parent, so she never needs her parent's login.",
       "If she's under 13, the parent first gives verified consent on the family page: signs our consent form by hand and uploads a photo of it, or asks for a short video call. An admin checks it on the Roster tab, then \"Create her login\" appears. A coach can't approve an under-13 player's own profile claim until that consent is checked.",
     ],
   },

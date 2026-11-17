@@ -16,7 +16,8 @@ export function FamilyShell({ children }: { children: ReactNode }) {
   );
 }
 
-export function SectionTitle({ title, line, children }: { title: string; line?: ReactNode; children?: ReactNode }) {
+/** `action`: a button to the right of the title (Logins & teams: back to the family dashboard, user 2026-11-16). */
+export function SectionTitle({ title, line, action, children }: { title: string; line?: ReactNode; action?: ReactNode; children?: ReactNode }) {
   return (
     <div className="flex flex-col gap-4">
       <Link href="/family" className="self-start text-sm text-muted hover:text-ink">
@@ -24,7 +25,10 @@ export function SectionTitle({ title, line, children }: { title: string; line?: 
       </Link>
       <header>
         <p className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">Family menu</p>
-        <h1 className="mt-1 text-4xl leading-none font-bold tracking-tight text-highlight uppercase sm:text-5xl">{title}</h1>
+        <div className="mt-1 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+          <h1 className="text-4xl leading-none font-bold tracking-tight text-highlight uppercase sm:text-5xl">{title}</h1>
+          {action}
+        </div>
         {line && <p className="mt-3 max-w-2xl text-sm text-muted">{line}</p>}
       </header>
       {children}

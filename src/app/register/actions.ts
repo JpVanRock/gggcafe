@@ -26,8 +26,9 @@ export type RegisterState = {
  * head coaches, a head coach approves assistants (staff_requests).
  * Player: /me shows her team's welcome message (the team is in her account's metadata) and
  * asks her to claim her profile (a coach approves it).
- * Parent: /family sends the request to join the team with its code (a head coach approves
- * it); the form there is filled in with what she typed here.
+ * Parent: enters the parent code (team_parent_codes; the team code still works, and then the head
+ * coach approves them). The first /family visit joins the team with what they typed here, approved at
+ * once when the code is the parent code and her name matches the roster (request_parent_link).
  * Mentor: asks with the team code for one player (her parents approve) or the whole team (the
  * head coach approves); /mentor sends the request if it couldn't go yet, filled in with what she typed.
  */
@@ -54,7 +55,7 @@ export async function registerAccount(_prev: RegisterState, fd: FormData): Promi
   const needsCode = CODE_TYPES.includes(role);
   const password = String(fd.get("password") ?? "");
 
-  if (needsCode && !values.code) return fail("Enter the team code from your coach.", "code");
+  if (needsCode && !values.code) return fail(parent ? "Enter the parent code from your coach." : "Enter the team code from your coach.", "code");
   if (!values.name || values.name.length > 80) return fail("Enter your name.", "name");
   if ((player || mentor || coach) && !/\s/.test(values.name)) return fail("Enter your first and last name.", "name");
   if (parent && (!values.child || values.child.length > 80)) return fail("Enter your daughter's first and last name.", "child");
@@ -72,13 +73,15 @@ export async function registerAccount(_prev: RegisterState, fd: FormData): Promi
   const supabase = await createClient();
   let team: { id: string; name: string } | null = null;
   if (needsCode) {
-    const { data, error } = await supabase.rpc("signup_team", { p_code: values.code });
-    if (error) {
-      console.error("Team code check failed:", error);
-      return fail("Couldn't check the team code. Try again in a moment.");
+    // parents: the parent code first; the team code works too (then the head coach approves them)
+    const parentCode = parent ? await supabase.rpc("signup_parent_team", { p_code: values.code }) : null;
+    const { data, error } = parentCode?.data?.length ? parentCode : await supabase.rpc("signup_team", { p_code: values.code });
+    if (error || parentCode?.error) {
+      console.error("Team code check failed:", error ?? parentCode?.error);
+      return fail("Couldn't check the code. Try again in a moment.");
     }
     team = data?.[0] ?? null;
-    if (!team) return fail("That team code doesn't match a team. Check it with your coach.", "code");
+    if (!team) return fail(parent ? "That code doesn't match a team. Check the parent code with your coach." : "That team code doesn't match a team. Check it with your coach.", "code");
   }
 
   const origin = await requestOrigin();

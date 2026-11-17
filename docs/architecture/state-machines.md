@@ -24,7 +24,7 @@ Checks that keep these in step:
 | Lifecycle | Column | States and moves | Who moves it | Guarded in DB |
 |---|---|---|---|---|
 | `PLAYER_CLAIM` | `player_claims.status` | pending → approved / declined; declined → pending (she asks again); approved → declined (consent withdrawn) | coach (`decidePlayerClaim`); player (`request_player_claim`); parent (`withdraw_parental_consent`) | yes |
-| `PARENT_LINK` | `parent_links.status` | pending → approved / declined. Removing a parent deletes the row | head coach (`decideParentLink`) | yes |
+| `PARENT_LINK` | `parent_links.status` | pending → approved / declined. Removing a parent deletes the row | head coach (`decideParentLink`); approve also `private.match_parent_link` (parent code + her name on the roster) | yes |
 | `MENTOR_LINK` | `mentor_links.status` | pending → approved / declined | head coach (whole team), her parents (one player), admin: `decide_mentor_link` | yes |
 | `STAFF_REQUEST` | `staff_requests.status` | pending → approved / declined | admin, or head coach for assistants: `decide_staff_request` | yes |
 | `PARENTAL_CONSENT` | `parental_consents.status` | pending → verified / declined; pending or verified → withdrawn. A new request is a new row | admin (`review_parental_consent`); parent (`withdraw_parental_consent`) | yes |

@@ -39,7 +39,7 @@ export function RegisterForm() {
               ? " finish. An admin approves new head coaches."
               : assistant
                 ? " finish. Your head coach approves assistant coaches."
-                : " send your request. Your coach approves parents."}
+                : " join your daughter's team. With the parent code, you're in as soon as her name matches the roster."}
       </p>
     );
   }
@@ -67,8 +67,16 @@ export function RegisterForm() {
 
       {role !== "" && CODE_TYPES.includes(role) && (
         <Field
-          label="Team code"
-          hint={assistant ? "From your head coach, who approves you" : mentor ? "From the head coach or the player's parents" : "Six letters and numbers from your coach"}
+          label={parent ? "Parent code" : "Team code"}
+          hint={
+            assistant
+              ? "From your head coach, who approves you"
+              : mentor
+                ? "From the head coach or the player's parents"
+                : parent
+                  ? "From your coach, just for parents: it gets you in right away"
+                  : "Six letters and numbers from your coach"
+          }
         >
           <input
             name="code"
@@ -86,7 +94,7 @@ export function RegisterForm() {
         <input name="name" required autoComplete="name" maxLength={80} defaultValue={state.values.name} className={inputClass} />
       </Field>
       {parent && (
-        <Field label="Your daughter's name" hint="First and last, so your coach can match you to her">
+        <Field label="Your daughter's name" hint="First and last, as it is on the team roster">
           <input name="child" required autoComplete="off" maxLength={80} defaultValue={state.values.child} className={inputClass} />
         </Field>
       )}

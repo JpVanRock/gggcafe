@@ -35,3 +35,31 @@ export async function setTeamCode(_prev: FormState, fd: FormData): Promise<FormS
     refresh();
   });
 }
+
+/**
+ * The parent code (team_parent_codes): parents who join with it are approved at once when their
+ * daughter's name matches the roster. A fresh code, or off (no row). Head coaches only.
+ */
+export async function setParentCode(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const denied = await headCoachCheck();
+    if (denied) return failed(denied);
+    const teamId = text(fd, "team_id");
+    if (!isUuid(teamId)) return failed(STALE);
+    const supabase = await createClient();
+    if (fd.get("mode") === "off") {
+      must(await supabase.from("team_parent_codes").delete().eq("team_id", teamId));
+    } else {
+      for (let tries = 0; ; tries++) {
+        const { error } = await supabase
+          .from("team_parent_codes")
+          .upsert({ team_id: teamId, code: newCode(), updated_at: new Date().toISOString() }, { onConflict: "team_id" });
+        // 23505: another team (or a team code) already has that code, so draw again
+        if (error?.code === "23505" && tries < 5) continue;
+        must({ error });
+        break;
+      }
+    }
+    refresh();
+  });
+}

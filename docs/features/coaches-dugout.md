@@ -69,10 +69,11 @@
     `note_budget_change` (staff read it; nobody sets it). `team_budget_summary()` returns it as `updated_at`, and
     `BudgetSummary` shows "Last updated" at its top, so parents (and the coaches' Parent view) see it.
 - Parents (user's choice: sign-in accounts, team totals only): parents sign up at `/register` (name,
-  email, password, team code, daughter's name) and land on `/family`. A head coach turns on the team's
-  6-character team code (`teams.team_code`, Dugout → Roster or Parents; players and assistant coaches use the
-  same code, see account-types.md) and approves each request by matching it to a
-  player (`parent_links`, status pending/approved/declined). Parents are not staff and can read no
+  email, password, parent code, daughter's name) and land on `/family`. The Parents tab shows the team's
+  parent code (`team_parent_codes`, user 2026-11-16; the team code for players, assistant coaches and mentors is on
+  the Roster tab, see account-types.md). A parent with the parent code whose daughter's name matches a player on the
+  current roster is approved at once and the head coaches are notified; the head coach approves the rest by matching
+  each to a player (`parent_links`, status pending/approved/declined). Parents are not staff and can read no
   app tables; they get data only through security-definer functions: `parent_home()` (their links)
   and `team_budget_summary()` (staff, or approved parents of that team), which returns team totals,
   expenses/income and player payments as daily totals with no names. `components/budget-summary.tsx`

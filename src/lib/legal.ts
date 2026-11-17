@@ -448,7 +448,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
         "Information stored encrypted at rest by our database provider.",
         "Passwords hashed by our sign-in provider: nobody at GGG.Cafe can read them.",
         "Row-level security on every table: the database checks who is asking before it returns anything.",
-        "Invite-only sign-up: a team code plus approval by a coach or admin.",
+        "Invite-only sign-up: a code from the coach plus approval by a coach or admin. Parents with the separate parent code join once their daughter's name matches the team roster, and the coach is told.",
         "Private file storage with links that expire, for photos, voice memos and team logos.",
         "Limits on password-reset emails, and other protections against abuse.",
         "Admin access only where it's needed to run the Service.",

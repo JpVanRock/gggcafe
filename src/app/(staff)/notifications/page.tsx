@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: "Notifications · GGG.Cafe" };
 
 type Note = { id: string; kind: string; title: string; body: string | null; href: string | null; created_at: string; read_at: string | null };
 
-const KIND_LABEL: Record<string, string> = { "player-of-the-week": "Player of the Week", "video-call": "Video call" };
+const KIND_LABEL: Record<string, string> = { "player-of-the-week": "Player of the Week", "video-call": "Video call", "parent-joined": "New parent" };
 
 export default async function NotificationsPage() {
   // everyone signed in: coaches (Player of the Week, mentors' video calls), and players, parents and

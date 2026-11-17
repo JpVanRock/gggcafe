@@ -346,6 +346,9 @@ const parent_links: Row[] = [maya, emma].map((pid, i) => ({
   requested_at: "2026-11-01T00:00:00Z", decided_by: U.admin, decided_at: "2026-11-01T00:00:00Z",
 }));
 
+// the parent code (user, 2026-11-16): parents who join with it are approved when her name matches the roster
+const team_parent_codes: Row[] = [{ team_id: T.us, code: "PAR678", updated_at: "2026-11-16T18:00:00Z" }];
+
 // the Switchboard (user, 2026-11-12): one feature off; the sample admin is also the team's team admin
 const team_features_off: Row[] = [{ team_id: T.us, feature: "player.activity", turned_off_by: U.admin, turned_off_at: "2026-11-11T18:00:00Z" }];
 const team_admins: Row[] = [{ team_id: T.us, user_id: U.admin, granted_by: U.admin, granted_at: "2026-11-11T18:00:00Z" }];
@@ -377,7 +380,7 @@ export const TABLES: Record<string, Row[]> = {
   team_culture, team_standards, player_advanced_access, player_leadership_access, player_leadership_certificates, measurements,
   mentors, mentor_links, mentor_messages, mentor_focus, mentor_notes, player_activities,
   budget_fees, budget_entries, budget_credits, budget_coach_expenses, player_mental_lessons, coach_mental_lessons, mental_game_plans,
-  team_hitting_philosophy, team_throwing_programs, player_journal_entries, parent_links, team_features_off, team_admins,
+  team_hitting_philosophy, team_throwing_programs, player_journal_entries, parent_links, team_parent_codes, team_features_off, team_admins,
   team_video_access, video_calls, video_call_players,
 };
 

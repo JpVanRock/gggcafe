@@ -2465,7 +2465,7 @@ export type Database = {
         Row: {
           id: string
           user_id: string
-          kind: "player-of-the-week" | "video-call"
+          kind: "player-of-the-week" | "video-call" | "parent-joined"
           title: string
           body: string | null
           href: string | null
@@ -2477,7 +2477,7 @@ export type Database = {
         Insert: {
           id?: string
           user_id: string
-          kind: "player-of-the-week" | "video-call"
+          kind: "player-of-the-week" | "video-call" | "parent-joined"
           title: string
           body?: string | null
           href?: string | null
@@ -2489,7 +2489,7 @@ export type Database = {
         Update: {
           id?: string
           user_id?: string
-          kind?: "player-of-the-week" | "video-call"
+          kind?: "player-of-the-week" | "video-call" | "parent-joined"
           title?: string
           body?: string | null
           href?: string | null
@@ -2678,6 +2678,7 @@ export type Database = {
           requested_at: string
           decided_by: string | null
           decided_at: string | null
+          via_parent_code: boolean
         }
         Insert: {
           id?: string
@@ -2689,6 +2690,7 @@ export type Database = {
           requested_at?: string
           decided_by?: string | null
           decided_at?: string | null
+          via_parent_code?: boolean
         }
         Update: {
           id?: string
@@ -2700,6 +2702,7 @@ export type Database = {
           requested_at?: string
           decided_by?: string | null
           decided_at?: string | null
+          via_parent_code?: boolean
         }
         Relationships: [
           {
@@ -5270,6 +5273,32 @@ export type Database = {
           },
         ]
       }
+      team_parent_codes: {
+        Row: {
+          team_id: string
+          code: string
+          updated_at: string
+        }
+        Insert: {
+          team_id: string
+          code: string
+          updated_at?: string
+        }
+        Update: {
+          team_id?: string
+          code?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_parent_codes_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: true
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       team_player_of_week: {
         Row: {
           team_id: string
@@ -6355,6 +6384,7 @@ export type Database = {
       rate_limit_hit: { Args: { p_bucket: string | null; p_max: number | null; p_window_seconds: number | null }; Returns: boolean }
       record_iq_answer: { Args: { p_player_id: string | null; p_question_id: string | null; p_chosen: number | null; p_attempt_id?: string | null; p_review_of?: string | null; p_hint_used?: boolean | null }; Returns: { correct: boolean; correct_index: number; explanation: string }[] }
       reimburse_coach_expenses: { Args: { p_ids: string[] | null; p_paid_on: string | null; p_from_team_funds: boolean | null }; Returns: undefined }
+      rematch_parent_link: { Args: { p_link_id: string | null; p_child_name: string | null }; Returns: Database["public"]["Enums"]["parent_link_status"] }
       report_error: { Args: { p_secret: string | null; p_fingerprint: string | null; p_source: string | null; p_name: string | null; p_message: string | null; p_route?: string | null; p_digest?: string | null }; Returns: undefined }
       request_mentor: { Args: { p_code: string | null; p_player_name: string | null }; Returns: string }
       request_parent_link: { Args: { p_code: string | null; p_child_name: string | null }; Returns: string }
@@ -6371,8 +6401,10 @@ export type Database = {
       save_practice_plan: { Args: { p_plan_id: string | null; p_plan: Json | null }; Returns: string }
       save_team_dugout: { Args: { p_team_id: string | null; p_headline: string | null; p_statement: string | null; p_standards: Json | null }; Returns: undefined }
       score_game_play: { Args: { p_run_id: string | null; p_play: number | null; p_boxes: Json | null }; Returns: { correct: boolean; wrong: string[]; answer: Json; next_play: number; first_try: number }[] }
+      set_daughter_birth_date: { Args: { p_player_id: string | null; p_birth_date: string | null }; Returns: undefined }
       set_goal_method: { Args: { p_player_id: string | null; p_method: string | null }; Returns: undefined }
       set_team_admin: { Args: { p_team_id: string | null; p_user_id: string | null; p_on: boolean | null }; Returns: undefined }
+      signup_parent_team: { Args: { p_code: string | null }; Returns: { id: string; name: string }[] }
       signup_team: { Args: { p_code: string | null }; Returns: { id: string; name: string }[] }
       staff_requests_to_decide: { Args: Record<PropertyKey, never>; Returns: { user_id: string; display_name: string; email: string; role: string; team_id: string; team_name: string; note: string; requested_at: string }[] }
       start_iq_level: { Args: { p_player_id: string | null; p_track: Database["public"]["Enums"]["iq_track"] | null; p_level: number | null; p_restart?: boolean | null; p_position?: Database["public"]["Enums"]["field_position"] | null }; Returns: string }

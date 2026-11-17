@@ -34,7 +34,7 @@ const TAB_NOTE: Record<string, string> = {
   "/dugout/gameday": "Lineups and defensive rotations",
   "/dugout/drills": "Every drill, tagged",
   "/dugout/budget": "Fees, payments and expenses",
-  "/dugout/parents": "Team code and parent requests",
+  "/dugout/parents": "Parent code and parent requests",
   "/dugout/mentors": "Mentors and skill coaches",
 };
 
@@ -386,10 +386,14 @@ async function HeadCoachHome({ role }: { role: StaffRole }) {
             </li>
             <li>
               Turn on your team code in Coaches Dugout →{" "}
+              <Link href="/dugout/roster" className="underline">
+                Roster
+              </Link>{" "}
+              for players and the parent code in{" "}
               <Link href="/dugout/parents" className="underline">
                 Parents
               </Link>{" "}
-              and share it with families.
+              for their families.
             </li>
             <li>Assistant coaches sign up and pick your team; approve them on the Roster tab.</li>
           </ol>
