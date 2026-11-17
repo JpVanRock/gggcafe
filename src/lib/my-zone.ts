@@ -17,6 +17,25 @@ export const ZONE_LABEL: Record<Exclude<ZoneState, "none">, { name: string; note
 
 export const ZONE_NOTES_MAX = 300;
 
+/**
+ * Two versions of My Zone (user, 2026-11-16): the Testing Result a coach marks from hitting testing,
+ * and her Player Choice. Her count plan follows the testing result when there is one.
+ */
+export const ZONE_SOURCES = ["testing", "player"] as const;
+export type ZoneSource = (typeof ZONE_SOURCES)[number];
+export const ZONE_SOURCE_LABEL: Record<ZoneSource, string> = { testing: "Testing Result", player: "Player Choice" };
+export type ZonesBySource = Record<ZoneSource, HittingZones | null>;
+
+/** Anything marked on this grid? */
+export function isMarked(zones: HittingZones | null): boolean {
+  return Boolean(zones && zones.hot.length + zones.strong.length + zones.weak.length);
+}
+
+/** The grid her count plan is built from: the testing result, else her own choice. */
+export function planSource(zones: ZonesBySource): ZoneSource | null {
+  return isMarked(zones.testing) ? "testing" : isMarked(zones.player) ? "player" : null;
+}
+
 /** Where a cell is (catcher's view). */
 export function cellName(cell: number): string {
   const row = cell <= 3 ? "Up" : cell <= 6 ? "Middle" : "Down";

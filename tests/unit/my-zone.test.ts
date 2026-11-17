@@ -1,7 +1,7 @@
 // Run with: npm run test:unit
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { cellName, cleanZones, countPlan, cycle, stateOf } from "../../src/lib/my-zone.ts";
+import { cellName, cleanZones, countPlan, cycle, stateOf, isMarked, planSource } from "../../src/lib/my-zone.ts";
 
 test("cells cycle through the states and stay in one list", () => {
   let z = { hot: [], strong: [], weak: [] } as { hot: number[]; strong: number[]; weak: number[] };
@@ -35,4 +35,16 @@ test("cell names", () => {
   assert.equal(cellName(1), "Up, left (catcher's view)");
   assert.equal(cellName(5), "Middle, center (catcher's view)");
   assert.equal(cellName(9), "Down, right (catcher's view)");
+});
+
+test("the count plan follows the testing result, else her own choice (user, 2026-11-16)", () => {
+  const testing = { hot: [5], strong: [4], weak: [] };
+  const player = { hot: [2], strong: [], weak: [9] };
+  const empty = { hot: [], strong: [], weak: [] };
+  assert.equal(planSource({ testing, player }), "testing");
+  assert.equal(planSource({ testing: empty, player }), "player");
+  assert.equal(planSource({ testing: null, player }), "player");
+  assert.equal(planSource({ testing: null, player: null }), null);
+  assert.equal(isMarked(empty), false);
+  assert.equal(isMarked(testing), true);
 });

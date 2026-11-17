@@ -4,10 +4,10 @@
 import { useState, useTransition } from "react";
 import { FormMessage, buttonClass, inputClass } from "@/components/ui";
 import { ZoneGrid } from "@/components/zone-grid";
-import { ZONE_LABEL, ZONE_NOTES_MAX, cycle, type HittingZones } from "@/lib/my-zone";
+import { ZONE_LABEL, ZONE_NOTES_MAX, cycle, type HittingZones, type ZoneSource } from "@/lib/my-zone";
 import { saveHittingZones } from "./zone-actions";
 
-export function ZoneEditor({ playerId, zones }: { playerId: string; zones: HittingZones | null }) {
+export function ZoneEditor({ playerId, source, zones }: { playerId: string; source: ZoneSource; zones: HittingZones | null }) {
   const [draft, setDraft] = useState<HittingZones>(zones ?? { hot: [], strong: [], weak: [] });
   const [notes, setNotes] = useState(zones?.notes ?? "");
   const [message, setMessage] = useState<{ error: string | null; saved?: boolean }>({ error: null });
@@ -31,13 +31,13 @@ export function ZoneEditor({ playerId, zones }: { playerId: string; zones: Hitti
             disabled={pending}
             onClick={() =>
               startTransition(async () => {
-                const res = await saveHittingZones({ playerId, ...draft, notes });
+                const res = await saveHittingZones({ playerId, source, ...draft, notes });
                 setMessage(res.error ? { error: res.error } : { error: null, saved: true });
               })
             }
             className={buttonClass}
           >
-            {pending ? "Saving…" : "Save My Zone"}
+            {pending ? "Saving…" : source === "testing" ? "Save testing result" : "Save my choice"}
           </button>
           <FormMessage error={message.error} saved={message.saved} />
         </div>

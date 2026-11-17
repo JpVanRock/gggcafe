@@ -15,4 +15,11 @@
   focus tip (out = scarlet red, big picture first; in = royal blue, zoom in first).
 - Preferred Hitting Style: the player herself or a coach changes it (`hitting_styles`, versioned; the
   player can only add rows in her own name; history shows who changed what).
+- Coach Observation and Player Choice (user, 2026-11-16: "coaches enter a players Hitting Style and Zone based upon
+  testing ... The Hitting Style should have a toggle switch that defaults to Coach Observation to Player Choice";
+  migration 20261117023236): `hitting_styles.source` is `coach` (from hitting testing; coaches write it, in the testing
+  words, `coachWords`) or `player` (her choice; she or a coach). Each keeps its own versions and history. The section
+  shows one at a time behind `HittingStyleToggle` (`hitting-toggle.tsx`), opening on Coach Observation. A player can
+  add only `player` rows (RLS). Rows saved before by a coach became the Coach Observation, hers her Player Choice.
+  Actions: `saveHittingStyle` takes `source` (coach: `editorCheck`; player: `actForCheck`).
 - Pop Report coach notes (players.notes) are shown to coaches only.

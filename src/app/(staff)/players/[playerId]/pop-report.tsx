@@ -7,7 +7,8 @@ import { currentRostering, type MetricProgress, type PopReport } from "./data";
 import { DetailHeading, MenuItem } from "./menu";
 import { HittingSection, MovementSection, movementHeadline } from "./movement";
 import type { StyleVersion } from "./data";
-import type { HittingZones } from "@/lib/my-zone";
+import type { ZonesBySource } from "@/lib/my-zone";
+import type { HittingSource } from "@/lib/movement";
 import { MyZoneSection } from "./my-zone";
 
 function metricValue(m: MetricProgress, value: number | null) {
@@ -66,7 +67,7 @@ export function PopDetail({
   /** Movement Preferences is G3 Advanced: "open" with it, "hidden" without (nothing says it exists) */
   movementAccess?: "open" | "hidden";
   /** Movement Preferences and Preferred Hitting Style, newest version first; My Zone */
-  styles?: { movement: StyleVersion[]; hitting: StyleVersion[]; zone?: HittingZones | null };
+  styles?: { movement: StyleVersion[]; hitting: Record<HittingSource, StyleVersion[]>; zone?: ZonesBySource };
   /** the player herself or a coach: can change her hitting style */
   canAct?: boolean;
   photoUrl?: string | null;
@@ -99,8 +100,8 @@ export function PopDetail({
       </section>
 
       {styles && movementAccess === "open" && <MovementSection playerId={player.id} versions={styles.movement} canManage={canEdit} />}
-      {styles && <HittingSection playerId={player.id} versions={styles.hitting} canAct={canAct} />}
-      {styles && <MyZoneSection playerId={player.id} zones={styles.zone ?? null} canAct={canAct} />}
+      {styles && <HittingSection playerId={player.id} versions={styles.hitting} canManage={canEdit} canAct={canAct} />}
+      {styles && <MyZoneSection playerId={player.id} zones={styles.zone ?? { testing: null, player: null }} canManage={canEdit} canAct={canAct} />}
 
       <section>
         <DetailHeading>Teams</DetailHeading>

@@ -1,12 +1,12 @@
 "use server";
 
-// Pop Report: Movement Preferences and Preferred Hitting Style.
+// Pop Report: Movement Preferences and Preferred Hitting Style (Coach Observation and Player Choice).
 import { refresh } from "next/cache";
 import { actForCheck, editorCheck } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { friendlyDbError, text, type FormState } from "@/lib/form";
+import { friendlyDbError, oneOf, text, type FormState } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
-import { HITTING, HITTING_KEYS, MOVEMENT, MOVEMENT_KEYS, changes, cleanValues, type Values } from "@/lib/movement";
+import { HITTING, HITTING_KEYS, HITTING_SOURCES, MOVEMENT, MOVEMENT_KEYS, changes, cleanValues, type Values } from "@/lib/movement";
 
 // ---------------------------------------------------------------------------
 // Movement Preferences (coaches) and Preferred Hitting Style (player or coach).
@@ -41,10 +41,15 @@ export async function saveMovement(_prev: FormState, fd: FormData): Promise<Form
   return { error: null, saved: true };
 }
 
+/**
+ * Her hitting style, as one of two versions (user, 2026-11-16): `source` "coach" is the Coach
+ * Observation from hitting testing (coaches only); "player" is her Player Choice (she, or a coach).
+ */
 export async function saveHittingStyle(_prev: FormState, fd: FormData): Promise<FormState> {
   const playerId = text(fd, "player_id");
   if (!isUuid(playerId)) return { error: "Unknown player." };
-  const denied = await actForCheck(playerId);
+  const source = oneOf(fd, "source", HITTING_SOURCES) ?? "player";
+  const denied = source === "coach" ? await editorCheck() : await actForCheck(playerId);
   if (denied) return { error: denied };
   const values = cleanValues(HITTING, formValues(fd, HITTING_KEYS));
   const supabase = await createClient();
@@ -52,11 +57,12 @@ export async function saveHittingStyle(_prev: FormState, fd: FormData): Promise<
     .from("hitting_styles")
     .select("*") // compared on HITTING_KEYS only (a built column list can't be typed)
     .eq("player_id", playerId)
+    .eq("source", source)
     .order("recorded_at", { ascending: false })
     .limit(1)
     .maybeSingle();
   if (latest && changes(HITTING, latest as Values, values).length === 0) return { error: null, saved: true };
-  const { error } = await supabase.from("hitting_styles").insert({ player_id: playerId, ...values });
+  const { error } = await supabase.from("hitting_styles").insert({ player_id: playerId, source, ...values });
   if (error) return { error: friendlyDbError(error) };
   refresh();
   return { error: null, saved: true };

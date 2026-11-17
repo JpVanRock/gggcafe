@@ -1373,6 +1373,7 @@ export type Database = {
           foot_down: "toe_to_heel" | "heel_to_toe" | "simultaneous" | null
           recorded_by: string | null
           recorded_at: string
+          source: "coach" | "player"
         }
         Insert: {
           id?: string
@@ -1388,6 +1389,7 @@ export type Database = {
           foot_down?: "toe_to_heel" | "heel_to_toe" | "simultaneous" | null
           recorded_by?: string | null
           recorded_at?: string
+          source?: "coach" | "player"
         }
         Update: {
           id?: string
@@ -1403,6 +1405,7 @@ export type Database = {
           foot_down?: "toe_to_heel" | "heel_to_toe" | "simultaneous" | null
           recorded_by?: string | null
           recorded_at?: string
+          source?: "coach" | "player"
         }
         Relationships: [
           {
@@ -1423,6 +1426,7 @@ export type Database = {
           notes: string | null
           updated_by: string | null
           updated_at: string
+          source: "testing" | "player"
         }
         Insert: {
           player_id: string
@@ -1432,6 +1436,7 @@ export type Database = {
           notes?: string | null
           updated_by?: string | null
           updated_at?: string
+          source?: "testing" | "player"
         }
         Update: {
           player_id?: string
@@ -1441,12 +1446,13 @@ export type Database = {
           notes?: string | null
           updated_by?: string | null
           updated_at?: string
+          source?: "testing" | "player"
         }
         Relationships: [
           {
             foreignKeyName: "hitting_zones_player_id_fkey"
             columns: ["player_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "players"
             referencedColumns: ["id"]
           },

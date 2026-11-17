@@ -10,8 +10,8 @@ import { AdvancedNotFoundForCoach, LEVEL_LABEL, advancedHref } from "../../../ad
 import { ChapterDone, ChapterNotes, FoundationHabits, MyHabits } from "../../../advanced-client";
 import { CourseRunner } from "../../../course-client";
 import { CountPlan } from "../../../my-zone";
-import type { HittingZones } from "@/lib/my-zone";
 import { firstName, loadPlayer } from "../../../section-data";
+import { countPlanZones } from "../../../data";
 import { SectionShell } from "../../section-shell";
 
 export const metadata: Metadata = { title: "G3 Advanced · GGG.Cafe" };
@@ -44,10 +44,8 @@ export default async function AdvancedChapterPage({ params }: PageProps<"/player
   const next = chapters[index + 1];
   const canEdit = access.canAct;
   const coming = chapter.status === "coming";
-  // her own tools on the page: the count plan from My Zone (Pop Report)
-  const zones = chapter.tools?.includes("count-plan")
-    ? (((await supabase.from("hitting_zones").select("hot, strong, weak, notes").eq("player_id", player.id).maybeSingle()).data as HittingZones | null) ?? null)
-    : null;
+  // her own tools on the page: the count plan from My Zone (Pop Report): the testing result, else her choice
+  const zones = chapter.tools?.includes("count-plan") ? await countPlanZones(supabase, player.id) : null;
 
   return (
     <SectionShell title={chapter.title} subtitle={`${chapterLabel(chapter, chapters)}${chapter.kicker ? ` · ${chapter.kicker}` : ""} · ${book.title} · ${LEVEL_LABEL}`}>

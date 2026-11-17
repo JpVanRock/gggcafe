@@ -17,6 +17,7 @@ export function StyleForm({
   action,
   coachWords = false,
   submitLabel,
+  source,
 }: {
   playerId: string;
   categories: Category[];
@@ -24,11 +25,14 @@ export function StyleForm({
   action: (prev: FormState, fd: FormData) => Promise<FormState>;
   coachWords?: boolean;
   submitLabel: string;
+  /** Preferred Hitting Style: which version this saves (coach observation or player choice) */
+  source?: string;
 }) {
   const [state, formAction] = useActionState(action, initialFormState);
   return (
     <form action={formAction} className="flex flex-col gap-4">
       <input type="hidden" name="player_id" value={playerId} />
+      {source && <input type="hidden" name="source" value={source} />}
       <div className="grid gap-4 sm:grid-cols-2">
         {categories.map((c) => (
           <label key={c.key} className="flex flex-col gap-1.5">

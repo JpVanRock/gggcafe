@@ -1,11 +1,12 @@
 import { Disclosure, EmptyState, eyebrowClass, cardClass } from "@/components/ui";
 import { MoveDial } from "@/components/move-dial";
 import { SpeedStripes } from "@/components/athletic";
-import { FOCUS_TIP, HITTING, MOVEMENT, changes, choiceOf, moveDial, type Category, type Values } from "@/lib/movement";
+import { FOCUS_TIP, HITTING, MOVEMENT, changes, choiceOf, moveDial, type Category, type HittingSource, type Values } from "@/lib/movement";
 import { saveHittingStyle, saveMovement } from "./pop-actions";
 import type { StyleVersion } from "./data";
 import { DetailHeading } from "./menu";
 import { StyleForm } from "./movement-client";
+import { HittingStyleToggle } from "./hitting-toggle";
 
 const stamp = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" });
 
@@ -116,22 +117,66 @@ export function MovementSection({ playerId, versions, canManage }: { playerId: s
   );
 }
 
-export function HittingSection({ playerId, versions, canAct }: { playerId: string; versions: StyleVersion[]; canAct: boolean }) {
-  const current = versions[0]?.values ?? {};
-  const hasAny = Object.values(current).some(Boolean);
-  return (
-    <section className="flex flex-col gap-5">
-      <div>
-        <DetailHeading>Preferred Hitting Style</DetailHeading>
-        <p className="-mt-1 text-sm text-muted">How you naturally set up and swing. There&apos;s no right or wrong: it&apos;s what feels natural to you.</p>
+/**
+ * Preferred Hitting Style (user, 2026-11-16): the Coach Observation from hitting testing (coaches write it,
+ * in their testing words) and her own Player Choice, one at a time behind a toggle that opens on Coach
+ * Observation. Each keeps its own history.
+ */
+export function HittingSection({
+  playerId,
+  versions,
+  canManage,
+  canAct,
+}: {
+  playerId: string;
+  versions: Record<HittingSource, StyleVersion[]>;
+  /** coaches: write the coach observation */
+  canManage: boolean;
+  /** she or a coach: write her player choice */
+  canAct: boolean;
+}) {
+  const panel = (source: HittingSource) => {
+    const list = versions[source];
+    const current = list[0]?.values ?? {};
+    const hasAny = Object.values(current).some(Boolean);
+    const coach = source === "coach";
+    const canWrite = coach ? canManage : canAct;
+    return (
+      <div className="flex flex-col gap-5">
+        <p className="text-sm text-muted">
+          {coach
+            ? "What your coach saw in your hitting testing."
+            : "How you naturally like to set up and swing. There's no right or wrong: it's what feels natural to you."}
+        </p>
+        {hasAny ? (
+          <Cards categories={HITTING} values={current} />
+        ) : (
+          <EmptyState>{coach ? "Not tested yet. Your coach adds this after your hitting testing." : "Not filled in yet."}</EmptyState>
+        )}
+        {canWrite && (
+          <Disclosure
+            summary={coach ? (hasAny ? "Update the coach observation" : "Add the coach observation") : hasAny ? "Change my hitting style" : "Fill in my hitting style"}
+            open={!hasAny}
+          >
+            <StyleForm
+              playerId={playerId}
+              categories={HITTING}
+              current={current}
+              action={saveHittingStyle}
+              source={source}
+              coachWords={coach}
+              submitLabel={coach ? "Save coach observation" : "Save my hitting style"}
+            />
+          </Disclosure>
+        )}
+        <History categories={HITTING} versions={list} />
       </div>
-      {hasAny ? <Cards categories={HITTING} values={current} /> : <EmptyState>Not filled in yet.</EmptyState>}
-      {canAct && (
-        <Disclosure summary={hasAny ? "Change my hitting style" : "Fill in my hitting style"} open={!hasAny}>
-          <StyleForm playerId={playerId} categories={HITTING} current={current} action={saveHittingStyle} submitLabel="Save hitting style" />
-        </Disclosure>
-      )}
-      <History categories={HITTING} versions={versions} />
+    );
+  };
+  return (
+    <section className="flex flex-col gap-4">
+      <DetailHeading>Preferred Hitting Style</DetailHeading>
+      <HittingStyleToggle panels={{ coach: panel("coach"), player: panel("player") }} />
     </section>
   );
 }

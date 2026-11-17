@@ -84,6 +84,26 @@ select pg_temp.expect('player cannot see GameDay Prep',
 reset role;
 select pg_temp.expect('player could not rewrite or delete history',
   (select string_agg(hands_height, ',' order by recorded_at) from public.hitting_styles), 'high,low');
+select pg_temp.expect('her own saves are her Player Choice', (select string_agg(distinct source, ',') from public.hitting_styles), 'player');
+
+-- Coach Observation (migration 20261117023236): coaches write it from testing; she reads it
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"77777777-0000-0000-0000-000000000002"}', false);
+do $$ begin
+  insert into public.hitting_styles (player_id, hands_height, source) values ('00000000-0000-0000-0000-0000000000c1', 'high', 'coach');
+  raise exception 'FAIL: a player wrote the coach observation';
+exception when insufficient_privilege then null;
+end $$;
+reset role;
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"77777777-0000-0000-0000-000000000001"}', false);
+insert into public.hitting_styles (player_id, hands_height, load_stride, source) values ('00000000-0000-0000-0000-0000000000c1', 'low', 'no_stride', 'coach');
+reset role;
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"77777777-0000-0000-0000-000000000002"}', false);
+select pg_temp.expect('she reads the coach observation', (select load_stride from public.hitting_styles where source = 'coach'), 'no_stride'),
+       pg_temp.expect('and her own choice', (select count(*) from public.hitting_styles where source = 'player'), 2::bigint);
+reset role;
 
 -- Viewer reads GameDay Prep, changes nothing
 set role authenticated;

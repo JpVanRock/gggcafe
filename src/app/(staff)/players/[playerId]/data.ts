@@ -11,7 +11,7 @@ import { HITTING_KEYS, MOVEMENT_KEYS, type Values } from "@/lib/movement";
 import { MENTAL_FIELDS, type MentalPlan } from "./shared";
 import { TRAINING_CATEGORY_LABEL, type Check, type Routine, type TrainingCategory } from "@/lib/achievements";
 import { phaseOn, phaseWeek } from "@/lib/training-plan";
-import type { HittingZones } from "@/lib/my-zone";
+import { planSource, type HittingZones, type ZoneSource } from "@/lib/my-zone";
 import { activeTeamIds, activeTeams } from "@/lib/roster";
 
 export { MENTAL_FIELDS, type MentalField, type MentalPlan } from "./shared";
@@ -658,11 +658,20 @@ export async function loadTeamDugout(supabase: Supabase, playerId: string): Prom
 
 export type StyleVersion = { id: string; recorded_at: string; by: string; values: Values };
 
+/** The grid her count plan follows: the Testing Result, else her Player Choice (user, 2026-11-16). */
+export async function countPlanZones(supabase: Supabase, playerId: string): Promise<HittingZones | null> {
+  const { data } = await supabase.from("hitting_zones").select("hot, strong, weak, notes, source").eq("player_id", playerId);
+  const of = (source: ZoneSource) => (data ?? []).find((z) => z.source === source) ?? null;
+  const zones = { testing: of("testing"), player: of("player") };
+  const from = planSource(zones);
+  return from ? zones[from] : null;
+}
+
 export async function loadMovementAndHitting(supabase: Supabase, playerId: string) {
   const [movementResult, hittingResult, zoneResult] = await Promise.all([
     supabase.from("movement_preferences").select("*").eq("player_id", playerId).order("recorded_at", { ascending: false }).limit(50),
     supabase.from("hitting_styles").select("*").eq("player_id", playerId).order("recorded_at", { ascending: false }).limit(50),
-    supabase.from("hitting_zones").select("hot, strong, weak, notes").eq("player_id", playerId).maybeSingle(),
+    supabase.from("hitting_zones").select("hot, strong, weak, notes, source").eq("player_id", playerId),
   ]);
   type Row = Record<string, string | null> & { id: string; recorded_at: string; recorded_by: string | null };
   const movementRows = (movementResult.data ?? []) as Row[];
@@ -678,10 +687,18 @@ export async function loadMovementAndHitting(supabase: Supabase, playerId: strin
     by: (r.recorded_by && names.get(r.recorded_by)) || "Coach",
     values: Object.fromEntries(keys.map((k) => [k, r[k] ?? null])),
   });
+  const zoneOf = (source: "testing" | "player") => {
+    const row = (zoneResult.data ?? []).find((z) => z.source === source);
+    return row ? ({ hot: row.hot, strong: row.strong, weak: row.weak, notes: row.notes } as HittingZones) : null;
+  };
   return {
     movement: movementRows.map(version(MOVEMENT_KEYS)),
-    hitting: hittingRows.map(version(HITTING_KEYS)),
-    /** My Zone (Phase 3) */
-    zone: (zoneResult.data as HittingZones | null) ?? null,
+    /** Coach Observation and Player Choice, each newest first (user, 2026-11-16) */
+    hitting: {
+      coach: hittingRows.filter((r) => r.source === "coach").map(version(HITTING_KEYS)),
+      player: hittingRows.filter((r) => r.source !== "coach").map(version(HITTING_KEYS)),
+    },
+    /** My Zone: the Testing Result and her Player Choice (user, 2026-11-16) */
+    zone: { testing: zoneOf("testing"), player: zoneOf("player") },
   };
 }

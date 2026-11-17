@@ -69,10 +69,25 @@ insert into public.hitting_zones (player_id, hot, strong, weak) values ('0000000
 select pg_temp.expect('a cell in two lists', pg_temp.err($$update public.hitting_zones set strong = '{4,5}' where player_id = '00000000-0000-0000-0000-0000000000c2'$$), '23514');
 select pg_temp.expect('no cell 10', pg_temp.err($$update public.hitting_zones set weak = '{10}' where player_id = '00000000-0000-0000-0000-0000000000c2'$$), '23514');
 select pg_temp.expect('not another player''s', pg_temp.err($$insert into public.hitting_zones (player_id, hot) values ('00000000-0000-0000-0000-0000000000c1', '{5}')$$), '42501');
+-- Testing Result vs her Player Choice (migration 20261117023236)
+select pg_temp.expect('her save is her Player Choice', (select source from public.hitting_zones where player_id = '00000000-0000-0000-0000-0000000000c2'), 'player');
+select pg_temp.expect('she can''t write the testing result',
+  pg_temp.err($$insert into public.hitting_zones (player_id, source, hot) values ('00000000-0000-0000-0000-0000000000c2', 'testing', '{9}')$$), '42501');
 reset role;
 set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"abababab-0000-0000-0000-000000000003"}', false);
+insert into public.hitting_zones (player_id, source, hot, strong, weak) values ('00000000-0000-0000-0000-0000000000c2', 'testing', '{2}', '{5}', '{7,9}');
+reset role;
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"abababab-0000-0000-0000-000000000001"}', false);
+select pg_temp.expect('she reads the testing result and her choice', (select count(*) from public.hitting_zones where player_id = '00000000-0000-0000-0000-0000000000c2'), 2::bigint);
+update public.hitting_zones set hot = '{9}' where source = 'testing';
+reset role;
+select pg_temp.expect('her update left the testing result alone', (select hot from public.hitting_zones where source = 'testing'), '{2}'::smallint[]);
+set role authenticated;
 select set_config('request.jwt.claims', '{"sub":"abababab-0000-0000-0000-000000000002"}', false);
-select pg_temp.expect('her mentor reads it', (select hot from public.hitting_zones where player_id = '00000000-0000-0000-0000-0000000000c2'), '{5}'::smallint[]);
+select pg_temp.expect('her mentor reads it', (select hot from public.hitting_zones where player_id = '00000000-0000-0000-0000-0000000000c2' and source = 'player'), '{5}'::smallint[]);
+select pg_temp.expect('and the testing result', (select hot from public.hitting_zones where player_id = '00000000-0000-0000-0000-0000000000c2' and source = 'testing'), '{2}'::smallint[]);
 select pg_temp.expect('mentor can''t change it', pg_temp.err($$insert into public.hitting_zones (player_id, hot) values ('00000000-0000-0000-0000-0000000000c1', '{5}')$$), '42501');
 reset role;
 

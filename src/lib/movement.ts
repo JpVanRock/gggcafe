@@ -266,6 +266,14 @@ export const HITTING: Category[] = [
 export const MOVEMENT_KEYS = MOVEMENT.map((c) => c.key);
 export const HITTING_KEYS = HITTING.map((c) => c.key);
 
+/**
+ * Two versions of her hitting style (user, 2026-11-16): what her coach saw in hitting testing (Coach
+ * Observation, coaches only) and her own Player Choice. The section's toggle opens on Coach Observation.
+ */
+export const HITTING_SOURCES = ["coach", "player"] as const;
+export type HittingSource = (typeof HITTING_SOURCES)[number];
+export const HITTING_SOURCE_LABEL: Record<HittingSource, string> = { coach: "Coach Observation", player: "Player Choice" };
+
 export type Values = Record<string, string | null>;
 
 export function choiceOf(categories: Category[], key: string, value: string | null | undefined): Choice | null {

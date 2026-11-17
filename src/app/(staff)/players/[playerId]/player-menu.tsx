@@ -66,7 +66,7 @@ export function PlayerMenu({
   iq: IqData;
   dugout: TeamDugout[];
   photoUrl: string | null;
-  styles: { movement: StyleVersion[]; hitting: StyleVersion[] };
+  styles: { movement: StyleVersion[]; hitting: { coach: StyleVersion[]; player: StyleVersion[] } };
   mental: MentalPlan | null;
   pop: PopReport;
   today: string;

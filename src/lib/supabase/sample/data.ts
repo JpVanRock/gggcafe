@@ -346,6 +346,16 @@ const parent_links: Row[] = [maya, emma].map((pid, i) => ({
   requested_at: "2026-11-01T00:00:00Z", decided_by: U.admin, decided_at: "2026-11-01T00:00:00Z",
 }));
 
+// Maya's hitting style and My Zone (user, 2026-11-16): the coach's from hitting testing and her own choice
+const hitting_styles: Row[] = [
+  { id: id("ahah00", 1), player_id: maya, source: "coach", hands_height: "high", hands_depth: "back", hands_reach: "proximal", feet_width: "wide", feet_angle: "neutral", weight: "centered", load_stride: "toe_tap", weight_shift: "no_shift", foot_down: "heel_to_toe", recorded_by: U.coach, recorded_at: "2026-11-05T18:00:00Z" },
+  { id: id("ahah00", 2), player_id: maya, source: "player", hands_height: "high", hands_depth: "back", hands_reach: "distal", feet_width: "wide", feet_angle: "open", weight: "back", load_stride: "leg_lift", weight_shift: "shift", foot_down: "toe_to_heel", recorded_by: null, recorded_at: "2026-11-08T21:00:00Z" },
+];
+const hitting_zones: Row[] = [
+  { player_id: maya, source: "testing", hot: [5], strong: [4, 6, 8], weak: [1, 3, 7], notes: "From the November 4 testing session.", updated_by: U.coach, updated_at: "2026-11-05T18:05:00Z" },
+  { player_id: maya, source: "player", hot: [4, 5], strong: [6, 8], weak: [3], notes: "I like it middle-in.", updated_by: null, updated_at: "2026-11-08T21:05:00Z" },
+];
+
 // the parent code (user, 2026-11-16): parents who join with it are approved when her name matches the roster
 const team_parent_codes: Row[] = [{ team_id: T.us, code: "PAR678", updated_at: "2026-11-16T18:00:00Z" }];
 
@@ -380,7 +390,7 @@ export const TABLES: Record<string, Row[]> = {
   team_culture, team_standards, player_advanced_access, player_leadership_access, player_leadership_certificates, measurements,
   mentors, mentor_links, mentor_messages, mentor_focus, mentor_notes, player_activities,
   budget_fees, budget_entries, budget_credits, budget_coach_expenses, player_mental_lessons, coach_mental_lessons, mental_game_plans,
-  team_hitting_philosophy, team_throwing_programs, player_journal_entries, parent_links, team_parent_codes, team_features_off, team_admins,
+  team_hitting_philosophy, team_throwing_programs, player_journal_entries, parent_links, team_parent_codes, hitting_styles, hitting_zones, team_features_off, team_admins,
   team_video_access, video_calls, video_call_players,
 };
 
