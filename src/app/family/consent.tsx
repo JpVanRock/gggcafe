@@ -43,7 +43,12 @@ export function ConsentAccept({
           <span className="font-semibold">Your earlier form wasn&apos;t accepted:</span> {declinedNote}
         </p>
       )}
-      <section aria-label="Parental consent notice" className="flex max-h-72 flex-col gap-3 overflow-y-auto rounded-lg border border-navy-700 bg-navy-900/60 p-4 text-sm">
+      {/* tabIndex: keyboard users can focus the box and scroll the notice with the arrow keys */}
+      <section
+        aria-label="Parental consent notice"
+        tabIndex={0}
+        className="flex max-h-72 flex-col gap-3 overflow-y-auto rounded-lg border border-navy-700 bg-navy-900/60 p-4 text-sm focus-visible:outline-2 focus-visible:outline-pink"
+      >
         {CONSENT_NOTICE.map((n) => (
           <div key={n.heading}>
             <p className="font-semibold">{n.heading}</p>
