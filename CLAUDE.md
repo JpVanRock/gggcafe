@@ -36,8 +36,8 @@ src/components/main-nav.tsx  top menu: staff get Dashboard/Coaches Dugout (opens
                          including /me and /family; players get "My profile". Every header is <SiteHeader>
                          (site-header.tsx): on phones the links fold behind a Menu button. Headers carry only our
                          logo. The coach/parent switch sits under the menu, left of the Switchboard pill
-                         (`switchboard-pill.tsx`, Coach and family pages alike). The team's logo sits large (104px, 152px from tablets: the 2026-11-13 size made 20% smaller,
-                         user 2026-11-14, with less space around it) right of the page title, tops lined up (user, 2026-11-13): the
+                         (`switchboard-pill.tsx`, Coach and family pages alike). The team's logo sits large (152px from tablets: the 2026-11-13 size made 20% smaller,
+                         user 2026-11-14, with less space around it; 64px on phones, user 2026-11-18, design audit) right of the page title, tops lined up (user, 2026-11-13): the
                          Coaches Dugout, the coaches' main pages (Dashboard, Teams, Players, Switchboard, Notifications, FAQ,
                          Health, View as) and the family page (wrap the <PageHeader> in `<TitleWithTeamLogo>`; `MyTeamLogo`,
                          `myTeamLogo()`), and top right of the player dashboard
@@ -239,7 +239,9 @@ like a sports brand or media-day graphics. Never childish or preschool.
   brand kit) for body and interface (text, buttons, navigation, forms, captions). Jost
   (`font-display`) for h1/h2 titles, tables, `dd` values, anything `tabular-nums`, outlined numerals
   and the award engravings: DM Sans has no tabular figures, so numbers wouldn't line up. The
-  Jost rule lives in `@layer base` in globals.css, so `font-mono` (Space Mono) still wins.
+  Jost rule lives in `@layer base` in globals.css, so `font-mono` still wins. Small labels and kickers are
+  DM Sans (user, 2026-11-18: Space Mono dropped); `font-mono` is the system monospace, nothing downloaded,
+  only for text people type exactly (a username, a code field). Label recipes: docs/features/ui-components.md.
 - Brand kit (Edition 03, from the user; not in the repo): colors Navy #000A2D, Neon Yellow #E7FB06,
   Neon Pink #FE1F7C, White. The site tokens (`navy-950`, `neon`, `pink`) use exactly these values;
   hard-coded glows use the same RGB (0 10 45 / 231 251 6 / 254 31 124). Tagline "Elevate Together": use ONLY the supplied artwork
