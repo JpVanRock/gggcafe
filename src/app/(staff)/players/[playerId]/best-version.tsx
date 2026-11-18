@@ -51,7 +51,7 @@ export function BestVersion({ playerId, answers, canEdit, safety }: { playerId: 
           ))}
         </ol>
 
-        <div className="rounded-xl border border-neon/60 bg-neon/5 p-4">
+        <div className="rounded-xl border border-neon-edge/60 bg-neon/5 p-4">
           <p className={label}>{CHALLENGE.title}</p>
           <p className="mt-2 font-semibold text-ink">{CHALLENGE.question}</p>
           <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted">

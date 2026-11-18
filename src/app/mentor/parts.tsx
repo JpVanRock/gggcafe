@@ -56,7 +56,7 @@ export function PlayerTiles({ cards, off }: { cards: MenteeCard[]; off?: Map<str
             <Link href={`/mentor/players/${p.id}`} className="flex items-center gap-4 rounded-2xl p-4 transition hover:bg-navy-800">
               {photo ? (
                 // eslint-disable-next-line @next/next/no-img-element -- short-lived signed Storage URL
-                <img src={photo} alt="" className="size-14 shrink-0 rounded-full border-2 border-neon object-cover" />
+                <img src={photo} alt="" className="size-14 shrink-0 rounded-full border-2 border-neon-edge object-cover" />
               ) : (
                 <span className="grid size-14 shrink-0 place-items-center rounded-full border-2 border-navy-600 font-display text-xl font-bold text-highlight">
                   {jersey ?? p.primary_position ?? "–"}

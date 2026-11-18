@@ -28,7 +28,7 @@ function QuickCheck({ check }: { check: NonNullable<CourseStep["check"]> }) {
                 disabled={chosen !== null}
                 onClick={() => setChosen(i)}
                 className={`flex w-full items-start gap-3 rounded-lg border p-3 text-left text-sm transition ${
-                  state === "right" ? "border-neon bg-neon/15" : state === "wrong" ? "border-pink bg-pink/15" : "border-navy-600 hover:border-pink disabled:hover:border-navy-600"
+                  state === "right" ? "border-neon-edge bg-neon/15" : state === "wrong" ? "border-pink bg-pink/15" : "border-navy-600 hover:border-pink disabled:hover:border-navy-600"
                 }`}
               >
                 <span className="font-mono font-bold text-muted">{LETTERS[i]}</span>
@@ -138,7 +138,7 @@ export function CourseRunner({
           </p>
         ))}
         {step.tryIt && (
-          <p className="mt-5 max-w-3xl rounded-xl border border-neon/60 bg-neon/5 p-4 text-sm">
+          <p className="mt-5 max-w-3xl rounded-xl border border-neon-edge/60 bg-neon/5 p-4 text-sm">
             <span className="mr-2 font-mono text-2xs font-bold tracking-widest text-highlight uppercase">Try it</span>
             {step.tryIt}
           </p>
@@ -159,7 +159,7 @@ export function CourseRunner({
             Next →
           </button>
         ) : finished ? (
-          <span className="rounded-full border border-neon bg-neon/10 px-3 py-1 text-sm font-semibold text-highlight">Course complete ✓</span>
+          <span className="rounded-full border border-neon-edge bg-neon/10 px-3 py-1 text-sm font-semibold text-highlight">Course complete ✓</span>
         ) : (
           <button type="button" disabled={pending} onClick={finish} className={buttonClass}>
             {pending ? "Saving…" : "Finish the course"}

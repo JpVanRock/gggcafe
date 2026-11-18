@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
  */
 export type SectionAccent = "neon" | "pink";
 const ACCENT: Record<SectionAccent, { rule: string; card: string }> = {
-  neon: { rule: "bg-neon", card: "border-t-4 border-t-neon" },
+  neon: { rule: "bg-neon", card: "border-t-4 border-t-neon-edge" },
   pink: { rule: "bg-pink", card: "border-t-4 border-t-pink" },
 };
 

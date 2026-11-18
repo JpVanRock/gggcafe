@@ -122,7 +122,7 @@ export function TwisChecklist({ playerId, cells, canEdit }: { playerId: string; 
                       <label className={`flex items-start gap-2.5 ${canEdit ? "cursor-pointer" : ""}`}>
                         <input
                           type="checkbox"
-                          className="mt-0.5 size-5 shrink-0 accent-pink"
+                          className="check-box mt-0.5 shrink-0"
                           checked={on}
                           disabled={!canEdit}
                           onChange={(e) => toggle(item, e.target.checked)}

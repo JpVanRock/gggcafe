@@ -59,7 +59,7 @@ export function BullpenRunner({ playerId, scriptId, pitches, canEdit, backHref }
           </div>
         )}
         {saved && (
-          <p role="status" className="rounded-xl border border-neon/60 bg-neon/10 p-4 text-sm">
+          <p role="status" className="rounded-xl border border-neon-edge/60 bg-neon/10 p-4 text-sm">
             Saved{saved.checked ? " and checked off in TWIS" : ""}. Your command by pitch type is on your Performance Training page.
           </p>
         )}

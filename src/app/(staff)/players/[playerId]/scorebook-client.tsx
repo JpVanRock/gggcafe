@@ -23,7 +23,7 @@ type Feedback = { chosen: number; correct: boolean; correctIndex: number; explan
 
 function choiceClass(state: "right" | "wrong" | "idle") {
   return `flex w-full items-start gap-3 rounded-lg border p-3 text-left text-sm transition ${
-    state === "right" ? "border-neon bg-neon/15" : state === "wrong" ? "border-pink bg-pink/15" : "border-navy-600 hover:border-pink disabled:hover:border-navy-600"
+    state === "right" ? "border-neon-edge bg-neon/15" : state === "wrong" ? "border-pink bg-pink/15" : "border-navy-600 hover:border-pink disabled:hover:border-navy-600"
   }`;
 }
 
@@ -300,7 +300,7 @@ export function ChapterRunner({
     return (
       <div className="flex flex-col gap-5">
         {heading}
-        <div className={`rounded-xl border p-6 text-center ${result.passed ? "border-neon bg-neon/10" : "border-pink/60 bg-pink/5"}`}>
+        <div className={`rounded-xl border p-6 text-center ${result.passed ? "border-neon-edge bg-neon/10" : "border-pink/60 bg-pink/5"}`}>
           <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">Chapter {n} quiz</p>
           {result.passed && (
             <div className="mt-4 flex justify-center">
@@ -452,7 +452,7 @@ export function ChapterRunner({
     <div className="flex flex-col gap-5">
       {heading}
       {earnedOn && (
-        <div className="flex items-center gap-3 rounded-xl border border-neon/60 bg-neon/5 px-4 py-3">
+        <div className="flex items-center gap-3 rounded-xl border border-neon-edge/60 bg-neon/5 px-4 py-3">
           <ManagerAward name={plate.name} engrave={false} size={44} />
           <p className="text-sm">
             <span className="font-bold text-highlight">Chapter complete.</span> Manager of the Year earned {earnedOn}.

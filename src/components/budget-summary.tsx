@@ -33,18 +33,19 @@ function Stat({
   note,
   tone = "ink",
   action,
+  className = "",
 }: {
   label: string;
   value: string;
   note?: string;
   tone?: "ink" | "highlight" | "danger";
   action?: ReactNode;
+  className?: string;
 }) {
   return (
-    <div className={`${cardClass("raised")} relative p-4`}>
-      {action && <div className="absolute top-3 right-3">{action}</div>}
-      {/* leave room for the Details button in the corner */}
-      <p className={`text-pink-soft ${action ? "pr-20" : ""} ${groupLabelClass}`}>{label}</p>
+    <div className={`${cardClass("raised")} relative min-w-0 p-4 ${className}`}>
+      {/* from 640px the Details button sits in the corner, with room left for it; on a phone's two columns it goes under the note */}
+      <p className={`text-pink-soft ${action ? "sm:pr-20" : ""} ${groupLabelClass}`}>{label}</p>
       <p
         className={`mt-1 font-display text-2xl font-bold tabular-nums ${
           tone === "highlight" ? "text-highlight" : tone === "danger" ? "text-danger" : "text-ink"
@@ -53,6 +54,7 @@ function Stat({
         {value}
       </p>
       {note && <p className="mt-0.5 text-xs text-muted">{note}</p>}
+      {action && <div className="mt-2 sm:absolute sm:top-3 sm:right-3 sm:mt-0">{action}</div>}
     </div>
   );
 }
@@ -136,13 +138,21 @@ export function BudgetSummary({ summary, showLedger = true }: { summary: BudgetS
           Last updated <span className="font-semibold text-ink">{formatLongDateAt(summary.updated_at)}</span>
         </p>
       )}
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {/* a two-column scoreboard on phones with the balance first, not six cards stacked (design audit M5) */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
         <Stat
           label="Registration"
           value={money(toCents(summary.fee_per_player))}
-          note={summary.fees.length ? summary.fees.map((f) => `${f.name} ${money(toCents(f.amount))}`).join(" · ") : "Not set yet"}
+          // the fees only when they say more than the total does ("Registration $450.00" under $450.00 said it twice)
+          note={
+            !summary.fees.length
+              ? "Not set yet"
+              : summary.fees.length === 1 && summary.fees[0].name === "Registration"
+                ? undefined
+                : summary.fees.map((f) => `${f.name} ${money(toCents(f.amount))}`).join(" · ")
+          }
         />
-        <div className={`${cardClass("raised")} p-4`}>
+        <div className={`${cardClass("raised")} min-w-0 p-4`}>
           <p className={`text-pink-soft ${groupLabelClass}`}>Collected</p>
           <p className="mt-1 font-display text-2xl font-bold text-highlight tabular-nums">{money(t.collected)}</p>
           <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-navy-800" aria-hidden>
@@ -165,7 +175,7 @@ export function BudgetSummary({ summary, showLedger = true }: { summary: BudgetS
           note={summary.entries.some((e) => e.kind === "expense") ? "Tap Details for each item" : undefined}
           action={<LineItems title="Expenses" kind="expense" entries={summary.entries} team={summary.team} />}
         />
-        <Stat label="Balance" value={money(t.balance)} note="Money in minus money out" tone={t.balance < 0 ? "danger" : "highlight"} />
+        <Stat label="Balance" value={money(t.balance)} note="Money in minus money out" tone={t.balance < 0 ? "danger" : "highlight"} className="order-first lg:order-none" />
       </div>
 
       {showLedger && (

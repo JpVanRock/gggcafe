@@ -24,6 +24,8 @@
   --color-muted: #a3acd1;    /* secondary text (8:1 on navy) */
   --color-neon: #e7fb06;     /* brand kit neon yellow: primary buttons, headings, numbers */
   --color-neon-bright: #f4ff66;
+  --color-neon-edge: #e7fb06; /* neon borders and rings: neon at night, navy by day (neon on white is 1.15:1) */
+  --color-numeral: rgb(254 31 124 / 0.45); /* the big outlined jersey number behind a name: a faint pink that reads at night */
   --color-pink: #fe1f7c;     /* brand kit neon pink: links, focus, selected, accents */
   --color-pink-soft: #ff6aa6;
   --color-danger: #ff7a7a;   /* errors, kept apart from the brand pink */
@@ -72,6 +74,8 @@
   --color-navy-700: #d3d9e8; /* borders */
   --color-navy-600: #a9b3ce; /* stronger borders */
   --color-field: #7c87a8;    /* form field edges: 3.3:1 on cards, 3.6:1 on white */
+  --color-neon-edge: #000a2d; /* a neon edge becomes a navy outline (design audit 2026-11-18, G3) */
+  --color-numeral: #dfe4ef;  /* by day it stays light, so it never runs through the name (design audit P5) */
   --color-ink: #000a2d;      /* main text: brand navy */
   --color-muted: #4a5578;    /* secondary text (7:1 on white) */
   --color-highlight: #000a2d;
@@ -93,6 +97,7 @@
   --color-navy-700: #1b2a63;
   --color-navy-600: #2c3d80;
   --color-field: #5b6bb0;
+  --color-neon-edge: #e7fb06;
   --color-ink: #f1f3fb;
   --color-muted: #a3acd1;
   --color-highlight: #e7fb06;
@@ -164,6 +169,35 @@ summary:focus-visible,
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/*
+ * A check-off box (TWIS): a 24px box with a pink edge, filled pink with a navy tick when done. The browser's
+ * own dark box read as disabled until it was ticked (design audit 2026-11-18, M9).
+ */
+.check-box {
+  appearance: none;
+  display: inline-grid;
+  place-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid var(--color-pink);
+  border-radius: 0.375rem;
+  background: var(--color-navy-950);
+  cursor: pointer;
+}
+.check-box:checked {
+  background: var(--color-pink)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23000a2d' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4.5 10.5 3.5 3.5 7.5-8'/%3E%3C/svg%3E")
+    center / 1rem no-repeat;
+}
+.check-box:focus-visible {
+  outline: 2px solid var(--color-pink);
+  outline-offset: 2px;
+}
+.check-box:disabled {
+  cursor: default;
+  opacity: 0.6;
 }
 
 /* While an <ActionForm> saves, its submit buttons dim and can't be pressed twice. */

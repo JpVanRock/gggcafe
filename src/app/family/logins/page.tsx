@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Card, Disclosure, badgeClass, buttonClass } from "@/components/ui";
+import { Card, Disclosure, badgeClass } from "@/components/ui";
 import { suggestUsername } from "@/lib/player-logins";
 import { consentStep } from "@/lib/consent";
 import { formatLongDateAt } from "@/lib/dates";
@@ -41,8 +41,9 @@ async function FamilyLogins() {
         line="Your daughter's login, parental consent for players under 13, and the teams you belong to."
         action={
           links.length > 0 && (
-            <Link href="/family" className={buttonClass}>
-              Go to my dashboard <span aria-hidden="true">→</span>
+            // a quiet way back, called what the header calls it: the page's own work comes first (design audit P6, C5)
+            <Link href="/family" className="text-sm font-semibold text-link hover:underline">
+              <span aria-hidden="true">←</span> Family menu
             </Link>
           )
         }
@@ -104,7 +105,7 @@ async function FamilyLogins() {
                       <ConsentOnFile playerId={d.player_id} firstName={first} status="verified" method={consent.method} date={formatLongDateAt(consent.reviewed_at)} />
                     )}
                     {/* the last step, unmistakable (user, 2026-11-16: the username didn't work because no login had been made) */}
-                    <div className="flex flex-col gap-1 rounded-xl border border-neon/60 bg-neon/5 p-4">
+                    <div className="flex flex-col gap-1 rounded-xl border border-neon-edge/60 bg-neon/5 p-4">
                       <p className="font-semibold">{consent?.status === "verified" ? `Last step: create ${possessive(first)} login` : `Create ${possessive(first)} login`}</p>
                       <p className="text-sm text-muted">
                         Pick her username and password, then press &quot;Create {possessive(first)} login&quot;. She signs in with them on the sign-in page:

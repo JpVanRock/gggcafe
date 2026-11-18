@@ -28,7 +28,7 @@ export function ComingUpCard({
 }) {
   const teamName = new Map(teams.map((t) => [t.id, t.name]));
   return (
-    <section aria-labelledby="coming-up" className="rounded-2xl border-2 border-neon bg-navy-900 p-6 sm:p-8">
+    <section aria-labelledby="coming-up" className="rounded-2xl border-2 border-neon-edge bg-navy-900 p-6 sm:p-8">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 id="coming-up" className="text-3xl leading-none font-bold tracking-wide text-highlight uppercase sm:text-4xl">
@@ -51,7 +51,7 @@ export function ComingUpCard({
                 {day.items.map((i) => (
                   <li
                     key={i.key}
-                    className={`flex flex-wrap items-baseline gap-x-3 gap-y-0.5 rounded-lg border-l-[3px] bg-navy-800/60 px-3 py-2 text-sm ${i.game ? "border-l-pink" : "border-l-neon"}`}
+                    className={`flex flex-wrap items-baseline gap-x-3 gap-y-0.5 rounded-lg border-l-[3px] bg-navy-800/60 px-3 py-2 text-sm ${i.game ? "border-l-pink" : "border-l-neon-edge"}`}
                   >
                     <span className="w-14 shrink-0 font-display text-muted tabular-nums">{time(i.start) ?? "TBA"}</span>
                     <span className="font-semibold">{i.game ? `Game ${i.title}` : i.title}</span>

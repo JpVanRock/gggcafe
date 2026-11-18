@@ -7,7 +7,7 @@ export function ConfirmNotice() {
   const confirm = useSearchParams().get("confirm");
   if (confirm === "done") {
     return (
-      <p role="status" className="rounded-lg border border-neon/60 bg-neon/10 p-3 text-center text-sm">
+      <p role="status" className="rounded-lg border border-neon-edge/60 bg-neon/10 p-3 text-center text-sm">
         Your email is confirmed. Sign in to finish setting up.
       </p>
     );

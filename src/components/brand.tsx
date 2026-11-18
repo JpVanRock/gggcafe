@@ -26,6 +26,8 @@ export function Wordmark({ className = "" }: { className?: string }) {
       alt="GGG.Cafe"
       width={913}
       height={189}
+      // it shows at 144-176px: without sizes every page loaded the 1080px file (design audit S2)
+      sizes="(min-width: 640px) 176px, 144px"
       className={`h-auto ${className}`}
     />
   );
@@ -46,7 +48,8 @@ export function SiteFooter() {
       </Link>
       {/* centered on phones and in the installed app (user, 2026-11-13); left-aligned on wider screens */}
       <div className="border-t border-navy-700 pt-4 text-center text-xs leading-relaxed text-muted sm:text-left standalone:text-center">
-        <p>{FOOTER_DISCLAIMER}</p>
+        {/* the rule stays full width; the text keeps a readable measure (design audit G8: 166 characters a line) */}
+        <p className="mx-auto max-w-[80ch] sm:mx-0 standalone:mx-auto">{FOOTER_DISCLAIMER}</p>
         <nav aria-label="Legal" className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1 sm:justify-start standalone:justify-center">
           <Link href="/terms" className={legalLink}>
             Terms of Service

@@ -110,6 +110,7 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
                           message={`Take team admin away from ${l.parent_name}? They keep their parent access.`}
                           className={buttonStyles("removeQuiet")}
                           confirmLabel="Take it away"
+                          label={`Remove ${l.parent_name} as team admin`}
                         >
                           Remove
                         </ConfirmSubmit>
@@ -136,6 +137,7 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
                   <ConfirmSubmit
                     message={`Remove ${l.parent_name}'s access to ${team.name}? If they shouldn't have had the parent code, make a new one too: they could join again with it.`}
                     className={buttonStyles("remove")}
+                    label={`Remove access for ${l.parent_name}`}
                   >
                     Remove access
                   </ConfirmSubmit>
@@ -196,7 +198,7 @@ async function PacketSection({ teamId }: { teamId: string }) {
               <div className="mt-2 flex flex-wrap items-center gap-3">
                 <ActionForm action={deletePacketItem}>
                   <input type="hidden" name="id" value={it.id} />
-                  <ConfirmSubmit message={`Remove "${it.title}" from the packet?`} className={buttonStyles("removeQuiet")}>
+                  <ConfirmSubmit message={`Remove "${it.title}" from the packet?`} label={`Remove ${it.title}`} className={buttonStyles("removeQuiet")}>
                     Remove
                   </ConfirmSubmit>
                 </ActionForm>

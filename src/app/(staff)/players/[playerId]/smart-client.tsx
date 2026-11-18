@@ -40,7 +40,7 @@ export function GoalMethodSwitch({ playerId, method, canEdit }: { playerId: stri
                 });
               }}
               className={`rounded-xl border-2 p-3 text-left transition ${
-                selected ? "border-neon bg-neon/10" : "border-navy-700 hover:border-pink disabled:hover:border-navy-700"
+                selected ? "border-neon-edge bg-neon/10" : "border-navy-700 hover:border-pink disabled:hover:border-navy-700"
               } ${!canEdit && !selected ? "opacity-50" : ""}`}
             >
               <span className={`block text-sm font-bold tracking-wider uppercase ${selected ? "text-highlight" : "text-ink"}`}>

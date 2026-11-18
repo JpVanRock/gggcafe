@@ -94,22 +94,23 @@ export { FormMessage } from "@/components/form-message";
  *   link         an action that reads as a text link
  * The text-only looks (remove, removeQuiet, link) are 40px tall on phones, so a thumb can hit them
  * (design audit 2026-11-18, M2: they were 18-22px).
- * Disabled buttons turn grey (not a dimmed neon) and show a not-allowed cursor.
+ * Disabled buttons turn grey (not a dimmed neon) and show a not-allowed cursor. Every boxed look dips 1px
+ * when pressed (active:), so a tap on a phone, which has no hover, still answers (design audit G4).
  */
 export type ButtonVariant = "primary" | "secondary" | "pill" | "pillOutline" | "pillQuiet" | "danger" | "remove" | "removeQuiet" | "link";
 
 const BUTTON: Record<ButtonVariant, string> = {
   primary:
-    "inline-flex items-center justify-center gap-2 rounded-md bg-neon px-4 py-2 text-sm font-semibold text-on-accent transition hover:bg-neon-bright disabled:cursor-not-allowed disabled:bg-navy-700 disabled:text-muted",
+    "inline-flex items-center justify-center gap-2 rounded-md bg-neon px-4 py-2 text-sm font-semibold text-on-accent transition hover:bg-neon-bright active:translate-y-px active:brightness-95 disabled:cursor-not-allowed disabled:bg-navy-700 disabled:text-muted",
   secondary:
-    "inline-flex items-center justify-center gap-2 rounded-md border border-navy-600 px-3 py-1.5 text-sm transition hover:border-pink hover:bg-navy-800 disabled:cursor-not-allowed disabled:opacity-50",
-  pill: "inline-flex items-center justify-center gap-2 rounded-full bg-neon px-5 py-2 text-sm font-semibold uppercase tracking-wider text-on-accent transition hover:bg-neon-bright disabled:cursor-not-allowed disabled:bg-navy-700 disabled:text-muted",
+    "inline-flex items-center justify-center gap-2 rounded-md border border-navy-600 px-3 py-1.5 text-sm transition hover:border-pink hover:bg-navy-800 active:translate-y-px active:bg-navy-700 disabled:cursor-not-allowed disabled:opacity-50",
+  pill: "inline-flex items-center justify-center gap-2 rounded-full bg-neon px-5 py-2 text-sm font-semibold uppercase tracking-wider text-on-accent transition hover:bg-neon-bright active:translate-y-px active:brightness-95 disabled:cursor-not-allowed disabled:bg-navy-700 disabled:text-muted",
   pillOutline:
-    "inline-flex items-center justify-center gap-2 rounded-full border border-pink px-5 py-2 text-sm font-semibold uppercase tracking-wider text-ink transition hover:bg-pink hover:text-on-accent disabled:cursor-not-allowed disabled:opacity-50",
+    "inline-flex items-center justify-center gap-2 rounded-full border border-pink px-5 py-2 text-sm font-semibold uppercase tracking-wider text-ink transition hover:bg-pink hover:text-on-accent active:translate-y-px active:brightness-95 disabled:cursor-not-allowed disabled:opacity-50",
   pillQuiet:
-    "inline-flex items-center justify-center gap-2 rounded-full border border-navy-600 px-4 py-2 text-sm transition hover:border-pink hover:bg-navy-800 disabled:cursor-not-allowed disabled:opacity-50",
+    "inline-flex items-center justify-center gap-2 rounded-full border border-navy-600 px-4 py-2 text-sm transition hover:border-pink hover:bg-navy-800 active:translate-y-px active:bg-navy-700 disabled:cursor-not-allowed disabled:opacity-50",
   danger:
-    "inline-flex items-center justify-center gap-2 rounded-md border border-danger/70 px-3 py-1.5 text-sm font-semibold text-danger transition hover:bg-danger hover:text-navy-950 disabled:cursor-not-allowed disabled:opacity-50",
+    "inline-flex items-center justify-center gap-2 rounded-md border border-danger/70 px-3 py-1.5 text-sm font-semibold text-danger transition hover:bg-danger hover:text-navy-950 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50",
   remove: "inline-flex min-h-10 items-center gap-1 text-xs text-danger hover:underline disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-0",
   removeQuiet: "inline-flex min-h-10 items-center gap-1 text-xs text-muted hover:text-danger disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-0",
   link: "inline-flex min-h-10 items-center gap-1 text-sm font-semibold text-link hover:underline disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-0",
@@ -167,8 +168,8 @@ const BADGE_TONE: Record<BadgeTone, string> = {
   ink: "border-navy-600 text-ink",
   pink: "border-pink/70 text-pink-soft",
   pinkSolid: "border-pink bg-pink text-on-accent",
-  neonOutline: "border-neon/70 text-highlight",
-  neon: "border-neon bg-neon text-on-accent",
+  neonOutline: "border-neon-edge/70 text-highlight",
+  neon: "border-neon-edge bg-neon text-on-accent",
   danger: "border-danger/70 text-danger",
 };
 
@@ -231,7 +232,7 @@ export function PageHeader({
         )}
         <h1 className="text-2xl font-semibold uppercase tracking-[0.08em] text-highlight">{title}</h1>
         <span aria-hidden className="mt-2 block h-0.5 w-12 rounded-full bg-pink" />
-        {description && <p className="mt-2 text-sm text-muted">{description}</p>}
+        {description && <p className="mt-2 max-w-prose text-sm text-muted">{description}</p>}
       </div>
       {children}
     </header>
@@ -277,16 +278,20 @@ export function Card({
 }
 
 /** A collapsible panel for forms ("Add a team", "Edit details"). */
+/**
+ * A section that opens on tap. Flat (a divider above, no box of its own), so it never becomes a card
+ * inside a card (design audit 2026-11-18, G7).
+ */
 export function Disclosure({ summary, children, open }: { summary: string; children: ReactNode; open?: boolean }) {
   return (
-    <details open={open} className="group rounded-xl border border-navy-700 bg-navy-900/70">
-      <summary className="cursor-pointer list-none rounded-xl px-4 py-3 text-sm font-semibold select-none hover:bg-navy-800">
+    <details open={open} className="group border-t border-navy-700">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center text-sm font-semibold select-none hover:text-link [&::-webkit-details-marker]:hidden">
         <span aria-hidden className="mr-2 inline-block text-link transition group-open:rotate-90">
           ›
         </span>
         {summary}
       </summary>
-      <div className="border-t border-navy-700 p-4">{children}</div>
+      <div className="pt-1 pb-4">{children}</div>
     </details>
   );
 }

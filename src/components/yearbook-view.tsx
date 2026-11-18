@@ -58,7 +58,7 @@ function TagChips({
             aria-pressed={on}
             onClick={() => onToggle(r.player_id)}
             className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold transition ${
-              on ? "border-neon bg-neon text-on-accent" : "border-navy-500 text-muted hover:border-pink hover:text-ink"
+              on ? "border-neon-edge bg-neon text-on-accent" : "border-navy-500 text-muted hover:border-pink hover:text-ink"
             }`}
           >
             {r.jersey ? `#${r.jersey} ` : ""}
@@ -283,7 +283,7 @@ function Lightbox({
               {photo.tags.length > 0 && (
                 <p className="flex flex-wrap gap-1.5">
                   {photo.tags.map((t) => (
-                    <span key={t.player_id} className="rounded-full border border-neon/60 px-2.5 py-0.5 text-xs font-semibold text-highlight">
+                    <span key={t.player_id} className="rounded-full border border-neon-edge/60 px-2.5 py-0.5 text-xs font-semibold text-highlight">
                       {t.name}
                     </span>
                   ))}
@@ -333,7 +333,7 @@ function Tile({ photo, size, url, onOpen }: { photo: YearbookPhoto; size: Return
     <button
       type="button"
       onClick={onOpen}
-      className={`group relative overflow-hidden rounded-xl border border-navy-700 bg-navy-900 text-left transition hover:border-neon ${span}`}
+      className={`group relative overflow-hidden rounded-xl border border-navy-700 bg-navy-900 text-left transition hover:border-neon-edge ${span}`}
     >
       {url && (
         // eslint-disable-next-line @next/next/no-img-element -- short-lived signed Storage URL
@@ -381,7 +381,7 @@ export function YearbookView({
   return (
     <div className="flex flex-col gap-8">
       {/* the cover */}
-      <section className="relative overflow-hidden rounded-3xl border-2 border-neon bg-linear-to-br from-navy-950 via-navy-900 to-navy-950 p-6 sm:p-10">
+      <section className="relative overflow-hidden rounded-2xl border-2 border-neon-edge bg-linear-to-br from-navy-950 via-navy-900 to-navy-950 p-6 sm:p-10">
         <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-1/2 opacity-80 sm:block" aria-hidden>
           {cover.map((p, i) => (
             // eslint-disable-next-line @next/next/no-img-element -- short-lived signed Storage URL
@@ -439,7 +439,7 @@ export function YearbookView({
                   href={`${seasonLink}${s.id}`}
                   aria-current={s.id === data.season?.id ? "page" : undefined}
                   className={`ml-1 rounded-full border px-3 py-1 text-xs font-semibold ${
-                    s.id === data.season?.id ? "border-neon text-highlight" : "border-navy-600 text-muted hover:border-pink"
+                    s.id === data.season?.id ? "border-neon-edge text-highlight" : "border-navy-600 text-muted hover:border-pink"
                   }`}
                 >
                   {s.name}
@@ -465,7 +465,7 @@ export function YearbookView({
                 className={`${inputClass} max-w-xs`}
               />
               {picked && (
-                <button type="button" onClick={() => setPlayer(null)} className="rounded-full border border-neon bg-neon px-3 py-1 text-xs font-bold text-on-accent">
+                <button type="button" onClick={() => setPlayer(null)} className="rounded-full border border-neon-edge bg-neon px-3 py-1 text-xs font-bold text-on-accent">
                   {picked.name} · {counts.get(picked.player_id) ?? 0} ×
                 </button>
               )}
@@ -478,7 +478,7 @@ export function YearbookView({
                   aria-pressed={player === r.player_id}
                   onClick={() => setPlayer(player === r.player_id ? null : r.player_id)}
                   className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold transition ${
-                    player === r.player_id ? "border-neon text-highlight" : "border-navy-600 text-muted hover:border-pink hover:text-ink"
+                    player === r.player_id ? "border-neon-edge text-highlight" : "border-navy-600 text-muted hover:border-pink hover:text-ink"
                   } ${counts.get(r.player_id) ? "" : "opacity-50"}`}
                 >
                   {r.name} <span className="font-display tabular-nums">{counts.get(r.player_id) ?? 0}</span>

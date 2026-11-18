@@ -51,7 +51,7 @@ export default async function LeadershipLessonPage({ params }: PageProps<"/playe
           ← {light ? "Leadership Light" : "Leadership Guide"}
         </Link>
 
-        <p className="max-w-3xl border-l-4 border-neon pl-4 text-2xl leading-snug font-semibold text-ink sm:text-3xl">{lesson.bigIdea}</p>
+        <p className="max-w-3xl border-l-4 border-neon-edge pl-4 text-2xl leading-snug font-semibold text-ink sm:text-3xl">{lesson.bigIdea}</p>
 
         <section className="flex max-w-3xl flex-col gap-4 text-ink/90">
           {lesson.body.map((p, i) => (

@@ -103,7 +103,7 @@ export default async function ScorebookGamesPage({ params }: PageProps<"/players
                 <Link
                   href={`/players/${player.id}/iq/scorebook/game/${game.n}`}
                   className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 transition hover:border-pink hover:bg-navy-800 ${
-                    g.status === "clean" ? "border-neon/50" : "border-navy-600"
+                    g.status === "clean" ? "border-neon-edge/50" : "border-navy-600"
                   }`}
                 >
                   {inner}

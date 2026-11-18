@@ -32,14 +32,14 @@ const BOARD = {
     numeral: "color-mix(in srgb, var(--color-highlight) 35%, transparent)",
   },
   outlineNeon: {
-    board: "border-2 border-neon bg-navy-900 text-ink [--menu-value:var(--color-highlight)] [--menu-note:var(--color-muted)]",
+    board: "border-2 border-neon-edge bg-navy-900 text-ink [--menu-value:var(--color-highlight)] [--menu-note:var(--color-muted)]",
     subtitle: "text-pink-soft",
     cta: "text-highlight",
     numeral: "color-mix(in srgb, var(--color-highlight) 35%, transparent)",
   },
   trophy: {
     board:
-      "border-2 border-neon bg-linear-to-b from-navy-800 to-navy-950 text-ink shadow-[0_0_36px_rgba(254,31,124,0.18)] [--menu-value:var(--color-highlight)] [--menu-note:var(--color-muted)]",
+      "border-2 border-neon-edge bg-linear-to-b from-navy-800 to-navy-950 text-ink shadow-[0_0_36px_rgba(254,31,124,0.18)] [--menu-value:var(--color-highlight)] [--menu-note:var(--color-muted)]",
     subtitle: "text-pink-soft",
     cta: "text-highlight",
     numeral: "rgb(254 31 124 / 0.45)",
@@ -121,9 +121,12 @@ export function MenuItem({ name, value, note }: { name: string; value?: ReactNod
   );
 }
 
-/** Heading inside a pop-up. */
+/**
+ * A section's heading on a section page or in a pop-up. An h2: section pages went from the page's h1
+ * straight to h3, a broken outline for screen-reader users (design audit 2026-11-18, A6).
+ */
 export function DetailHeading({ children }: { children: ReactNode }) {
-  return <h3 className={`mb-3 text-pink-soft ${groupLabelClass}`}>{children}</h3>;
+  return <h2 className={`mb-3 text-pink-soft ${groupLabelClass}`}>{children}</h2>;
 }
 
 
@@ -161,7 +164,12 @@ export function MenuPanel({
         {subtitle && <p className={`relative mt-2 font-mono text-xs tracking-[0.2em] uppercase ${style.subtitle}`}>{subtitle}</p>}
         <div className="relative mt-6 flex-1">{children}</div>
         {cta?.href ? (
-          <Link href={cta.href} className={`${ctaClass} hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-pink`}>
+          <Link
+            href={cta.href}
+            // two daughters' boards both say "All her goals": the name says whose (design audit A7)
+            aria-label={`${cta.label}: ${title}`}
+            className={`${ctaClass} hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-pink`}
+          >
             {cta.label} <span aria-hidden="true">→</span>
           </Link>
         ) : cta ? (
@@ -242,7 +250,12 @@ export function NeedsYou({ items, title = "Needs you" }: { items: NeedsItem[]; t
           <li key={i.key} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 py-2.5 text-sm">
             <span className="min-w-0">{i.text}</span>
             {i.href && (
-              <Link href={i.href} className="inline-flex min-h-10 shrink-0 items-center font-semibold text-link hover:underline sm:min-h-0">
+              <Link
+                href={i.href}
+                // "Add" and "Fill in" repeat per daughter: the name says which one (design audit A7)
+                aria-label={typeof i.text === "string" ? `${i.action ?? "Open"}: ${i.text}` : undefined}
+                className="inline-flex min-h-10 shrink-0 items-center font-semibold text-link hover:underline sm:min-h-0"
+              >
                 {i.action ?? "Open"} <span aria-hidden="true">→</span>
               </Link>
             )}

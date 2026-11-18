@@ -189,9 +189,10 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
                 <tr>
                   <th className={thClass}>#</th>
                   <th className={thClass}>Player</th>
-                  <th className={thClass}>Pos</th>
-                  <th className={thClass}>B/T</th>
-                  <th className={thClass}>Class</th>
+                  {/* phones: position, B/T and class go under her name, so the account column is on screen (design audit M6) */}
+                  <th className={`${thClass} hidden sm:table-cell`}>Pos</th>
+                  <th className={`${thClass} hidden sm:table-cell`}>B/T</th>
+                  <th className={`${thClass} hidden sm:table-cell`}>Class</th>
                   {editor && <th className={thClass}>Player account</th>}
                   {head && <th className={thClass}>Parents</th>}
                   {head && <th className={thClass}>G3 Advanced</th>}
@@ -218,6 +219,9 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
                           </Link>
                         )}
                         {!r.active && <span className="ml-2 text-xs">inactive</span>}
+                        <span className="block text-xs text-muted sm:hidden">
+                          {[[r.player.primary_position, ...r.player.secondary_positions].filter(Boolean).slice(0, 3).join(", "), batsThrows(r.player) !== "–" && batsThrows(r.player), r.player.grad_year].filter(Boolean).join(" · ")}
+                        </span>
                         {editor && (
                           // edit her name, profile and jersey here (user, 2026-11-13); next to the name so phones see it
                           <Link
@@ -229,9 +233,9 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
                           </Link>
                         )}
                       </td>
-                      <td className={tdClass}>{[r.player.primary_position, ...r.player.secondary_positions].filter(Boolean).slice(0, 3).join(", ") || "–"}</td>
-                      <td className={tdClass}>{batsThrows(r.player)}</td>
-                      <td className={`${tdClass} tabular-nums`}>{r.player.grad_year ?? "–"}</td>
+                      <td className={`${tdClass} hidden sm:table-cell`}>{[r.player.primary_position, ...r.player.secondary_positions].filter(Boolean).slice(0, 3).join(", ") || "–"}</td>
+                      <td className={`${tdClass} hidden sm:table-cell`}>{batsThrows(r.player)}</td>
+                      <td className={`${tdClass} hidden tabular-nums sm:table-cell`}>{r.player.grad_year ?? "–"}</td>
                       {editor && (
                         <td className={tdClass}>
                           {claim === "approved" ? <Pill tone="on">Claimed</Pill> : claim === "pending" ? <Pill tone="wait">Waiting</Pill> : <Pill tone="off">—</Pill>}

@@ -107,7 +107,7 @@ export default async function TrainingPage({ searchParams }: PageProps<"/dugout/
             <p className="mt-1 text-sm text-muted">Players see the phase and the week in TWIS, with its focus.</p>
           </div>
           {now && (
-            <p className="rounded-full border border-neon px-3 py-1 font-mono text-xs font-bold tracking-wider text-highlight uppercase">
+            <p className="rounded-full border border-neon-edge px-3 py-1 font-mono text-xs font-bold tracking-wider text-highlight uppercase">
               Now: {now.name} · Week {phaseWeek(now, today).week} of {phaseWeek(now, today).of}
             </p>
           )}
@@ -135,7 +135,7 @@ export default async function TrainingPage({ searchParams }: PageProps<"/dugout/
               {phases.map((p) => {
                 const weeks = phaseWeek(p, p.ends_on).of;
                 return (
-                  <li key={p.id} className={`rounded-xl border p-3 ${now?.id === p.id ? "border-neon" : "border-navy-700"}`}>
+                  <li key={p.id} className={`rounded-xl border p-3 ${now?.id === p.id ? "border-neon-edge" : "border-navy-700"}`}>
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                       <span aria-hidden className={`size-3 rounded-sm ${KIND_COLOR[p.kind]}`} />
                       <span className="font-display text-lg font-bold tracking-wide uppercase">{p.name}</span>

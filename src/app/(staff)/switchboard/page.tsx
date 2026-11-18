@@ -44,7 +44,7 @@ function Toggle({
         className="group inline-flex items-center gap-2 text-2xs font-bold tracking-[0.14em] uppercase"
       >
         <span className={on ? "text-highlight" : "text-muted"}>{on ? "On" : "Off"}</span>
-        <span className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${on ? "border-neon bg-neon" : "border-navy-600 bg-navy-800"}`}>
+        <span className={`relative inline-flex h-6 w-11 items-center rounded-full border transition ${on ? "border-neon-edge bg-neon" : "border-navy-600 bg-navy-800"}`}>
           <span className={`absolute size-4 rounded-full transition-all ${on ? "left-6 bg-navy-950" : "left-1 bg-muted"}`} />
         </span>
       </button>

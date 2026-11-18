@@ -66,7 +66,7 @@ export default async function AdvancedPage({ params }: PageProps<"/players/[play
       {leadProgress && (
         <Link
           href={leadershipHref(player.id)}
-          className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-neon bg-neon/5 p-5 transition hover:bg-neon/10"
+          className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-neon-edge bg-neon/5 p-5 transition hover:bg-neon/10"
         >
           <span>
             <span className="block font-mono text-2xs tracking-[0.2em] text-pink-soft uppercase">Picked by your coach</span>

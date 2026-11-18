@@ -53,7 +53,7 @@ export default async function LineupPage({ params, searchParams }: PageProps<"/d
         ← GameDay · {lineup.team.name}
       </Link>
       {typeof shared === "string" && lineup.status === "final" && (
-        <p role="status" className="rounded-xl border border-neon/60 bg-neon/10 px-4 py-3 text-sm font-semibold">
+        <p role="status" className="rounded-xl border border-neon-edge/60 bg-neon/10 px-4 py-3 text-sm font-semibold">
           {shared === "app" ? "Your email app opened with the lineup. Hit send there to share it." : `Emailed to ${n} coach${n === 1 ? "" : "es"} with the PDF attached.`}
         </p>
       )}

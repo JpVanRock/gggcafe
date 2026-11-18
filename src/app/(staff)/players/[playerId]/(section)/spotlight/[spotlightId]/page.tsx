@@ -34,7 +34,7 @@ export default async function SpotlightPage({ params }: PageProps<"/players/[pla
         <Link href={`/players/${playerId}/team#spotlight`} className="-mt-2 self-start text-sm text-link hover:underline">
           ← Team page
         </Link>
-        <article className="keep-night relative mx-auto w-full max-w-xl overflow-hidden rounded-2xl border-2 border-neon bg-linear-to-br from-navy-950 via-navy-900 to-navy-950 p-6 sm:p-8">
+        <article className="keep-night relative mx-auto w-full max-w-xl overflow-hidden rounded-2xl border-2 border-neon-edge bg-linear-to-br from-navy-950 via-navy-900 to-navy-950 p-6 sm:p-8">
           <span aria-hidden className="absolute inset-x-0 top-0 h-1.5 bg-linear-to-r from-pink via-pink to-neon" />
           {s.jersey && (
             <span className="pointer-events-none absolute -top-4 -right-2 font-display text-[11rem] leading-none font-black">

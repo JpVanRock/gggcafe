@@ -98,7 +98,7 @@ export function MentalTools({
         {upNext && (
           <Link
             href={`${base}/lessons/${upNext.lesson.slug}`}
-            className="flex flex-col gap-2 rounded-2xl border border-neon/40 bg-neon/5 p-4 transition hover:border-pink sm:flex-row sm:items-center sm:justify-between"
+            className="flex flex-col gap-2 rounded-2xl border border-neon-edge/40 bg-neon/5 p-4 transition hover:border-pink sm:flex-row sm:items-center sm:justify-between"
           >
             <span>
               <span className={`${eyebrowClass} block`}>Up next</span>
@@ -184,7 +184,7 @@ export function MentalTools({
             <div className={`${cardClass("inset")} relative flex h-28 items-end gap-1.5 px-3 pt-3 pb-2`} aria-hidden>
               {/* her zone as a band */}
               <span
-                className="absolute inset-x-0 border-y border-dashed border-neon/40 bg-neon/5"
+                className="absolute inset-x-0 border-y border-dashed border-neon-edge/40 bg-neon/5"
                 style={{ bottom: `${((zone.low ?? DEFAULT_ZONE.low) - 1) * 10 + 8}%`, height: `${((zone.high ?? DEFAULT_ZONE.high) - (zone.low ?? DEFAULT_ZONE.low) + 1) * 9}%` }}
               />
               {[...checks].reverse().map((c) => {

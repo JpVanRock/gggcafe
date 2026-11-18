@@ -134,7 +134,7 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
       <header className="flex flex-wrap items-center gap-5">
         {player.photo_path && photos.get(player.photo_path) && (
           // eslint-disable-next-line @next/next/no-img-element -- short-lived signed Storage URL
-          <img src={photos.get(player.photo_path)!} alt="" className="size-20 rounded-full border-2 border-neon object-cover" />
+          <img src={photos.get(player.photo_path)!} alt="" className="size-20 rounded-full border-2 border-neon-edge object-cover" />
         )}
         <div>
           <h1 className="text-4xl leading-none font-bold tracking-tight text-highlight uppercase sm:text-5xl">

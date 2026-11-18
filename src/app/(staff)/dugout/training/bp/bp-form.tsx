@@ -50,7 +50,7 @@ export function BpRoundForm({ players, today }: { players: { id: string; short: 
               onClick={() => setSwings((s) => [...s, g])}
               title={QAB_SCALE.find((x) => x.grade === g)?.label}
               className={`rounded-xl border py-3 font-display text-2xl font-bold tabular-nums transition ${
-                g >= 3 ? "border-neon/60 text-highlight hover:bg-neon/10" : "border-navy-600 text-ink hover:border-pink"
+                g >= 3 ? "border-neon-edge/60 text-highlight hover:bg-neon/10" : "border-navy-600 text-ink hover:border-pink"
               }`}
             >
               {g}

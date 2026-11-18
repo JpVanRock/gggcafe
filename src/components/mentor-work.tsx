@@ -43,7 +43,7 @@ export function FocusBoard({ items, controls, empty }: { items: FocusItem[]; con
           <section
             key={status}
             aria-label={FOCUS_LABEL[status]}
-            className={`rounded-xl border p-3 ${status === "working" ? "border-neon/50 bg-neon/5" : "border-pink/50 bg-pink/5"}`}
+            className={`rounded-xl border p-3 ${status === "working" ? "border-neon-edge/50 bg-neon/5" : "border-pink/50 bg-pink/5"}`}
           >
             <h4 className={label}>
               {FOCUS_LABEL[status]} <span className="text-muted">· {list.length}</span>

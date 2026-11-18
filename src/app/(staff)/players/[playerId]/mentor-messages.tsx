@@ -19,7 +19,7 @@ export function MessageCard({
   canDismiss: boolean;
 }) {
   return (
-    <article className={`flex flex-col gap-2 rounded-xl border p-4 ${m.read_at ? "border-navy-700" : "border-neon/60 bg-neon/5"}`}>
+    <article className={`flex flex-col gap-2 rounded-xl border p-4 ${m.read_at ? "border-navy-700" : "border-neon-edge/60 bg-neon/5"}`}>
       <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <span className="font-semibold text-ink">{m.sender_name}</span>
         <span className="font-mono text-2xs tracking-wider text-muted uppercase">{formatDay(m.created_at.slice(0, 10))}</span>
@@ -79,7 +79,7 @@ export function MentorAlerts({
     );
   }
   return (
-    <section aria-label="From your mentors" className="flex flex-col gap-3 rounded-2xl border-2 border-neon/70 bg-navy-900/60 p-4 sm:p-5">
+    <section aria-label="From your mentors" className="flex flex-col gap-3 rounded-2xl border-2 border-neon-edge/70 bg-navy-900/60 p-4 sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="flex items-center gap-3 font-mono text-2xs font-bold tracking-[0.25em] text-pink-soft uppercase">
           <SpeedStripes className="h-3 w-8 text-link" />

@@ -133,9 +133,10 @@ export function TrophyRoomSummary({ room }: { room: TrophyRoom }) {
   );
 }
 
+// a shelf is a section under a divider, not a card inside the page's card (design audit G7)
 function Shelf({ title, note, children }: { title: string; note?: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-navy-700 bg-navy-950/50 p-5">
+    <section className="border-t border-navy-700 pt-6">
       <DetailHeading>{title}</DetailHeading>
       {note && <p className="-mt-1 mb-4 text-xs text-muted">{note}</p>}
       {children}
@@ -162,7 +163,7 @@ export function TrophyRoomDetail({ room }: { room: TrophyRoom }) {
     <div className="flex flex-col gap-6">
       {/* leads with what to go after next (design audit 2026-11-18, P2) */}
       {next.length > 0 && (
-        <section aria-labelledby="next-awards" className="rounded-2xl border-2 border-neon bg-navy-900 p-5">
+        <section aria-labelledby="next-awards">
           <DetailHeading>
             <span id="next-awards">Next to earn</span>
           </DetailHeading>
@@ -267,7 +268,7 @@ export function TrophyRoomDetail({ room }: { room: TrophyRoom }) {
         {room.achievements.length ? (
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {room.achievements.map((a) => (
-              <li key={a.def.key} className="flex items-start gap-2.5 rounded-xl border border-neon/60 bg-neon/5 p-3">
+              <li key={a.def.key} className="flex items-start gap-2.5 rounded-xl border border-neon-edge/60 bg-neon/5 p-3">
                 <HexBadge unlocked pct={100} />
                 <div className="min-w-0">
                   <p className="text-sm font-bold text-highlight">{a.def.title}</p>

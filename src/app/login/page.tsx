@@ -19,9 +19,11 @@ export default function LoginPage() {
         </Link>
         {/* The tagline sits apart from the logo, never as a lockup (brand kit rule) */}
         {/* yellow at night, navy by day; kept apart from the logo (no lockup) */}
-        <h1 className="mt-8">
+        {/* the page's heading says what the page is; the tagline artwork stays exactly as it was, beside it (design audit A3) */}
+        <h1 className="sr-only">Sign in to GGG.Cafe</h1>
+        <div className="mt-8">
           <Tagline width={280} eager />
-        </h1>
+        </div>
         <span aria-hidden className="mt-2 block h-0.5 w-12 rounded-full bg-pink" />
         <p className="mt-3 text-sm text-muted">Good Vibes Only</p>
       </header>
@@ -36,7 +38,7 @@ export default function LoginPage() {
           Forgot your password?
         </Link>
         <Link href="/register" className="text-pink-soft underline hover:text-ink">
-          Create an account
+          New here? Sign up
         </Link>
       </div>
     </main>

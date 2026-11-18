@@ -66,7 +66,7 @@ export function VideoCallList({
             </span>
             <span className={badgeClass(state === "open" ? "neon" : state === "cancelled" ? "danger" : "neutral")}>{CALL_STATE_LABEL[state]}</span>
             {coming && (
-              <Link href={`/calls/${c.id}`} className={`text-sm font-semibold ${linkClass} hover:underline`}>
+              <Link href={`/calls/${c.id}`} aria-label={`${state === "open" ? "Join now" : "Call page"}: ${c.topic}`} className={`text-sm font-semibold ${linkClass} hover:underline`}>
                 {state === "open" ? "Join now →" : "Call page →"}
               </Link>
             )}

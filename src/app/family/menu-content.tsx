@@ -302,7 +302,7 @@ export function YearbookBanner({ teamNames, preview = false }: { teamNames: stri
       <span className="font-mono text-xs tracking-wider text-ink uppercase">Open →</span>
     </>
   );
-  const cls = "flex flex-wrap items-center justify-between gap-4 rounded-2xl border-2 border-neon bg-linear-to-r from-neon/10 to-pink/10 p-5 sm:p-6";
+  const cls = "flex flex-wrap items-center justify-between gap-4 rounded-2xl border-2 border-neon-edge bg-linear-to-r from-neon/10 to-pink/10 p-5 sm:p-6";
   return preview ? (
     <div className={cls}>{body}</div>
   ) : (

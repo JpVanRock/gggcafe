@@ -28,7 +28,7 @@ export function Flashcards({ cards }: { cards: CallCard[] }) {
 
   if (!card) {
     return (
-      <div className="flex flex-col items-center gap-4 rounded-2xl border border-neon/60 bg-neon/5 p-8 text-center">
+      <div className="flex flex-col items-center gap-4 rounded-2xl border border-neon-edge/60 bg-neon/5 p-8 text-center">
         <p className="font-display text-3xl font-bold text-highlight tabular-nums">
           {deck.known}/{cards.length}
         </p>
@@ -135,7 +135,7 @@ export function TeamQuizRunner({ playerId, quizId, questions, canAct }: { player
   if (finished && !view.fixing) {
     return (
       <div className="flex flex-col gap-5">
-        <div className="rounded-2xl border border-neon/60 bg-neon/5 p-6 text-center">
+        <div className="rounded-2xl border border-neon-edge/60 bg-neon/5 p-6 text-center">
           <p className="font-mono text-xs tracking-[0.2em] text-pink-soft uppercase">First try</p>
           <p className="mt-1 font-display text-5xl font-bold text-highlight tabular-nums">
             {score.firstTry}/{score.total}
@@ -178,7 +178,7 @@ export function TeamQuizRunner({ playerId, quizId, questions, canAct }: { player
                 onClick={() => choose(q, i)}
                 className={`w-full rounded-xl border px-4 py-3 text-left text-sm transition ${
                   isRight
-                    ? "border-neon bg-neon/15 font-semibold text-ink"
+                    ? "border-neon-edge bg-neon/15 font-semibold text-ink"
                     : isWrongPick
                       ? "border-danger bg-danger/10 text-ink"
                       : "border-navy-600 bg-navy-950/40 enabled:hover:border-pink"
@@ -191,7 +191,7 @@ export function TeamQuizRunner({ playerId, quizId, questions, canAct }: { player
         })}
       </ul>
       {reveal && (
-        <div className={`rounded-xl border px-4 py-3 text-sm ${a.is_correct ? "border-neon/60 text-ink" : "border-pink/60 text-ink"}`}>
+        <div className={`rounded-xl border px-4 py-3 text-sm ${a.is_correct ? "border-neon-edge/60 text-ink" : "border-pink/60 text-ink"}`}>
           <p className="font-semibold">{a.is_correct ? "Right." : "Not this time."}</p>
           {a.explanation && <p className="mt-1 text-base text-ink/90">{a.explanation}</p>}
         </div>

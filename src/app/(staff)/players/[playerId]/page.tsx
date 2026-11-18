@@ -73,7 +73,7 @@ export default async function PlayerDashboardPage({ params, searchParams }: Page
   const photoUrl = player.photo_path ? (photos?.get(player.photo_path) ?? null) : null;
 
   const callPanel = calls.length > 0 && (
-    <section aria-labelledby="video-calls" className="rounded-2xl border border-neon/50 bg-navy-900/70 px-5 py-4">
+    <section aria-labelledby="video-calls" className="rounded-2xl border border-neon-edge/50 bg-navy-900/70 px-5 py-4">
       <h2 id="video-calls" className="font-display text-xl leading-none font-bold tracking-wide text-highlight uppercase">
         Video calls
       </h2>

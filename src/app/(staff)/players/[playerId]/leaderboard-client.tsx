@@ -65,7 +65,7 @@ export function LogSessionForm({ playerId, today, daysBack }: { playerId: string
                 aria-pressed={on}
                 onClick={() => setKind(k.kind)}
                 className={`flex flex-col items-start gap-1 rounded-2xl border-2 p-4 text-left transition ${
-                  on ? "border-neon bg-neon/10" : "border-navy-600 hover:border-pink"
+                  on ? "border-neon-edge bg-neon/10" : "border-navy-600 hover:border-pink"
                 }`}
               >
                 <span className="flex w-full items-baseline justify-between gap-2">

@@ -25,7 +25,7 @@ export function RegisterForm() {
 
   if (state.checkEmail) {
     return (
-      <p role="status" className="rounded-lg border border-neon/60 bg-neon/10 p-4 text-sm">
+      <p role="status" className="rounded-lg border border-neon-edge/60 bg-neon/10 p-4 text-sm">
         Almost done. We sent a confirmation link to <strong>{state.values.email}</strong>. Open it on this device, then sign in and
         {mentor
           ? " enter the parent code to ask to work with one player (her parents approve you) or the whole team (the head coach does)."
@@ -101,8 +101,9 @@ export function RegisterForm() {
       <AgreementCheckbox />
 
       <FormMessage error={state.error} fields={state.fields} />
-      <SubmitButton pendingLabel="Creating your account…" className="w-full">
-        {role ? `Create ${SIGNUP_LABEL[role].toLowerCase()} account` : "Create account"}
+      <SubmitButton pendingLabel="Signing you up…" className="w-full">
+        {/* one name for this action everywhere: Sign up (design audit C3) */}
+        {role ? `Sign up as ${/^[AEIOU]/.test(SIGNUP_LABEL[role]) ? "an" : "a"} ${SIGNUP_LABEL[role].toLowerCase()}` : "Sign up"}
       </SubmitButton>
     </form>
   );

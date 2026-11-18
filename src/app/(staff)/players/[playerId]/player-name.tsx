@@ -18,10 +18,11 @@ export function PlayerName({ first, last, leaderHref }: { first: string; last: s
         {first} <span className="text-ink">{last}</span>
       </h1>
       {leaderHref && (
-        // -top-2.5: half the label's height, so the badge (not the label) centers on her name
+        // beside her name (640px up) -top-2.5 centers the badge, not its label, on the name; when it wraps under
+        // the name on a phone it keeps the full gap, so "TEAM LEAD" doesn't touch the name (design audit P5)
         <Link
           href={leaderHref}
-          className="relative -top-2.5 flex shrink-0 flex-col items-center gap-1.5 transition hover:scale-105"
+          className="relative flex shrink-0 flex-col items-center gap-1.5 transition hover:scale-105 sm:-top-2.5"
           title="Team Lead · Certificate of Leadership"
         >
           <span className="pl-[0.35em] font-mono text-xs leading-none font-normal tracking-[0.35em] whitespace-nowrap text-pink-soft">TEAM LEAD</span>

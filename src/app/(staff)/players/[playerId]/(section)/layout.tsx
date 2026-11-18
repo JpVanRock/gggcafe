@@ -46,7 +46,7 @@ async function SectionHeader({ params }: { params: LayoutProps<"/players/[player
   return (
     <div className="flex flex-col gap-3">
       <ParentViewBanner playerId={playerId} />
-      <Link href={`/players/${playerId}`} className="self-start text-sm text-muted hover:text-ink">
+      <Link href={`/players/${playerId}`} className="inline-flex min-h-10 items-center self-start text-sm text-muted hover:text-ink sm:min-h-0">
         ← Back to {name}&apos;s menu
       </Link>
       <Suspense fallback={<SectionNav playerId={playerId} advanced={advanced} hidden={hidden} />}>

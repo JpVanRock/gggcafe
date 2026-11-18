@@ -11,7 +11,7 @@ export function GotIt({ playerId, ids, label = "Got it" }: { playerId: string; i
       type="button"
       disabled={pending}
       onClick={() => startTransition(async () => void (await markMessagesRead({ playerId, ids })))}
-      className="rounded-full border border-neon px-3 py-1 text-xs font-semibold tracking-wider text-highlight uppercase transition hover:bg-neon hover:text-on-accent disabled:opacity-50"
+      className="rounded-full border border-neon-edge px-3 py-1 text-xs font-semibold tracking-wider text-highlight uppercase transition hover:bg-neon hover:text-on-accent disabled:opacity-50"
     >
       {pending ? "…" : label}
     </button>

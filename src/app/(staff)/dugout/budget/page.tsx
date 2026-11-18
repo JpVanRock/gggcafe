@@ -278,6 +278,26 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
         {players.length === 0 ? (
           <EmptyState>No active players on this season&apos;s roster.</EmptyState>
         ) : (
+          <>
+          {/* phones: each player on one line with her status and what she still owes beside her name, not a table
+              whose status column falls off the screen (design audit M6) */}
+          <ul className="divide-y divide-navy-700 sm:hidden">
+            {balances.map((b, i) => (
+              <li key={b.id} className="flex items-center justify-between gap-3 py-2.5">
+                <span className="min-w-0">
+                  <span className="block truncate text-sm font-medium">{options[i].label}</span>
+                  <span className="block text-xs text-muted tabular-nums">
+                    Paid {money(b.paid)} of {money(b.due)}
+                  </span>
+                </span>
+                <span className="flex shrink-0 flex-col items-end gap-1">
+                  <span className={badgeClass(STATUS[b.status].tone)}>{STATUS[b.status].label}</span>
+                  {b.owed > 0 && <span className="font-display text-sm font-semibold tabular-nums">{money(b.owed)} left</span>}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <div className="hidden sm:block">
           <TableScroll label="Player payments">
             <table className={tableClass}>
               <thead>
@@ -307,7 +327,8 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
                       </td>
                       <td className={`${tdClass} text-right tabular-nums`}>{money(b.due)}</td>
                       <td className={`${tdClass} text-right tabular-nums`}>{money(b.paid)}</td>
-                      <td className={`${tdClass} text-right font-semibold tabular-nums ${b.owed > 0 ? "text-pink-soft" : ""}`}>{money(b.owed)}</td>
+                      {/* plain text: pink is the link color, and the Unpaid / Partial chip carries the status (design audit G5) */}
+                      <td className={`${tdClass} text-right font-semibold tabular-nums`}>{money(b.owed)}</td>
                       <td className={tdClass}>
                         <span className={badgeClass(STATUS[b.status].tone)}>
                           {STATUS[b.status].label}
@@ -320,6 +341,8 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
               </tbody>
             </table>
           </TableScroll>
+          </div>
+          </>
         )}
       </Card>
 
@@ -380,7 +403,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
                             )}
                             <ActionForm action={deleteEntry}>
                               <input type="hidden" name="id" value={e.id} />
-                              <ConfirmSubmit message={`Remove “${item}” (${money(e.cents)}) from the ledger?`} className={buttonStyles("remove")}>
+                              <ConfirmSubmit message={`Remove “${item}” (${money(e.cents)}) from the ledger?`} label={`Remove ${item}, ${money(e.cents)}`} className={buttonStyles("remove")}>
                                 Remove
                               </ConfirmSubmit>
                             </ActionForm>
@@ -441,6 +464,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
                             <input type="hidden" name="id" value={c.id} />
                             <ConfirmSubmit
                               message={`Remove this tournament credit (${money(c.cents)}) from the credit balance?`}
+                              label={`Remove the ${c.description ? `${c.description} ` : ""}credit, ${money(c.cents)}`}
                               className={buttonStyles("remove")}
                             >
                               Remove
@@ -471,7 +495,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
             ].map(([label, cents]) => (
               <div key={label as string} className="flex min-w-0 items-baseline justify-between gap-3 rounded-xl border border-navy-700 bg-navy-950/50 p-3 sm:block">
                 <dt className="text-2xs font-semibold tracking-[0.14em] text-muted uppercase">{label}</dt>
-                <dd className={`mt-1 font-display text-2xl font-bold tabular-nums ${label === "Still owed" && (cents as number) > 0 ? "text-highlight" : ""}`}>
+                <dd className="mt-1 font-display text-2xl font-bold tabular-nums">
                   {money(cents as number)}
                 </dd>
               </div>
@@ -535,6 +559,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
                                 <input type="hidden" name="id" value={r.expense.id} />
                                 <ConfirmSubmit
                                   message={`Remove “${r.expense.item}” (${money(r.expense.cents)}) from Out of Pocket Expenses?`}
+                                  label={`Remove ${r.expense.item}, ${money(r.expense.cents)}`}
                                   className={buttonStyles("remove")}
                                 >
                                   Remove

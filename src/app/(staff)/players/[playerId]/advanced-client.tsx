@@ -110,7 +110,7 @@ export function FoundationHabits({
         {habits.map((h, i) => {
           const on = owned.has(h.key);
           return (
-            <li key={h.key} className={`flex items-start gap-4 rounded-xl border p-4 transition ${on ? "border-neon/70 bg-neon/5" : "border-navy-600"}`}>
+            <li key={h.key} className={`flex items-start gap-4 rounded-xl border p-4 transition ${on ? "border-neon-edge/70 bg-neon/5" : "border-navy-600"}`}>
               <span className="font-display text-2xl font-bold text-highlight tabular-nums">{String(i + 1).padStart(2, "0")}</span>
               <div className="min-w-0 flex-1">
                 <p className="font-semibold">{h.text}</p>
@@ -122,7 +122,7 @@ export function FoundationHabits({
                 disabled={!canEdit}
                 onClick={() => toggle(h.key)}
                 className={`shrink-0 rounded-full border px-3 py-1 text-xs font-semibold tracking-wider uppercase transition disabled:opacity-50 ${
-                  on ? "border-neon bg-neon text-on-accent" : "border-navy-500 text-muted hover:border-pink hover:text-ink"
+                  on ? "border-neon-edge bg-neon text-on-accent" : "border-navy-500 text-muted hover:border-pink hover:text-ink"
                 }`}
               >
                 {on ? "I own this ✓" : "I own this"}
@@ -279,7 +279,7 @@ export function ChapterDone({
     <div className="flex flex-wrap items-center gap-3">
       {done ? (
         <>
-          <span className="rounded-full border border-neon bg-neon/10 px-3 py-1 text-sm font-semibold text-highlight">Chapter complete ✓</span>
+          <span className="rounded-full border border-neon-edge bg-neon/10 px-3 py-1 text-sm font-semibold text-highlight">Chapter complete ✓</span>
           {canEdit && (
             <button
               type="button"
@@ -349,7 +349,7 @@ export function ConfirmPosition({
   const [pending, startTransition] = useTransition();
   return (
     <div className="flex flex-wrap items-center gap-3">
-      {confirmed && <span className="rounded-full border border-neon bg-neon/10 px-3 py-1 text-sm font-semibold text-highlight">Confirmed {label} ✓</span>}
+      {confirmed && <span className="rounded-full border border-neon-edge bg-neon/10 px-3 py-1 text-sm font-semibold text-highlight">Confirmed {label} ✓</span>}
       <button
         type="button"
         disabled={pending}

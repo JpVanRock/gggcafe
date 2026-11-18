@@ -97,7 +97,7 @@ export default async function LeadershipPlanPage({ params }: PageProps<"/players
           </p>
           <CoachSignOff playerId={player.id} name={name} signed={Boolean(lead.review.signedAt)} ready={ready} canManage={access.canManage} />
           {certificate && (
-            <Link href={leadershipHref(player.id, "certificate")} className="mt-4 inline-flex items-center gap-3 rounded-xl border border-neon/60 px-4 py-3 hover:bg-navy-800">
+            <Link href={leadershipHref(player.id, "certificate")} className="mt-4 inline-flex items-center gap-3 rounded-xl border border-neon-edge/60 px-4 py-3 hover:bg-navy-800">
               <LeaderBadge size={28} />
               <span className="font-semibold">View &amp; print the certificate →</span>
             </Link>

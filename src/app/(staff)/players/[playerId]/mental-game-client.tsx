@@ -100,7 +100,7 @@ export function IntensityForm({ playerId, zone }: { playerId: string; zone: { lo
         </p>
       </fieldset>
       {status && (
-        <p aria-live="polite" className={`rounded-lg border p-3 text-sm ${status === "in" ? "border-neon/60 bg-neon/5" : "border-pink/60 bg-pink/5"}`}>
+        <p aria-live="polite" className={`rounded-lg border p-3 text-sm ${status === "in" ? "border-neon-edge/60 bg-neon/5" : "border-pink/60 bg-pink/5"}`}>
           {ZONE_TIP[status]}
         </p>
       )}

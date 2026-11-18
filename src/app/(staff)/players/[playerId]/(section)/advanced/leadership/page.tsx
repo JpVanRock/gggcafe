@@ -27,7 +27,7 @@ function LessonList({ playerId, lessons, work, prefix }: { playerId: string; les
             <Link
               href={leadershipHref(playerId, l.slug)}
               className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 transition hover:border-pink hover:bg-navy-800 ${
-                w?.completedAt ? "border-neon/50" : "border-navy-600"
+                w?.completedAt ? "border-neon-edge/50" : "border-navy-600"
               }`}
             >
               <span className="w-10 shrink-0 font-display text-2xl font-bold text-highlight tabular-nums">
@@ -59,7 +59,7 @@ export default async function LeadershipPage({ params }: PageProps<"/players/[pl
       <SectionShell title={GUIDE_TITLE} subtitle="G3 Advanced · Leadership">
         <div className="flex flex-col gap-6">
           {certificate && (
-            <Link href={leadershipHref(player.id, "certificate")} className="flex items-center gap-3 self-start rounded-xl border border-neon/60 px-4 py-3 hover:bg-navy-800">
+            <Link href={leadershipHref(player.id, "certificate")} className="flex items-center gap-3 self-start rounded-xl border border-neon-edge/60 px-4 py-3 hover:bg-navy-800">
               <LeaderBadge size={28} />
               <span className="font-semibold">Certificate of Leadership →</span>
             </Link>
@@ -98,7 +98,7 @@ export default async function LeadershipPage({ params }: PageProps<"/players/[pl
         {certificate && (
           <Link
             href={leadershipHref(player.id, "certificate")}
-            className="flex flex-wrap items-center gap-4 rounded-2xl border-2 border-neon bg-linear-to-r from-neon/10 to-pink/10 p-4 transition hover:from-neon/15"
+            className="flex flex-wrap items-center gap-4 rounded-2xl border-2 border-neon-edge bg-linear-to-r from-neon/10 to-pink/10 p-4 transition hover:from-neon/15"
           >
             <LeaderBadge size={52} label />
             <span className="min-w-0 flex-1">
@@ -170,7 +170,7 @@ export default async function LeadershipPage({ params }: PageProps<"/players/[pl
 
         <Link
           href={leadershipHref(player.id, "plan")}
-          className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-neon bg-neon/5 p-5 transition hover:bg-neon/10"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-neon-edge bg-neon/5 p-5 transition hover:bg-neon/10"
         >
           <span>
             <span className="block font-display text-2xl font-bold tracking-wide text-highlight uppercase">{light ? "My Leader Plan" : "My Leadership Plan"}</span>

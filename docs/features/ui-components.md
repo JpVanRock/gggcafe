@@ -19,7 +19,9 @@ Never `text-[10px]`/`text-[11px]` or other arbitrary sizes under 12px **(tested)
 
 `text-highlight` for emphasis, `text-link` for pink text and links (brand pink at night, a darker
 pink by day, because brand pink is 3.7:1 on white) **(tested)**, `text-on-accent` on neon or pink
-fills, `text-pink-soft` for small pink labels. No zinc/gray/slate and no `dark:` **(tested)**.
+fills, `text-pink-soft` for small pink labels. No zinc/gray/slate and no `dark:` **(tested)**. Neon edges (borders, rings)
+use `border-neon-edge`: neon at night, brand navy by day, where neon on white is 1.15:1 **(tested)**. `--color-numeral` is
+the big outlined jersey number behind a name (faint pink at night, light by day so it never fights the name).
 
 ## Components (`src/components/ui.tsx` unless noted)
 
@@ -31,7 +33,7 @@ fills, `text-pink-soft` for small pink labels. No zinc/gray/slate and no `dark:`
 | `SubmitButton` (`submit-button.tsx`) | `variant?`, `pendingLabel?` ("Saving…"), button props | Spinner + "Saving…" while its form's action runs; disabled meanwhile. With `name`/`value`, only the pressed one spins. |
 | `ActionForm` (`action-form.tsx`) | `action`, form props | Shows the action's error after the controls; `aria-busy` while saving, and its submit buttons dim and can't be pressed twice. When the action returns `invalid("field", message)`, that field turns red (`aria-invalid`), gets focus, and clears when edited. |
 | `FormMessage` (`form-message.tsx`) | `error`, `saved?`, `fields?` | The message under a client form; pass `fields={state.fields}` and it marks the named fields the same way. |
-| `ConfirmSubmit` (`confirm-submit.tsx`) | `message`, `confirmLabel?`, `tone?` (`danger`/`primary`), `className` | A submit button that asks first in the site's own dialog. Cancel has focus; Esc or a click outside cancels. |
+| `ConfirmSubmit` (`confirm-submit.tsx`) | `message`, `confirmLabel?`, `tone?` (`danger`/`primary`), `className`, `label?` | A submit button that asks first in the site's own dialog. Cancel has focus; Esc or a click outside cancels. `label` names it for screen readers when the same text repeats on every row ("Remove Field rental, $120.00"). |
 | `confirmAction(message, options?)` | | The same dialog from code: `if (!(await confirmAction("Remove this session?"))) return;`. Never `window.confirm` **(tested)**. |
 | `Badge` / `badgeClass(tone, size?)` | tone: `neutral` `ink` `pink` `pinkSolid` `neonOutline` `neon` `danger`; size `sm`/`md` | Status chips (Draft, Final, Game-ready). `md` (32px tall) for chips that are buttons. No hand-made chips **(tested)**. |
 | `CountBadge` | `count`, `label`, `tone?` | Round counts in menus and tabs. Nothing at 0, "99+" past 99; screen readers hear `label`. |
@@ -40,7 +42,7 @@ fills, `text-pink-soft` for small pink labels. No zinc/gray/slate and no `dark:`
 | `groupLabelClass` | | The bold Space Mono label over a group, list or column ("UPCOMING", "NOTES"); add its color (`text-pink-soft`, `text-muted`). These three are the only small-label recipes: a hand-written `font-mono text-2xs font-bold tracking-[0.2em]` fails `ui-rules`. Labels stay short; a rule or sentence goes under the label in DM Sans (`text-sm text-muted`), not in spaced-out capitals. |
 | `Card` | `title?`, `actions?`, `tone?` (`raised`/`inset`), `className?` | `rounded-xl`; `inset` for a box inside a card. |
 | `cardClass(tone)` | `raised` / `inset` | The same box for a tile, list item or form that isn't a titled `Card`; add your own padding. The cafe-menu boards (`rounded-2xl`) keep their own looks. |
-| `Disclosure` | `summary`, `open?` | Collapsible form panels. |
+| `Disclosure` | `summary`, `open?` | A section that opens on tap. Flat (a divider above, no box), so it is never a card inside a card. |
 | `EmptyState` | `title?`, `children?`, `action?` | A whole section or list with nothing in it: say what will show up here, and give the action when the viewer can fix it. Inside a card that has other content, one muted sentence (`text-sm text-muted`) is lighter and enough. |
 | `Loading` | `label?` | Every `loading.tsx`: a pulsing outline of a page (still for reduced motion); screen readers hear "Loading…". |
 | `TabRow` (`tab-row.tsx`) | `label`, `current?` | A tab row that scrolls sideways (Dugout tabs, player sections, age groups): fades at the edge that has more tabs, and scrolls the current tab into view. |
@@ -81,7 +83,7 @@ edited (`components/field-errors.ts`). Hidden inputs are never marked.
 
 <ActionForm action={deleteGame}>
   <input type="hidden" name="id" value={game.id} />
-  <ConfirmSubmit message="Delete this game? Its box score goes too." className="text-xs text-danger hover:underline">
+  <ConfirmSubmit message="Delete this game? Its box score goes too." label={`Delete the game vs ${opponent}`} className={buttonStyles("remove")}>
     Delete
   </ConfirmSubmit>
 </ActionForm>
@@ -100,7 +102,14 @@ edited (`components/field-errors.ts`). Hidden inputs are never marked.
 
 - Phones: the site header is one row (logo, Night/Day switch, Menu) and scrolls away; it sticks only from 640px
   up. The Menu panel closes when a link is tapped or Esc is pressed.
-- Touch targets: anything you tap is at least 24px tall; chips that are buttons use `badgeClass(tone, "md")` (32px).
+- Touch targets: anything you tap is at least 24px tall; chips that are buttons use `badgeClass(tone, "md")` (32px);
+  text-only buttons (`remove`, `removeQuiet`, `link`) are 40px tall on phones. Check-offs use the `check-box` class
+  (globals.css): a 24px box with a pink edge, filled with a navy tick when done.
+- One box level: inside a card, groups are sections under a divider or a label, not more cards. Corners are
+  `rounded-2xl` at most **(tested)**. Headings go in order: a section page's h1, then `DetailHeading` (h2), then h3.
+- Phones: a wide table either hides the columns that matter least (`hidden sm:table-cell`, with what they held under
+  the name) or becomes a list of one line per row (Players, Budget payments) or labeled cards (GameDay player cards).
+  Paragraphs keep a readable measure (`max-w-prose`; the footer disclaimer 80 characters).
 - Motion: `motion-safe:` for animations; a global rule turns animations and transitions off for people whose
   device asks for less motion.
 - Focus: every link, button, summary and focusable region shows a pink outline when reached by keyboard.

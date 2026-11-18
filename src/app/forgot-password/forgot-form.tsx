@@ -13,7 +13,7 @@ export function ForgotForm() {
 
   if (state.sent) {
     return (
-      <div className="rounded-md border border-neon/60 bg-neon/10 p-4 text-sm" role="status">
+      <div className="rounded-md border border-neon-edge/60 bg-neon/10 p-4 text-sm" role="status">
         <p className="font-semibold text-highlight">Check your email.</p>
         <p className="mt-1 text-ink/90">
           If {state.email} has a GGG.Cafe account, a reset link is on its way. Open it in this browser within the hour.

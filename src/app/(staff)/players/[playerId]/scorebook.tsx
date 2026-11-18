@@ -147,7 +147,7 @@ export function CourseCard({ playerId, course, plate }: { playerId: string; cour
                 <Link
                   href={chapterHref(playerId, c.n)}
                   className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 transition hover:border-pink hover:bg-navy-800 ${
-                    c.status === "complete" ? "border-neon/50" : "border-navy-600"
+                    c.status === "complete" ? "border-neon-edge/50" : "border-navy-600"
                   }`}
                 >
                   {inner}

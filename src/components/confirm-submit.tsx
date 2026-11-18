@@ -100,10 +100,13 @@ export function ConfirmSubmit({
   children,
   confirmLabel,
   tone,
+  label: name,
 }: {
   message: string;
   className?: string;
   children: ReactNode;
+  /** what screen readers hear when the text alone is the same on every row ("Remove Field rental") */
+  label?: string;
 } & Options) {
   const button = useRef<HTMLButtonElement>(null);
   const label = confirmLabel ?? (typeof children === "string" && children.trim().length <= 24 ? children.trim() : "Yes");
@@ -112,6 +115,7 @@ export function ConfirmSubmit({
       ref={button}
       type="button"
       aria-haspopup="dialog"
+      aria-label={name}
       className={className}
       onClick={async () => {
         if (await confirmAction(message, { confirmLabel: label, tone })) button.current?.form?.requestSubmit();

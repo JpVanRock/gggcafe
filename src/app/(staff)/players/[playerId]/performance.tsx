@@ -116,7 +116,7 @@ function AchievementBadge({ a }: { a: AchievementProgress }) {
   const unlocked = Boolean(a.unlockedOn);
   return (
     <li
-      className={`rounded-xl border p-3 ${unlocked ? "border-neon bg-neon/10" : "border-navy-700 bg-navy-950/40"}`}
+      className={`rounded-xl border p-3 ${unlocked ? "border-neon-edge bg-neon/10" : "border-navy-700 bg-navy-950/40"}`}
       aria-label={`${a.def.title}: ${unlocked ? "unlocked" : `${a.current} of ${a.target}`}`}
     >
       <div className="flex items-start gap-2.5">

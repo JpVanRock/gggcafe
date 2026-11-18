@@ -64,7 +64,7 @@ export default async function DraftPage({ searchParams }: PageProps<"/dugout/tra
       ) : (
         <>
           {remaining.length > 0 && clock ? (
-            <section className="flex flex-col gap-4 rounded-2xl border-2 border-neon p-5">
+            <section className="flex flex-col gap-4 rounded-2xl border-2 border-neon-edge p-5">
               <p className="font-mono text-xs tracking-[0.3em] text-pink-soft uppercase">On the clock · pick {picks + 1}</p>
               <p className="font-display text-4xl leading-none font-bold tracking-tight text-highlight uppercase">{clock.name}</p>
               <p className="text-sm text-muted">Captain {nameOf.get(clock.captain_id) ?? ""}. Tap the player she picks.</p>
@@ -84,14 +84,14 @@ export default async function DraftPage({ searchParams }: PageProps<"/dugout/tra
               </ul>
             </section>
           ) : (
-            <p className="rounded-xl border border-neon/60 bg-neon/10 p-4 text-sm font-semibold">The draft is done. Every player on the roster has a squad.</p>
+            <p className="rounded-xl border border-neon-edge/60 bg-neon/10 p-4 text-sm font-semibold">The draft is done. Every player on the roster has a squad.</p>
           )}
 
           <section className="flex flex-col gap-3">
             <h2 className={heading}>Squads</h2>
             <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {standings.map((s) => (
-                <li key={s.id} className={`rounded-2xl border p-4 ${clock?.id === s.id && remaining.length ? "border-neon" : "border-navy-600"}`}>
+                <li key={s.id} className={`rounded-2xl border p-4 ${clock?.id === s.id && remaining.length ? "border-neon-edge" : "border-navy-600"}`}>
                   <p className="font-display text-xl font-bold tracking-wide uppercase">{s.name}</p>
                   <p className="font-mono text-xs text-muted">
                     {s.points} pts · {s.weekPoints} this week

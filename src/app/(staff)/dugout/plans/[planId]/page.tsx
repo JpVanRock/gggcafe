@@ -23,7 +23,7 @@ function SharedBanner({ shared }: { shared: string }) {
       ? "Your email app opened with the plan. Hit send there to share it."
       : `Emailed to ${n} coach${n === 1 ? "" : "es"} with the PDF attached.`;
   return (
-    <p role="status" className="rounded-xl border border-neon/60 bg-neon/10 px-4 py-3 text-sm font-semibold text-ink">
+    <p role="status" className="rounded-xl border border-neon-edge/60 bg-neon/10 px-4 py-3 text-sm font-semibold text-ink">
       {message}
     </p>
   );

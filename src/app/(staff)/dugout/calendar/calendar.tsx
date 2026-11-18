@@ -48,7 +48,7 @@ const time = (t: string | null) => {
 };
 const eventTitle = (e: CalEvent) => e.title || EVENT_KIND_LABEL[e.kind];
 const KIND_ACCENT: Record<EventKind, string> = {
-  practice: "border-l-neon",
+  practice: "border-l-neon-edge",
   workout: "border-l-pink",
   lesson: "border-l-pink-soft",
   meeting: "border-l-muted",
@@ -62,8 +62,11 @@ function EventChip({ event, onOpen }: { event: CalEvent; onOpen: () => void }) {
       onClick={onOpen}
       className={`block w-full truncate rounded border-l-[3px] bg-navy-800 px-1.5 py-0.5 text-left text-xs leading-5 hover:bg-navy-700 ${KIND_ACCENT[event.kind]}`}
       title={eventTitle(event)}
+      // time, title and day, so a weekly event isn't "4 PMSpeed and agility" three times over (design audit A7)
+      aria-label={[time(event.start), eventTitle(event), dayLabel(event.date)].filter(Boolean).join(", ")}
     >
-      {time(event.start) && <span className="mr-1 font-display tabular-nums text-muted">{time(event.start)}</span>}
+      {/* a real space after the time, so screen readers don't hear "4 PMSpeed and agility" (design audit A7) */}
+      {time(event.start) && <span className="font-display tabular-nums text-muted">{time(event.start)} </span>}
       <span className="font-semibold">{eventTitle(event)}</span>
     </button>
   );
@@ -77,7 +80,7 @@ function GameChip({ game, onOpen }: { game: CalGame; onOpen: () => void }) {
       className="block w-full truncate rounded bg-pink px-1.5 py-0.5 text-left text-xs leading-5 font-semibold text-on-accent hover:opacity-90"
       title={`Game ${game.label}`}
     >
-      {time(game.start) && <span className="mr-1 font-display tabular-nums">{time(game.start)}</span>}
+      {time(game.start) && <span className="font-display tabular-nums">{time(game.start)} </span>}
       {game.label}
     </button>
   );
@@ -372,12 +375,15 @@ export function CalendarView({
                   )}
                 </div>
                 <div className="flex flex-col gap-1">
+                  {/* chips shorten with "…" like event titles instead of running past the cell (design audit P7) */}
                   {offLabel && (
-                    <span className={badgeClass("neon")}>{offLabel}</span>
+                    <span className={`${badgeClass("neon")} max-w-full`} title={offLabel}>
+                      <span className="truncate">{offLabel}</span>
+                    </span>
                   )}
                   {phaseStart && (
-                    <span className={badgeClass("pink")}>
-                      {phaseStart.name} begins
+                    <span className={`${badgeClass("pink")} max-w-full`} title={`${phaseStart.name} begins`}>
+                      <span className="truncate">{phaseStart.name} begins</span>
                     </span>
                   )}
                   {g.map((game) => (

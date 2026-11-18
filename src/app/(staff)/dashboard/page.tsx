@@ -31,7 +31,7 @@ const heading = `text-pink-soft ${groupLabelClass}`;
 const TAB_NOTE: Record<string, string> = {
   "/dugout/roster": "Your roster, player accounts, approvals",
   "/dugout": "What your team stands for",
-  "/dugout/calendar": "Dates that show in TWIS",
+  "/dugout/calendar": "Practices, games and team events",
   "/dugout/plans": "Build, print and share",
   "/dugout/training": "Roadmap, team routines, testing",
   "/dugout/gameday": "Lineups and defensive rotations",
@@ -268,7 +268,7 @@ async function CheckIns() {
   }[];
   if (checkIns.length === 0) return null;
   return (
-    <section className="rounded-2xl border border-neon/60 bg-neon/5 p-4 sm:p-5" aria-label="Leadership check-ins">
+    <section className="rounded-2xl border border-neon-edge/60 bg-neon/5 p-4 sm:p-5" aria-label="Leadership check-ins">
       <h2 className={heading}>Leadership check-ins · next two weeks</h2>
       <ul className="mt-3 flex flex-col gap-2">
         {checkIns.map((c) => (
@@ -304,7 +304,7 @@ function DugoutCard({ role, counts }: { role: StaffRole; counts: TileCounts }) {
     <Card title="Coaches Dugout">
       <div className="flex flex-col gap-5">
         {groups.map((g) => (
-          <section key={g.title} aria-label={g.title}>
+          <div key={g.title}>
             <h3 className={`mb-2 text-muted ${groupLabelClass}`}>{g.title}</h3>
             <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {g.tabs.map((tab) => {
@@ -322,7 +322,7 @@ function DugoutCard({ role, counts }: { role: StaffRole; counts: TileCounts }) {
                 );
               })}
             </ul>
-          </section>
+          </div>
         ))}
       </div>
     </Card>

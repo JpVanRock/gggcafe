@@ -166,7 +166,7 @@ function BadgeTrackPicker({ tracks, actions }: { tracks: BadgeTrackInfo[]; actio
     <div className="grid gap-4 lg:grid-cols-2">
       {tracks.map((t) => (
         <section key={t.track} className={`${cardClass("inset")} p-4`}>
-          <h4 className="text-lg font-bold tracking-wide uppercase">{t.label}</h4>
+          <h3 className="text-lg font-bold tracking-wide uppercase">{t.label}</h3>
           <p className="mt-0.5 text-xs text-muted">{t.blurb}</p>
           <ul className="mt-4 grid gap-2">
             {t.levels.map((l) => {
@@ -203,6 +203,8 @@ function BadgeTrackPicker({ tracks, actions }: { tracks: BadgeTrackInfo[]; actio
                         type="button"
                         disabled={!actions.canEdit || actions.pending}
                         onClick={() => actions.start(key)}
+                        // which test: three "Start" buttons read alike in a list (design audit A7)
+                        aria-label={`${l.status === "earned" ? "Retake" : "Start"} ${t.label} level ${l.level}`}
                         className={l.status === "earned" ? secondaryButtonClass : buttonClass}
                       >
                         {l.status === "earned" ? "Retake" : "Start"}
@@ -225,7 +227,7 @@ function TrackPicker({ tracks, actions }: { tracks: TrackInfo[]; actions: Action
     <div className="grid gap-4 lg:grid-cols-2">
       {tracks.map((t) => (
         <section key={t.track} className={`${cardClass("inset")} p-4`}>
-          <h4 className="text-lg font-bold tracking-wide uppercase">{t.label}</h4>
+          <h3 className="text-lg font-bold tracking-wide uppercase">{t.label}</h3>
           <p className="mt-0.5 text-xs text-muted">{t.blurb}</p>
           <ul className="mt-4 grid gap-2">
             {t.levels.map((l) => {
@@ -260,6 +262,8 @@ function TrackPicker({ tracks, actions }: { tracks: TrackInfo[]; actions: Action
                         type="button"
                         disabled={!actions.canEdit || actions.pending}
                         onClick={() => actions.start(key)}
+                        // which test: three "Start" buttons read alike in a list (design audit A7)
+                        aria-label={`${l.status === "earned" ? "Retake" : "Start"} ${t.label} level ${l.level}`}
                         className={l.status === "earned" ? secondaryButtonClass : buttonClass}
                       >
                         {l.status === "earned" ? "Retake" : "Start"}
@@ -317,11 +321,13 @@ function PositionPicker({ positions, plate, actions }: { positions: PositionInfo
                     : `${p.questionCount} questions · one level`}
             </p>
           </div>
-          {!p.inProgress && (
+          {!p.inProgress && p.questionCount === 0 && <Badge>Coming soon</Badge>}
+          {!p.inProgress && p.questionCount > 0 && (
             <button
               type="button"
-              disabled={!actions.canEdit || actions.pending || p.questionCount === 0}
+              disabled={!actions.canEdit || actions.pending}
               onClick={() => actions.start(key)}
+              aria-label={`${p.earnedOn ? "Retake" : "Start"} ${p.label} IQ`}
               className={p.earnedOn ? secondaryButtonClass : buttonClass}
             >
               {p.earnedOn ? "Retake" : "Start"}
@@ -540,7 +546,7 @@ export function IqTests({
     const award = position ? "Golden Glove" : extra ? "GGG Champions Trophy" : "championship ring";
     const perfect = result.total > 0 && result.correct === result.total;
     return (
-      <div className={`rounded-xl border p-6 text-center ${result.passed ? "border-neon bg-neon/10" : "border-pink/60 bg-pink/5"}`}>
+      <div className={`rounded-xl border p-6 text-center ${result.passed ? "border-neon-edge bg-neon/10" : "border-pink/60 bg-pink/5"}`}>
         <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">{testName(session)}</p>
         {result.passed && !badge && (
           <div className="mt-4 flex justify-center">
@@ -608,7 +614,7 @@ export function IqTests({
     const total = session.questions.length;
     const right = session.questions.filter((q) => session.done[q.id]?.correct).length;
     return (
-      <div className="rounded-xl border border-neon bg-neon/10 p-6 text-center">
+      <div className="rounded-xl border border-neon-edge bg-neon/10 p-6 text-center">
         <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">{testName(session)} · Review</p>
         <div className="mt-4 flex justify-center">
           <MvpBadge label={mvpLabel(session)} size={96} />
@@ -711,7 +717,7 @@ export function IqTests({
                       onClick={() => answer(i)}
                       className={`flex w-full items-start gap-3 rounded-lg border p-3 text-left text-sm transition ${
                         isCorrect
-                          ? "border-neon bg-neon/15"
+                          ? "border-neon-edge bg-neon/15"
                           : isWrongPick
                             ? "border-pink bg-pink/15"
                             : "border-navy-600 hover:border-pink disabled:hover:border-navy-600"

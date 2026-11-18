@@ -75,10 +75,11 @@ export function PendingConsentList({ consents, formUrls }: { consents: PendingCo
                 <span className="text-sm font-medium">{video ? "Note (required to verify or decline)" : "Note (required to decline; the parent sees it)"}</span>
                 <input name="note" maxLength={500} className={inputClass} />
               </label>
-              <button type="submit" name="decision" value="verify" className={buttonClass}>
+              {/* each named for her, so a list of buttons isn't "Verify, Decline, Verify, Decline" (design audit A7) */}
+              <button type="submit" name="decision" value="verify" aria-label={`Verify ${c.player_name}`} className={buttonClass}>
                 Verify
               </button>
-              <button type="submit" name="decision" value="decline" className={secondaryButtonClass}>
+              <button type="submit" name="decision" value="decline" aria-label={`Decline ${c.player_name}`} className={secondaryButtonClass}>
                 Decline
               </button>
             </ActionForm>

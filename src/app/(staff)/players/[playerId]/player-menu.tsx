@@ -208,7 +208,8 @@ export function PlayerMenu({
             in the corner beside them */}
         <TeamLogoMark logo={teamLogo} sizeClass="h-22 w-22 sm:h-38 sm:w-38" className="relative z-10 ml-auto block lg:absolute lg:top-0 lg:right-0" />
         {/* Jersey number behind the name, media-day style */}
-        <OutlineText className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[11rem] tracking-tighter sm:text-[15rem]">
+        {/* a faint pink at night so it reads, light by day so it never fights her name (design audit P5) */}
+        <OutlineText stroke="var(--color-numeral)" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[11rem] tracking-tighter sm:text-[15rem]">
           {team?.jersey_number ?? player.primary_position ?? ""}
         </OutlineText>
         {/* lg:px-42: with the logo in the corner (152px), her name, badge and trophies keep clear of it on both
@@ -219,7 +220,7 @@ export function PlayerMenu({
             <img
               src={photoUrl}
               alt={`${name} ${player.last_name}`}
-              className="mx-auto mb-5 size-28 rounded-full border-2 border-neon object-cover shadow-[0_0_0_6px_rgb(0_10_45),0_0_0_7px_rgb(254_31_124)] sm:size-32"
+              className="mx-auto mb-5 size-28 rounded-full border-2 border-neon-edge object-cover shadow-[0_0_0_6px_rgb(0_10_45),0_0_0_7px_rgb(254_31_124)] sm:size-32"
             />
           )}
           <p className="flex items-center justify-center gap-3 font-mono text-xs tracking-[0.35em] text-pink-soft uppercase">

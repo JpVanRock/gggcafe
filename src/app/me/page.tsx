@@ -127,7 +127,7 @@ async function Me({ searchParams }: Pick<PageProps<"/me">, "searchParams">) {
       {pending.map((c) => (
         <div key={c.claim_id} className="flex flex-col gap-4">
           <Welcome team={c.team_name} season={c.season_name} message={c.welcome_message} />
-          <p role="status" className="rounded-xl border border-neon/60 bg-neon/10 p-4 text-sm">
+          <p role="status" className="rounded-xl border border-neon-edge/60 bg-neon/10 p-4 text-sm">
             Claim sent for <strong>{c.typed_name}</strong>
             {c.typed_jersey ? ` #${c.typed_jersey}` : ""}. Your coach approves it, then your dashboard opens here.
           </p>

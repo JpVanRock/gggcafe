@@ -86,6 +86,14 @@ test("small group labels use groupLabelClass, not a hand-written copy", () => {
   assert.deepEqual(find(/font-mono text-2xs font-bold tracking-\[0\.2em\]/, (p) => p === "components/ui.tsx"), [], "use groupLabelClass from components/ui.tsx");
 });
 
+test("neon edges use the neon-edge token (navy by day, where neon on white is 1.15:1)", () => {
+  assert.deepEqual(find(/(?<![\w-])(?:border(?:-[trblxy])?|ring|outline|divide)-neon(?:\/\d+)?(?![\w-])/), [], "use border-neon-edge (ring-neon-edge...)");
+});
+
+test("corners are rounded-2xl at most (no bubbly 3xl or 2rem radii on boards and cards)", () => {
+  assert.deepEqual(find(/(?<![\w-])rounded(?:-[trblse]{1,2})?-(?:3xl|4xl|\[(?:[2-9]|1\.[5-9])\d*rem\])(?![\w-])/), [], "use rounded-2xl or less (CLAUDE.md, Design audience)");
+});
+
 test("text on neon or pink fills is navy (text-on-accent)", () => {
   // white on brand pink is 3.7:1, too faint for small text
   assert.deepEqual(find(/\bbg-(?:pink|neon)\b[^"`]*\btext-white\b|\btext-white\b[^"`]*\bbg-(?:pink|neon)\b/), []);

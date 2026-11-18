@@ -20,7 +20,7 @@ export function GoalsBoard({ goals, teamId, editor }: { goals: TeamGoal[]; teamI
       {sortGoals(goals).map((g, i) => {
         const pct = goalProgress(g);
         return (
-          <li key={g.id} className={`flex gap-4 rounded-xl border p-4 ${g.achieved_at ? "border-neon bg-neon/5" : "border-navy-700"}`}>
+          <li key={g.id} className={`flex gap-4 rounded-xl border p-4 ${g.achieved_at ? "border-neon-edge bg-neon/5" : "border-navy-700"}`}>
             <span className="font-display text-3xl leading-none font-bold text-highlight tabular-nums" aria-label={`Goal ${i + 1}`}>
               {String(i + 1).padStart(2, "0")}
             </span>

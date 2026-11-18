@@ -81,7 +81,7 @@ export function QuizRunner({ playerId, quizzes, canEdit }: { playerId: string; q
   const done = index >= run.questions.length;
   if (done) {
     return (
-      <div className="rounded-xl border border-neon bg-neon/10 p-6 text-center">
+      <div className="rounded-xl border border-neon-edge bg-neon/10 p-6 text-center">
         <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">{run.label}</p>
         <p className="mt-2 text-4xl font-bold text-highlight">
           {score}/{run.questions.length}
@@ -135,7 +135,7 @@ export function QuizRunner({ playerId, quizzes, canEdit }: { playerId: string; q
                 onClick={() => choose(i)}
                 className={`flex w-full items-start gap-3 rounded-lg border p-3 text-left text-sm transition ${
                   isCorrect
-                    ? "border-neon bg-neon/15 text-ink"
+                    ? "border-neon-edge bg-neon/15 text-ink"
                     : isWrongPick
                       ? "border-pink bg-pink/15 text-ink"
                       : "border-navy-600 hover:border-pink disabled:hover:border-navy-600"

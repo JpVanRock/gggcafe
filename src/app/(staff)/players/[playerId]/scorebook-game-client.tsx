@@ -389,7 +389,7 @@ export function GameRunner({
       <div className="flex flex-col gap-5">
         {header}
         {result.passed && (result.allTenEarned || result.awardEarned) ? (
-          <div className="flex flex-col items-center gap-3 rounded-xl border border-neon bg-neon/10 p-6 text-center">
+          <div className="flex flex-col items-center gap-3 rounded-xl border border-neon-edge bg-neon/10 p-6 text-center">
             <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">
               Clean book · {result.firstTry} of {GAME_PLAYS} first try
             </p>
@@ -414,7 +414,7 @@ export function GameRunner({
             </div>
           </div>
         ) : result.passed ? (
-          <div className="flex flex-col items-center gap-3 rounded-xl border border-neon bg-neon/10 p-6 text-center">
+          <div className="flex flex-col items-center gap-3 rounded-xl border border-neon-edge bg-neon/10 p-6 text-center">
             <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">Game {n} · clean book</p>
             <p className="text-4xl font-bold text-highlight tabular-nums">
               {result.firstTry}/{GAME_PLAYS}
@@ -575,7 +575,7 @@ export function GameRunner({
           </div>
 
           {feedback?.correct ? (
-            <div className="rounded-xl border border-neon bg-neon/10 p-4" aria-live="polite">
+            <div className="rounded-xl border border-neon-edge bg-neon/10 p-4" aria-live="polite">
               <p className="font-bold text-highlight">In the book.</p>
               <p className="mt-1 text-sm">
                 {lastBatter

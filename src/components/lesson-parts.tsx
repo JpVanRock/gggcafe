@@ -62,7 +62,7 @@ export function LessonPairs({ items }: { items: { who: string; text: string }[] 
 
 export function LessonCallout({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="max-w-3xl rounded-2xl border border-neon/40 bg-neon/5 p-5">
+    <div className="max-w-3xl rounded-2xl border border-neon-edge/40 bg-neon/5 p-5">
       <p className={eyebrowClass}>{label}</p>
       <div className="mt-2">{children}</div>
     </div>

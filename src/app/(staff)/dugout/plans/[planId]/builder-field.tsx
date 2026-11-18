@@ -87,7 +87,7 @@ export function PositionZone({
         type="button"
         onClick={onTap}
         aria-label={`${position}: ${players.length ? players.map((id) => roster.get(id)?.name).join(", ") : "nobody yet"}${armed ? ". Tap to place the selected player" : ""}`}
-        className={`rounded-full transition ${isOver || armed ? "ring-2 ring-neon ring-offset-2 ring-offset-navy-950" : ""}`}
+        className={`rounded-full transition ${isOver || armed ? "ring-2 ring-neon-edge ring-offset-2 ring-offset-navy-950" : ""}`}
       >
         <PositionBadge position={position} active={players.length > 0} />
       </button>

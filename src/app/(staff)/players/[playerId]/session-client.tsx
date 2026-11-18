@@ -114,7 +114,7 @@ export function SessionRunner({ playerId, session, canEdit, backHref }: { player
           </div>
         )}
         {logged && (
-          <p role="status" className="rounded-xl border border-neon/60 bg-neon/10 p-4 text-sm">
+          <p role="status" className="rounded-xl border border-neon-edge/60 bg-neon/10 p-4 text-sm">
             {logged.checked
               ? "Checked off in TWIS. It counts toward your training streaks and achievements."
               : "Nice work. Make it a mental routine in Performance Training to check it off in TWIS."}

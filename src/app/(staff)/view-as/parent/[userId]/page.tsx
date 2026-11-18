@@ -126,7 +126,7 @@ export default async function ViewAsParentPage({ params, searchParams }: PagePro
               eyebrow="Family menu"
               first={nameFirst}
               last={nameRest.join(" ") || undefined}
-              line={[teams.map((t) => t.name).join(" · "), v.account.email].filter(Boolean).join(" · ")}
+              line={teams.map((t) => t.name).join(" · ") || undefined}
               aside={<TeamLogoMark logo={logo} />}
             />
             <PageLinks items={menuItems} label="Family pages" />

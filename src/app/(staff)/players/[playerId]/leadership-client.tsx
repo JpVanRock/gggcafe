@@ -22,7 +22,7 @@ function ErrorLine({ error }: { error: string | null }) {
 
 function chip(on: boolean) {
   return `rounded-full border px-3 py-1 text-xs font-semibold tracking-wider uppercase transition disabled:opacity-50 ${
-    on ? "border-neon bg-neon text-on-accent" : "border-navy-500 text-muted hover:border-pink hover:text-ink"
+    on ? "border-neon-edge bg-neon text-on-accent" : "border-navy-500 text-muted hover:border-pink hover:text-ink"
   }`;
 }
 
@@ -135,13 +135,13 @@ export function StepChecks({
                   });
                 }}
                 className={`flex w-full items-start gap-3 rounded-lg border p-3 text-left text-sm transition ${
-                  on ? "border-neon/70 bg-neon/5" : "border-navy-600 hover:border-pink"
+                  on ? "border-neon-edge/70 bg-neon/5" : "border-navy-600 hover:border-pink"
                 }`}
               >
                 <span
                   aria-hidden
                   className={`mt-0.5 grid size-5 shrink-0 place-items-center rounded border text-xs font-bold ${
-                    on ? "border-neon bg-neon text-on-accent" : "border-navy-500"
+                    on ? "border-neon-edge bg-neon text-on-accent" : "border-navy-500"
                   }`}
                 >
                   {on ? "✓" : ""}
@@ -166,7 +166,7 @@ export function LessonDone({ playerId, lesson, done, canEdit }: { playerId: stri
     <div className="flex flex-wrap items-center gap-3">
       {done ? (
         <>
-          <span className="rounded-full border border-neon bg-neon/10 px-3 py-1 text-sm font-semibold text-highlight">Lesson complete ✓</span>
+          <span className="rounded-full border border-neon-edge bg-neon/10 px-3 py-1 text-sm font-semibold text-highlight">Lesson complete ✓</span>
           {canEdit && (
             <button type="button" disabled={pending} onClick={() => set(false)} className="text-xs text-muted underline hover:text-ink">
               Reopen
@@ -304,7 +304,7 @@ export function RubricTool({
             disabled={!enabled}
             onClick={() => rate(who, key, n)}
             className={`grid size-8 place-items-center rounded-full border font-display text-sm font-bold transition disabled:opacity-60 ${
-              on ? (who === "self" ? "border-neon bg-neon text-on-accent" : "border-pink bg-pink text-on-accent") : "border-navy-500 text-muted hover:border-pink"
+              on ? (who === "self" ? "border-neon-edge bg-neon text-on-accent" : "border-pink bg-pink text-on-accent") : "border-navy-500 text-muted hover:border-pink"
             }`}
           >
             {n}
@@ -577,7 +577,7 @@ export function CoachSignOff({
     );
   return (
     <div className="flex flex-wrap items-center gap-3">
-      {signed && <span className="rounded-full border border-neon bg-neon/10 px-3 py-1 text-sm font-semibold text-highlight">Signed off · certificate awarded ✓</span>}
+      {signed && <span className="rounded-full border border-neon-edge bg-neon/10 px-3 py-1 text-sm font-semibold text-highlight">Signed off · certificate awarded ✓</span>}
       {!signed && !ready && <span className="text-sm text-muted">{name} needs every lesson complete and her plan committed first.</span>}
       {(signed || ready) && (
         <button
@@ -635,7 +635,7 @@ export function LeaderToggle({ playerId, name, program }: { playerId: string; na
   const other: Program = program === "full" ? "light" : "full";
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <span className="rounded-full border border-neon bg-neon/10 px-3 py-1 text-sm font-semibold text-highlight">
+      <span className="rounded-full border border-neon-edge bg-neon/10 px-3 py-1 text-sm font-semibold text-highlight">
         Training as a leader · {PROGRAM_CHOICE[program].name} ✓
       </span>
       <button

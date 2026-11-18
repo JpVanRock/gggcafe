@@ -128,7 +128,7 @@ export default async function LeaderboardPage({ params, searchParams }: PageProp
 
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
           {/* Player of the Week */}
-          <section className="relative overflow-hidden rounded-2xl border-2 border-neon bg-linear-to-br from-navy-950 to-navy-900 p-5 sm:p-6">
+          <section className="relative overflow-hidden rounded-2xl border-2 border-neon-edge bg-linear-to-br from-navy-950 to-navy-900 p-5 sm:p-6">
             <p className="flex items-center gap-3 font-mono text-xs tracking-[0.3em] text-pink-soft uppercase">
               <SpeedStripes className="h-3 w-9 text-link" />
               Player of the Week
@@ -160,7 +160,7 @@ export default async function LeaderboardPage({ params, searchParams }: PageProp
                     <li
                       key={p.player_id}
                       className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold ${
-                        named.has(p.player_id) ? "border-neon bg-neon text-on-accent" : "border-navy-500 text-muted"
+                        named.has(p.player_id) ? "border-neon-edge bg-neon text-on-accent" : "border-navy-500 text-muted"
                       }`}
                     >
                       {p.first_name} {p.last_name.slice(0, 1)}.
@@ -204,7 +204,7 @@ export default async function LeaderboardPage({ params, searchParams }: PageProp
               {squads.map((sq, i) => (
                 <li
                   key={sq.id}
-                  className={`relative overflow-hidden rounded-2xl border p-4 ${sq.id === mySquad?.id ? "border-2 border-pink" : i === 0 ? "border-neon" : "border-navy-600"}`}
+                  className={`relative overflow-hidden rounded-2xl border p-4 ${sq.id === mySquad?.id ? "border-2 border-pink" : i === 0 ? "border-neon-edge" : "border-navy-600"}`}
                 >
                   <p className="flex items-baseline justify-between gap-2">
                     <span className="font-display text-2xl font-bold tracking-wide uppercase">{sq.name}</span>

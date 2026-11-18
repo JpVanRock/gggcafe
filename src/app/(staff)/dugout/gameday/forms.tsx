@@ -32,8 +32,9 @@ export function CardsForm({ teamId, seasonId, players }: { teamId: string; seaso
       <input type="hidden" name="team_id" value={teamId} />
       <input type="hidden" name="season_id" value={seasonId} />
       <TableScroll label="Player cards">
-        <table className="w-full min-w-[46rem] text-left text-sm">
-          <thead>
+        {/* phones: one card per player, each field labeled (design audit M6); a table from 640px */}
+        <table className="w-full text-left text-sm max-sm:block sm:min-w-[46rem]">
+          <thead className="max-sm:hidden">
             <tr className="border-b border-navy-700 text-2xs font-semibold tracking-wider text-muted uppercase">
               <th className="py-2 pr-3">Player</th>
               <th className="py-2 pr-3">Hitting type</th>
@@ -49,15 +50,16 @@ export function CardsForm({ teamId, seasonId, players }: { teamId: string; seaso
               </th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="max-sm:grid max-sm:gap-3">
             {players.map((p) => (
-              <tr key={p.id} className="border-b border-navy-800">
-                <td className="py-2 pr-3">
+              <tr key={p.id} className="border-b border-navy-800 max-sm:grid max-sm:grid-cols-6 max-sm:gap-2 max-sm:rounded-xl max-sm:border max-sm:border-navy-700 max-sm:p-3">
+                <td className="py-2 pr-3 max-sm:col-span-6 max-sm:p-0">
                   <input type="hidden" name="player_id" value={p.id} />
                   <span className="font-semibold">{p.short}</span>
                   {p.positions.length > 0 && <span className="ml-2 font-mono text-2xs text-muted">{p.positions.join(" ")}</span>}
                 </td>
-                <td className="py-2 pr-3">
+                <td className="py-2 pr-3 max-sm:col-span-3 max-sm:p-0">
+                  <span className="mb-1 block text-2xs font-semibold tracking-wider text-muted uppercase sm:hidden">Hitting type</span>
                   <select name="hitting_type" defaultValue={p.hitting_type ?? ""} aria-label={`Hitting type for ${p.short}`} className={small}>
                     <option value="">—</option>
                     {HITTING_TYPES.map((t) => (
@@ -67,7 +69,8 @@ export function CardsForm({ teamId, seasonId, players }: { teamId: string; seaso
                     ))}
                   </select>
                 </td>
-                <td className="py-2 pr-3">
+                <td className="py-2 pr-3 max-sm:col-span-3 max-sm:p-0">
+                  <span className="mb-1 block text-2xs font-semibold tracking-wider text-muted uppercase sm:hidden">Base running</span>
                   <select name="base_running" defaultValue={p.base_running ?? ""} aria-label={`Base running for ${p.short}`} className={small}>
                     <option value="">—</option>
                     {BASE_RUNNING.map((b) => (
@@ -79,28 +82,34 @@ export function CardsForm({ teamId, seasonId, players }: { teamId: string; seaso
                 </td>
                 {p.statsFrom === "box" ? (
                   <>
-                    <td className="py-2 pr-2 font-display tabular-nums" title="From box scores">
+                    <td className="py-2 pr-2 font-display tabular-nums max-sm:col-span-2 max-sm:p-0" title="From box scores">
+                      <span className="mb-1 block text-2xs font-semibold tracking-wider text-muted uppercase sm:hidden">AVG</span>
                       {rate(p.avg)}
                       <input type="hidden" name="avg" value={stat(p.typed.avg)} />
                     </td>
-                    <td className="py-2 pr-2 font-display tabular-nums" title="From box scores">
+                    <td className="py-2 pr-2 font-display tabular-nums max-sm:col-span-2 max-sm:p-0" title="From box scores">
+                      <span className="mb-1 block text-2xs font-semibold tracking-wider text-muted uppercase sm:hidden">OBP</span>
                       {rate(p.obp)}
                       <input type="hidden" name="obp" value={stat(p.typed.obp)} />
                     </td>
-                    <td className="py-2 pr-2 font-display tabular-nums" title="From box scores">
+                    <td className="py-2 pr-2 font-display tabular-nums max-sm:col-span-2 max-sm:p-0" title="From box scores">
+                      <span className="mb-1 block text-2xs font-semibold tracking-wider text-muted uppercase sm:hidden">K%</span>
                       {percent(p.k_pct)}
                       <input type="hidden" name="k_pct" value={stat(p.typed.k_pct, true)} />
                     </td>
                   </>
                 ) : (
                   <>
-                    <td className="py-2 pr-2">
+                    <td className="py-2 pr-2 max-sm:col-span-2 max-sm:p-0">
+                      <span className="mb-1 block text-2xs font-semibold tracking-wider text-muted uppercase sm:hidden">AVG</span>
                       <input name="avg" defaultValue={stat(p.typed.avg)} inputMode="decimal" placeholder=".000" aria-label={`AVG for ${p.short}`} className={`${fieldClass} w-20 px-2 py-1.5 text-sm font-display tabular-nums`} />
                     </td>
-                    <td className="py-2 pr-2">
+                    <td className="py-2 pr-2 max-sm:col-span-2 max-sm:p-0">
+                      <span className="mb-1 block text-2xs font-semibold tracking-wider text-muted uppercase sm:hidden">OBP</span>
                       <input name="obp" defaultValue={stat(p.typed.obp)} inputMode="decimal" placeholder=".000" aria-label={`OBP for ${p.short}`} className={`${fieldClass} w-20 px-2 py-1.5 text-sm font-display tabular-nums`} />
                     </td>
-                    <td className="py-2 pr-2">
+                    <td className="py-2 pr-2 max-sm:col-span-2 max-sm:p-0">
+                      <span className="mb-1 block text-2xs font-semibold tracking-wider text-muted uppercase sm:hidden">K%</span>
                       <input name="k_pct" defaultValue={stat(p.typed.k_pct, true)} inputMode="decimal" placeholder="0" aria-label={`K% for ${p.short}`} className={`${fieldClass} w-20 px-2 py-1.5 text-sm font-display tabular-nums`} />
                     </td>
                   </>

@@ -14,7 +14,7 @@ export default function PlayersPage({ searchParams }: PageProps<"/players">) {
   return (
     <>
       <TitleWithTeamLogo>
-        <PageHeader title="Players" description="Everyone in the database: your players and the opponents you track." />
+        <PageHeader title="Players" description="Your players and the opponents you scout." />
       </TitleWithTeamLogo>
       <Suspense fallback={<Loading />}>
         <PlayersContent searchParams={searchParams} />
@@ -49,7 +49,8 @@ function AgeTabs({ counts, current, query }: { counts: Map<AgeGroup | "all", num
   return (
     <TabRow label="Age groups" current={current}>
       <ul className="flex min-w-max gap-1 border-b border-navy-700">
-        {(["all", ...AGE_GROUPS] as const).map((age) => {
+        {/* only age groups with players in them (and the one open), not a row of zeros (design audit M4) */}
+        {(["all", ...AGE_GROUPS] as const).filter((age) => age === "all" || age === current || (counts.get(age) ?? 0) > 0).map((age) => {
           const on = age === current;
           return (
             <li key={age}>
@@ -130,6 +131,30 @@ async function PlayersContent({ searchParams }: Pick<PageProps<"/players">, "sea
             {query ? "No players match that name." : ageTab !== "all" ? `No ${ageTab} players yet. A player's age group comes from her team's age group.` : "No players yet."}
           </EmptyState>
         ) : (
+          <>
+          {/* phones: one line per player, number first (design audit M4: names wrapped in a five-column table) */}
+          <ul className="divide-y divide-navy-700 sm:hidden">
+            {players.map((p) => {
+              const team = p.entry?.team;
+              const bt = batsThrows(p);
+              return (
+                <li key={p.id}>
+                  <Link href={`/players/${p.id}`} className="flex min-h-11 items-center gap-3 py-2">
+                    <span className="w-10 shrink-0 text-right font-display font-bold text-highlight tabular-nums">
+                      {p.entry?.jersey_number ? `#${p.entry.jersey_number}` : ""}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate font-medium">{playerName(p)}</span>
+                      <span className="block truncate text-xs text-muted">
+                        {[p.primary_position, bt !== "–" && bt, p.grad_year, team ? team.short_name || team.name : "Not on a roster"].filter(Boolean).join(" · ")}
+                      </span>
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+          <div className="hidden sm:block">
           <TableScroll label="Players">
             <table className={tableClass}>
               <thead>
@@ -148,10 +173,10 @@ async function PlayersContent({ searchParams }: Pick<PageProps<"/players">, "sea
                   return (
                     <tr key={p.id}>
                       <td className={tdClass}>
-                        <Link href={`/players/${p.id}`} className="font-medium hover:underline">
-                          {p.last_name}, {p.preferred_name || p.first_name}
+                        {/* one name format in lists: First Last (design audit C5) */}
+                        <Link href={`/players/${p.id}`} className="font-medium whitespace-nowrap hover:underline">
+                          {playerName(p)}
                         </Link>
-                        <span className="sr-only"> ({playerName(p)})</span>
                       </td>
                       <td className={tdClass} title={p.primary_position ? POSITION_LABEL[p.primary_position] : undefined}>
                         {p.primary_position ?? "–"}
@@ -175,6 +200,8 @@ async function PlayersContent({ searchParams }: Pick<PageProps<"/players">, "sea
               </tbody>
             </table>
           </TableScroll>
+          </div>
+          </>
         )}
       </Card>
     </div>

@@ -52,7 +52,7 @@ export default async function NotificationsPage() {
                 {n.body && <span className="block text-sm text-muted">{n.body}</span>}
               </>
             );
-            const cls = `block rounded-xl border px-4 py-3 ${n.read_at ? "border-navy-700" : "border-neon/60 bg-neon/5"}`;
+            const cls = `block rounded-xl border px-4 py-3 ${n.read_at ? "border-navy-700" : "border-neon-edge/60 bg-neon/5"}`;
             return (
               <li key={n.id}>
                 {n.href ? (

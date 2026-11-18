@@ -123,7 +123,7 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
         eyebrow="Family menu"
         first={nameFirst || "Welcome"}
         last={nameRest.join(" ") || undefined}
-        line={[teams.map((t) => t.name).join(" · "), user.email].filter(Boolean).join(" · ")}
+        line={teams.map((t) => t.name).join(" · ") || undefined}
         aside={
           <Suspense fallback={null}>
             <MyTeamLogo />
