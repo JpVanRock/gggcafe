@@ -48,6 +48,7 @@ for name, value in updates.items():
     if name not in seen:
         lines.append(f"{name}={value}")
 open(path, "w").write("\n".join(lines) + "\n")
+os.chmod(path, 0o600)  # the password and keys: readable by this Mac account only
 
 print("Publishable key:", "saved" if key else "unchanged")
 print("Database password:", "saved" if pw else "unchanged")

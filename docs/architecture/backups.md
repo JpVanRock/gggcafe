@@ -81,6 +81,11 @@ keeps using 16.
   doesn't name.
 - `SUPABASE_SECRET_KEY` can read everything. It stays in `.env.local` on this Mac and never goes in
   Vercel. Add it with `bash scripts/set-secrets.sh`.
+- `.env.local` is readable only by this Mac account (`set-secrets.sh` sets it to 600 each time it saves).
+- The database password never appears on a command line, where every account on the Mac could see it
+  with `ps`. `scripts/lib/env.sh` builds `SUPABASE_DB_URL` without it and passes it to `psql`,
+  `pg_dump`, `pg_restore` and the Supabase CLI as `PGPASSWORD` (the same for `db:push`, `db:check` and
+  `db:restore`). Checked 2026-11-18: 153 snapshots of the process list during a backup, none held it.
 
 ## Restoring (lost the Supabase project)
 
