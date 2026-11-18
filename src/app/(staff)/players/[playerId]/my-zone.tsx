@@ -26,8 +26,8 @@ export function CountPlan({ zones }: { zones: HittingZones | null }) {
  * Choice, side by side; her count plan follows the testing result when there is one.
  * Order and opening (user, same day: "keep the player choice on the left open with the strike zone showing
  * unless they choose to collapse. The Testing results on the left once entered"): her Player Choice comes
- * first until a testing result is marked, then the Testing Result does. For whoever can mark it, her Player
- * Choice is an open panel with the tap-to-mark strike zone, which they can collapse.
+ * first until a testing result is marked, then the Testing Result does. Each one is an open panel with the
+ * tap-to-mark strike zone for whoever can mark it (the Testing Result too, user, 2026-11-17), which they can collapse.
  */
 export function MyZoneSection({
   playerId,
@@ -53,11 +53,11 @@ export function MyZoneSection({
           const marked = isMarked(z);
           const testing = source === "testing";
           const canWrite = testing ? canManage : canAct;
-          // her choice, for whoever can mark it: open with the strike zone showing, collapsible
-          if (!testing && canWrite) {
+          // for whoever can mark it: an open panel with the strike zone showing, collapsible
+          if (canWrite) {
             return (
               <div key={source} className="min-w-0">
-                <Disclosure summary={ZONE_SOURCE_LABEL.player} open>
+                <Disclosure summary={ZONE_SOURCE_LABEL[source]} open>
                   <ZoneEditor playerId={playerId} source={source} zones={z} />
                 </Disclosure>
               </div>
@@ -75,11 +75,6 @@ export function MyZoneSection({
                 <p className="text-sm text-muted">
                   {testing ? "Not tested yet. Your coach marks it from your hitting testing." : "Not marked yet."}
                 </p>
-              )}
-              {canWrite && (
-                <Disclosure summary={marked ? "Edit the testing result" : "Mark the testing result"}>
-                  <ZoneEditor playerId={playerId} source={source} zones={z} />
-                </Disclosure>
               )}
             </div>
           );

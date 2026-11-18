@@ -13,8 +13,8 @@
 - Testing Result and Player Choice (user, 2026-11-16; migration 20261117023236): one `hitting_zones` row per player and
   `source`: `testing` (a coach marks it from hitting testing; coaches only) and `player` (her choice; she or a coach).
   The Pop Report shows both grids side by side, each with its own editor (`ZoneEditor` takes `source`): her Player Choice
-  first until a testing result is marked, then the Testing Result first; for whoever can mark her choice it's an open,
-  collapsible panel with the tap-to-mark strike zone (user, 2026-11-16). Her count plan
+  first until a testing result is marked, then the Testing Result first; for whoever can mark one it's an open,
+  collapsible panel with the tap-to-mark strike zone (user, 2026-11-16; the Testing Result too, 2026-11-17). Her count plan
   follows the testing result when it's marked, else her choice (`planSource()`; the G3 Hitting Approach chapter uses
   `countPlanZones()` in `players/[playerId]/data.ts`). A player reads both rows and writes only hers (RLS). Rows saved
   before by a coach became the Testing Result.
