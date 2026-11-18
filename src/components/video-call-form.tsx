@@ -6,7 +6,7 @@
 // 2026-11-14) picks which calendars list it; the booker's own always does. With a list of players, any
 // number of them can be ticked for a group call (user, 2026-11-14), all on one team, up to 12.
 import { useActionState, useState } from "react";
-import { Field, FormMessage, inputClass } from "@/components/ui";
+import { Field, FormMessage, inputClass, groupLabelClass } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
 import { initialFormState } from "@/lib/form";
 import { CALL_CALENDARS, CALL_MAX_PLAYERS, CALL_MINUTES, TOPIC_MAX, type CallCalendar } from "@/lib/video-calls";
@@ -65,7 +65,7 @@ export function VideoCallForm({
           </p>
           {teamNames.map((team) => (
             <div key={team || "team"} className="flex flex-col gap-2">
-              {teamNames.length > 1 && <p className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">{team}</p>}
+              {teamNames.length > 1 && <p className={`text-pink-soft ${groupLabelClass}`}>{team}</p>}
               <div className="grid gap-x-4 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
                 {(players ?? [])
                   .filter((p) => (p.team ?? "") === team)

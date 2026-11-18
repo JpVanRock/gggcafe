@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { getCurrentUser, getMentor, getMentorAccess } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { isUuid, playerName } from "@/lib/softball";
-import { Disclosure } from "@/components/ui";
+import { Disclosure, groupLabelClass } from "@/components/ui";
 import { FocusBoard, FocusControls, FocusForm, NoteForm, NotesThread, RemoveNote, type FocusItem, type MentorNote } from "@/components/mentor-work";
 import { addMentorFocus, addMentorNote, removeMentorFocus, removeMentorNote, setMentorFocus } from "../../actions";
 import { TrainingForm } from "../../mentor-client";
@@ -85,7 +85,7 @@ export default async function MentorTeamPage({ params }: PageProps<"/mentor/team
           controls={(item) => <FocusControls item={item} move={setMentorFocus} remove={removeMentorFocus} />}
         />
         <FocusForm action={addMentorFocus} hidden={{ team_id: teamId }} />
-        <h3 className="mt-2 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Notes with the coaches</h3>
+        <h3 className={`mt-2 text-pink-soft ${groupLabelClass}`}>Notes with the coaches</h3>
         <NotesThread
           notes={(noteRows ?? []) as MentorNote[]}
           empty="No notes yet. After you talk with the coaches, add a discussion summary."

@@ -9,7 +9,7 @@ import { DndContext, DragOverlay, KeyboardSensor, MouseSensor, TouchSensor, clos
 import { SortableContext, arrayMove, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useRouter } from "next/navigation";
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
-import { Card, inputClass, pillButtonClass, pillOutlineClass, sectionLabelClass, badgeClass } from "@/components/ui";
+import { Card, inputClass, pillButtonClass, pillOutlineClass, sectionLabelClass, badgeClass, buttonStyles } from "@/components/ui";
 import { TOTAL_TIME_OPTIONS, durationLabel, finalizeProblems, planTimeline, type LibraryDrill, type PracticeSetting } from "@/lib/dugout";
 import type { PlanBlock, PlanSpot, PracticePlan, RosterPlayer, StaffContact } from "@/lib/practice-plans";
 import { SettingPills } from "../new-plan-form";
@@ -405,7 +405,7 @@ export function PlanBuilder({
           <ActionForm action={deletePracticePlan} className="ml-auto">
             <input type="hidden" name="id" value={plan.id} />
             <input type="hidden" name="team_id" value={plan.team.id} />
-            <ConfirmSubmit message="Delete this draft practice plan? This can't be undone." className="text-xs text-danger hover:underline">
+            <ConfirmSubmit message="Delete this draft practice plan? This can't be undone." className={buttonStyles("remove")}>
               Delete draft
             </ConfirmSubmit>
           </ActionForm>

@@ -4,6 +4,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { OutlineText, SpeedStripes } from "@/components/athletic";
+import { groupLabelClass } from "@/components/ui";
 
 /**
  * Board colors, all from the brand palette. Add a variant here when a new
@@ -122,7 +123,7 @@ export function MenuItem({ name, value, note }: { name: string; value?: ReactNod
 
 /** Heading inside a pop-up. */
 export function DetailHeading({ children }: { children: ReactNode }) {
-  return <h3 className="mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">{children}</h3>;
+  return <h3 className={`mb-3 text-pink-soft ${groupLabelClass}`}>{children}</h3>;
 }
 
 
@@ -213,7 +214,8 @@ export function MenuHeader({
           {eyebrow}
           <SpeedStripes className="h-3 w-9 text-link" />
         </p>
-        <h1 className="mt-3 text-5xl leading-none font-bold tracking-tight text-highlight uppercase sm:text-7xl">
+        {/* an explicit label: screen readers ran the two-tone halves together ("COACHSAMPLE"; design audit A5) */}
+        <h1 aria-label={last ? `${first} ${last}` : first} className="mt-3 text-5xl leading-none font-bold tracking-tight text-highlight uppercase sm:text-7xl">
           {first}
           {last && <span className="text-ink"> {last}</span>}
         </h1>
@@ -240,7 +242,7 @@ export function NeedsYou({ items, title = "Needs you" }: { items: NeedsItem[]; t
           <li key={i.key} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 py-2.5 text-sm">
             <span className="min-w-0">{i.text}</span>
             {i.href && (
-              <Link href={i.href} className="shrink-0 font-semibold text-link hover:underline">
+              <Link href={i.href} className="inline-flex min-h-10 shrink-0 items-center font-semibold text-link hover:underline sm:min-h-0">
                 {i.action ?? "Open"} <span aria-hidden="true">→</span>
               </Link>
             )}

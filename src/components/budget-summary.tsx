@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 import { Modal } from "@/components/modal";
 import { formatDay, formatLongDateAt } from "@/lib/dates";
 import { creditLedger, money, runningLedger, toCents, type CreditKind, type EntryKind } from "@/lib/budget";
-import { TableScroll, cardClass, EmptyState } from "@/components/ui";
+import { TableScroll, cardClass, EmptyState, groupLabelClass } from "@/components/ui";
 
 export type BudgetSummaryData = {
   team: string;
@@ -44,7 +44,7 @@ function Stat({
     <div className={`${cardClass("raised")} relative p-4`}>
       {action && <div className="absolute top-3 right-3">{action}</div>}
       {/* leave room for the Details button in the corner */}
-      <p className={`font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase ${action ? "pr-20" : ""}`}>{label}</p>
+      <p className={`text-pink-soft ${action ? "pr-20" : ""} ${groupLabelClass}`}>{label}</p>
       <p
         className={`mt-1 font-display text-2xl font-bold tabular-nums ${
           tone === "highlight" ? "text-highlight" : tone === "danger" ? "text-danger" : "text-ink"
@@ -91,7 +91,7 @@ function LineItems({ title, kind, entries, team }: { title: string; kind: "expen
           .map(([category, rows]) => (
             <section key={category}>
               <div className="mb-2 flex items-baseline justify-between gap-3 border-b border-navy-700 pb-1.5">
-                <h3 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">{category}</h3>
+                <h3 className={`text-pink-soft ${groupLabelClass}`}>{category}</h3>
                 <span className="font-display text-sm font-bold tabular-nums">{money(rows.reduce((sum, e) => sum + toCents(e.amount), 0))}</span>
               </div>
               <ul className="flex flex-col">
@@ -143,7 +143,7 @@ export function BudgetSummary({ summary, showLedger = true }: { summary: BudgetS
           note={summary.fees.length ? summary.fees.map((f) => `${f.name} ${money(toCents(f.amount))}`).join(" · ") : "Not set yet"}
         />
         <div className={`${cardClass("raised")} p-4`}>
-          <p className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Collected</p>
+          <p className={`text-pink-soft ${groupLabelClass}`}>Collected</p>
           <p className="mt-1 font-display text-2xl font-bold text-highlight tabular-nums">{money(t.collected)}</p>
           <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-navy-800" aria-hidden>
             <div className="h-full rounded-full bg-neon" style={{ width: `${pct}%` }} />
@@ -170,7 +170,7 @@ export function BudgetSummary({ summary, showLedger = true }: { summary: BudgetS
 
       {showLedger && (
         <section aria-label="Ledger">
-          <h3 className="mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Ledger</h3>
+          <h3 className={`mb-3 text-pink-soft ${groupLabelClass}`}>Ledger</h3>
           {ledger.length === 0 ? (
             <EmptyState>Nothing recorded yet.</EmptyState>
           ) : (
@@ -219,7 +219,7 @@ export function CreditsSummary({ credits }: { credits: NonNullable<BudgetSummary
   return (
     <section aria-label="Tournament credits" className={`${cardClass("raised")} flex flex-col gap-4 p-4 sm:p-5`}>
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h3 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Tournament credits</h3>
+        <h3 className={`text-pink-soft ${groupLabelClass}`}>Tournament credits</h3>
         <p className="text-xs text-muted">Kept apart from the team budget · all seasons</p>
       </div>
       <p className="flex flex-wrap items-baseline gap-x-3">

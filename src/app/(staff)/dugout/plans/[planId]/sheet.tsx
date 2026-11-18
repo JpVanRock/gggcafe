@@ -1,7 +1,7 @@
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { DrillTags } from "@/components/drill-tags";
 import { FieldLineup } from "@/components/practice-field";
-import { Card, EmptyState, pillButtonClass, pillOutlineClass, badgeClass, cardClass } from "@/components/ui";
+import { Card, EmptyState, pillButtonClass, pillOutlineClass, badgeClass, cardClass, groupLabelClass, buttonStyles } from "@/components/ui";
 import { formatLongDate } from "@/lib/dates";
 import { PRACTICE_SETTING_LABEL, durationLabel, equipmentChecklist, planTimeline, practiceRange, type PlanPosition } from "@/lib/dugout";
 import type { PracticePlan, RosterPlayer, StaffContact } from "@/lib/practice-plans";
@@ -71,7 +71,7 @@ export function PlanSheet({
             <ActionForm action={deletePracticePlan} className="ml-auto">
               <input type="hidden" name="id" value={plan.id} />
               <input type="hidden" name="team_id" value={plan.team.id} />
-              <ConfirmSubmit message="Delete this practice plan? This can't be undone." className="text-xs text-danger hover:underline">
+              <ConfirmSubmit message="Delete this practice plan? This can't be undone." className={buttonStyles("remove")}>
                 Delete plan
               </ConfirmSubmit>
             </ActionForm>
@@ -81,7 +81,7 @@ export function PlanSheet({
 
       <section aria-label="Practice timeline">
         <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Practice timeline</h2>
+          <h2 className={`text-pink-soft ${groupLabelClass}`}>Practice timeline</h2>
           <p className="text-sm text-muted">
             {used} of {plan.total_minutes} min planned
           </p>

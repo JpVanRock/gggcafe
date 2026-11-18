@@ -81,6 +81,11 @@ test("form fields get their edge and placeholder from fieldClass (3:1 edges, rea
   assert.deepEqual(find(/placeholder:text-muted\/\d+/), [], "placeholders are full text-muted (a faded one is 3.7:1)");
 });
 
+test("small group labels use groupLabelClass, not a hand-written copy", () => {
+  // one recipe for the mono label over a group or list (design audit G1: it had drifted into ~70 copies)
+  assert.deepEqual(find(/font-mono text-2xs font-bold tracking-\[0\.2em\]/, (p) => p === "components/ui.tsx"), [], "use groupLabelClass from components/ui.tsx");
+});
+
 test("text on neon or pink fills is navy (text-on-accent)", () => {
   // white on brand pink is 3.7:1, too faint for small text
   assert.deepEqual(find(/\bbg-(?:pink|neon)\b[^"`]*\btext-white\b|\btext-white\b[^"`]*\bbg-(?:pink|neon)\b/), []);

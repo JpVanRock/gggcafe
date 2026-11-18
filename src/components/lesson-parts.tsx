@@ -4,7 +4,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { SpeedStripes } from "@/components/athletic";
-import { eyebrowClass } from "@/components/ui";
+import { eyebrowClass, groupLabelClass } from "@/components/ui";
 import { twoDigits } from "@/lib/mental-lessons";
 
 /** A labeled part of a lesson. `level`: h2 under a page title (h1), h3 under a section title (h2). */
@@ -12,7 +12,7 @@ export function LessonPart({ title, level = "h2", children }: { title: string; l
   const Heading = level;
   return (
     <section className="flex flex-col gap-3">
-      <Heading className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">{title}</Heading>
+      <Heading className={`text-pink-soft ${groupLabelClass}`}>{title}</Heading>
       {children}
     </section>
   );

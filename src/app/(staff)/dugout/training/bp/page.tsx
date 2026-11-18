@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { canEdit, isHeadCoach, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Card, EmptyState, tableClass, tdClass, thClass, TableScroll } from "@/components/ui";
+import { Card, EmptyState, tableClass, tdClass, thClass, TableScroll, buttonStyles } from "@/components/ui";
 import { StatTerm } from "@/components/stat-term";
 import { formatDay, todayISO } from "@/lib/dates";
 import { qabSummary } from "@/lib/box-score";
@@ -108,7 +108,7 @@ export default async function BpPage({ searchParams }: PageProps<"/dugout/traini
                   {editor && (
                     <ActionForm action={removeBpRound}>
                       <input type="hidden" name="id" value={r.id} />
-                      <ConfirmSubmit message="Remove this BP round?" className="text-xs text-muted hover:text-danger">
+                      <ConfirmSubmit message="Remove this BP round?" className={buttonStyles("removeQuiet")}>
                         Remove
                       </ConfirmSubmit>
                     </ActionForm>

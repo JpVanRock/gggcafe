@@ -7,7 +7,7 @@ import {
   FORMAT_LABEL, POSITION_LABEL, batsThrows, compareJersey, isUuid, playerName,
   type Player, type Season, type Team,
 } from "@/lib/softball";
-import { Card, Disclosure, EmptyState, PageHeader, pillButtonClass, secondaryButtonClass, tableClass, tdClass, thClass, badgeClass, TableScroll } from "@/components/ui";
+import { Card, Disclosure, EmptyState, PageHeader, pillButtonClass, secondaryButtonClass, tableClass, tdClass, thClass, badgeClass, TableScroll, buttonStyles } from "@/components/ui";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { addDays, formatDay, formatTime, todayISO } from "@/lib/dates";
 import { deleteTeamEvent, removeFromRoster } from "../actions";
@@ -234,7 +234,7 @@ export default async function TeamPage({
                               <RosterEntryEditor id={r.id} jersey={r.jersey_number} active={r.active} />
                               <ActionForm action={removeFromRoster}>
                                 <input type="hidden" name="id" value={r.id} />
-                                <button type="submit" className="text-xs text-danger hover:underline">
+                                <button type="submit" className={buttonStyles("remove")}>
                                   Remove from {season.name} roster
                                 </button>
                               </ActionForm>
@@ -290,7 +290,7 @@ export default async function TeamPage({
                       <input type="hidden" name="id" value={row.eventId} />
                       <ConfirmSubmit
                         message={`Remove ${row.title} on ${formatDay(row.date)}? Players' check-offs for it go too.`}
-                        className="text-xs text-danger hover:underline"
+                        className={buttonStyles("remove")}
                       >
                         Remove
                       </ConfirmSubmit>

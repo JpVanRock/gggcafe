@@ -6,7 +6,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { formatDay } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
 import { MESSAGE_COLUMNS, signedMessagePhotoUrls, type MentorMessage } from "@/lib/message-photos";
-import { Badge, EmptyState, Loading } from "@/components/ui";
+import { Badge, EmptyState, Loading, groupLabelClass } from "@/components/ui";
 import { FocusBoard, NotesThread, type FocusItem, type MentorNote } from "@/components/mentor-work";
 import { FamilyHeader } from "../header";
 import { DaughterMentors, loadFamilyMentors } from "../mentors";
@@ -27,7 +27,7 @@ export default function FamilyMentorsPage({ searchParams }: PageProps<"/family/m
   );
 }
 
-const heading = "mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = `mb-3 text-pink-soft ${groupLabelClass}`;
 
 /** Everything her mentors send her and write about her: messages (all of them), focus areas and notes with her coaches. */
 async function FamilyMentors({ searchParams }: Pick<PageProps<"/family/mentors">, "searchParams">) {

@@ -23,7 +23,7 @@ import { loadMentalTools } from "@/app/(staff)/players/[playerId]/mental-data";
 import { MessageForm, RemoveMessage, TrainingForm, type LibraryDrill } from "../../mentor-client";
 import { ActionForm } from "@/components/action-form";
 import { SubmitButton } from "@/components/submit-button";
-import { Badge, RECENT_LIMIT } from "@/components/ui";
+import { Badge, RECENT_LIMIT, groupLabelClass } from "@/components/ui";
 import { JOURNAL_BUCKET } from "@/lib/journal";
 import { FocusBoard, FocusControls, FocusForm, NoteForm, NotesThread, RemoveNote, type FocusItem, type MentorNote } from "@/components/mentor-work";
 import { addMentorFocus, addMentorNote, removeMentorFocus, removeMentorNote, setMentorFocus, setMessageSharing } from "../../actions";
@@ -239,7 +239,7 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
             controls={(item) => <FocusControls item={item} move={setMentorFocus} remove={removeMentorFocus} />}
           />
           <FocusForm action={addMentorFocus} hidden={{ player_id: player.id }} />
-          <h3 className="mt-2 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Notes with her coaches</h3>
+          <h3 className={`mt-2 text-pink-soft ${groupLabelClass}`}>Notes with her coaches</h3>
           <NotesThread
             notes={notes}
             empty="No notes yet. After you talk with her coaches, add a discussion summary."

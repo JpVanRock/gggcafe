@@ -4,7 +4,7 @@
 // props from the server page; never import src/lib/advanced-book.ts here (paid
 // content stays on the server). Type-only imports are fine.
 import { useState, useTransition } from "react";
-import { buttonClass, inputClass, pillOutlineClass, secondaryButtonClass, eyebrowClass } from "@/components/ui";
+import { buttonClass, buttonStyles, inputClass, secondaryButtonClass, eyebrowClass } from "@/components/ui";
 import type { Habit } from "@/lib/advanced-book";
 import {
   renameAdvancedBook, saveAdvancedMine, saveAdvancedNotes, setAdvancedAccess, setAdvancedChapterDone, setAdvancedHabit, setConfirmedPosition,
@@ -321,7 +321,8 @@ export function AdvancedAccessToggle({ playerId, name, on, compact = false }: { 
           startTransition(async () => setError((await setAdvancedAccess({ playerId, on: !on })).error));
         }}
         aria-label={compact ? (on ? `Turn off G3 Advanced for ${name}` : `Unlock G3 Advanced for ${name}`) : undefined}
-        className={on ? "text-xs text-muted underline hover:text-danger" : compact ? pillOutlineClass : buttonClass}
+        // the Roster's G3 column: a quiet link per row, so ten Unlock pills don't outshout the roster (design audit P9)
+        className={on ? "text-xs text-muted underline hover:text-danger" : compact ? buttonStyles("link") : buttonClass}
       >
         {pending ? "Saving…" : compact ? (on ? "Turn off" : "Unlock") : on ? "Turn off G3 Advanced" : `Unlock G3 Advanced for ${name}`}
       </button>

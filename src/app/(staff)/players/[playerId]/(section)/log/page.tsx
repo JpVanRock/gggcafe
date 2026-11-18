@@ -4,7 +4,7 @@ import { requirePlayerPage } from "@/lib/auth";
 import { formatDay, todayISO } from "@/lib/dates";
 import { LOG_DAYS_BACK, POINTS, rankRows, sessionLabel } from "@/lib/leaderboard";
 import { createClient } from "@/lib/supabase/server";
-import { EmptyState, eyebrowClass } from "@/components/ui";
+import { EmptyState, eyebrowClass, groupLabelClass } from "@/components/ui";
 import { loadTeamDugout } from "../../data";
 import { loadLeaderboard, loadMySessions } from "../../leaderboard-data";
 import { LogSessionForm, RemoveSession } from "../../leaderboard-client";
@@ -13,7 +13,7 @@ import { SectionShell } from "../section-shell";
 
 export const metadata: Metadata = { title: "+ Activity · GGG.Cafe" };
 
-const heading = "mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = `mb-3 text-pink-soft ${groupLabelClass}`;
 
 export default async function LogPage({ params }: PageProps<"/players/[playerId]/log">) {
   const { playerId } = await params;

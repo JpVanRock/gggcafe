@@ -3,7 +3,7 @@
 // Coaches Dugout → Calendar: the team's Offseason Training dates (the window the
 // players' Leaderboard and Player of the Week count). Coaches and admins only.
 import { useEffect, useState, useTransition, type ReactNode } from "react";
-import { inputClass, secondaryButtonClass } from "@/components/ui";
+import { inputClass, secondaryButtonClass, groupLabelClass } from "@/components/ui";
 import { setOffseason } from "./actions";
 import { confirmAction } from "@/components/confirm-submit";
 
@@ -36,7 +36,7 @@ export function OffseasonPanel({ status, children }: { status: string; children:
       className={`flex flex-col gap-3 rounded-2xl border border-neon/50 bg-neon/5 ${hidden ? "px-4 py-2.5 sm:px-5" : "p-4 sm:p-5"}`}
     >
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
-        <h3 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Offseason Training</h3>
+        <h3 className={`text-pink-soft ${groupLabelClass}`}>Offseason Training</h3>
         {hidden && <span className="min-w-0 flex-1 truncate text-sm text-muted">{status}</span>}
         <button
           type="button"

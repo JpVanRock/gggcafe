@@ -1,14 +1,14 @@
 // Coaches Dugout → Culture (Phase 5): Team Season Goals, the pledge tracker and
 // Player Spotlights, under Team Standards and Culture.
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Disclosure, EmptyState, eyebrowClass } from "@/components/ui";
+import { Disclosure, EmptyState, eyebrowClass, groupLabelClass, buttonStyles } from "@/components/ui";
 import { formatDay } from "@/lib/dates";
 import { GOAL_PHASE_LABEL, goalProgress, pledgeStatus, sortGoals, type TeamGoal } from "@/lib/culture";
 import { deleteGoal, deleteSpotlight, setGoalAchieved } from "./actions";
 import { GoalForm, SpotlightForm } from "./culture-forms";
 import { ActionForm } from "@/components/action-form";
 
-const heading = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = `text-pink-soft ${groupLabelClass}`;
 
 export type Spotlight = { id: string; player_name: string; jersey: string | null; headline: string; body: string; published_on: string };
 type Pledge = { player_id: string; lines: Record<string, string>; signed_at: string | null };
@@ -45,13 +45,13 @@ export function GoalsBoard({ goals, teamId, editor }: { goals: TeamGoal[]; teamI
                 <ActionForm action={setGoalAchieved}>
                   <input type="hidden" name="id" value={g.id} />
                   {!g.achieved_at && <input type="hidden" name="achieved" value="on" />}
-                  <button type="submit" className="text-xs font-semibold text-link hover:underline">
+                  <button type="submit" className={"inline-flex min-h-10 items-center text-xs font-semibold text-link hover:underline sm:min-h-0"}>
                     {g.achieved_at ? "Mark not achieved" : "Mark achieved"}
                   </button>
                 </ActionForm>
                 <ActionForm action={deleteGoal}>
                   <input type="hidden" name="id" value={g.id} />
-                  <ConfirmSubmit message={`Remove the goal "${g.title}"?`} className="text-xs text-muted hover:text-danger">
+                  <ConfirmSubmit message={`Remove the goal "${g.title}"?`} className={buttonStyles("removeQuiet")}>
                     Remove
                   </ConfirmSubmit>
                 </ActionForm>
@@ -145,7 +145,7 @@ export function CultureTeamSections({
                 {editor && (
                   <ActionForm action={deleteSpotlight} className="mt-2">
                     <input type="hidden" name="id" value={s.id} />
-                    <ConfirmSubmit message="Remove this spotlight?" className="text-xs text-muted hover:text-danger">
+                    <ConfirmSubmit message="Remove this spotlight?" className={buttonStyles("removeQuiet")}>
                       Remove
                     </ConfirmSubmit>
                   </ActionForm>

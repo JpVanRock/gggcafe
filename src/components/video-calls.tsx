@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ActionForm } from "@/components/action-form";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { badgeClass } from "@/components/ui";
+import { badgeClass, buttonStyles } from "@/components/ui";
 import { APP_TIME_ZONE } from "@/lib/dates";
 import { playerName } from "@/lib/softball";
 import { CALL_STATE_LABEL, callState, formatCallTime, groupLabel, isComing, type CallTimes } from "@/lib/video-calls";
@@ -73,7 +73,7 @@ export function VideoCallList({
             {coming && canCancel(c) && (
               <ActionForm action={cancelVideoCall}>
                 <input type="hidden" name="call_id" value={c.id} />
-                <ConfirmSubmit message="Cancel this call? Everyone invited is told." confirmLabel="Cancel the call" className="text-xs text-muted hover:text-danger">
+                <ConfirmSubmit message="Cancel this call? Everyone invited is told." confirmLabel="Cancel the call" className={buttonStyles("removeQuiet")}>
                   Cancel
                 </ConfirmSubmit>
               </ActionForm>

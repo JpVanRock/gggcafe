@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { RatingChip } from "@/components/rating-chip";
-import { Disclosure, EmptyState, eyebrowClass, badgeClass } from "@/components/ui";
+import { Disclosure, EmptyState, eyebrowClass, badgeClass, buttonStyles } from "@/components/ui";
 import {
   TRAINING_CATEGORY_LABEL, categoriesFor, evaluateAchievements, streaks, weeklyStats,
   type AchievementProgress, type TrainingCategory,
@@ -59,16 +59,23 @@ export function PerformanceSummary({ summary }: { summary: Summary }) {
   const latest = [...unlocked].sort((a, b) => (b.unlockedOn ?? "").localeCompare(a.unlockedOn ?? "")).slice(0, 3);
   return (
     <div>
-      <div className="grid gap-x-10 gap-y-4 sm:grid-cols-2">
-        {summary.categories.map(({ category, routines, week }) => (
-          <MenuItem
-            key={category}
-            name={TRAINING_CATEGORY_LABEL[category].title}
-            value={week.planned ? `${week.done}/${week.planned}` : undefined}
-            note={routines.length ? routines.map((r) => r.title).join(", ") : "Nothing yet"}
-          />
-        ))}
-      </div>
+      {/* an area with no routines stays off the board: five "Nothing yet" lines said nothing (design audit P2) */}
+      {summary.categories.some((c) => c.routines.length) ? (
+        <div className="grid gap-x-10 gap-y-4 sm:grid-cols-2">
+          {summary.categories
+            .filter((c) => c.routines.length)
+            .map(({ category, routines, week }) => (
+              <MenuItem
+                key={category}
+                name={TRAINING_CATEGORY_LABEL[category].title}
+                value={week.planned ? `${week.done}/${week.planned}` : undefined}
+                note={routines.map((r) => r.title).join(", ")}
+              />
+            ))}
+        </div>
+      ) : (
+        <p className="text-sm text-[var(--menu-note)]">No routines yet. Your coach&apos;s show up here, and you can add your own.</p>
+      )}
       <div className="mt-6 flex flex-wrap items-center gap-2">
         <span className="font-mono text-xs tracking-wider text-muted uppercase">
           {unlocked.length}/{summary.achievements.length} achievements
@@ -162,7 +169,7 @@ function RoutineCard({ r, today, canEdit, playerId }: { r: RoutineRow; today: st
               <input type="hidden" name="id" value={r.id} />
               <ConfirmSubmit
                 message={`Delete “${r.title}” and its check-offs? Use End to keep the history (achievements already earned stay either way).`}
-                className="text-xs text-danger hover:underline"
+                className={buttonStyles("remove")}
               >
                 Delete
               </ConfirmSubmit>
@@ -261,19 +268,6 @@ export function PerformanceDetail({
         </section>
       )}
 
-      <section>
-        <DetailHeading>
-          Achievements · {unlocked}/{summary.achievements.length} unlocked
-        </DetailHeading>
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {[...summary.achievements]
-            .sort((a, b) => Number(Boolean(b.unlockedOn)) - Number(Boolean(a.unlockedOn)) || b.current / b.target - a.current / a.target)
-            .map((a) => (
-              <AchievementBadge key={a.def.key} a={a} />
-            ))}
-        </ul>
-      </section>
-
       {summary.categories.map(({ category, routines, week }) => {
         const label = TRAINING_CATEGORY_LABEL[category];
         return (
@@ -301,6 +295,44 @@ export function PerformanceDetail({
           </section>
         );
       })}
+
+      {/* after her routines, and folded (design audit 2026-11-18, P2: a new player met 12 locked badges first):
+          what she has earned and the next one to go for; the rest open on tap */}
+      <section>
+        <DetailHeading>
+          Achievements · {unlocked}/{summary.achievements.length} unlocked
+        </DetailHeading>
+        {(() => {
+          const sorted = [...summary.achievements].sort(
+            (a, b) => Number(Boolean(b.unlockedOn)) - Number(Boolean(a.unlockedOn)) || b.current / b.target - a.current / a.target,
+          );
+          const earned = sorted.filter((a) => a.unlockedOn);
+          const next = sorted.find((a) => !a.unlockedOn);
+          const shown = [...earned, ...(next ? [next] : [])];
+          const rest = sorted.filter((a) => !shown.includes(a));
+          return (
+            <>
+              {next && <p className="-mt-1 mb-3 text-sm text-muted">Next up: {next.def.title}.</p>}
+              <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {shown.map((a) => (
+                  <AchievementBadge key={a.def.key} a={a} />
+                ))}
+              </ul>
+              {rest.length > 0 && (
+                <div className="mt-3">
+                  <Disclosure summary={`The other ${rest.length} to unlock`}>
+                    <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {rest.map((a) => (
+                        <AchievementBadge key={a.def.key} a={a} />
+                      ))}
+                    </ul>
+                  </Disclosure>
+                </div>
+              )}
+            </>
+          );
+        })()}
+      </section>
 
       {perf.routines.some((r) => r.ends_on !== null && r.ends_on < today) && (
         <p className="text-xs text-muted">

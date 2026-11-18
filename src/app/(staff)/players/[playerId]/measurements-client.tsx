@@ -36,8 +36,9 @@ export function MeasurementForm({
           ))}
         </select>
       </Field>
-      <Field label="Value">
-        <input name="value" inputMode="decimal" required className={`${fieldClass} w-24`} placeholder="3.1" />
+      {/* the unit goes in the hint, not a placeholder that disappears as she types (design audit A4) */}
+      <Field label="Value" hint="In the unit next to the measurement">
+        <input name="value" inputMode="decimal" required className={`${fieldClass} w-24`} />
       </Field>
       <Field label="Date" hint={`Today counts for ${todaySeason}`}>
         <input name="measured_on" type="date" defaultValue={today} max={today} className={`${fieldClass} w-40`} />

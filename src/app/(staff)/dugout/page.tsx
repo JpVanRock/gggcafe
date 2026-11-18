@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { canEdit, requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Card, EmptyState } from "@/components/ui";
+import { Card, EmptyState, groupLabelClass } from "@/components/ui";
 import { DugoutStrip } from "@/components/dugout-strip";
 import { CultureStatement, StandardsList, hasCulture, type TeamCulture, type TeamStandard } from "@/components/team-standards";
 import { loadDugoutTeam } from "./data";
@@ -71,7 +71,7 @@ export default async function DugoutPage({ searchParams }: PageProps<"/dugout">)
       />
 
       <section className="flex flex-col gap-3">
-        <h2 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">
+        <h2 className={`text-pink-soft ${groupLabelClass}`}>
           What players see above TWIS
         </h2>
         <DugoutStrip teams={[{ team, culture, standards }]} canEdit={false} yearbookHref={`/dugout/yearbook?team=${team.id}`} coachResponsibilities />

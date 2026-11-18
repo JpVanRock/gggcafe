@@ -6,7 +6,9 @@
   `/team` (Team Standards & Culture, #standards / #culture) and `/activities` (TWIS "Manage
   activities"). They live in the `(section)` route group, whose layout gives every section page a
   "← Back to {Name}'s menu" link and a section menu bar (`(section)/section-nav.tsx`); pages wrap
-  their content in `SectionShell` and check access with `requirePlayerPage()`.
+  their content in `SectionShell` and check access with `requirePlayerPage()`. A board section's page carries its board:
+  `SectionShell accent="neon" | "pink"` colors the title rule and a band across the card, and the section menu numbers
+  the board sections the way her menu does (01 Goals, 02 Pop Report...; design audit 2026-11-18, P4).
 - Add a future section: a page under `(section)/`, an entry in `SECTIONS` (section-nav.tsx) and in
   the menu's `sections` array (summary + href); add a board color in `menu.tsx` `BOARD` if needed.
 - Pop-ups are only for small things: confirmations, Share, calendar event editing, and the Team
@@ -39,6 +41,10 @@
   `drills` library. They appear in TWIS; check-offs drive consistency and achievements.
   Rules live in `src/lib/achievements.ts` (no imports; unit-tested with `npm run test:unit`).
   Earned achievements are stored in `player_achievements` when a box is ticked and never removed.
+  On her Training page the achievements come after the routines: what she's earned and the next one, the rest behind
+  "The other N to unlock". Her Training board lists only areas with routines (one line when there are none), and the
+  goals boards (hers and the family's) are an outline until she sets goals, neon once she has. A test level or practice
+  quiz with no questions shows "Coming soon", not a greyed-out Start (design audit 2026-11-18, P2).
 - Softball IQ (board formerly "IQ Test"): shared `iq_questions` bank (topic general/hitting/pitching/position) with a starter
   set seeded by migration; `iq_answers` per player. Correct answers are checked server-side
   (`answerIqQuestion`) so quiz questions are sent to the browser without them.
@@ -92,7 +98,9 @@
 - Stolen Base Leader plaques: one per Baserunning IQ level, earned with that level's ring (no table).
   `src/components/stolen-base-plaque.tsx` engraves name and number on the gold bar, with
   "BASERUNNING IQ · LEVEL n · {Rookie|Varsity|All-American}" beneath.
-- Trophy Room (`trophy-room.tsx`, last menu board, `trophy` board variant), shelves top to bottom:
+- Trophy Room (`trophy-room.tsx`, last menu board, `trophy` board variant): "Next to earn" first (up to three awards in
+  reach: a Golden Glove at her position, the next ring, her first training achievement, the Champions Trophy; design
+  audit P2), then shelves top to bottom:
   championship rings, Stolen Base Leader plaques, Golden Gloves, MVP badges, Manager of the Year (one
   per course chapter, all six shown), the hidden GGG World Series Trophy (only once earned),
   Performance Training achievements, then the GGG Champions Trophy at the bottom (user's order).

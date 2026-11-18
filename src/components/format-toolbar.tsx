@@ -6,6 +6,7 @@
 import { useRef, useState, type ReactElement, type TextareaHTMLAttributes } from "react";
 import { wrapSelection, type Mark } from "@/lib/rich-text";
 import { RichText } from "@/components/rich-text";
+import { groupLabelClass } from "@/components/ui";
 
 const BUTTONS: { mark: Mark; label: string; face: ReactElement }[] = [
   { mark: "bold", label: "Bold", face: <span className="font-bold">B</span> },
@@ -48,7 +49,7 @@ export function FormattedTextarea(props: TextareaHTMLAttributes<HTMLTextAreaElem
       <textarea ref={ref} {...props} onInput={(e) => setText(e.currentTarget.value)} />
       {/[*_]/.test(text) && paragraphs.length > 0 && (
         <div className="rounded-lg border border-navy-700 bg-navy-950/60 p-3" aria-live="polite">
-          <p className="mb-2 font-mono text-2xs font-bold tracking-[0.2em] text-muted uppercase">Preview</p>
+          <p className={`mb-2 text-muted ${groupLabelClass}`}>Preview</p>
           <div className="flex flex-col gap-2 text-sm text-ink">
             {paragraphs.map((p, i) => (
               <p key={i} className="whitespace-pre-line">

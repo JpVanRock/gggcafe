@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requirePlayerPage, isHeadCoach } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { EmptyState, eyebrowClass } from "@/components/ui";
+import { EmptyState, eyebrowClass, groupLabelClass } from "@/components/ui";
 import { ScrollToHash } from "@/components/scroll-to-hash";
 import { CultureStatement, StandardsList, hasCulture } from "@/components/team-standards";
 import { loadTeamDugout } from "../../data";
@@ -22,7 +22,7 @@ export const metadata: Metadata = { title: "Team Standards & Culture · GGG.Cafe
 
 function Heading({ id, children }: { id: string; children: React.ReactNode }) {
   return (
-    <h2 id={id} className="mb-5 scroll-mt-40 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">
+    <h2 id={id} className={`mb-5 scroll-mt-40 text-pink-soft ${groupLabelClass}`}>
       {children}
     </h2>
   );

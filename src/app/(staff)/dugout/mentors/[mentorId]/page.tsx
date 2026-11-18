@@ -6,7 +6,7 @@ import { formatDay } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
 import { loadRoster } from "@/lib/roster";
 import { isUuid } from "@/lib/softball";
-import { Badge } from "@/components/ui";
+import { Badge, groupLabelClass } from "@/components/ui";
 import { FocusBoard, NoteForm, NotesThread, RemoveNote, type FocusItem, type MentorNote } from "@/components/mentor-work";
 import { loadDugoutTeam } from "../../data";
 import { NoOwnTeam } from "../../team-picker";
@@ -43,7 +43,7 @@ function Scope({
         {subtitle && <p className="mt-1 text-sm text-muted">{subtitle}</p>}
       </div>
       <FocusBoard items={items} empty={`${first} hasn't added focus areas yet.`} />
-      <h4 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Notes</h4>
+      <h4 className={`text-pink-soft ${groupLabelClass}`}>Notes</h4>
       <NotesThread
         notes={thread}
         controls={(n) => (n.author_id === userId ? <RemoveNote id={n.id} action={removeCoachNote} /> : null)}
@@ -143,7 +143,7 @@ export default async function MentorNotesPage({ params, searchParams }: PageProp
       )}
 
       <section>
-        <h3 className="mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">
+        <h3 className={`mb-3 text-pink-soft ${groupLabelClass}`}>
           {user.staff.role === "admin" ? `${first}'s messages to players` : `Messages ${first} shared with you`}
         </h3>
         {messages.length === 0 ? (

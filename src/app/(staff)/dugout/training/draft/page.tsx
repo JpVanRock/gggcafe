@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { EmptyState } from "@/components/ui";
+import { EmptyState, groupLabelClass, buttonStyles } from "@/components/ui";
 import { onTheClock, squadStandings } from "@/lib/training-plan";
 import { loadDugoutTeam } from "../../data";
 import { NoOwnTeam, TeamPicker } from "../../team-picker";
@@ -19,7 +19,7 @@ export const metadata: Metadata = { title: "Offseason draft · Training · Coach
 // with a captain each, then a snake draft the head coach records here as the
 // captains pick. Squads score the Leaderboard's points; players see the squads
 // and their totals on the Leaderboard.
-const heading = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = `text-pink-soft ${groupLabelClass}`;
 
 export default async function DraftPage({ searchParams }: PageProps<"/dugout/training/draft">) {
   await requireHeadCoachPage();
@@ -120,7 +120,7 @@ export default async function DraftPage({ searchParams }: PageProps<"/dugout/tra
             )}
             <ActionForm action={resetDraft} className="ml-auto">
               <input type="hidden" name="team_id" value={team.id} />
-              <ConfirmSubmit message="Start the draft over? Every squad and pick is removed (points stay with the players)." className="text-xs text-danger hover:underline">
+              <ConfirmSubmit message="Start the draft over? Every squad and pick is removed (points stay with the players)." className={buttonStyles("remove")}>
                 Start over
               </ConfirmSubmit>
             </ActionForm>

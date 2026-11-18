@@ -5,7 +5,7 @@ import { dugoutCanEdit, requireDugoutPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { isUuid } from "@/lib/softball";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Card, pillButtonClass, pillOutlineClass, badgeClass, TableScroll } from "@/components/ui";
+import { Card, pillButtonClass, pillOutlineClass, badgeClass, TableScroll, buttonStyles } from "@/components/ui";
 import { formatLongDate } from "@/lib/dates";
 import { emailConfigured } from "@/lib/email";
 import { BASE_RUNNING_LABEL, HITTING_TYPE_LABEL, percent, pitcherOf, rate } from "@/lib/gameday";
@@ -104,7 +104,7 @@ export default async function LineupPage({ params, searchParams }: PageProps<"/d
                 <ActionForm action={deleteLineup} className="ml-auto">
                   <input type="hidden" name="id" value={lineup.id} />
                   <input type="hidden" name="team_id" value={lineup.team.id} />
-                  <ConfirmSubmit message="Delete this lineup? This can't be undone." className="text-xs text-danger hover:underline">
+                  <ConfirmSubmit message="Delete this lineup? This can't be undone." className={buttonStyles("remove")}>
                     Delete lineup
                   </ConfirmSubmit>
                 </ActionForm>

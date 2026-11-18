@@ -110,7 +110,8 @@ export function PlayerMenu({
       key: "goals",
       title: `${possessive(name)} Goals`,
       subtitle: GOAL_METHOD_LABEL[method],
-      variant: "neon",
+      // color is earned (design audit 2026-11-18, P2): an outline until she has goals, the neon board once she does
+      variant: (method === "smart" ? smartGoals.some((g) => g.status === "active" || g.status === "achieved") : chart) ? "neon" : "outlineNeon",
       wide: true,
       summary: method === "smart" ? <SmartSummary goals={smartGoals} metrics={pop.metrics} /> : <GoalsSummary chart={chart} />,
       href: `${base}/goals`,

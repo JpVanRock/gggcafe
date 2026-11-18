@@ -104,7 +104,8 @@ export function familyMenu(input: FamilyMenuInput, { preview = false }: { previe
     key: `goals-${d.player_id}`,
     title: `${possessive(firstOf(d.player_name))} Goals`,
     subtitle: GOAL_METHOD_LABEL[goals.method],
-    variant: "neon" as const,
+    // an outline until she sets goals, neon once she has (design audit 2026-11-18, P2: color is earned)
+    variant: (goals.method === "smart" ? goals.smart.length === 0 : !goals.chart) ? ("outlineNeon" as const) : ("neon" as const),
     wide: true,
     cta: offForDaughter(d, "parent.view_as") ? null : { href: href(`/players/${d.player_id}/goals`), label: "All her goals" },
     body: <GoalsBoardSummary first={firstOf(d.player_name)} goals={goals} />,

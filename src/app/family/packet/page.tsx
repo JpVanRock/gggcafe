@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ActionForm } from "@/components/action-form";
-import { EmptyState, eyebrowClass } from "@/components/ui";
+import { EmptyState, eyebrowClass, buttonStyles } from "@/components/ui";
 import { PACKET_KIND_LABEL, type PacketKind } from "@/lib/family";
 import { markPacketRead } from "../actions";
 import { loadFamily } from "../family-data";
@@ -49,7 +49,7 @@ async function FamilyPacket() {
               ) : (
                 <ActionForm action={markPacketRead} className="mt-3">
                   <input type="hidden" name="item_id" value={it.id} />
-                  <button type="submit" className="text-sm font-semibold text-link hover:underline">
+                  <button type="submit" className={buttonStyles("link")}>
                     Mark as read
                   </button>
                 </ActionForm>

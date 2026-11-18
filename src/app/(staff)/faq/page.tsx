@@ -3,13 +3,13 @@ import { notFound } from "next/navigation";
 import { requireStaffPage } from "@/lib/auth";
 import { FAQ, FEATURE_SECTIONS, TIERS, type Access } from "@/lib/access-faq";
 import { Softball } from "@/components/softball-icon";
-import { Disclosure, PageHeader, eyebrowClass } from "@/components/ui";
+import { Disclosure, PageHeader, eyebrowClass, groupLabelClass } from "@/components/ui";
 import { FaqNav } from "./faq-nav";
 import { TitleWithTeamLogo } from "@/components/team-logo";
 
 export const metadata: Metadata = { title: "Access FAQ · GGG.Cafe" };
 
-const heading = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = `text-pink-soft ${groupLabelClass}`;
 
 function Mark({ access, tier }: { access: Access; tier: string }) {
   if (access === "no") return <Softball off size={22} label={`Not in ${tier}`} />;
@@ -62,7 +62,7 @@ export default async function FaqPage() {
         <table className="w-full text-sm">
           <thead className="bg-navy-900">
             <tr>
-              <th className="px-4 py-3 text-left font-mono text-2xs font-bold tracking-[0.2em] text-muted uppercase">Feature</th>
+              <th className={`px-4 py-3 text-left text-muted ${groupLabelClass}`}>Feature</th>
               {TIERS.map((t) => (
                 <th key={t.key} className="w-28 px-2 py-3 text-center font-mono text-2xs font-bold tracking-[0.15em] text-highlight uppercase sm:w-36">
                   {t.label.replace(" Access", "")}

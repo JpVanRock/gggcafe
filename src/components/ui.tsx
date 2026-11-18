@@ -89,10 +89,14 @@ export { FormMessage } from "@/components/form-message";
  *   pillOutline  the second big action (Share)
  *   pillQuiet    small actions on a board (New code, Turn off)
  *   danger       delete or remove, when it is the action itself (not the small "Remove" link)
+ *   remove       the small "Remove" / "Delete" link beside a row (red)
+ *   removeQuiet  the same, grey until hovered (a row's own x or Remove)
  *   link         an action that reads as a text link
+ * The text-only looks (remove, removeQuiet, link) are 40px tall on phones, so a thumb can hit them
+ * (design audit 2026-11-18, M2: they were 18-22px).
  * Disabled buttons turn grey (not a dimmed neon) and show a not-allowed cursor.
  */
-export type ButtonVariant = "primary" | "secondary" | "pill" | "pillOutline" | "pillQuiet" | "danger" | "link";
+export type ButtonVariant = "primary" | "secondary" | "pill" | "pillOutline" | "pillQuiet" | "danger" | "remove" | "removeQuiet" | "link";
 
 const BUTTON: Record<ButtonVariant, string> = {
   primary:
@@ -106,7 +110,9 @@ const BUTTON: Record<ButtonVariant, string> = {
     "inline-flex items-center justify-center gap-2 rounded-full border border-navy-600 px-4 py-2 text-sm transition hover:border-pink hover:bg-navy-800 disabled:cursor-not-allowed disabled:opacity-50",
   danger:
     "inline-flex items-center justify-center gap-2 rounded-md border border-danger/70 px-3 py-1.5 text-sm font-semibold text-danger transition hover:bg-danger hover:text-navy-950 disabled:cursor-not-allowed disabled:opacity-50",
-  link: "inline-flex items-center gap-1 text-sm font-semibold text-link hover:underline disabled:cursor-not-allowed disabled:opacity-50",
+  remove: "inline-flex min-h-10 items-center gap-1 text-xs text-danger hover:underline disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-0",
+  removeQuiet: "inline-flex min-h-10 items-center gap-1 text-xs text-muted hover:text-danger disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-0",
+  link: "inline-flex min-h-10 items-center gap-1 text-sm font-semibold text-link hover:underline disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-0",
 };
 
 /** The classes for a button look, plus any of your own (margins, width). */
@@ -133,6 +139,12 @@ export const sectionLabelClass = "text-2xs font-semibold uppercase tracking-[0.1
 
 /** The typewriter kicker above a title or a group ("FROM THE DUGOUT", "PLAYER MENU"). */
 export const eyebrowClass = "font-mono text-2xs uppercase tracking-widest text-pink-soft";
+
+/**
+ * The label over a group, list or column ("UPCOMING", "WELCOME PACKET", "NOTES"): Space Mono caps, bold.
+ * Add its color (text-pink-soft, text-muted). Short labels only: a sentence goes in DM Sans.
+ */
+export const groupLabelClass = "font-mono text-2xs font-bold uppercase tracking-[0.2em]";
 
 export function Eyebrow({ children, className = "" }: { children: ReactNode; className?: string }) {
   return <p className={className ? `${eyebrowClass} ${className}` : eyebrowClass}>{children}</p>;

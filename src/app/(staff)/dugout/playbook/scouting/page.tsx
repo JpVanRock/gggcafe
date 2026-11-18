@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Card, Disclosure, EmptyState, sectionLabelClass } from "@/components/ui";
+import { Card, Disclosure, EmptyState, sectionLabelClass, buttonStyles } from "@/components/ui";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { formatDay, todayISO } from "@/lib/dates";
 import { isUuid } from "@/lib/softball";
@@ -130,7 +130,7 @@ export default async function ScoutingPage({ searchParams }: PageProps<"/dugout/
                                 {editor && (
                                   <ActionForm action={removeScoutReport}>
                                     <input type="hidden" name="id" value={r.id} />
-                                    <ConfirmSubmit message={`Remove “${r.title}”?`} className="text-xs text-muted hover:text-danger">
+                                    <ConfirmSubmit message={`Remove “${r.title}”?`} className={buttonStyles("removeQuiet")}>
                                       Remove
                                     </ConfirmSubmit>
                                   </ActionForm>

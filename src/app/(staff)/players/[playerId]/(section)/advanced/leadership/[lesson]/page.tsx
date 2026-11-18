@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { buttonClass, secondaryButtonClass, eyebrowClass } from "@/components/ui";
+import { buttonClass, secondaryButtonClass, eyebrowClass, groupLabelClass } from "@/components/ui";
 import {
   ANSWER_MAX, BONUS, BONUS_TITLE, ENGAGEMENT_ASK, ENGAGEMENT_LEVELS, GUIDE_TITLE, HABITS, LEADER_ROLES, RUBRIC, RUBRIC_LEVELS,
   SCENARIOS, SCENARIO_GROUPS, STARTER_GROUPS, findLesson, lessonLabel, lessonList, lessonProgram, programTitle,
@@ -13,7 +13,7 @@ import { SectionShell } from "../../../section-shell";
 export const metadata: Metadata = { title: "G3 Leadership Guide · GGG.Cafe" };
 
 function Heading({ children }: { children: React.ReactNode }) {
-  return <h2 className="mb-4 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">{children}</h2>;
+  return <h2 className={`mb-4 text-pink-soft ${groupLabelClass}`}>{children}</h2>;
 }
 
 export default async function LeadershipLessonPage({ params }: PageProps<"/players/[playerId]/advanced/leadership/[lesson]">) {

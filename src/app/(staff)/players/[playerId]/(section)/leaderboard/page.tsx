@@ -9,7 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 import { SpeedStripes } from "@/components/athletic";
 import { squadStandings, type SquadRow } from "@/lib/training-plan";
 import { StatTerm } from "@/components/stat-term";
-import { EmptyState, buttonClass, tableClass, tdClass, thClass, TableScroll } from "@/components/ui";
+import { EmptyState, buttonClass, tableClass, tdClass, thClass, TableScroll, groupLabelClass } from "@/components/ui";
 import { loadTeamDugout } from "../../data";
 import { loadLeaderboard, loadTeamSessions } from "../../leaderboard-data";
 import { RemoveTeamSession } from "../../leaderboard-client";
@@ -20,7 +20,7 @@ import { pickTeam } from "../../../../dugout/team-picker";
 
 export const metadata: Metadata = { title: "Leaderboard · GGG.Cafe" };
 
-const heading = "mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = `mb-3 text-pink-soft ${groupLabelClass}`;
 
 /** The board's rallying cry (user, 2026-11-08: "This is meant to be fun"). */
 function BestVersion() {

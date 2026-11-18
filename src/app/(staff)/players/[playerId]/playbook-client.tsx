@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { ProgressBar } from "@/components/progress-bar";
-import { buttonClass, secondaryButtonClass } from "@/components/ui";
+import { buttonClass, secondaryButtonClass, groupLabelClass } from "@/components/ui";
 import { quizScore, shuffled } from "@/lib/playbook";
 import { answerTeamQuiz } from "./playbook-actions";
 import type { CallCard, QuizQuestion } from "./playbook-data";
@@ -49,7 +49,7 @@ export function Flashcards({ cards }: { cards: CallCard[] }) {
           deck.flipped ? "border-pink bg-navy-900" : "border-navy-600 bg-navy-950/60 hover:border-pink"
         }`}
       >
-        <span className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">{card.kind}</span>
+        <span className={`text-pink-soft ${groupLabelClass}`}>{card.kind}</span>
         {deck.flipped ? (
           <span className="max-w-prose text-base whitespace-pre-line text-ink">{card.description}</span>
         ) : (

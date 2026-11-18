@@ -7,7 +7,7 @@
 // them read-only. Every event shows in each player's TWIS for that week.
 import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
-import { Field, FormMessage, inputClass, pillButtonClass, pillQuietClass, badgeClass, cardClass, EmptyState } from "@/components/ui";
+import { Field, FormMessage, inputClass, pillButtonClass, pillQuietClass, badgeClass, cardClass, EmptyState, groupLabelClass } from "@/components/ui";
 import { EVENT_KINDS, EVENT_KIND_LABEL, clockLabel, parseClock, type EventKind } from "@/lib/dugout";
 import { initialFormState, type FormState } from "@/lib/form";
 import { deleteCalendarEvent, saveCalendarEvent } from "./actions";
@@ -332,7 +332,7 @@ export function CalendarView({
       <div className="hidden overflow-hidden rounded-xl border border-navy-700 sm:block">
         <div className="grid grid-cols-7 border-b border-navy-700 bg-navy-900">
           {WEEKDAYS.map((d) => (
-            <div key={d} className="px-2 py-2 font-mono text-2xs font-bold tracking-[0.2em] text-muted uppercase">
+            <div key={d} className={`px-2 py-2 text-muted ${groupLabelClass}`}>
               {d}
             </div>
           ))}
@@ -402,7 +402,7 @@ export function CalendarView({
             const { games: g, events: e } = byDay(date);
             return (
               <section key={date} className={`${cardClass("raised")} p-3`}>
-                <h3 className={`mb-2 font-mono text-2xs font-bold tracking-[0.2em] uppercase ${date === today ? "text-highlight" : "text-pink-soft"}`}>
+                <h3 className={`mb-2 ${date === today ? "text-highlight" : "text-pink-soft"} ${groupLabelClass}`}>
                   {dayLabel(date)}
                   {date === today && " · Today"}
                   {phases.find((p) => p.startsOn === date) && ` · ${phases.find((p) => p.startsOn === date)!.name} begins`}

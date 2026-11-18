@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { EmptyState, secondaryButtonClass, badgeClass } from "@/components/ui";
+import { EmptyState, secondaryButtonClass, badgeClass, buttonStyles } from "@/components/ui";
 import { WEEKDAYS, addDays, formatDay, formatWeekRange, isoWeekday, weekStart } from "@/lib/dates";
 import { deleteActivity, endActivity } from "./twis-actions";
 import type { ActivityRow, TwisWeek } from "./data";
@@ -145,7 +145,7 @@ export function ActivitiesManager({
                     <input type="hidden" name="id" value={a.id} />
                     <ConfirmSubmit
                       message={`Delete “${a.title}” and all its check-offs? Use End instead to keep the history.`}
-                      className="text-xs text-danger hover:underline"
+                      className={buttonStyles("remove")}
                     >
                       Delete
                     </ConfirmSubmit>

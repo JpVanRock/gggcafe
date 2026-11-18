@@ -5,7 +5,7 @@ import { getPlayerFeaturesOff, requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatDay, todayISO } from "@/lib/dates";
 import { JOURNAL_BUCKET, formatSeconds } from "@/lib/journal";
-import { Badge, EmptyState, RECENT_LIMIT, ShowAllLink, eyebrowClass } from "@/components/ui";
+import { Badge, EmptyState, RECENT_LIMIT, ShowAllLink, eyebrowClass, groupLabelClass, buttonStyles } from "@/components/ui";
 import { ActionForm } from "@/components/action-form";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { loadPlayer } from "../../../section-data";
@@ -100,7 +100,7 @@ export default async function JournalPage({ params, searchParams }: PageProps<"/
         {access.isSelf && (
           <section className="flex flex-col gap-4">
             <div>
-              <h2 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">New entry</h2>
+              <h2 className={`text-pink-soft ${groupLabelClass}`}>New entry</h2>
               <p className="mt-1 max-w-3xl text-sm text-muted">
                 Right after a session, while it&apos;s fresh: what you worked on, the cues that clicked, what to do before next time. Type it, record
                 it, or both. It&apos;s yours: your parents can read it, your coaches can&apos;t, and a mentor sees only what you share.
@@ -111,7 +111,7 @@ export default async function JournalPage({ params, searchParams }: PageProps<"/
         )}
 
         <section className="flex flex-col gap-4">
-          <h2 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">
+          <h2 className={`text-pink-soft ${groupLabelClass}`}>
             {count ? `${count} ${count === 1 ? "entry" : "entries"}` : "Entries"}
           </h2>
           {entries.length === 0 ? (
@@ -132,7 +132,7 @@ export default async function JournalPage({ params, searchParams }: PageProps<"/
                               <input type="hidden" name="player_id" value={player.id} />
                               <input type="hidden" name="id" value={e.id} />
                               {!e.shared_with_mentor && <input type="hidden" name="share" value="on" />}
-                              <button type="submit" className="text-sm font-semibold text-link hover:underline">
+                              <button type="submit" className={buttonStyles("link")}>
                                 {e.shared_with_mentor ? "Stop sharing" : `Share with ${mentorName.get(e.mentor_id)}`}
                               </button>
                             </ActionForm>

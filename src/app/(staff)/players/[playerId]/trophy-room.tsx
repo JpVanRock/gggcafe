@@ -143,11 +143,39 @@ function Shelf({ title, note, children }: { title: string; note?: string; childr
   );
 }
 
+/** The next few awards within reach, so the room opens with a target rather than a shelf of locked art. */
+function nextAwards(room: TrophyRoom): { title: string; how: string }[] {
+  const out: { title: string; how: string }[] = [];
+  const glove = room.positions.find((p) => !p.earnedOn && p.primary) ?? room.positions.find((p) => !p.earnedOn && p.mine) ?? room.positions.find((p) => !p.earnedOn);
+  if (glove) out.push({ title: `Golden Glove · ${glove.label}`, how: "Score 80% or better on its position test in Softball IQ." });
+  if (room.rings.length < 6) out.push({ title: `Championship ring ${room.rings.length + 1} of 6`, how: "Pass the next Playbook test level with 80% or better." });
+  if (room.achievements.length === 0) out.push({ title: "Your first training achievement", how: "Check off a routine in Performance Training." });
+  if (!room.championsOn) out.push({ title: "GGG Champions Trophy", how: "Every Extra Credit question in one run, 80% or better." });
+  return out.slice(0, 3);
+}
+
 export function TrophyRoomDetail({ room }: { room: TrophyRoom }) {
   const gloves = room.positions.filter((p) => p.earnedOn);
   const managers = room.managers.filter((m) => m.earnedOn);
+  const next = nextAwards(room);
   return (
     <div className="flex flex-col gap-6">
+      {/* leads with what to go after next (design audit 2026-11-18, P2) */}
+      {next.length > 0 && (
+        <section aria-labelledby="next-awards" className="rounded-2xl border-2 border-neon bg-navy-900 p-5">
+          <DetailHeading>
+            <span id="next-awards">Next to earn</span>
+          </DetailHeading>
+          <ul className="grid gap-3 sm:grid-cols-3">
+            {next.map((n) => (
+              <li key={n.title}>
+                <p className="font-display text-lg font-bold text-highlight">{n.title}</p>
+                <p className="text-sm text-muted">{n.how}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       <Shelf title="Championship rings" note={`${room.rings.length} of 6 · one per playbook level passed with 80%+`}>
         <RingCase earned={room.rings} size={76} />
       </Shelf>

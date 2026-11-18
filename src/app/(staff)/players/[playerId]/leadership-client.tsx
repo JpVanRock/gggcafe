@@ -4,7 +4,7 @@
 // the server pages; never import src/lib/leadership-guide.ts values here (paid
 // content stays on the server). Type-only imports are fine.
 import { useState, useTransition } from "react";
-import { buttonClass, inputClass, secondaryButtonClass, eyebrowClass } from "@/components/ui";
+import { buttonClass, inputClass, secondaryButtonClass, eyebrowClass, groupLabelClass } from "@/components/ui";
 import type { HabitItem, LeadershipPlan, Program, RubricArea } from "@/lib/leadership-guide";
 import {
   commitLeadershipPlan, saveCoachRating, saveLeadershipAnswer, saveLeadershipPlan, setLeadershipAccess, setLeadershipLessonDone,
@@ -397,7 +397,7 @@ export function PlanForm({
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const field = inputClass;
-  const heading = "mb-2 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
+  const heading = `mb-2 text-pink-soft ${groupLabelClass}`;
 
   function save(commit = false) {
     setError(null);

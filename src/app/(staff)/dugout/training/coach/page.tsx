@@ -7,14 +7,14 @@ import { MENTAL_LESSONS, lessonsDone, twoDigits } from "@/lib/mental-lessons";
 import { loadRoster } from "@/lib/roster";
 import { ROLE_LABEL, type StaffRole } from "@/lib/roles";
 import { OutlineText } from "@/components/athletic";
-import { EmptyState, TableScroll, eyebrowClass, tableClass, tdClass, thClass } from "@/components/ui";
+import { EmptyState, TableScroll, eyebrowClass, tableClass, tdClass, thClass, groupLabelClass } from "@/components/ui";
 import { loadDugoutTeam } from "../../data";
 import { NoOwnTeam, TeamPicker } from "../../team-picker";
 import { TrainingNav } from "../nav";
 
 export const metadata: Metadata = { title: "Coach training · Training · Coaches Dugout · GGG.Cafe" };
 
-const heading = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = `text-pink-soft ${groupLabelClass}`;
 
 function Progress({ label, done, total }: { label: string; done: number; total: number }) {
   return (

@@ -23,14 +23,19 @@ function sectionsFor(advanced: boolean, hidden: readonly string[] = []) {
   return [...shown.slice(0, at), { slug: "advanced", label: "G3 Advanced" }, ...shown.slice(at)];
 }
 
-/** The menu across the top of every player section page. */
+/** The sections that are boards on her menu, numbered the same way there (01 Goals, 02 Pop Report...). */
+const BOARD_SLUGS = ["goals", "pop", "mental", "training", "iq", "advanced", "trophies"];
+
+/** The menu across the top of every player section page. Board sections carry their board's number (design audit, P4). */
 export function SectionNav({ playerId, path = "", advanced = false, hidden = [] }: { playerId: string; path?: string; advanced?: boolean; hidden?: string[] }) {
   const base = `/players/${playerId}`;
   return (
     <TabRow label="Player sections" current={path}>
       <ul className="flex min-w-max gap-5 border-b border-navy-700">
-        {sectionsFor(advanced, hidden).map((s) => {
+        {sectionsFor(advanced, hidden).map((s, _, all) => {
           const href = `${base}/${s.slug}`;
+          const boards = all.filter((x) => BOARD_SLUGS.includes(x.slug));
+          const number = boards.findIndex((x) => x.slug === s.slug) + 1;
           const active = path === href || path.startsWith(`${href}/`);
           return (
             <li key={s.slug}>
@@ -41,6 +46,7 @@ export function SectionNav({ playerId, path = "", advanced = false, hidden = [] 
                   active ? "border-pink text-highlight" : "border-transparent text-muted hover:text-ink"
                 }`}
               >
+                {number > 0 && <span className="mr-1.5 font-display tabular-nums">{String(number).padStart(2, "0")}</span>}
                 {s.label}
               </Link>
             </li>

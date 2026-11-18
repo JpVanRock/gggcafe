@@ -29,7 +29,7 @@ export default async function TrainingPage({ params }: PageProps<"/players/[play
   ]);
   const summary = summarizePerformance(performance, positions, today);
   return (
-    <SectionShell title="Performance Training" subtitle="Workouts · stretching · drills · testing" notice={<SafetyNote audience="player" />}>
+    <SectionShell accent="neon" title="Performance Training" subtitle="Workouts · stretching · drills · testing" notice={<SafetyNote audience="player" />}>
       <div className="flex flex-col gap-10">
         {bullpens && <PitchingSection playerId={player.id} scripts={bullpens.scripts} sessions={bullpens.sessions} canEdit={access.canAct} />}
         <PerformanceDetail playerId={player.id} perf={performance} summary={summary} today={today} canEdit={access.canAct} testing={testing} />

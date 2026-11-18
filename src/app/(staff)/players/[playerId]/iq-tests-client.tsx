@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { buttonClass, inputClass, secondaryButtonClass, cardClass } from "@/components/ui";
+import { Badge, buttonClass, inputClass, secondaryButtonClass, cardClass } from "@/components/ui";
 
 import { POSITION_LABEL, type FieldPosition } from "@/lib/softball";
 import { Diamond, type DiamondSpec } from "@/components/diamond";
@@ -180,7 +180,8 @@ function BadgeTrackPicker({ tracks, actions }: { tracks: BadgeTrackInfo[]; actio
                       <p className="text-sm font-bold">
                         Level {l.level}
                         <span className="ml-2 font-mono text-2xs font-normal tracking-wider text-muted uppercase">
-                          {LEVEL_NAME[l.level]} · {l.questionCount} questions
+                          {LEVEL_NAME[l.level]}
+                          {l.questionCount > 0 && ` · ${l.questionCount} questions`}
                         </span>
                       </p>
                       <p className="text-xs text-muted">
@@ -195,10 +196,12 @@ function BadgeTrackPicker({ tracks, actions }: { tracks: BadgeTrackInfo[]; actio
                                 : `Score ${PASS_PCT}% to pass; a perfect score earns the MVP badge`}
                       </p>
                     </div>
-                    {open && !l.inProgress && (
+                    {/* a level with no questions yet says so, instead of a greyed-out Start (design audit P2) */}
+                    {open && !l.inProgress && l.questionCount === 0 && <Badge>Coming soon</Badge>}
+                    {open && !l.inProgress && l.questionCount > 0 && (
                       <button
                         type="button"
-                        disabled={!actions.canEdit || actions.pending || l.questionCount === 0}
+                        disabled={!actions.canEdit || actions.pending}
                         onClick={() => actions.start(key)}
                         className={l.status === "earned" ? secondaryButtonClass : buttonClass}
                       >
@@ -236,7 +239,8 @@ function TrackPicker({ tracks, actions }: { tracks: TrackInfo[]; actions: Action
                       <p className="text-sm font-bold">
                         Level {l.level}
                         <span className="ml-2 font-mono text-2xs font-normal tracking-wider text-muted uppercase">
-                          {LEVEL_NAME[l.level]} · {l.questionCount} questions
+                          {LEVEL_NAME[l.level]}
+                          {l.questionCount > 0 && ` · ${l.questionCount} questions`}
                         </span>
                       </p>
                       <p className="text-xs text-muted">
@@ -249,10 +253,12 @@ function TrackPicker({ tracks, actions }: { tracks: TrackInfo[]; actions: Action
                               : `Score ${PASS_PCT}% or better to earn the ring`}
                       </p>
                     </div>
-                    {open && !l.inProgress && (
+                    {/* a level with no questions yet says so, instead of a greyed-out Start (design audit P2) */}
+                    {open && !l.inProgress && l.questionCount === 0 && <Badge>Coming soon</Badge>}
+                    {open && !l.inProgress && l.questionCount > 0 && (
                       <button
                         type="button"
-                        disabled={!actions.canEdit || actions.pending || l.questionCount === 0}
+                        disabled={!actions.canEdit || actions.pending}
                         onClick={() => actions.start(key)}
                         className={l.status === "earned" ? secondaryButtonClass : buttonClass}
                       >
@@ -768,12 +774,15 @@ export function IqTests({
   return (
     <>
       <section>
-        <DetailHeading>Playbook tests · score 80% to earn the ring and unlock the next level</DetailHeading>
+        {/* a short label, the rule as a sentence (design audit, G1: no sentences in spaced-out mono caps) */}
+        <DetailHeading>Playbook tests</DetailHeading>
+        <p className="-mt-1 mb-3 text-sm text-muted">Score 80% to earn the ring and unlock the next level.</p>
         <TrackPicker tracks={tracks} actions={actions} />
       </section>
       {badgeTracks.length > 0 && (
         <section>
-          <DetailHeading>{badgeTracks.map((t) => t.label).join(" · ")} · score 80% to unlock the next level · MVP badges</DetailHeading>
+          <DetailHeading>{badgeTracks.map((t) => t.label).join(" · ")} · MVP badges</DetailHeading>
+          <p className="-mt-1 mb-3 text-sm text-muted">Score 80% to unlock the next level.</p>
           <BadgeTrackPicker tracks={badgeTracks} actions={actions} />
         </section>
       )}

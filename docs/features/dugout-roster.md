@@ -3,7 +3,9 @@
   is decided once: a page left open after another coach decided it says so and changes nothing, `PLAYER_CLAIM` /
   `PARENT_LINK` in `src/lib/lifecycles.ts`, docs/architecture/state-machines.md),
   then the parent code card for coaches (`dugout/team-code.tsx`, also on the Parents tab: the team's one join code for
-  parents, assistant coaches and mentors, never players; head coaches make a new one or turn it off), then the season's roster with each player's account status (Claimed / Waiting) and approved parents,
+  parents, assistant coaches and mentors, never players; head coaches make a new one or turn it off; "Copy code" and
+  "Share invite" (the phone's share sheet, else the invite copied) for every coach, and the rules in a "How joining works"
+  section that opens on tap: design audit 2026-11-18, P3 and C1), then the season's roster with each player's account status (Claimed / Waiting) and approved parents,
   and an Edit link per row for coaches and admins (user, 2026-11-13): `dugout/roster/players/[playerId]` (`?team=&season=`)
   edits her name and profile with the Pop Report's form (`players/player-form.tsx`, `updatePlayer`) and her jersey
   number and Active for this team and season (`RosterEntryEditor`, `updateRosterEntry`); viewers get a 404;

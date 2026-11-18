@@ -59,9 +59,10 @@
   `request.jwt.claims` to that person for the rest of the call, so their own access rules and functions answer,
   then puts the setting back. Nobody signs in as anyone and nothing can be changed. `admin_account(user)` (definer,
   admins only) adds email, sign-up type, account and confirmation dates and last sign-in. `tests/db/admin_view_as.test.sql`.
-- Parent View and Mentor View (user, 2026-11-14): on the Dugout's Parents and Mentors tabs admins get a "Coach view |
-  Parent view" ("Mentor view") toggle (`ViewToggle` in `view-as/parts.tsx`), opening the team's first approved parent
-  (working mentor) with `?team=`; a picker switches between that team's parents (mentors), and Coach view goes back. The
+- Parent View and Mentor View (user, 2026-11-14): on the Dugout's Parents and Mentors tabs admins get a "Preview as
+  parent →" ("Preview as mentor →") link (`ViewToggle` in `view-as/parts.tsx`; a switch until the 2026-11-18 design audit),
+  opening the team's first approved parent (working mentor) with `?team=`; a picker switches between that team's parents
+  (mentors), and "← Back to the Coach view" goes back. The
   View as pages now draw the page the way the person sees it: the Parent View with the family page's own builder
   (`familyMenu` in `family/menu-content.tsx`, `preview`: labels without links), the Mentor View in the mentor menu's
   layout (`view-as/mentor/preview.tsx`, shared). The account and troubleshooting facts follow under "Behind the page".

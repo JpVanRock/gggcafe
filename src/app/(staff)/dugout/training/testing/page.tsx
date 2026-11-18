@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { canEdit, isHeadCoach, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Disclosure, EmptyState } from "@/components/ui";
+import { Disclosure, EmptyState, groupLabelClass } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import { TESTS, composite, cutoffsFor, rate, tierFor } from "@/lib/training-plan";
 import { RatingChip } from "@/components/rating-chip";
@@ -17,7 +17,7 @@ export const metadata: Metadata = { title: "Testing · Training · Coaches Dugou
 // The athletic testing pack (Phase 2): results save as measurements; each is rated
 // 1-5 against the team's age-group bands, with a composite score. Coaches only:
 // players see their own results in Performance Training (no public rankings).
-const heading = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = `text-pink-soft ${groupLabelClass}`;
 const TIER_LABEL = { youth: "8U-10U", u12: "11U-12U", u14: "13U-14U", u16: "15U-16U", u18: "17U-18U" } as const;
 
 export default async function TestingPage({ searchParams }: PageProps<"/dugout/training/testing">) {

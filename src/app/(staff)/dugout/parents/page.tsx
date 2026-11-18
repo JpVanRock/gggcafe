@@ -3,7 +3,7 @@ import Link from "next/link";
 import { canEdit, requireHeadCoachPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Card, EmptyState, Disclosure, badgeClass, eyebrowClass } from "@/components/ui";
+import { Card, EmptyState, Disclosure, badgeClass, eyebrowClass, groupLabelClass, buttonStyles } from "@/components/ui";
 import { loadDugoutTeam } from "../data";
 import { NoOwnTeam, TeamPicker } from "../team-picker";
 import { ViewToggle } from "../../view-as/parts";
@@ -70,12 +70,12 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
       <ParentCodeCard team={team} code={code} head />
 
       <Card title={`Waiting for approval (${pending.length})`}>
-        <p className="-mt-1 mb-3 text-sm text-muted">
-          Parents who join with the parent code and their daughter&apos;s name as it is on the roster don&apos;t wait here. These typed a name
-          that matches no one on the current roster, or were declined before: pick her, or decline.
-        </p>
+        {/* the explanation only when there's something to act on (design audit 2026-11-18, C1) */}
+        {pending.length > 0 && (
+          <p className="-mt-1 mb-3 text-sm text-muted">These typed a name that matches no one on the current roster, or were declined before: pick her, or decline.</p>
+        )}
         {pending.length === 0 ? (
-          <EmptyState>No requests waiting.</EmptyState>
+          <EmptyState>No requests waiting. Parents who enter the code with their daughter&apos;s name as it is on the roster get in without waiting here.</EmptyState>
         ) : (
           <PendingParentList links={pending} players={players} />
         )}
@@ -108,7 +108,7 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
                         <span className={badgeClass("neon")}>Team admin</span>
                         <ConfirmSubmit
                           message={`Take team admin away from ${l.parent_name}? They keep their parent access.`}
-                          className="text-xs text-muted hover:text-danger"
+                          className={buttonStyles("removeQuiet")}
                           confirmLabel="Take it away"
                         >
                           Remove
@@ -117,7 +117,7 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
                     ) : (
                       <ConfirmSubmit
                         message={`Make ${l.parent_name} a team admin? They can change ${team.name}'s calendar, GameDay (lineups, depth chart, box scores) and players' measurements. Nothing else.`}
-                        className="text-xs font-semibold text-link hover:underline"
+                        className={"inline-flex min-h-10 items-center text-xs font-semibold text-link hover:underline sm:min-h-0"}
                         confirmLabel="Make team admin"
                         tone="primary"
                       >
@@ -135,7 +135,7 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
                   <input type="hidden" name="link_id" value={l.link_id} />
                   <ConfirmSubmit
                     message={`Remove ${l.parent_name}'s access to ${team.name}? If they shouldn't have had the parent code, make a new one too: they could join again with it.`}
-                    className="text-xs text-danger hover:underline"
+                    className={buttonStyles("remove")}
                   >
                     Remove access
                   </ConfirmSubmit>
@@ -156,7 +156,7 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
                 </span>
                 <ActionForm action={removeParentLink}>
                   <input type="hidden" name="link_id" value={l.link_id} />
-                  <button type="submit" className="text-xs text-muted hover:text-danger">
+                  <button type="submit" className={buttonStyles("removeQuiet")}>
                     Clear
                   </button>
                 </ActionForm>
@@ -182,7 +182,7 @@ async function PacketSection({ teamId }: { teamId: string }) {
   const readCount = (id: string) => ((reads ?? []) as { item_id: string }[]).filter((r) => r.item_id === id).length;
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Welcome packet</h2>
+      <h2 className={`text-pink-soft ${groupLabelClass}`}>Welcome packet</h2>
       <p className="text-sm text-muted">Approved parents read it on their family page and mark each item read.</p>
       {list.length > 0 && (
         <ul className="grid gap-3 md:grid-cols-2">
@@ -196,7 +196,7 @@ async function PacketSection({ teamId }: { teamId: string }) {
               <div className="mt-2 flex flex-wrap items-center gap-3">
                 <ActionForm action={deletePacketItem}>
                   <input type="hidden" name="id" value={it.id} />
-                  <ConfirmSubmit message={`Remove "${it.title}" from the packet?`} className="text-xs text-muted hover:text-danger">
+                  <ConfirmSubmit message={`Remove "${it.title}" from the packet?`} className={buttonStyles("removeQuiet")}>
                     Remove
                   </ConfirmSubmit>
                 </ActionForm>
@@ -215,7 +215,7 @@ async function PacketSection({ teamId }: { teamId: string }) {
       </Disclosure>
       <ActionForm action={addStarterTips}>
         <input type="hidden" name="team_id" value={teamId} />
-        <button type="submit" className="text-sm font-semibold text-link hover:underline">
+        <button type="submit" className={buttonStyles("link")}>
           + Add the starter &ldquo;how to help her&rdquo; tips
         </button>
       </ActionForm>

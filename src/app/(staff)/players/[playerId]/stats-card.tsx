@@ -6,7 +6,7 @@ import type { createClient } from "@/lib/supabase/server";
 import { StatTerm } from "@/components/stat-term";
 import { qabSummary } from "@/lib/box-score";
 import { rateLabel, type StatKey } from "@/lib/stat-formulas";
-import { cardClass } from "@/components/ui";
+import { cardClass, groupLabelClass } from "@/components/ui";
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
@@ -73,7 +73,7 @@ export function StatsCard({ stats, seasonLabel }: { stats: Awaited<ReturnType<ty
   const has = stats && (stats.batting || stats.pitching || stats.fielding || stats.qab || stats.bp);
   return (
     <section className="mt-10 flex flex-col gap-3">
-      <h2 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">
+      <h2 className={`text-pink-soft ${groupLabelClass}`}>
         Season stats{seasonLabel ? ` · ${seasonLabel}` : ""}
       </h2>
       {!has ? (

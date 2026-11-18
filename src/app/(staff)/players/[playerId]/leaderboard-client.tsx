@@ -2,7 +2,7 @@
 
 // + Activity (log a session) and the Leaderboard's coach controls (removing a session).
 import { useState, useTransition } from "react";
-import { buttonClass, inputClass } from "@/components/ui";
+import { buttonClass, inputClass, groupLabelClass } from "@/components/ui";
 import { LOG_NOTE_MAX, SESSION_KINDS, sessionLabel, type SessionKind } from "@/lib/leaderboard";
 import { deleteSession, logSession, removeTeamSession } from "./leaderboard-actions";
 import { confirmAction } from "@/components/confirm-submit";
@@ -54,7 +54,7 @@ export function LogSessionForm({ playerId, today, daysBack }: { playerId: string
       }}
     >
       <fieldset>
-        <legend className="mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">What did you do?</legend>
+        <legend className={`mb-3 text-pink-soft ${groupLabelClass}`}>What did you do?</legend>
         <div className="grid gap-3 sm:grid-cols-3">
           {SESSION_KINDS.map((k) => {
             const on = kind === k.kind;
@@ -80,7 +80,7 @@ export function LogSessionForm({ playerId, today, daysBack }: { playerId: string
       </fieldset>
 
       <fieldset className="flex flex-wrap items-end gap-3">
-        <legend className="mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">When?</legend>
+        <legend className={`mb-3 text-pink-soft ${groupLabelClass}`}>When?</legend>
         {[
           { label: "Today", value: today },
           { label: "Yesterday", value: yesterday },
@@ -112,7 +112,7 @@ export function LogSessionForm({ playerId, today, daysBack }: { playerId: string
       </fieldset>
 
       <label className="flex max-w-2xl flex-col gap-2">
-        <span className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Note (optional)</span>
+        <span className={`text-pink-soft ${groupLabelClass}`}>Note (optional)</span>
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}

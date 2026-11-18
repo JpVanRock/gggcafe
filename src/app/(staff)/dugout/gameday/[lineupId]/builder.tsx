@@ -10,7 +10,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { useRouter } from "next/navigation";
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Card, fieldClass, inputClass, pillButtonClass, pillOutlineClass, sectionLabelClass, TableScroll, cardClass } from "@/components/ui";
+import { Card, fieldClass, inputClass, pillButtonClass, pillOutlineClass, sectionLabelClass, TableScroll, cardClass, buttonStyles } from "@/components/ui";
 import { formatLongDate } from "@/lib/dates";
 import {
   BASE_RUNNING_LABEL, GAME_JOB_STARTERS, HITTING_TYPE_LABEL, MAX_ROTATIONS, PITCHES, ROTATION_SPOTS, dpFlexProblems, fieldingPlayers, percent,
@@ -539,7 +539,7 @@ export function LineupBuilder({
           <ActionForm action={deleteLineup} className="ml-auto">
             <input type="hidden" name="id" value={lineup.id} />
             <input type="hidden" name="team_id" value={lineup.team.id} />
-            <ConfirmSubmit message="Delete this draft lineup? This can't be undone." className="text-xs text-danger hover:underline">
+            <ConfirmSubmit message="Delete this draft lineup? This can't be undone." className={buttonStyles("remove")}>
               Delete draft
             </ConfirmSubmit>
           </ActionForm>

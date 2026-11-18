@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { Modal } from "@/components/modal";
 import { BudgetSummary, CreditsSummary, type BudgetSummaryData } from "@/components/budget-summary";
-import { Card, Disclosure, EmptyState, pillQuietClass, tableClass, tdClass, thClass, badgeClass, type BadgeTone, TableScroll } from "@/components/ui";
+import { Card, Disclosure, EmptyState, pillQuietClass, tableClass, tdClass, thClass, badgeClass, type BadgeTone, TableScroll, buttonStyles } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import {
   PAYER_ROLE_LABEL, coachLedger, coachTotals, creditLedger, money, paymentCategory, playerBalances, runningLedger, toCents,
@@ -190,7 +190,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
             </nav>
           )}
           {summary && (
-            <Modal title="What parents see" subtitle={`${team.name} · ${season.name}`} trigger="Parent view" triggerClassName={pillQuietClass}>
+            <Modal title="What parents see" subtitle={`${team.name} · ${season.name}`} trigger="Preview as parent" triggerClassName={pillQuietClass}>
               <p className="mb-5 text-sm text-muted">
                 Approved parents see team totals only: no names, and player payments as daily totals. Tournament credits show on their
                 own, below the budget.
@@ -380,7 +380,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
                             )}
                             <ActionForm action={deleteEntry}>
                               <input type="hidden" name="id" value={e.id} />
-                              <ConfirmSubmit message={`Remove “${item}” (${money(e.cents)}) from the ledger?`} className="text-xs text-danger hover:underline">
+                              <ConfirmSubmit message={`Remove “${item}” (${money(e.cents)}) from the ledger?`} className={buttonStyles("remove")}>
                                 Remove
                               </ConfirmSubmit>
                             </ActionForm>
@@ -441,7 +441,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
                             <input type="hidden" name="id" value={c.id} />
                             <ConfirmSubmit
                               message={`Remove this tournament credit (${money(c.cents)}) from the credit balance?`}
-                              className="text-xs text-danger hover:underline"
+                              className={buttonStyles("remove")}
                             >
                               Remove
                             </ConfirmSubmit>
@@ -535,7 +535,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
                                 <input type="hidden" name="id" value={r.expense.id} />
                                 <ConfirmSubmit
                                   message={`Remove “${r.expense.item}” (${money(r.expense.cents)}) from Out of Pocket Expenses?`}
-                                  className="text-xs text-danger hover:underline"
+                                  className={buttonStyles("remove")}
                                 >
                                   Remove
                                 </ConfirmSubmit>
@@ -550,7 +550,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/dugout/bu
                                       ? "Undo this repayment? Its Out-of-pocket reimbursement expense comes out of the team ledger, and every item it covered is owed again."
                                       : "Undo this repayment? The item is owed again."
                                   }
-                                  className="text-xs text-danger hover:underline"
+                                  className={buttonStyles("remove")}
                                 >
                                   Undo
                                 </ConfirmSubmit>

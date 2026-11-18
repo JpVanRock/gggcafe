@@ -49,9 +49,9 @@
   created they should have a toggle view between parent view and player view"). The family page's header has a
   "Create Player Login" button per daughter on the current roster without a login ("Create Maya's Login" when there are
   several daughters), opening her card on Logins & Teams; the menu's Logins & Teams carries a "Her login" badge. Once she
-  has a login, `ParentPlayerToggle` (`components/parent-player-toggle.tsx`, `loadPlayerViews`) shows "Parent view |
-  Player view" ("Maya's view" per daughter when there are several): Player view is her pages read only (View as player),
-  and the banner on her pages (`parent-view-banner.tsx`) carries the same toggle back. Not shown when View as player is
+  has a login, `ParentPlayerToggle` (`components/parent-player-toggle.tsx`, `loadPlayerViews`) shows "See her view →"
+  ("See Maya's view →" per daughter when there are several): her pages read only (View as player), and the banner on her
+  pages (`parent-view-banner.tsx`) has "← Family menu" back. Links, not a switch, since the 2026-11-18 design audit (N3). Not shown when View as player is
   off for her team. The parents' top menu says "Family menu" (it said Home), and sign-in sends parents straight to
   /family (`signIn` in `login/actions.ts` picks each account's home: staff /dashboard, parents /family, mentors
   /mentor, players /me).

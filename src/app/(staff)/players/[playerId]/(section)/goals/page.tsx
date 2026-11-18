@@ -29,7 +29,7 @@ export default async function GoalsPage({ params }: PageProps<"/players/[playerI
     supabase.from("player_best_version").select("answers").eq("player_id", player.id).maybeSingle(),
   ]);
   return (
-    <SectionShell title={`${possessive(firstName(player))} Goals`} subtitle={GOAL_METHOD_LABEL[method]}>
+    <SectionShell accent="neon" title={`${possessive(firstName(player))} Goals`} subtitle={GOAL_METHOD_LABEL[method]}>
       <div className="flex flex-col gap-8">
         <BestVersion
           playerId={player.id}

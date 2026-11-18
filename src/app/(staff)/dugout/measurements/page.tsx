@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ActionForm } from "@/components/action-form";
 import { SubmitButton } from "@/components/submit-button";
 import { PillNav } from "@/components/pill-nav";
-import { EmptyState, TableScroll, fieldClass, tableClass, tdClass, thClass } from "@/components/ui";
+import { EmptyState, TableScroll, fieldClass, tableClass, tdClass, thClass, groupLabelClass } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import { CATCHER_MEASUREMENT, DEFAULT_MEASUREMENTS, PITCHER_MEASUREMENT, formatMeasure, type MeasureDef } from "@/lib/measurements";
 import { loadRoster } from "@/lib/roster";
@@ -15,7 +15,7 @@ import { recordMeasurements, removeMeasurement } from "./actions";
 
 export const metadata: Metadata = { title: "Measurements · Coaches Dugout · GGG.Cafe" };
 
-const heading = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = `text-pink-soft ${groupLabelClass}`;
 
 // Team measurements (user, 2026-11-12): one measurement for the whole roster at once (a testing
 // day, a radar gun at practice). Coaches and the team's team admin enter them; each value shows

@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { requireStaffPage } from "@/lib/auth";
 import { formatLongDateAt } from "@/lib/dates";
 import type { ViewAccount } from "@/lib/view-as";
+import { buttonStyles, groupLabelClass } from "@/components/ui";
 
 /** Admins only: anyone else gets a 404. */
 export async function requireAdminPage() {
@@ -17,7 +18,7 @@ export async function requireAdminPage() {
 export function ViewBanner({ who, role, children }: { who: string; role: "parent" | "mentor"; children?: ReactNode }) {
   return (
     <div className="flex flex-col gap-2 rounded-2xl border-2 border-pink bg-pink/5 p-4 sm:p-5">
-      <p className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Admin · view as {role} · read only</p>
+      <p className={`text-pink-soft ${groupLabelClass}`}>Admin · view as {role} · read only</p>
       <p className="text-lg font-semibold text-ink">
         What {who} sees on their {role === "parent" ? "family page" : "mentor home"}
       </p>
@@ -33,29 +34,27 @@ export function ViewBanner({ who, role, children }: { who: string; role: "parent
 }
 
 /**
- * Coach view | Parent view (or Mentor view), for admins (user, 2026-11-14): on the Dugout's Parents and
- * Mentors tabs, and over a Parent or Mentor View to go back. `viewHref` null when there's nobody to show.
+ * Admins' way into a Parent or Mentor View (user, 2026-11-14), on the Dugout's Parents and Mentors tabs,
+ * and the way back from one. A plain link, not a second Coach/Parent-style switch (design audit
+ * 2026-11-18, N3: four look-alike pink switches did different things; the header's Coach / Parent
+ * switch is the only one now). The View page's banner says whose view it is. `viewHref` null when
+ * there's nobody to show.
  */
 export function ViewToggle({ kind, current, coachHref, viewHref }: { kind: "parent" | "mentor"; current: "coach" | "view"; coachHref: string; viewHref: string | null }) {
-  const item = "inline-flex min-h-10 items-center rounded-full px-4 transition";
-  const on = "bg-pink text-on-accent";
-  const off = "text-muted hover:text-ink";
-  const label = kind === "parent" ? "Parent view" : "Mentor view";
-  return (
-    <nav aria-label={`Coach view or ${label.toLowerCase()}`} className="inline-flex self-start rounded-full border border-navy-600 p-0.5 text-sm font-semibold tracking-wider uppercase">
-      <Link href={coachHref} aria-current={current === "coach" ? "page" : undefined} className={`${item} ${current === "coach" ? on : off}`}>
-        Coach view
+  if (current === "view") {
+    return (
+      <Link href={coachHref} className="self-start text-sm font-semibold text-link hover:underline">
+        <span aria-hidden="true">←</span> Back to the Coach view
       </Link>
-      {viewHref ? (
-        <Link href={viewHref} aria-current={current === "view" ? "page" : undefined} className={`${item} ${current === "view" ? on : off}`}>
-          {label}
-        </Link>
-      ) : (
-        <span className={`${item} text-muted`} title={kind === "parent" ? "No approved parents on this team yet" : "No mentors on this team yet"}>
-          {label}
-        </span>
-      )}
-    </nav>
+    );
+  }
+  const label = `Preview as ${kind}`;
+  return viewHref ? (
+    <Link href={viewHref} className={buttonStyles("secondary", "self-start")}>
+      {label} <span aria-hidden="true">→</span>
+    </Link>
+  ) : (
+    <span className="self-start text-sm text-muted">{label}: {kind === "parent" ? "no approved parents on this team yet" : "no mentors on this team yet"}</span>
   );
 }
 

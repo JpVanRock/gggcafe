@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { canEdit, isHeadCoach, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Disclosure, EmptyState, cardClass } from "@/components/ui";
+import { Disclosure, EmptyState, cardClass, groupLabelClass, buttonStyles } from "@/components/ui";
 import { INTENT_LABEL, type ScriptPitch } from "@/lib/bullpen";
 import { loadDugoutTeam } from "../../data";
 import { NoOwnTeam, TeamPicker } from "../../team-picker";
@@ -33,7 +33,7 @@ export default async function BullpensPage({ searchParams }: PageProps<"/dugout/
       <TeamPicker teams={teams} current={team.id} basePath="/dugout/training/bullpens" />
       <TrainingNav current="bullpens" teamId={team.id} head={isHeadCoach(user.staff.role)} />
       <section className="flex flex-col gap-3">
-        <h2 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Bullpen scripts</h2>
+        <h2 className={`text-pink-soft ${groupLabelClass}`}>Bullpen scripts</h2>
         <p className="text-sm text-muted">
           Pitch by pitch: type, target zone (catcher&apos;s view), intent and count. Pitchers throw them from Performance Training and tap hit or
           miss on each pitch; command % by pitch type builds over the weeks. Push one as a pitching team routine to put it in TWIS.
@@ -60,7 +60,7 @@ export default async function BullpensPage({ searchParams }: PageProps<"/dugout/
                   {editor && (
                     <ActionForm action={deleteBullpenScript}>
                       <input type="hidden" name="id" value={s.id} />
-                      <ConfirmSubmit message={`Remove "${s.name}"? Sessions already thrown stay.`} className="text-xs text-danger hover:underline">
+                      <ConfirmSubmit message={`Remove "${s.name}"? Sessions already thrown stay.`} className={buttonStyles("remove")}>
                         Remove
                       </ConfirmSubmit>
                     </ActionForm>

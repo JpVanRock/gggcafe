@@ -81,10 +81,13 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
   );
 }
 
-/** The switch pinned to the top right of pages without the staff header. */
+/**
+ * The switch at the top right of pages without the staff header. It scrolls away with the page instead of
+ * staying pinned, where it sat on the sign-up form's fields (design audit 2026-11-18, M1).
+ */
 export function CornerThemeToggle() {
   return (
-    <div className="fixed top-3 right-4 z-20">
+    <div className="absolute top-3 right-4 z-20">
       <ThemeToggle />
     </div>
   );

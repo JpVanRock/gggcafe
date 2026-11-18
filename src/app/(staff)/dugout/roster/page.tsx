@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { canEdit, isHeadCoach, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Card, Disclosure, EmptyState, pillButtonClass, tableClass, tdClass, thClass, Badge, TableScroll } from "@/components/ui";
+import { Card, Disclosure, EmptyState, pillButtonClass, tableClass, tdClass, thClass, Badge, TableScroll, groupLabelClass } from "@/components/ui";
 import { batsThrows, compareJersey, playerName, type Player, type Season } from "@/lib/softball";
 import { loadStaffRequests, loadTeamApprovals } from "@/lib/approvals";
 import { seasonOrCurrent } from "@/lib/roster";
@@ -130,7 +130,7 @@ export default async function RosterPage({ searchParams }: PageProps<"/dugout/ro
 
       {editor && (
         <section id="waiting" aria-label="Waiting for approval" className={`rounded-2xl border p-4 sm:p-5 ${waiting ? "border-pink/60 bg-pink/5" : "border-navy-700 bg-navy-900/60"}`}>
-          <h2 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Waiting for approval ({waiting})</h2>
+          <h2 className={`text-pink-soft ${groupLabelClass}`}>Waiting for approval ({waiting})</h2>
           {waiting === 0 ? (
             <p className="mt-3 text-sm text-muted">
               Nothing waiting. Players claiming their profile{head ? ", parents asking to join and coaches signing up" : ""} show up here.

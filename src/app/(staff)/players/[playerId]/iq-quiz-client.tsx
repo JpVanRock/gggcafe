@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useRef, useState, useTransition } from "react";
-import { Field, FormMessage, buttonClass, inputClass, secondaryButtonClass, cardClass } from "@/components/ui";
+import { Badge, Field, FormMessage, buttonClass, inputClass, secondaryButtonClass, cardClass } from "@/components/ui";
 import { initialFormState } from "@/lib/form";
 import { POSITIONS, POSITION_LABEL } from "@/lib/softball";
 
@@ -63,14 +63,14 @@ export function QuizRunner({ playerId, quizzes, canEdit }: { playerId: string; q
                 {quiz.stats.mastered}/{quiz.stats.total} mastered · {quiz.stats.answered} answered
               </p>
             </div>
-            <button
-              type="button"
-              disabled={!canEdit || quiz.questions.length === 0}
-              onClick={() => begin(quiz)}
-              className={buttonClass}
-            >
-              {quiz.questions.length === 0 ? "No questions yet" : `Start · ${plural(Math.min(quiz.questions.length, QUIZ_LENGTH), "question", "questions")}`}
-            </button>
+            {quiz.questions.length === 0 ? (
+              // not a greyed-out button (design audit P2)
+              <Badge>Coming soon</Badge>
+            ) : (
+              <button type="button" disabled={!canEdit} onClick={() => begin(quiz)} className={buttonClass}>
+                {`Start · ${plural(Math.min(quiz.questions.length, QUIZ_LENGTH), "question", "questions")}`}
+              </button>
+            )}
           </div>
         ))}
         {!canEdit && <p className="text-xs text-muted sm:col-span-2">Viewers can see results; a coach runs the quiz with the player.</p>}

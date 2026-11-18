@@ -16,11 +16,20 @@ export default function RegisterPage() {
         </Link>
         <h1 className="mt-6 text-2xl font-semibold tracking-[0.08em] text-highlight uppercase">Sign up</h1>
         <span aria-hidden className="mt-2 block h-0.5 w-12 rounded-full bg-pink" />
-        <p className="mt-3 text-sm text-muted">
-          For parents, coaches and mentors. Make your account and confirm your email, then sign in and join your team with the parent code
-          from your coach. Parents are in right away; a coach, a parent or an admin approves everyone else. Players don&apos;t sign up: a
-          parent makes each player&apos;s login from the family page.
-        </p>
+        {/* one line that says what to do; the rest opens on tap, left-aligned (design audit 2026-11-18, C1) */}
+        <p className="mt-3 text-sm text-muted">For parents, coaches and mentors. Players don&apos;t sign up: a parent makes her login.</p>
+        <details className="group mt-3 w-full text-left text-sm">
+          <summary className="cursor-pointer list-none text-center font-semibold text-link select-none hover:underline [&::-webkit-details-marker]:hidden">
+            <span aria-hidden="true" className="mr-1 inline-block transition group-open:rotate-90">›</span>
+            How joining works
+          </summary>
+          <ol className="mt-2 list-decimal space-y-1 pl-5 text-muted">
+            <li>Make your account and confirm your email.</li>
+            <li>Sign in and join your team with the parent code from your coach.</li>
+            <li>Parents are in right away; a coach, a parent or an admin approves everyone else.</li>
+            <li>Parents make each player&apos;s login from the family page.</li>
+          </ol>
+        </details>
       </header>
 
       <RegisterForm />

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { isHeadCoach, requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { buttonClass, secondaryButtonClass } from "@/components/ui";
+import { buttonClass, secondaryButtonClass, groupLabelClass } from "@/components/ui";
 import { CHAPTERS, MY_HABITS_MAX, MY_HABIT_LENGTH, NOTES_MAX, chapterLabel, courseLessons, visibleChapters } from "@/lib/advanced-book";
 import { loadAdvanced } from "../../../advanced-data";
 import { AdvancedNotFoundForCoach, LEVEL_LABEL, advancedHref } from "../../../advanced";
@@ -17,7 +17,7 @@ import { SectionShell } from "../../section-shell";
 export const metadata: Metadata = { title: "G3 Advanced · GGG.Cafe" };
 
 function Heading({ children }: { children: React.ReactNode }) {
-  return <h2 className="mb-4 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">{children}</h2>;
+  return <h2 className={`mb-4 text-pink-soft ${groupLabelClass}`}>{children}</h2>;
 }
 
 export default async function AdvancedChapterPage({ params }: PageProps<"/players/[playerId]/advanced/[chapter]">) {

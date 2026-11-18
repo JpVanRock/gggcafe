@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { canEdit, isHeadCoach, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Disclosure, EmptyState, eyebrowClass, cardClass } from "@/components/ui";
+import { Disclosure, EmptyState, eyebrowClass, cardClass, groupLabelClass, buttonStyles } from "@/components/ui";
 import { WEEKDAYS, formatDay, todayISO } from "@/lib/dates";
 import { TRAINING_CATEGORY_LABEL } from "@/lib/achievements";
 import { PHASE_INFO, overlaps, phaseOn, phaseWeek } from "@/lib/training-plan";
@@ -19,7 +19,7 @@ export const metadata: Metadata = { title: "Training · Coaches Dugout · GGG.Ca
 
 // Coaches Dugout → Training (SB Blueprint Phase 2): the season roadmap, planned
 // backward from the championship, and team routines pushed to every player.
-const heading = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = `text-pink-soft ${groupLabelClass}`;
 const KIND_COLOR: Record<string, string> = {
   testing: "bg-pink",
   build: "bg-navy-600",
@@ -84,7 +84,7 @@ export default async function TrainingPage({ searchParams }: PageProps<"/dugout/
           )}
           <ActionForm action={deleteTeamRoutine}>
             <input type="hidden" name="id" value={r.id} />
-            <ConfirmSubmit message={`Remove "${r.title}"? Players' copies end today and keep their check-offs.`} className="text-xs text-danger hover:underline">
+            <ConfirmSubmit message={`Remove "${r.title}"? Players' copies end today and keep their check-offs.`} className={buttonStyles("remove")}>
               Remove
             </ConfirmSubmit>
           </ActionForm>
@@ -145,7 +145,7 @@ export default async function TrainingPage({ searchParams }: PageProps<"/dugout/
                       {editor && (
                         <ActionForm action={deletePhase} className="ml-auto">
                           <input type="hidden" name="id" value={p.id} />
-                          <ConfirmSubmit message={`Remove the ${p.name} phase? Team routines in it stay.`} className="text-xs text-muted hover:text-danger">
+                          <ConfirmSubmit message={`Remove the ${p.name} phase? Team routines in it stay.`} className={buttonStyles("removeQuiet")}>
                             Remove
                           </ConfirmSubmit>
                         </ActionForm>

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { isHeadCoach, requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { buttonClass, eyebrowClass } from "@/components/ui";
+import { buttonClass, eyebrowClass, groupLabelClass } from "@/components/ui";
 import { OutlineText, SpeedStripes } from "@/components/athletic";
 import { ProgressBar } from "@/components/progress-bar";
 import { BOOK_THEME, BOOK_TITLE_MAX, bookProgress, chapterLabel, visibleChapters } from "@/lib/advanced-book";
@@ -40,7 +40,7 @@ export default async function AdvancedPage({ params }: PageProps<"/players/[play
   const lead = await loadLeadership(supabase, player.id, book.unlocked);
   const leadProgress = lead.open ? guideProgress(lead.work, lead.program) : null;
   return (
-    <SectionShell title={book.title} subtitle={`${LEVEL_LABEL} · ${BOOK_THEME}`}>
+    <SectionShell accent="pink" title={book.title} subtitle={`${LEVEL_LABEL} · ${BOOK_THEME}`}>
       {/* the cover */}
       <div className="relative overflow-hidden rounded-2xl border-2 border-pink bg-linear-to-br from-navy-950 via-navy-900 to-navy-800 p-6 sm:p-8">
         <OutlineText stroke="rgb(254 31 124 / 0.35)" className="absolute -right-2 -bottom-6 text-[9rem] leading-none tracking-tighter sm:text-[12rem]">
@@ -79,7 +79,7 @@ export default async function AdvancedPage({ params }: PageProps<"/players/[play
       )}
 
       {/* table of contents */}
-      <h2 className="mt-8 mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Contents</h2>
+      <h2 className={`mt-8 mb-3 text-pink-soft ${groupLabelClass}`}>Contents</h2>
       <ol className="divide-y divide-navy-700 border-y border-navy-700">
         {chapters.map((c) => {
           const work = book.work.find((w) => w.chapter === c.slug);

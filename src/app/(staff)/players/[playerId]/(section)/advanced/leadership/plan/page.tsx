@@ -9,6 +9,7 @@ import { LeaderBadge } from "@/components/leader-badge";
 import { CoachSignOff, PlanForm } from "../../../../leadership-client";
 import { LeadershipClosed, leadershipContext, leadershipHref } from "../../../../leadership";
 import { SectionShell } from "../../../section-shell";
+import { groupLabelClass } from "@/components/ui";
 
 export const metadata: Metadata = { title: "My Leadership Plan · G3 Leadership Guide · GGG.Cafe" };
 
@@ -39,7 +40,7 @@ export default async function LeadershipPlanPage({ params }: PageProps<"/players
 
         {!light && (
         <section>
-          <h2 className="mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Where I stand</h2>
+          <h2 className={`mb-3 text-pink-soft ${groupLabelClass}`}>Where I stand</h2>
           <div className="overflow-x-auto rounded-xl border border-navy-700">
             <table className="w-full text-sm">
               <thead>
@@ -89,7 +90,7 @@ export default async function LeadershipPlanPage({ params }: PageProps<"/players
         />
 
         <section className="border-t border-navy-700 pt-5">
-          <h2 className="mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Coach sign-off</h2>
+          <h2 className={`mb-3 text-pink-soft ${groupLabelClass}`}>Coach sign-off</h2>
           <p className="mb-3 text-sm text-muted">
             {progress.done} of {progress.total} lessons complete · plan {lead.committedAt ? "committed" : "not committed yet"}. The sign-off awards the
             Certificate of Leadership and the Leader Badge.

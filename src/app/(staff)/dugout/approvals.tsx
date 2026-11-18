@@ -1,7 +1,7 @@
 // Approval lists shared by the Dugout Roster tab, the Parents tab and the team
 // page: players claiming their roster spot and parents asking to join.
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { buttonClass, inputClass, secondaryButtonClass } from "@/components/ui";
+import { buttonClass, inputClass, secondaryButtonClass, buttonStyles } from "@/components/ui";
 import { formatDay } from "@/lib/dates";
 import { usernameFromEmail } from "@/lib/player-logins";
 import { nameKey, type ClaimRow, type ParentLinkRow, type ParentMatch, type SpotOption } from "@/lib/approvals";
@@ -73,7 +73,7 @@ export function ApprovedClaimList({ claims, spots }: { claims: ClaimRow[]; spots
           </span>
           <ActionForm action={removePlayerClaim}>
             <input type="hidden" name="claim_id" value={c.claim_id} />
-            <ConfirmSubmit message={`Remove ${c.typed_name}'s access to her profile for ${c.season_name}?`} className="text-xs text-danger hover:underline">
+            <ConfirmSubmit message={`Remove ${c.typed_name}'s access to her profile for ${c.season_name}?`} className={buttonStyles("remove")}>
               Remove access
             </ConfirmSubmit>
           </ActionForm>

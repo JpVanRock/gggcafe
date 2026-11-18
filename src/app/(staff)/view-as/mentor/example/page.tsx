@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { EmptyState } from "@/components/ui";
+import { EmptyState, groupLabelClass } from "@/components/ui";
 import { comingUp } from "@/lib/family";
 import { loadRoster } from "@/lib/roster";
 import { loadComingUp } from "@/app/family/team-data";
@@ -30,7 +30,7 @@ export default async function ExampleMentorViewPage({ searchParams }: PageProps<
     <div className="flex flex-col gap-8">
       <ViewToggle kind="mentor" current="view" coachHref={`/dugout/mentors?team=${team.id}`} viewHref={`/view-as/mentor/example?team=${team.id}`} />
       <div className="flex flex-col gap-2 rounded-2xl border-2 border-pink bg-pink/5 p-4 sm:p-5">
-        <p className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Admin · example mentor view · read only</p>
+        <p className={`text-pink-soft ${groupLabelClass}`}>Admin · example mentor view · read only</p>
         <p className="text-lg font-semibold text-ink">What a mentor sees on {team.name}</p>
         <p className="text-sm text-muted">
           {team.name} has no mentors yet, so this is an example: a mentor the head coach approved for the whole team, with your real roster and

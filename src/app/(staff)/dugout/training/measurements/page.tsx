@@ -9,12 +9,13 @@ import { loadDugoutTeam } from "../../data";
 import { NoOwnTeam, TeamPicker } from "../../team-picker";
 import { TrainingNav } from "../nav";
 import { saveTeamMeasurements } from "../actions";
+import { groupLabelClass } from "@/components/ui";
 
 export const metadata: Metadata = { title: "Measurements · Training · Coaches Dugout · GGG.Cafe" };
 
 // The team's measurement list (user, 2026-11-10): every player's POP Report shows the
 // built-in list by season; coaches add more here for their team.
-const heading = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = `text-pink-soft ${groupLabelClass}`;
 
 export default async function MeasurementsSettingsPage({ searchParams }: PageProps<"/dugout/training/measurements">) {
   const user = await requireStaffPage();

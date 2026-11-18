@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { canEdit, getCurrentUser, getMentor, isHeadCoach, type StaffUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Card, CountBadge, PageHeader } from "@/components/ui";
+import { Card, CountBadge, PageHeader, groupLabelClass } from "@/components/ui";
 import { addDays, formatDay, formatTime, todayISO } from "@/lib/dates";
 import { COACH_SIGNUP_ROLE, ROLE_NOTE, canEditPlanRole, dugoutTabsFor, isCoachSignup, type DugoutTab, type StaffRole } from "@/lib/roles";
 import { loadStaffRequests, type StaffRequestRow } from "@/lib/approvals";
@@ -26,7 +26,7 @@ export const metadata: Metadata = { title: "Dashboard · GGG.Cafe" };
 // get the full dashboard, assistant coaches their week and their plans, coaches
 // waiting for approval a holding page; players, parents and mentors are sent to
 // /me, /family and /mentor.
-const heading = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = `text-pink-soft ${groupLabelClass}`;
 
 const TAB_NOTE: Record<string, string> = {
   "/dugout/roster": "Your roster, player accounts, approvals",
@@ -305,7 +305,7 @@ function DugoutCard({ role, counts }: { role: StaffRole; counts: TileCounts }) {
       <div className="flex flex-col gap-5">
         {groups.map((g) => (
           <section key={g.title} aria-label={g.title}>
-            <h3 className="mb-2 font-mono text-2xs font-bold tracking-[0.2em] text-muted uppercase">{g.title}</h3>
+            <h3 className={`mb-2 text-muted ${groupLabelClass}`}>{g.title}</h3>
             <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {g.tabs.map((tab) => {
                 const n = counts[tab.href] ?? 0;

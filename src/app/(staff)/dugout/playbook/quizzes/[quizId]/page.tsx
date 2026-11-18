@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Card, EmptyState, buttonClass, secondaryButtonClass, tableClass, tdClass, thClass, TableScroll } from "@/components/ui";
+import { Card, EmptyState, buttonClass, secondaryButtonClass, tableClass, tdClass, thClass, TableScroll, buttonStyles } from "@/components/ui";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { isUuid } from "@/lib/softball";
 import { quizScore } from "@/lib/playbook";
@@ -108,7 +108,7 @@ export default async function QuizPage({ params }: PageProps<"/dugout/playbook/q
                 {editor && (
                   <ActionForm action={removeQuizQuestion}>
                     <input type="hidden" name="id" value={q.id} />
-                    <ConfirmSubmit message="Remove this question (and the answers to it)?" className="text-xs text-muted hover:text-danger">
+                    <ConfirmSubmit message="Remove this question (and the answers to it)?" className={buttonStyles("removeQuiet")}>
                       Remove
                     </ConfirmSubmit>
                   </ActionForm>

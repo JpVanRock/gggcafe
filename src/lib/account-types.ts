@@ -163,7 +163,7 @@ export const SECTIONS: { title: string; rows: Row[] }[] = [
       row("Welcome packet", "The coach's letter, team policies and how-to-help tips on the family page.", ["yes", "no", "no", "view", "no"],
         "Head coaches write it (Parents tab); approved parents read it and mark each item read."),
       row("Change roles, remove staff", "Head Coach, Assistant Coach or Viewer, on the Roster tab.", ["no", "no", "no", "no", "no"], "Admins only."),
-      row("View as a parent or mentor", "See their family page or mentor home as they see it, read only, to help with their questions: Parent view and Mentor view toggles on the Dugout's Parents and Mentors tabs. A team with no mentors yet shows an example mentor's page with the team's roster and schedule.", ["no", "no", "no", "no", "no"],
+      row("View as a parent or mentor", "See their family page or mentor home as they see it, read only, to help with their questions: Preview as parent and Preview as mentor links on the Dugout's Parents and Mentors tabs. A team with no mentors yet shows an example mentor's page with the team's roster and schedule.", ["no", "no", "no", "no", "no"],
         "Admins only: Coaches Dugout → Parents or Mentors, or the View as page."),
     ],
   },
@@ -191,7 +191,7 @@ export const QUESTIONS: { q: string; a: string[] }[] = [
     q: "A player has no email. How does she get in?",
     a: [
       "Her parent signs up as a Parent and joins with the parent code. Once approved (at once when her name matches the roster), the family page's \"Create Player Login\" button opens Logins & Teams, where the parent picks her username and password. There's no email and nothing to confirm: she signs in with them right away.",
-      "Then the family page has a Parent view / Player view toggle: Player view shows her pages as she sees them, read only, and the same toggle brings the parent back.",
+      "Then the family page has a See her view link: it shows her pages as she sees them, read only, and Family menu on her pages brings the parent back.",
       "It works only for a daughter on the official roster the head coach built for the current season, and only once per player. If her birth date isn't on her profile, the parent adds it there first. She signs in with the username instead of an email; her parent or a head coach can reset the password.",
       "Her login opens only her player pages. Player accounts can't open the family pages or join a team as a parent, so she never needs her parent's login.",
       "If she's under 13, the parent first reads the consent notice on Logins & Teams and clicks Accept; then the login form appears right away. We keep their name, sign-in email, the time, IP address and browser as the record. A coach can't approve an under-13 player's own profile claim without that consent.",

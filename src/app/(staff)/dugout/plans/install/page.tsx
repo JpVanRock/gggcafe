@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Badge, Disclosure, EmptyState, badgeClass, buttonClass, sectionLabelClass, type BadgeTone } from "@/components/ui";
+import { Badge, Disclosure, EmptyState, badgeClass, buttonClass, sectionLabelClass, type BadgeTone, buttonStyles } from "@/components/ui";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { formatDay, todayISO } from "@/lib/dates";
 import {
@@ -231,7 +231,7 @@ export default async function InstallPage({ searchParams }: PageProps<"/dugout/p
                                 {editor && (
                                   <ActionForm action={removeInstallItem}>
                                     <input type="hidden" name="id" value={item.id} />
-                                    <ConfirmSubmit message={`Remove “${item.title}” from the checklist?`} className="text-xs text-muted hover:text-danger">
+                                    <ConfirmSubmit message={`Remove “${item.title}” from the checklist?`} className={buttonStyles("removeQuiet")}>
                                       Remove
                                     </ConfirmSubmit>
                                   </ActionForm>

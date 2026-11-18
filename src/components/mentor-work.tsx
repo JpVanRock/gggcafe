@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 import { ActionForm } from "@/components/action-form";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { SubmitButton } from "@/components/submit-button";
-import { Badge, Field, buttonStyles, fieldClass, inputClass } from "@/components/ui";
+import { Badge, Field, buttonStyles, fieldClass, inputClass, groupLabelClass } from "@/components/ui";
 import { formatDay } from "@/lib/dates";
 import type { FormState } from "@/lib/form";
 import { FOCUS_LABEL, FOCUS_STATUSES, NOTE_KIND_LABEL, NOTE_MAX, type FocusStatus, type NoteKind } from "@/lib/mentors";
@@ -25,7 +25,7 @@ export type MentorNote = {
   created_at: string;
 };
 
-const label = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
+const label = `text-pink-soft ${groupLabelClass}`;
 
 /** Hidden inputs for a form. */
 function Hidden({ values }: { values: Record<string, string> }) {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { browserClient } from "@/lib/supabase/lazy-client";
 import { buttonClass, secondaryButtonClass } from "@/components/ui";
 import { setTeamLogo } from "../actions";
 
@@ -24,7 +24,7 @@ export function LogoUpload({ teamId, logoUrl }: { teamId: string; logoUrl: strin
 
     startTransition(async () => {
       const path = `${teamId}/${Date.now()}.${ext}`;
-      const { error: uploadError } = await createClient()
+      const { error: uploadError } = await (await browserClient())
         .storage.from("team-logos")
         .upload(path, file, { contentType: file.type, cacheControl: "31536000" });
       if (uploadError) {

@@ -1,7 +1,7 @@
 // Coach sign-ups waiting (head coaches: assistants; admins: everyone) and the
 // coaching staff list, on the Dugout Roster tab.
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { buttonClass, inputClass, secondaryButtonClass } from "@/components/ui";
+import { buttonClass, inputClass, secondaryButtonClass, buttonStyles } from "@/components/ui";
 import { formatDay } from "@/lib/dates";
 import { ROLE_LABEL, type StaffRole } from "@/lib/roles";
 import type { StaffRequestRow } from "@/lib/approvals";
@@ -67,7 +67,7 @@ export function StaffList({ staff, isAdmin, meId }: { staff: StaffMember[]; isAd
               </ActionForm>
               <ActionForm action={removeStaff}>
                 <input type="hidden" name="user_id" value={s.user_id} />
-                <ConfirmSubmit message={`Take ${s.display_name} off the coaching staff? Their account stays; they lose staff access.`} className="text-xs text-danger hover:underline">
+                <ConfirmSubmit message={`Take ${s.display_name} off the coaching staff? Their account stays; they lose staff access.`} className={buttonStyles("remove")}>
                   Remove
                 </ConfirmSubmit>
               </ActionForm>

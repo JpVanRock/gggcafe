@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { browserClient } from "@/lib/supabase/lazy-client";
 
 const MAX_SIDE = 900; // px; plenty for a profile picture
 const BUCKET = "player-photos";
@@ -39,7 +39,7 @@ export function PhotoField({ folder, path, previewUrl }: { folder?: string; path
       const blob = await shrink(file);
       folderRef.current ??= crypto.randomUUID();
       const newPath = `${folderRef.current}/${Date.now()}.jpg`;
-      const { error } = await createClient()
+      const { error } = await (await browserClient())
         .storage.from(BUCKET)
         .upload(newPath, blob, { contentType: "image/jpeg", cacheControl: "3600" });
       if (error) {

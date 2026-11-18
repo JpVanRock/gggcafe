@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Field, inputClass } from "@/components/ui";
+import { Field, inputClass, groupLabelClass } from "@/components/ui";
 import {
   BATS, BATS_LABEL, MAX_WALK_UP_SONGS, POSITIONS, POSITION_LABEL, THROWS, THROWS_LABEL, type Player, type WalkUpSong,
 } from "@/lib/softball";
@@ -10,7 +10,7 @@ import { PhotoField } from "./photo-field";
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <fieldset className="grid gap-4 sm:col-span-6 sm:grid-cols-6">
-      <legend className="mb-1 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">{title}</legend>
+      <legend className={`mb-1 text-pink-soft ${groupLabelClass}`}>{title}</legend>
       {children}
     </fieldset>
   );

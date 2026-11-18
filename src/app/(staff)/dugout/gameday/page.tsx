@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { dugoutCanEdit, requireDugoutPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Card, Disclosure, EmptyState, RECENT_LIMIT, ShowAllLink, tableClass, tdClass, thClass, badgeClass, TableScroll, cardClass } from "@/components/ui";
+import { Card, EmptyState, RECENT_LIMIT, ShowAllLink, tableClass, tdClass, thClass, badgeClass, TableScroll, buttonStyles, cardClass } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import { BASE_RUNNING_LABEL, HITTING_TYPE_LABEL, percent, rate } from "@/lib/gameday";
 import { loadGamedayRoster } from "@/lib/gameday-data";
@@ -62,10 +62,17 @@ export default async function GamedayPage({ searchParams }: PageProps<"/dugout/g
           <h2 className="text-3xl leading-tight font-bold tracking-tight text-highlight uppercase">Game lineups</h2>
           <p className="text-sm text-muted">Batting order, defensive rotations and pitching plan. Print or share each one.</p>
         </div>
+        {/* the page's main action as a button, not a collapsed panel (design audit 2026-11-18, N4); still a
+            <details>, so it opens without JavaScript, and open when there are no lineups yet */}
         {editor && seasonId && (
-          <Disclosure summary="New lineup" open={lineups.length === 0}>
-            <NewLineupForm teamId={team.id} seasonId={seasonId} today={today} games={games} />
-          </Disclosure>
+          <details open={lineups.length === 0} className="group">
+            <summary className={buttonStyles("primary", "cursor-pointer list-none select-none [&::-webkit-details-marker]:hidden")}>
+              <span aria-hidden="true" className="transition group-open:rotate-45">+</span> New lineup
+            </summary>
+            <div className={`${cardClass("raised")} mt-3 p-4`}>
+              <NewLineupForm teamId={team.id} seasonId={seasonId} today={today} games={games} />
+            </div>
+          </details>
         )}
         {lineups.length === 0 ? (
           <EmptyState>No lineups yet.</EmptyState>
@@ -73,6 +80,8 @@ export default async function GamedayPage({ searchParams }: PageProps<"/dugout/g
           <ul className="flex flex-col gap-3">
             {lineups.map((l) => {
               const [weekday, ...rest] = formatDay(l.game_date).split(", ");
+              // the year when it isn't this one, so "Sat Feb 27" above "Sat Nov 14" reads right (N4)
+              const year = l.game_date.slice(0, 4) !== today.slice(0, 4) ? l.game_date.slice(0, 4) : null;
               return (
                 <li key={l.id}>
                   <Link
@@ -82,6 +91,7 @@ export default async function GamedayPage({ searchParams }: PageProps<"/dugout/g
                     <div className="w-16 shrink-0 text-center">
                       <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">{weekday}</p>
                       <p className="font-display text-lg leading-tight font-bold text-highlight tabular-nums">{rest.join(", ")}</p>
+                      {year && <p className="font-display text-xs text-muted tabular-nums">{year}</p>}
                     </div>
                     <div className="min-w-0 flex-1 border-l border-navy-700 pl-4">
                       <p className="truncate font-semibold">{l.opponent ? `vs ${l.opponent}` : "Lineup"}</p>

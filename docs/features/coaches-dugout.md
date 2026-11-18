@@ -9,7 +9,9 @@
   the next two weeks with no lineup or a draft one (→ GameDay), and lineups left in draft. The Dugout tiles come in three
   groups (Team, Game day, Development) and Roster, Parents and Mentors carry how many wait there. "Get started" shows a
   head coach only until the team, its roster and the parent code are in place.
-- GameDay (tab renamed from "GameDay Prep"; from the user's Lineup + Defensive Rotations tabs): season player cards
+- GameDay (tab renamed from "GameDay Prep"; from the user's Lineup + Defensive Rotations tabs): "+ New lineup" is a primary
+  button over the list (a `<details>`, open when there are none; design audit 2026-11-18, N4), and a lineup's date shows
+  its year when it isn't this year. Season player cards
   (`gameday_profiles`: hitting type power/contact/gap, base running pure/intelligent/average, typed
   AVG/OBP/K% used only until box scores exist, `batting_season` wins) and game lineups
   (`gameday_lineups`: batting order uuid[], `defense` {rotation: {player: P..RF|Sub}}, `pitching`
@@ -84,7 +86,7 @@
   app tables; they get data only through security-definer functions: `parent_home()` (their links)
   and `team_budget_summary()` (staff, or approved parents of that team), which returns team totals,
   expenses/income and player payments as daily totals with no names. `components/budget-summary.tsx`
-  draws it for parents and as the coaches' summary/"Parent view", with "Details" pop-ups listing each
+  draws it for parents and as the coaches' summary/"Preview as parent", with "Details" pop-ups listing each
   expense / income line item by category. Non-staff parents signing in are sent from /dashboard to
   /family (players to /me).
 - Calendar: month grid Monday–Sunday (`?month=2026-11`; day-by-day list on phones) of `team_events`

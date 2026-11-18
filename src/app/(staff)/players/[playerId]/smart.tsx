@@ -1,5 +1,5 @@
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Disclosure, EmptyState, secondaryButtonClass, badgeClass } from "@/components/ui";
+import { Disclosure, EmptyState, secondaryButtonClass, badgeClass, buttonStyles } from "@/components/ui";
 import { formatLongDate } from "@/lib/dates";
 import { SKILL_AREA_LABEL, type SkillArea } from "@/lib/softball";
 import { deleteSmartGoal, setSmartGoalStatus } from "./goals-actions";
@@ -141,7 +141,7 @@ function SmartGoalCard({
           </details>
           <ActionForm action={deleteSmartGoal} className="ml-auto">
             <input type="hidden" name="id" value={goal.id} />
-            <ConfirmSubmit message={`Delete the goal “${goal.title}”?`} className="text-xs text-danger hover:underline">
+            <ConfirmSubmit message={`Delete the goal “${goal.title}”?`} className={buttonStyles("remove")}>
               Delete
             </ConfirmSubmit>
           </ActionForm>

@@ -4,10 +4,10 @@
 // shared with the coaches only if she ticks it), training on her players' weeks (one player
 // or a group, once or every week), and asking to work with a team or player.
 import { useRef, useState, useTransition } from "react";
-import { Field, buttonClass, fieldClass, inputClass, secondaryButtonClass } from "@/components/ui";
+import { Field, buttonClass, fieldClass, inputClass, secondaryButtonClass, groupLabelClass } from "@/components/ui";
 import { ActionForm } from "@/components/action-form";
 import { SubmitButton } from "@/components/submit-button";
-import { createClient } from "@/lib/supabase/client";
+import { browserClient } from "@/lib/supabase/lazy-client";
 import { MESSAGE_MAX, MESSAGE_PHOTO_BUCKET } from "@/lib/mentors";
 import { addMentorTraining, deleteMentorMessage, requestMentor, sendMentorMessage } from "./actions";
 import { confirmAction } from "@/components/confirm-submit";
@@ -36,7 +36,7 @@ function ErrorLine({ error }: { error: string | null }) {
   ) : null;
 }
 
-const label = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
+const label = `text-pink-soft ${groupLabelClass}`;
 
 export type LibraryDrill = { id: string; name: string; video_url: string | null };
 
@@ -70,7 +70,7 @@ export function MessageForm({
     try {
       const blob = await shrink(file);
       const path = `${mentorId}/${Date.now()}.jpg`;
-      const { error: upErr } = await createClient().storage.from(MESSAGE_PHOTO_BUCKET).upload(path, blob, { contentType: "image/jpeg" });
+      const { error: upErr } = await (await browserClient()).storage.from(MESSAGE_PHOTO_BUCKET).upload(path, blob, { contentType: "image/jpeg" });
       if (upErr) return setError("The photo didn't upload. Try again.");
       setPhoto((old) => {
         if (old) URL.revokeObjectURL(old.preview);

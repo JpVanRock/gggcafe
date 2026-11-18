@@ -8,6 +8,7 @@ import { loadIq, loadPopReport } from "../../data";
 import { IqDetail, buildBadgeTracks, buildLibrary, buildPositions, buildQuizzes, buildTracks } from "../../iq";
 import { loadPlayer, plateFor, positionsOf } from "../../section-data";
 import { SectionShell } from "../section-shell";
+import { groupLabelClass } from "@/components/ui";
 
 export const metadata: Metadata = { title: "Softball IQ · GGG.Cafe" };
 
@@ -20,14 +21,14 @@ export default async function IqPage({ params }: PageProps<"/players/[playerId]/
   const open = team.quizzes.filter((q) => q.answered < q.total || q.to_fix > 0).length;
   const positions = positionsOf(player);
   return (
-    <SectionShell title="Softball IQ" subtitle="Defense IQ · Baserunning IQ · Offense IQ · Position IQ · Keep the Book · Extra Credit">
+    <SectionShell accent="pink" title="Softball IQ" subtitle="Defense IQ · Baserunning IQ · Offense IQ · Position IQ · Keep the Book · Extra Credit">
       {(team.cards.length > 0 || team.quizzes.length > 0) && (
         <Link
           href={`/players/${player.id}/iq/playbook`}
           className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-pink/60 bg-pink/5 p-4 transition hover:border-pink hover:bg-pink/10"
         >
           <span>
-            <span className="block font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Team Playbook</span>
+            <span className={`block text-pink-soft ${groupLabelClass}`}>Team Playbook</span>
             <span className="mt-1 block text-sm text-ink">
               {team.cards.length} call{team.cards.length === 1 ? "" : "s"} to know cold
               {team.quizzes.length > 0 && ` · ${team.quizzes.length} team quiz${team.quizzes.length === 1 ? "" : "zes"}${open ? ` (${open} open)` : ""}`}

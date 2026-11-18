@@ -68,7 +68,7 @@ export function GoalsForm({ playerId, chart }: { playerId: string; chart: Harada
               <input
                 name={`pillar_${i + 1}`}
                 aria-label={`Area ${i + 1} name`}
-                placeholder="Area name, e.g. Hitting power"
+                placeholder="e.g. Hitting power"
                 defaultValue={p?.title ?? ""}
                 className={`${inputClass} font-semibold`}
               />

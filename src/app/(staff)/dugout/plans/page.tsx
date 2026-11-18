@@ -3,7 +3,7 @@ import Link from "next/link";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { canEditPlanRole } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
-import { Disclosure, EmptyState, RECENT_LIMIT, ShowAllLink, badgeClass, cardClass } from "@/components/ui";
+import { Disclosure, EmptyState, RECENT_LIMIT, ShowAllLink, badgeClass, cardClass, groupLabelClass } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import { PRACTICE_SETTING_LABEL, durationLabel, practiceRange, type PracticeSetting } from "@/lib/dugout";
 import { loadDugoutTeam } from "../data";
@@ -123,7 +123,7 @@ export default async function PracticePlansPage({ searchParams }: PageProps<"/du
       )}
 
       <section>
-        <h2 className="mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Upcoming</h2>
+        <h2 className={`mb-3 text-pink-soft ${groupLabelClass}`}>Upcoming</h2>
         {upcoming.length ? (
           <ul className="flex flex-col gap-3">
             {upcoming.map((p) => (
@@ -137,7 +137,7 @@ export default async function PracticePlansPage({ searchParams }: PageProps<"/du
 
       {past.length > 0 && (
         <section>
-          <h2 className="mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">Past</h2>
+          <h2 className={`mb-3 text-pink-soft ${groupLabelClass}`}>Past</h2>
           <ul className="flex flex-col gap-3">
             {past.map((p) => (
               <PlanCard key={p.id} plan={p} viewOnly={viewOnly(p)} />

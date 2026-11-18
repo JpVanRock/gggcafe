@@ -3,7 +3,7 @@
 // My Journal (user, 2026-11-12): the entry form, with a voice memo recorded in the browser
 // and uploaded to her own folder in the private journal-audio bucket.
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { browserClient } from "@/lib/supabase/lazy-client";
 import { Field, FormMessage, buttonStyles, fieldClass, inputClass, secondaryButtonClass } from "@/components/ui";
 import {
   JOURNAL_BUCKET, JOURNAL_MENTOR_NAME_MAX, JOURNAL_NOTES_MAX, JOURNAL_TOPIC_MAX, MEMO_MAX_BYTES, MEMO_MAX_SECONDS, RECORDING_TYPES,
@@ -73,7 +73,7 @@ function VoiceMemo({ playerId, memo, onChange }: { playerId: string; memo: Memo 
       if (blob.size > MEMO_MAX_BYTES) return setState("idle"), setError("That memo is too big to keep. Try a shorter one.");
       setState("uploading");
       const path = memoPath(playerId, crypto.randomUUID(), type.ext);
-      const { error: upErr } = await createClient().storage.from(JOURNAL_BUCKET).upload(path, blob, { contentType: type.contentType });
+      const { error: upErr } = await (await browserClient()).storage.from(JOURNAL_BUCKET).upload(path, blob, { contentType: type.contentType });
       setState("idle");
       if (upErr) return setError("The voice memo didn't upload. Check your connection and record it again.");
       if (memo?.fresh) void discardJournalMemo(playerId, memo.path);

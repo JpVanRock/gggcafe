@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requirePlayerPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Disclosure, EmptyState } from "@/components/ui";
+import { Disclosure, EmptyState, groupLabelClass } from "@/components/ui";
 import { addDays, formatDay, todayISO } from "@/lib/dates";
 import { GamePlanForm } from "../../../bullpen-client";
 import { loadGamePlans } from "../../../pitching-data";
@@ -12,7 +12,7 @@ import { SectionShell } from "../../section-shell";
 export const metadata: Metadata = { title: "Game plans · Performance Training · GGG.Cafe" };
 
 // The pitcher's game plan (Phase 4): before a game her plan, after it a look-back.
-const heading = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = `text-pink-soft ${groupLabelClass}`;
 
 export default async function GamePlanPage({ params }: PageProps<"/players/[playerId]/training/game-plan">) {
   const { playerId } = await params;

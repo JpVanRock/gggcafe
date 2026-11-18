@@ -8,15 +8,15 @@ import Link from "next/link";
 import { LeaderBadge } from "@/components/leader-badge";
 
 export function PlayerName({ first, last, leaderHref }: { first: string; last: string; leaderHref?: string | null }) {
+  // The heading is just her name, with an explicit label (screen readers ran the two-tone halves together as
+  // "MAYATORRES"), and the Team Lead badge is a link beside it, not inside it (design audit 2026-11-18, A5).
   return (
-    <h1
-      className={`flex flex-wrap items-center justify-center gap-x-4 gap-y-4 text-5xl leading-none font-bold tracking-tight text-highlight uppercase sm:gap-x-5 sm:text-7xl ${
-        leaderHref ? "mt-6 sm:mt-8" : "mt-3"
-      }`}
+    <div
+      className={`flex flex-wrap items-center justify-center gap-x-4 gap-y-4 sm:gap-x-5 ${leaderHref ? "mt-6 sm:mt-8" : "mt-3"}`}
     >
-      <span>
+      <h1 aria-label={`${first} ${last}`} className="text-5xl leading-none font-bold tracking-tight text-highlight uppercase sm:text-7xl">
         {first} <span className="text-ink">{last}</span>
-      </span>
+      </h1>
       {leaderHref && (
         // -top-2.5: half the label's height, so the badge (not the label) centers on her name
         <Link
@@ -28,6 +28,6 @@ export function PlayerName({ first, last, leaderHref }: { first: string; last: s
           <LeaderBadge className="block h-auto w-11 sm:w-14" size={56} />
         </Link>
       )}
-    </h1>
+    </div>
   );
 }

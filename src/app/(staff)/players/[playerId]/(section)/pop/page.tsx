@@ -37,7 +37,7 @@ export default async function PopPage({ params, searchParams }: PageProps<"/play
     loadMeasurements(supabase, player, ownTeam?.id ?? null),
   ]);
   return (
-    <SectionShell title={`${possessive(firstName(player))} Pop Report`} subtitle={`Profile · ${movementAccess === "open" ? "movement · " : ""}hitting style · teams · measurements`}>
+    <SectionShell accent="pink" title={`${possessive(firstName(player))} Pop Report`} subtitle={`Profile · ${movementAccess === "open" ? "movement · " : ""}hitting style · teams · measurements`}>
       <PopDetail
         player={player}
         pop={pop}

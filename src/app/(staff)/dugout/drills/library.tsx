@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { DrillTags } from "@/components/drill-tags";
-import { Disclosure, EmptyState, Field, FormMessage, inputClass, secondaryButtonClass, cardClass } from "@/components/ui";
+import { Disclosure, EmptyState, Field, FormMessage, inputClass, secondaryButtonClass, cardClass, buttonStyles } from "@/components/ui";
 import { DRILL_TAGS, DRILL_TAG_LABEL, filterDrills, type DrillTag, type LibraryDrill } from "@/lib/dugout";
 import { initialFormState } from "@/lib/form";
 import { deleteDrill, saveDrill } from "./actions";
@@ -140,7 +140,7 @@ function DrillCard({ drill, canEdit }: { drill: LibraryDrill; canEdit: boolean }
             <input type="hidden" name="id" value={drill.id} />
             <ConfirmSubmit
               message={`Delete “${drill.name}” from the library? Practice plans that use it keep their copy.`}
-              className="text-xs text-danger hover:underline"
+              className={buttonStyles("remove")}
             >
               Delete
             </ConfirmSubmit>

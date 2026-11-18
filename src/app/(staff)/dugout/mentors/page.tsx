@@ -7,7 +7,7 @@ import { loadRoster } from "@/lib/roster";
 import { ActionForm } from "@/components/action-form";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { SubmitButton } from "@/components/submit-button";
-import { Badge, Card, Disclosure, EmptyState, buttonStyles } from "@/components/ui";
+import { Badge, Card, Disclosure, EmptyState, buttonStyles, groupLabelClass } from "@/components/ui";
 import { loadDugoutTeam } from "../data";
 import { NoOwnTeam, TeamPicker } from "../team-picker";
 import { ViewToggle } from "../../view-as/parts";
@@ -19,7 +19,7 @@ type Link_ = { id: string; mentor_id: string; team_id: string | null; player_id:
 type Mentor = { user_id: string; display_name: string; specialty: string | null };
 type Msg = { id: string; player_id: string; sender_id: string; sender_name: string; body: string | null; photo_path: string | null; drill_name: string | null; created_at: string; read_at: string | null; shared_with_coaches: boolean };
 
-const heading = "mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = `mb-3 text-pink-soft ${groupLabelClass}`;
 
 /**
  * What great mentors do, in the words of the G3 Leadership Guide's lessons (Relationships, Listening,

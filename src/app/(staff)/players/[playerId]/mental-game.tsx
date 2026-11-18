@@ -4,7 +4,7 @@
 // mental-game-client.tsx.
 import Link from "next/link";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Disclosure, eyebrowClass, cardClass } from "@/components/ui";
+import { Disclosure, eyebrowClass, cardClass, buttonStyles } from "@/components/ui";
 import { formatDay } from "@/lib/dates";
 import {
   CONTEXT_LABEL, DEFAULT_ZONE, GUIDED_SESSIONS, SCAN_LABELS, SCAN_SKILLS, SIGNALS, monthStart, scanAverage, scanChange, scanExtremes, zoneStatus,
@@ -213,7 +213,7 @@ export function MentalTools({
                       <ActionForm action={removeIntensityCheck} className="ml-auto">
                         <input type="hidden" name="player_id" value={playerId} />
                         <input type="hidden" name="id" value={c.id} />
-                        <ConfirmSubmit message="Remove this check?" className="text-xs text-muted hover:text-danger">
+                        <ConfirmSubmit message="Remove this check?" className={buttonStyles("removeQuiet")}>
                           Remove
                         </ConfirmSubmit>
                       </ActionForm>

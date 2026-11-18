@@ -7,14 +7,14 @@ import { useActionState } from "react";
 import { initialFormState } from "@/lib/form";
 import { FormMessage } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
-import { inputClass } from "@/components/ui";
+import { inputClass, groupLabelClass } from "@/components/ui";
 import { SpeedStripes } from "@/components/athletic";
 import {
   BEST_VERSION_GOAL, BEST_VERSION_MAX, BEST_VERSION_PROMPTS, BEST_VERSION_TITLE, CHALLENGE, type BestVersionAnswers,
 } from "@/lib/best-version";
 import { saveBestVersion } from "./goals-actions";
 
-const label = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
+const label = `text-pink-soft ${groupLabelClass}`;
 
 function Answer({ name, value, canEdit, rows, ariaLabel }: { name: string; value: string; canEdit: boolean; rows: number; ariaLabel: string }) {
   if (!canEdit) return <p className="text-sm whitespace-pre-line text-ink/90">{value || <span className="text-muted">Not answered yet.</span>}</p>;

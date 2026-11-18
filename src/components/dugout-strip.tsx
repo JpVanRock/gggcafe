@@ -5,7 +5,7 @@
 // (Offseason Training, user 2026-11-08).
 import Link from "next/link";
 import { Modal } from "@/components/modal";
-import { EmptyState, eyebrowClass } from "@/components/ui";
+import { EmptyState, eyebrowClass, groupLabelClass, pillButtonClass, pillQuietClass } from "@/components/ui";
 import { CultureStatement, StandardsList, hasCulture, type TeamCulture, type TeamStandard } from "@/components/team-standards";
 import {
   COACHING_ETIQUETTE, COACHING_ETIQUETTE_MOTTO, COACHING_ETIQUETTE_TITLE, COACH_RESPONSIBILITIES, COACH_RESPONSIBILITIES_MOTTO,
@@ -18,11 +18,12 @@ export type DugoutTeam = {
   standards: TeamStandard[];
 };
 
-const pill =
-  "inline-flex items-center justify-center rounded-full px-4 py-1.5 text-sm font-semibold uppercase tracking-wider transition";
+// One look for the row (design audit 2026-11-18, G2: it had five): quiet pills, and the one action,
+// + Activity, as the row's only filled button.
+const pill = pillQuietClass;
 
 function TeamHeading({ name }: { name: string }) {
-  return <h3 className="mb-4 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">{name}</h3>;
+  return <h3 className={`mb-4 text-pink-soft ${groupLabelClass}`}>{name}</h3>;
 }
 
 export function DugoutStrip({
@@ -68,17 +69,17 @@ export function DugoutStrip({
   const extraPills = (
     <>
       {yearbookHref && (
-        <Link href={yearbookHref} className={`${pill} border border-ink/70 text-ink hover:bg-ink hover:text-navy-950`}>
+        <Link href={yearbookHref} className={pill}>
           Yearbook
         </Link>
       )}
       {leaderboardHref && (
-        <Link href={leaderboardHref} className={`${pill} bg-pink text-on-accent hover:brightness-110`}>
+        <Link href={leaderboardHref} className={pill}>
           Leaderboard
         </Link>
       )}
       {activityHref && (
-        <Link href={activityHref} className={`${pill} border border-neon text-highlight hover:bg-neon hover:text-on-accent`}>
+        <Link href={activityHref} className={pillButtonClass}>
           + Activity
         </Link>
       )}
@@ -102,10 +103,10 @@ export function DugoutStrip({
         <div className="flex flex-wrap gap-2">{extraPills}</div>
       ) : teamHref ? (
         <div className="flex flex-wrap gap-2">
-          <Link href={`${teamHref}#standards`} className={`${pill} bg-neon text-on-accent hover:bg-neon-bright`}>
+          <Link href={`${teamHref}#standards`} className={pill}>
             Team Standards
           </Link>
-          <Link href={`${teamHref}#culture`} className={`${pill} border border-pink text-ink hover:bg-pink hover:text-on-accent`}>
+          <Link href={`${teamHref}#culture`} className={pill}>
             Team Culture
           </Link>
           {extraPills}
@@ -117,7 +118,7 @@ export function DugoutStrip({
             title={COACH_RESPONSIBILITIES_TITLE}
             subtitle="Coaches only"
             trigger={COACH_RESPONSIBILITIES_TITLE}
-            triggerClassName={`${pill} border border-neon text-highlight hover:bg-neon hover:text-on-accent`}
+            triggerClassName={pill}
           >
             <div className="flex flex-col gap-6">
               <p className="font-display text-2xl font-bold tracking-wide text-link italic">{COACH_RESPONSIBILITIES_MOTTO}</p>
@@ -130,7 +131,7 @@ export function DugoutStrip({
                 ))}
               </ol>
               <section className="flex flex-col gap-3 border-t-2 border-pink pt-5">
-                <h3 className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">{COACHING_ETIQUETTE_TITLE}</h3>
+                <h3 className={`text-pink-soft ${groupLabelClass}`}>{COACHING_ETIQUETTE_TITLE}</h3>
                 <p className="font-display text-2xl font-bold tracking-wide text-link italic">{COACHING_ETIQUETTE_MOTTO}</p>
                 {COACHING_ETIQUETTE.map((p) => (
                   <p key={p} className="text-ink/90">
@@ -145,7 +146,7 @@ export function DugoutStrip({
           title="Team Standards"
           subtitle={names}
           trigger="Team Standards"
-          triggerClassName={`${pill} bg-neon text-on-accent hover:bg-neon-bright`}
+          triggerClassName={pill}
         >
           <div className="flex flex-col gap-10">
             {teams.map(({ team, standards }) => (
@@ -167,7 +168,7 @@ export function DugoutStrip({
           title="Team Culture"
           subtitle={names}
           trigger="Team Culture"
-          triggerClassName={`${pill} border border-pink text-ink hover:bg-pink hover:text-on-accent`}
+          triggerClassName={pill}
         >
           <div className="flex flex-col gap-10">
             {teams.map(({ team, culture }) => (

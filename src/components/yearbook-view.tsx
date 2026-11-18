@@ -9,8 +9,8 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { SpeedStripes } from "@/components/athletic";
-import { buttonClass, inputClass, secondaryButtonClass } from "@/components/ui";
-import { createClient } from "@/lib/supabase/client";
+import { buttonClass, inputClass, secondaryButtonClass, groupLabelClass } from "@/components/ui";
+import { browserClient } from "@/lib/supabase/lazy-client";
 import {
   CAPTION_MAX, FULL_SIDE, THUMB_SIDE, YEARBOOK_BUCKET, monthSpreads, photoDay, photoPaths, photosOf, tagCounts, tileSize,
   type YearbookData, type YearbookPhoto,
@@ -18,7 +18,7 @@ import {
 import { addYearbookPhotos, deleteYearbookPhoto, setYearbookCaption, setYearbookTags } from "@/app/yearbook/actions";
 import { confirmAction } from "@/components/confirm-submit";
 
-const label = "font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
+const label = `text-pink-soft ${groupLabelClass}`;
 
 async function shrink(file: File, side: number): Promise<{ blob: Blob; width: number; height: number }> {
   const bitmap = await createImageBitmap(file);
@@ -88,7 +88,7 @@ function AddPhotos({ data, onDone }: { data: YearbookData; onDone: () => void })
     if (files.length === 0) return setError("Pick some photos first.");
     setError(null);
     setBusy(true);
-    const supabase = createClient();
+    const supabase = await browserClient();
     const uploaded: { path: string; thumbPath: string; width: number; height: number }[] = [];
     try {
       for (let i = 0; i < files.length; i++) {

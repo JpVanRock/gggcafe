@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Disclosure, buttonClass, eyebrowClass } from "@/components/ui";
+import { Disclosure, buttonClass, eyebrowClass, groupLabelClass } from "@/components/ui";
 import { ProgressBar } from "@/components/progress-bar";
 import { SpeedStripes } from "@/components/athletic";
 import { LeaderBadge } from "@/components/leader-badge";
@@ -49,7 +49,7 @@ function LessonList({ playerId, lessons, work, prefix }: { playerId: string; les
   );
 }
 
-const heading = "mb-3 font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase";
+const heading = `mb-3 text-pink-soft ${groupLabelClass}`;
 
 export default async function LeadershipPage({ params }: PageProps<"/players/[playerId]/advanced/leadership">) {
   const { playerId } = await params;
@@ -133,7 +133,7 @@ export default async function LeadershipPage({ params }: PageProps<"/players/[pl
 
           {light ? (
             <div className="rounded-2xl border-2 border-pink bg-linear-to-b from-navy-950 to-navy-900 p-5">
-              <p className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">What you&apos;ll build</p>
+              <p className={`text-pink-soft ${groupLabelClass}`}>What you&apos;ll build</p>
               <ol className="mt-4 flex flex-col gap-2">
                 {LIGHT_KEYS.map((key, i) => (
                   <li key={key} className="flex items-center gap-3 border-b border-navy-700 pb-2 last:border-0">
@@ -146,7 +146,7 @@ export default async function LeadershipPage({ params }: PageProps<"/players/[pl
           ) : (
           /* the ladder: top rung first */
           <div className="rounded-2xl border-2 border-pink bg-linear-to-b from-navy-950 to-navy-900 p-5">
-            <p className="font-mono text-2xs font-bold tracking-[0.2em] text-pink-soft uppercase">The leadership ladder</p>
+            <p className={`text-pink-soft ${groupLabelClass}`}>The leadership ladder</p>
             <ol className="mt-4 flex flex-col-reverse gap-2">
               {LADDER.map((rung, i) => (
                 <li key={rung} className="flex items-center gap-3 border-b border-navy-700 pb-2 last:border-0">
