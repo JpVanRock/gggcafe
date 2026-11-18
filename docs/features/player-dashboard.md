@@ -1,6 +1,7 @@
 # Player dashboard (`/players/[playerId]`, cafe-menu design)
-- Layout in `src/app/(staff)/players/[playerId]/player-menu.tsx`: menu header, "From the Dugout"
-  strip, TWIS board, then menu boards. Each board shows a summary and LINKS to the section's own page
+- Layout in `src/app/(staff)/players/[playerId]/player-menu.tsx`: menu header, video calls, the TWIS board
+  (right under her name since the 2026-11-18 design audit, M3), mentor messages, the "From the Dugout" strip,
+  then menu boards. Each board shows a summary and LINKS to the section's own page
   (user, 2026-11-07: pages, not pop-ups): `/players/[id]/{goals,pop,mental,training,iq,trophies}`, plus
   `/team` (Team Standards & Culture, #standards / #culture) and `/activities` (TWIS "Manage
   activities"). They live in the `(section)` route group, whose layout gives every section page a
@@ -13,7 +14,8 @@
 - Section names (user's wording): "{Name}'s Goals" (Harada Method), "{Name}'s Pop Report",
   "Mental GP", "Softball IQ" (renamed from "IQ Test"), "{Name}'s Trophy Room". Pop Report fields are placeholders until the user specifies them.
 - TWIS = This Week in Softball: team practices/events (`team_events`) and games for the player's
-  active teams, plus `player_activities`; check-offs in `twis_checks`. Weeks start Monday;
+  active teams, plus `player_activities`; check-offs in `twis_checks`. Weeks start Monday; the days are
+  one list (not a landmark each), and a run of empty rest days folds into one line ("Fri – Sun · Rest days");
   "today" uses `APP_TIME_ZONE` (default America/New_York) in `src/lib/dates.ts`.
 - Harada charts save through the `save_harada_plan` RPC (one transaction, RLS applies).
 - The top of her Goals page (user, 2026-11-10): "The Best Version of You" (`src/lib/best-version.ts`, the user's own

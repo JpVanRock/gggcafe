@@ -266,6 +266,8 @@ export function PlayerMenu({
 
       <div className="flex flex-col gap-3">
         {calls}
+        {/* her week right under her name (design audit 2026-11-18, M3): it's the board she opens the site for */}
+        <TwisBoard playerId={player.id} week={twis} today={today} canEdit={editor} />
         {mentorMessages && (
           <MentorAlerts
             playerId={player.id}
@@ -283,12 +285,6 @@ export function PlayerMenu({
           yearbookHref={advanced.unlocked && !off.has("player.yearbook") ? `${base}/yearbook` : undefined}
           leaderboardHref={off.has("player.leaderboard") ? undefined : `${base}/leaderboard`}
           activityHref={off.has("player.activity") ? undefined : `${base}/log`}
-        />
-        <TwisBoard
-          playerId={player.id}
-          week={twis}
-          today={today}
-          canEdit={editor}
         />
       </div>
 

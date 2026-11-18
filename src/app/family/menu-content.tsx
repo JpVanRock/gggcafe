@@ -1,5 +1,5 @@
 // The family menu's content (user, 2026-11-13): what's waiting on the parent ("Needs you"), the page's
-// hamburger menu and the numbered boards, built from plain data. The family page feeds it the parent's
+// links (Season Forms, Logins & Teams, Join Another Team) and the numbered boards, built from plain data. The family page feeds it the parent's
 // own data; an admin's Parent View (/view-as/parent/[id], user 2026-11-14) feeds it what
 // admin_view_parent() returns, so the preview is built by the same code as the real page. In a preview
 // (`preview: true`) nothing links to the admin's own family pages: the labels show, without links.
@@ -252,7 +252,8 @@ export function familyMenu(input: FamilyMenuInput, { preview = false }: { previe
   const halves = boards.filter((b) => !b.wide);
   if (halves.length % 2 === 1) halves[halves.length - 1].wide = true;
 
-  // the page's hamburger menu (user, 2026-11-13): Season forms, Logins & teams and Join another team, with a badge when they need the parent
+  // the page's links under its header (user, 2026-11-13; in the open since the design audit, N2): Season forms, Logins & teams
+  // and Join another team, with a badge when they need the parent
   const formsToDo = daughters.filter((d) => {
     const f = formOf(d.player_id);
     return f && (!f.medical || (!f.questionnaire && !offForDaughter(d, "parent.questionnaire")));

@@ -80,17 +80,18 @@ export type MenuSection = {
 export function MenuBoard({ section, number }: { section: MenuSection; number: number }) {
   const style = BOARD[section.variant];
   return (
-    <article className={`relative ${section.wide ? "md:col-span-2" : ""}`}>
-      <div className={`relative h-full overflow-hidden rounded-2xl p-6 pb-14 sm:p-8 sm:pb-16 ${style.board}`}>
-        <OutlineText stroke={style.numeral} className="absolute -top-2 right-3 text-7xl tracking-tight sm:right-5 sm:text-8xl">
+    // min-w-0: a long title never stretches the grid column past a 360px screen (design audit, M8)
+    <article className={`relative min-w-0 ${section.wide ? "md:col-span-2" : ""}`}>
+      <div className={`relative h-full overflow-hidden rounded-2xl p-5 pb-14 min-[400px]:p-6 min-[400px]:pb-14 sm:p-8 sm:pb-16 ${style.board}`}>
+        <OutlineText stroke={style.numeral} className="absolute -top-2 right-3 text-6xl tracking-tight min-[400px]:text-7xl sm:right-5 sm:text-8xl">
           {String(number).padStart(2, "0")}
         </OutlineText>
-        <h2 className="relative pr-20 text-3xl leading-none font-bold tracking-wide uppercase sm:pr-28 sm:text-4xl">{section.title}</h2>
+        <h2 className="relative pr-18 text-2xl leading-none font-bold tracking-wide break-words uppercase min-[400px]:pr-20 min-[400px]:text-3xl sm:pr-28 sm:text-4xl">{section.title}</h2>
         {section.subtitle && (
           <p className={`relative mt-2 font-mono text-xs tracking-[0.2em] uppercase ${style.subtitle}`}>{section.subtitle}</p>
         )}
         <div className="relative mt-6">{section.summary}</div>
-        <p aria-hidden className={`absolute bottom-5 left-6 font-mono text-xs tracking-widest uppercase sm:left-8 ${style.cta}`}>
+        <p aria-hidden className={`absolute bottom-5 left-5 font-mono text-xs tracking-widest uppercase min-[400px]:left-6 sm:left-8 ${style.cta}`}>
           Full details →
         </p>
         {/* The whole board opens the section's page */}
@@ -150,12 +151,12 @@ export function MenuPanel({
   const style = BOARD[variant];
   const ctaClass = `relative mt-6 self-start font-mono text-xs tracking-widest uppercase ${style.cta}`;
   return (
-    <article className={`relative ${wide ? "md:col-span-2" : ""}`}>
-      <div className={`relative flex h-full flex-col overflow-hidden rounded-2xl p-6 sm:p-8 ${style.board}`}>
-        <OutlineText stroke={style.numeral} className="absolute -top-2 right-3 text-7xl tracking-tight sm:right-5 sm:text-8xl">
+    <article className={`relative min-w-0 ${wide ? "md:col-span-2" : ""}`}>
+      <div className={`relative flex h-full flex-col overflow-hidden rounded-2xl p-5 min-[400px]:p-6 sm:p-8 ${style.board}`}>
+        <OutlineText stroke={style.numeral} className="absolute -top-2 right-3 text-6xl tracking-tight min-[400px]:text-7xl sm:right-5 sm:text-8xl">
           {String(number).padStart(2, "0")}
         </OutlineText>
-        <h2 className="relative pr-20 text-3xl leading-none font-bold tracking-wide uppercase sm:pr-28 sm:text-4xl">{title}</h2>
+        <h2 className="relative pr-18 text-2xl leading-none font-bold tracking-wide break-words uppercase min-[400px]:pr-20 min-[400px]:text-3xl sm:pr-28 sm:text-4xl">{title}</h2>
         {subtitle && <p className={`relative mt-2 font-mono text-xs tracking-[0.2em] uppercase ${style.subtitle}`}>{subtitle}</p>}
         <div className="relative mt-6 flex-1">{children}</div>
         {cta?.href ? (

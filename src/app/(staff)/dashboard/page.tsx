@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { canEdit, getCurrentUser, getMentor, isHeadCoach, type StaffUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Card, PageHeader } from "@/components/ui";
+import { Card, CountBadge, PageHeader } from "@/components/ui";
 import { addDays, formatDay, formatTime, todayISO } from "@/lib/dates";
-import { COACH_SIGNUP_ROLE, ROLE_NOTE, canEditPlanRole, dugoutTabsFor, isCoachSignup, type StaffRole } from "@/lib/roles";
+import { COACH_SIGNUP_ROLE, ROLE_NOTE, canEditPlanRole, dugoutTabsFor, isCoachSignup, type DugoutTab, type StaffRole } from "@/lib/roles";
 import { loadStaffRequests, type StaffRequestRow } from "@/lib/approvals";
+import { NeedsYou } from "@/components/menu-board";
+import { loadApprovalNeeds, loadGetStarted, loadTeamNeeds, type TileCounts } from "./needs";
 import { playerName } from "@/lib/softball";
 import { loadRoster } from "@/lib/roster";
 import { ActionForm } from "@/components/action-form";
@@ -32,6 +35,7 @@ const TAB_NOTE: Record<string, string> = {
   "/dugout/plans": "Build, print and share",
   "/dugout/training": "Roadmap, team routines, testing",
   "/dugout/gameday": "Lineups and defensive rotations",
+  "/dugout/playbook": "Plays, call sheet, quizzes, scouting",
   "/dugout/drills": "Every drill, tagged",
   "/dugout/budget": "Fees, payments and expenses",
   "/dugout/parents": "Parent code and parent requests",
@@ -48,11 +52,12 @@ export default async function DashboardPage() {
   const supabase = await createClient();
   const editor = canEdit(role);
   const head = isHeadCoach(role);
-  const [waiting, staffRequests] = await Promise.all([
-    editor
-      ? supabase.rpc("pending_approvals").then((r) => (r.data ?? []) as { team_id: string; team_name: string; player_claims: number; parent_requests: number }[])
-      : Promise.resolve([]),
-    head ? loadStaffRequests(supabase) : Promise.resolve([] as StaffRequestRow[]),
+  const staffRequests = head ? await loadStaffRequests(supabase) : ([] as StaffRequestRow[]);
+  // what's waiting on this coach first (design audit 2026-11-18, P1): approvals by the tab they're
+  // decided on, fees still owed, the next game's lineup, lineups left in draft
+  const [approvals, teamNeeds] = await Promise.all([
+    loadApprovalNeeds(supabase, { editor, head, staffRequests }),
+    head ? loadTeamNeeds(supabase) : Promise.resolve([]),
   ]);
 
   return (
@@ -60,9 +65,9 @@ export default async function DashboardPage() {
       <TitleWithTeamLogo>
         <PageHeader title={`Welcome, ${staffUser.staff.displayName}`} description={ROLE_NOTE[role]} />
       </TitleWithTeamLogo>
-      <Approvals waiting={waiting} staffRequests={staffRequests} />
+      <NeedsYou items={[...approvals.needs, ...teamNeeds]} />
       {editor && <CheckIns />}
-      {role === "assistant" ? <AssistantHome user={staffUser} /> : <HeadCoachHome role={role} />}
+      {role === "assistant" ? <AssistantHome user={staffUser} counts={approvals.counts} /> : <HeadCoachHome role={role} counts={approvals.counts} />}
       {editor && <ParentSide userId={staffUser.id} head={head} />}
     </div>
   );
@@ -245,69 +250,6 @@ function AssistantJoin({ email }: { email: string | null }) {
 // Shared pieces
 // ---------------------------------------------------------------------------
 
-function Approvals({
-  waiting,
-  staffRequests,
-}: {
-  waiting: { team_id: string; team_name: string; player_claims: number; parent_requests: number }[];
-  staffRequests: StaffRequestRow[];
-}) {
-  if (waiting.length === 0 && staffRequests.length === 0) return null;
-  const heads = staffRequests.filter((r) => r.role === "coach");
-  const assistants = staffRequests.filter((r) => r.role === "assistant");
-  const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? "" : "s"}`;
-  return (
-    <section className="rounded-2xl border border-pink/60 bg-pink/10 p-4 sm:p-5" aria-label="Waiting for your approval">
-      <h2 className={heading}>Waiting for your approval</h2>
-      <ul className="mt-3 flex flex-col gap-2">
-        {heads.length > 0 && (
-          <li className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-            <span className="font-semibold">Head coaches</span>
-            <span className="text-muted">{heads.map((r) => r.display_name).join(", ")}</span>
-            <Link href="/dugout/roster#waiting" className="text-link hover:underline">
-              Review in Roster →
-            </Link>
-          </li>
-        )}
-        {waiting.map((w) => {
-          const coaches = assistants.filter((r) => r.team_id === w.team_id).length;
-          return (
-            <li key={w.team_id} className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-              <span className="font-semibold">{w.team_name}</span>
-              <span className="text-muted">
-                {[
-                  Number(w.player_claims) > 0 && plural(Number(w.player_claims), "player claim"),
-                  Number(w.parent_requests) > 0 && plural(Number(w.parent_requests), "parent request"),
-                  coaches > 0 && plural(coaches, "assistant coach"),
-                ]
-                  .filter(Boolean)
-                  .join(" · ")}
-              </span>
-              <Link href={`/dugout/roster?team=${w.team_id}#waiting`} className="text-link hover:underline">
-                Review in Roster →
-              </Link>
-            </li>
-          );
-        })}
-        {/* assistant coaches for teams with nothing else waiting */}
-        {Object.values(
-          Object.fromEntries(
-            assistants.filter((r) => !waiting.some((w) => w.team_id === r.team_id)).map((r) => [r.team_id ?? "", r] as const),
-          ),
-        ).map((r) => (
-          <li key={r.team_id ?? "none"} className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-            <span className="font-semibold">{r.team_name ?? "Assistant coaches"}</span>
-            <span className="text-muted">{plural(assistants.filter((a) => a.team_id === r.team_id).length, "assistant coach")}</span>
-            <Link href={`/dugout/roster${r.team_id ? `?team=${r.team_id}` : ""}#waiting`} className="text-link hover:underline">
-              Review in Roster →
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
 /** Leadership Plan check-ins coming up: the dates her plan set, as TWIS reminders. */
 async function CheckIns() {
   const supabase = await createClient();
@@ -347,19 +289,42 @@ async function CheckIns() {
   );
 }
 
-function DugoutCard({ role }: { role: StaffRole }) {
+// The Dugout tabs in three groups, each tile with what it holds and, for Roster, Parents and Mentors,
+// how many approvals wait there (design audit 2026-11-18, P1).
+const TILE_GROUPS: { title: string; tabs: string[] }[] = [
+  { title: "Team", tabs: ["/dugout/roster", "/dugout/parents", "/dugout/mentors", "/dugout/budget", "/dugout"] },
+  { title: "Game day", tabs: ["/dugout/gameday", "/dugout/playbook", "/dugout/calendar"] },
+  { title: "Development", tabs: ["/dugout/plans", "/dugout/training", "/dugout/drills"] },
+];
+
+function DugoutCard({ role, counts }: { role: StaffRole; counts: TileCounts }) {
+  const tabs = new Map(dugoutTabsFor(role).map((t) => [t.href, t] as const));
+  const groups = TILE_GROUPS.map((g) => ({ ...g, tabs: g.tabs.map((h) => tabs.get(h)).filter((t): t is DugoutTab => Boolean(t)) })).filter((g) => g.tabs.length);
   return (
     <Card title="Coaches Dugout">
-      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {dugoutTabsFor(role).map((tab) => (
-          <li key={tab.href}>
-            <Link href={tab.href} className="block rounded-lg border border-navy-700 px-4 py-3 transition hover:border-pink hover:bg-navy-800">
-              <span className="block font-semibold tracking-wide text-highlight uppercase">{tab.label}</span>
-              <span className="text-sm text-muted">{TAB_NOTE[tab.href]}</span>
-            </Link>
-          </li>
+      <div className="flex flex-col gap-5">
+        {groups.map((g) => (
+          <section key={g.title} aria-label={g.title}>
+            <h3 className="mb-2 font-mono text-2xs font-bold tracking-[0.2em] text-muted uppercase">{g.title}</h3>
+            <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {g.tabs.map((tab) => {
+                const n = counts[tab.href] ?? 0;
+                return (
+                  <li key={tab.href}>
+                    <Link href={tab.href} className="flex h-full items-start justify-between gap-3 rounded-lg border border-navy-700 px-4 py-3 transition hover:border-pink hover:bg-navy-800">
+                      <span className="min-w-0">
+                        <span className="block font-semibold tracking-wide text-highlight uppercase">{tab.label}</span>
+                        <span className="text-sm text-muted">{TAB_NOTE[tab.href]}</span>
+                      </span>
+                      <CountBadge count={n} label={`${n} waiting`} />
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
         ))}
-      </ul>
+      </div>
     </Card>
   );
 }
@@ -368,63 +333,45 @@ function DugoutCard({ role }: { role: StaffRole }) {
 // Head coach, admin (and view-only staff)
 // ---------------------------------------------------------------------------
 
-async function HeadCoachHome({ role }: { role: StaffRole }) {
+async function HeadCoachHome({ role, counts }: { role: StaffRole; counts: TileCounts }) {
   const supabase = await createClient();
-  const [teams, players, games, metrics] = await Promise.all([
-    supabase.from("teams").select("*", { count: "exact", head: true }),
-    supabase.from("players").select("*", { count: "exact", head: true }),
-    supabase.from("games").select("*", { count: "exact", head: true }),
-    supabase.from("metrics").select("*", { count: "exact", head: true }),
-  ]);
-  const rows: { label: string; count: number | null; href?: string }[] = [
-    { label: "Teams", count: teams.count, href: "/teams" },
-    { label: "Players", count: players.count, href: "/players" },
-    { label: "Games", count: games.count },
-    { label: "Development metrics", count: metrics.count },
-  ];
+  // the first steps until they're done: a team, its roster, the parent code
+  const steps = isHeadCoach(role) ? await loadGetStarted(supabase) : null;
+  const started = steps && steps.team && steps.roster && steps.code;
+  const step = (done: boolean, children: ReactNode) => (
+    <li className={done ? "text-muted line-through decoration-navy-600" : undefined}>
+      {children}
+      {done && <span className="sr-only"> (done)</span>}
+    </li>
+  );
   return (
     <>
-      <Card title="In the database">
-        <dl className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
-          {rows.map(({ label, count, href }) => (
-            <div key={label}>
-              <dt className="text-xs text-muted">{label}</dt>
-              <dd className="text-3xl font-semibold tabular-nums text-highlight">
-                {href ? (
-                  <Link href={href} className="hover:underline">
-                    {count ?? "–"}
-                  </Link>
-                ) : (
-                  (count ?? "–")
-                )}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </Card>
+      <DugoutCard role={role} counts={counts} />
 
-      <DugoutCard role={role} />
-
-      {isHeadCoach(role) && (
+      {steps && !started && (
         <Card title="Get started">
           <ol className="list-decimal space-y-1 pl-5 text-sm">
-            <li>
-              Register your team on the{" "}
-              <Link href="/teams" className="underline">
-                Teams
-              </Link>{" "}
-              page, and the opponents you play.
-            </li>
-            <li>
-              Build the official roster with Player intake. Parents join only for players on it, and make each player&apos;s login.
-            </li>
-            <li>
-              Turn on your parent code in Coaches Dugout →{" "}
-              <Link href="/dugout/parents" className="underline">
-                Parents
-              </Link>{" "}
-              and give it to parents, assistant coaches and mentors. Never to players.
-            </li>
+            {step(
+              steps.team,
+              <>
+                Register your team on the{" "}
+                <Link href="/teams" className="underline">
+                  Teams
+                </Link>{" "}
+                page, and the opponents you play.
+              </>,
+            )}
+            {step(steps.roster, <>Build the official roster with Player intake. Parents join only for players on it, and make each player&apos;s login.</>)}
+            {step(
+              steps.code,
+              <>
+                Turn on your parent code in Coaches Dugout →{" "}
+                <Link href="/dugout/parents" className="underline">
+                  Parents
+                </Link>{" "}
+                and give it to parents, assistant coaches and mentors. Never to players.
+              </>,
+            )}
             <li>Assistant coaches sign up and pick your team; approve them on the Roster tab.</li>
           </ol>
         </Card>
@@ -440,7 +387,7 @@ async function HeadCoachHome({ role }: { role: StaffRole }) {
 type EventRow = { id: string; kind: string; title: string | null; event_date: string; start_time: string | null; team: { name: string; is_own_team: boolean } | null };
 type PlanRow = { id: string; practice_date: string; start_time: string | null; focus: string | null; status: "draft" | "final"; created_by: string | null; team: { name: string } | null };
 
-async function AssistantHome({ user }: { user: StaffUser }) {
+async function AssistantHome({ user, counts }: { user: StaffUser; counts: TileCounts }) {
   const supabase = await createClient();
   const today = todayISO();
   const [{ data: events }, { data: plans }, { data: drafts }] = await Promise.all([
@@ -531,7 +478,7 @@ async function AssistantHome({ user }: { user: StaffUser }) {
         </Card>
       )}
 
-      <DugoutCard role="assistant" />
+      <DugoutCard role="assistant" counts={counts} />
     </>
   );
 }

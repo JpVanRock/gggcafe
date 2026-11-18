@@ -52,6 +52,20 @@ const TAG_TONE: Record<TwisItem["kind"], BadgeTone> = {
   activity: "neutral",
 };
 
+type DayGroup = { rest: true; cells: TwisCellView[] } | { rest: false; cell: TwisCellView };
+
+/** Days in order, with each run of empty rest days (not today) folded into one group. */
+function groupRestDays(cells: TwisCellView[]): DayGroup[] {
+  const groups: DayGroup[] = [];
+  for (const cell of cells) {
+    const empty = cell.isRestDay && !cell.isToday && cell.items.length === 0 && !cell.notes?.length && !cell.calls?.length;
+    const last = groups[groups.length - 1];
+    if (empty && last?.rest) last.cells.push(cell);
+    else groups.push(empty ? { rest: true, cells: [cell] } : { rest: false, cell });
+  }
+  return groups;
+}
+
 export function TwisChecklist({ playerId, cells, canEdit }: { playerId: string; cells: TwisCellView[]; canEdit: boolean }) {
   const saved = new Set(cells.flatMap((c) => c.items.filter((i) => i.checked).map((i) => i.key)));
   const [checked, setChecked] = useOptimistic(saved, (state: Set<string>, change: { key: string; on: boolean }) => {
@@ -74,24 +88,9 @@ export function TwisChecklist({ playerId, cells, canEdit }: { playerId: string; 
     });
   }
 
-  return (
-    <div>
-      <div className="mb-4 flex items-center gap-3">
-        <div className="h-2 flex-1 overflow-hidden rounded-full bg-navy-800" aria-hidden>
-          <div className="h-full rounded-full bg-neon transition-all" style={{ width: `${items.length ? (done / items.length) * 100 : 0}%` }} />
-        </div>
-        <p className="font-mono text-sm tabular-nums text-highlight" aria-live="polite">
-          {done}/{items.length} done
-        </p>
-      </div>
+  const dayCell = (cell: TwisCellView) => (
+    <li key={cell.key} className={`rounded-xl border p-3 ${cell.isToday ? "border-pink bg-pink/10" : "border-navy-700 bg-navy-950/40"}`}>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {cells.map((cell) => (
-          <section
-            key={cell.key}
-            aria-label={`${cell.label} ${cell.sublabel}`}
-            className={`rounded-xl border p-3 ${cell.isToday ? "border-pink bg-pink/10" : "border-navy-700 bg-navy-950/40"}`}
-          >
             <header className="flex items-baseline justify-between gap-2">
               <span className="font-mono text-xs font-bold tracking-widest text-highlight uppercase">{cell.label}</span>
               <span className="font-mono text-xs text-muted">{cell.isToday ? "Today" : cell.sublabel}</span>
@@ -151,9 +150,40 @@ export function TwisChecklist({ playerId, cells, canEdit }: { playerId: string; 
               </ul>
             )}
             {cell.notes && cell.notes.length > 0 && <PracticeNotes notes={cell.notes} many={new Set(cell.notes.map((n) => n.team)).size > 1} />}
-          </section>
-        ))}
+    </li>
+  );
+
+  return (
+    <div>
+      <div className="mb-4 flex items-center gap-3">
+        <div className="h-2 flex-1 overflow-hidden rounded-full bg-navy-800" aria-hidden>
+          <div className="h-full rounded-full bg-neon transition-all" style={{ width: `${items.length ? (done / items.length) * 100 : 0}%` }} />
+        </div>
+        <p className="font-mono text-sm tabular-nums text-highlight" aria-live="polite">
+          {done}/{items.length} done
+        </p>
       </div>
+
+      {/* one list of days (not a landmark each: design audit A8); empty rest days in a row fold into one line (M3) */}
+      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {groupRestDays(cells).map((group) =>
+          group.rest ? (
+            <li
+              key={group.cells[0].key}
+              className="flex items-baseline justify-between gap-2 self-start rounded-xl border border-navy-700 bg-navy-950/20 px-3 py-2.5"
+            >
+              <span className="font-mono text-xs font-bold tracking-widest text-muted uppercase">
+                {group.cells.length === 1 ? group.cells[0].label : `${group.cells[0].label} – ${group.cells[group.cells.length - 1].label}`}
+              </span>
+              <span className="font-mono text-xs text-muted">
+                {group.cells.length === 1 ? `${group.cells[0].sublabel} · Rest day` : "Rest days"}
+              </span>
+            </li>
+          ) : (
+            dayCell(group.cell)
+          ),
+        )}
+      </ul>
       {error && (
         <p role="alert" className="mt-3 text-sm text-danger">
           {error}

@@ -28,12 +28,12 @@
   header (`MenuHeader`: "Family menu", their name, the team logo), the Yearbook banner first (user's choice), "Needs you"
   (`NeedsYou`: her consent, the medical card, the questionnaire, unread packet items, mentor requests, each linking to
   where it's done), video calls, Coming up, then numbered boards (`MenuPanel`): her goals (one per daughter), Team
-  Standards & Culture, Team Budget, Mentors, Welcome packet, Team admin. Season forms and Logins & teams are in the page's
-  hamburger menu, top left (`PageMenu` in `components/page-menu.tsx`, a badge when they need the parent; user, same
-  day), and the header's menu no longer lists the Yearbook (its banner tops the page). Each board shows a
+  Standards & Culture, Team Budget, Mentors, Welcome packet, Team admin. Season Forms, Logins & Teams and Join Another Team
+  are links under the header (`PageLinks` in `components/page-menu.tsx`, a pink badge when they need the parent; they
+  sat behind a second Menu button until the 2026-11-18 design audit, N2), and the header's menu no longer lists the Yearbook (its banner tops the page). Each board shows a
   short summary and opens its own page: `/family/team`, `/family/budget`, `/family/forms` (questionnaire and medical
   card), `/family/packet`, `/family/logins` (her login and consent, their teams; "Go to my dashboard →" right of the title, user
-  2026-11-16), `/family/join` (Join another team: in the hamburger menu since 2026-11-16), `/family/mentors`
+  2026-11-16), `/family/join` (Join another team: one of the links under the header), `/family/mentors`
   (now with approving or declining a mentor's request at the top). Shared: `family/family-data.ts` (`loadFamily`: links,
   daughters, approved teams, switches; once per request) and `family/shell.tsx` (`FamilyShell`, `SectionTitle`, whose
   `action` sits right of the title). A parent with no team yet still sees the join form on /family.

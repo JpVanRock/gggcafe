@@ -2,6 +2,13 @@
 - Header tabs (`dugout/tabs.tsx`): Roster (`/dugout/roster`, first: user 2026-11-08), Culture (`/dugout`; Team Standards + Team Culture), Calendar (`/dugout/calendar`),
   Practice Plans (`/dugout/plans`), Training, GameDay (`/dugout/gameday`), Playbook (`/dugout/playbook`), Drill Library (`/dugout/drills`),
   Budget (`/dugout/budget`; the tab says just "Budget" so the row fits, user 2026-11-12), Parents (`/dugout/parents`).
+  The header is the title and the team logo with no description (the tabs say what's here; design audit 2026-11-18, N1).
+- The coach dashboard (`/dashboard`, `dashboard/page.tsx` + `dashboard/needs.ts`; design audit 2026-11-18, P1) opens with
+  "Needs you" (`NeedsYou`): approvals by the tab they're decided on (player claims, coach sign-ups and parental consents →
+  Roster; parents asking to join → Parents; mentors → Mentors), players who still owe fees (→ Budget), the next game in
+  the next two weeks with no lineup or a draft one (→ GameDay), and lineups left in draft. The Dugout tiles come in three
+  groups (Team, Game day, Development) and Roster, Parents and Mentors carry how many wait there. "Get started" shows a
+  head coach only until the team, its roster and the parent code are in place.
 - GameDay (tab renamed from "GameDay Prep"; from the user's Lineup + Defensive Rotations tabs): season player cards
   (`gameday_profiles`: hitting type power/contact/gap, base running pure/intelligent/average, typed
   AVG/OBP/K% used only until box scores exist, `batting_season` wins) and game lineups

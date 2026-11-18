@@ -22,15 +22,15 @@ import { loadComingUp, loadDaughterGoals, loadTeamCulture } from "./team-data";
 import { FamilyBoards, YearbookBanner, familyMenu } from "./menu-content";
 import { ComingUpCard } from "@/components/coming-up";
 import { FamilyShell } from "./shell";
-import { PageMenu } from "@/components/page-menu";
+import { PageLinks } from "@/components/page-menu";
 
 export const metadata: Metadata = { title: "Family · GGG.Cafe" };
 
 // The family menu (user, 2026-11-13: cleaner and organized like the player dashboard's menu): the
 // media-day header, the Yearbook at the top, "Needs you" (what's waiting on the parent, with where to do
 // it), video calls, Coming up, then numbered menu boards, each with a short summary and its own page
-// (Team Standards & Culture, Team Budget, Mentors, Welcome packet). Season forms and Logins & teams are in
-// the page's hamburger menu, top left (user, 2026-11-13).
+// (Team Standards & Culture, Team Budget, Mentors, Welcome packet). Season Forms, Logins & Teams and Join
+// Another Team are links under the header (PageLinks; a second Menu button until the design audit, N2).
 export default function FamilyPage({ searchParams }: PageProps<"/family">) {
   return (
     <FamilyShell>
@@ -97,7 +97,7 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
   // on a group call, name only their own daughters
   const daughtersOn = (c: VideoCallRow) =>
     (invited.get(c.id) ?? []).map((id) => daughters.find((d) => d.player_id === id)?.player_name).filter(Boolean).join(", ") || null;
-  // Needs you, the hamburger menu and the boards: the same builder as an admin's Parent View
+  // Needs you, the page links and the boards: the same builder as an admin's Parent View
   const { needs, menuItems, boards } = familyMenu({
     daughters,
     teams,
@@ -124,7 +124,6 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
         first={nameFirst || "Welcome"}
         last={nameRest.join(" ") || undefined}
         line={[teams.map((t) => t.name).join(" · "), user.email].filter(Boolean).join(" · ")}
-        start={links.length > 0 && <PageMenu items={menuItems} />}
         aside={
           <Suspense fallback={null}>
             <MyTeamLogo />
@@ -148,6 +147,9 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
           </>
         }
       />
+
+      {/* Season Forms, Logins & Teams, Join Another Team: in the open, not behind a second Menu button (design audit, N2) */}
+      {links.length > 0 && <PageLinks items={menuItems} label="Family pages" />}
 
       {(code === "invalid" || joinError) && links.length === 0 && (
         <p role="alert" className="rounded-lg border border-pink/60 bg-pink/10 p-4 text-sm">

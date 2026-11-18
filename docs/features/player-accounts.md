@@ -5,8 +5,8 @@
   then `/me` shows the welcome message and "Claim my
   profile" (name + jersey; `request_player_claim()` matches her spot on the team's CURRENT season
   roster, else the coach matches it). Coaches approve on the team page (`teams/[teamId]/claims.tsx`,
-  `team_player_claims()`); the nav shows a count and the dashboard a "Waiting for your approval" card
-  (`pending_approvals()`, includes parent requests).
+  `team_player_claims()`); the nav shows a count and the dashboard's "Needs you" board lists each approval with the tab it's
+  decided on (`pending_approvals()`; `dashboard/needs.ts`).
 - Claims are per team + season (`player_claims`). A team's current season = its latest season with a
   roster (`private.team_current_season`). When a new season's roster starts, last season's claim stops
   giving access until she claims again (/me prompts her); her profile and history stay.

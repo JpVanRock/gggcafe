@@ -5,7 +5,7 @@ import { isUuid } from "@/lib/softball";
 import { BudgetSummary, CreditsSummary, type BudgetSummaryData } from "@/components/budget-summary";
 import { Badge, Card, EmptyState, badgeClass, eyebrowClass } from "@/components/ui";
 import { MenuHeader, NeedsYou } from "@/components/menu-board";
-import { PageMenu } from "@/components/page-menu";
+import { PageLinks } from "@/components/page-menu";
 import { PillNav } from "@/components/pill-nav";
 import { TeamLogoMark } from "@/components/team-logo";
 import { ComingUpCard } from "@/components/coming-up";
@@ -127,9 +127,9 @@ export default async function ViewAsParentPage({ params, searchParams }: PagePro
               first={nameFirst}
               last={nameRest.join(" ") || undefined}
               line={[teams.map((t) => t.name).join(" · "), v.account.email].filter(Boolean).join(" · ")}
-              start={<PageMenu items={menuItems} />}
               aside={<TeamLogoMark logo={logo} />}
             />
+            <PageLinks items={menuItems} label="Family pages" />
             {yearbooks.length > 0 && <YearbookBanner teamNames={yearbooks.map((t) => t.name)} preview />}
             <NeedsYou items={needs} />
             {calendarTeams.length > 0 && <ComingUpCard items={comingUpItems} teams={calendarTeams} calendarHref={`/dugout/calendar?team=${calendarTeams[0].id}`} />}
