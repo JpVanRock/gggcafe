@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { DrillTags } from "@/components/drill-tags";
-import { Disclosure, EmptyState, Field, FormMessage, inputClass, secondaryButtonClass, cardClass, buttonStyles } from "@/components/ui";
+import { ActionDisclosure, EmptyState, Field, FormMessage, inputClass, secondaryButtonClass, cardClass, buttonStyles } from "@/components/ui";
 import { DRILL_TAGS, DRILL_TAG_LABEL, filterDrills, type DrillTag, type LibraryDrill } from "@/lib/dugout";
 import { initialFormState } from "@/lib/form";
 import { deleteDrill, saveDrill } from "./actions";
@@ -160,11 +160,14 @@ export function DrillLibrary({ drills, canEdit }: { drills: LibraryDrill[]; canE
   return (
     <div className="flex flex-col gap-6">
       {canEdit && (
-        <Disclosure summary="Add a drill" open={drills.length === 0}>
+        <ActionDisclosure label="Add a drill" open={drills.length === 0}>
           <DrillForm />
-        </Disclosure>
+        </ActionDisclosure>
       )}
 
+      {/* search and the tag filter once there's something to search: an empty library showed a row of zeros
+          (second audit round, 2026-11-18) */}
+      {drills.length > 0 && (
       <div className="flex flex-col gap-3">
         <input
           type="search"
@@ -176,6 +179,7 @@ export function DrillLibrary({ drills, canEdit }: { drills: LibraryDrill[]; canE
         />
         <TagFilter drills={drills} value={tag} onChange={setTag} />
       </div>
+      )}
 
       {drills.length === 0 ? (
         <EmptyState>The library is empty. Add the drills your team runs, then drag them into practice plans.</EmptyState>

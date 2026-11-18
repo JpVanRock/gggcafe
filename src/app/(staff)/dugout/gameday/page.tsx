@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { dugoutCanEdit, requireDugoutPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Card, EmptyState, RECENT_LIMIT, ShowAllLink, tableClass, tdClass, thClass, badgeClass, TableScroll, buttonStyles, cardClass } from "@/components/ui";
+import { ActionDisclosure, Card, EmptyState, RECENT_LIMIT, ShowAllLink, tableClass, tdClass, thClass, badgeClass, TableScroll, cardClass } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import { BASE_RUNNING_LABEL, HITTING_TYPE_LABEL, percent, rate } from "@/lib/gameday";
 import { loadGamedayRoster } from "@/lib/gameday-data";
@@ -62,17 +62,10 @@ export default async function GamedayPage({ searchParams }: PageProps<"/dugout/g
           <h2 className="text-3xl leading-tight font-bold tracking-tight text-highlight uppercase">Game lineups</h2>
           <p className="text-sm text-muted">Batting order, defensive rotations and pitching plan. Print or share each one.</p>
         </div>
-        {/* the page's main action as a button, not a collapsed panel (design audit 2026-11-18, N4); still a
-            <details>, so it opens without JavaScript, and open when there are no lineups yet */}
         {editor && seasonId && (
-          <details open={lineups.length === 0} className="group">
-            <summary className={buttonStyles("primary", "cursor-pointer list-none select-none [&::-webkit-details-marker]:hidden")}>
-              <span aria-hidden="true" className="transition group-open:rotate-45">+</span> New lineup
-            </summary>
-            <div className={`${cardClass("raised")} mt-3 p-4`}>
-              <NewLineupForm teamId={team.id} seasonId={seasonId} today={today} games={games} />
-            </div>
-          </details>
+          <ActionDisclosure label="New lineup" open={lineups.length === 0}>
+            <NewLineupForm teamId={team.id} seasonId={seasonId} today={today} games={games} />
+          </ActionDisclosure>
         )}
         {lineups.length === 0 ? (
           <EmptyState>No lineups yet.</EmptyState>

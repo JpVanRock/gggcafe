@@ -166,7 +166,7 @@ export default async function MentorHome() {
                       <h3 className="font-display text-xl font-bold tracking-wide uppercase">
                         {t.name} <span className="font-sans text-xs tracking-wider text-muted normal-case">· whole team · {roster.length} players</span>
                       </h3>
-                      <Link href={`/mentor/teams/${t.id}`} className="font-sans text-xs tracking-widest text-highlight uppercase hover:underline">
+                      <Link href={`/mentor/teams/${t.id}`} className="inline-flex min-h-10 items-center gap-1 font-sans text-xs tracking-widest text-highlight uppercase hover:underline sm:min-h-0">
                         Team focus &amp; notes <span aria-hidden="true">→</span>
                       </Link>
                     </div>

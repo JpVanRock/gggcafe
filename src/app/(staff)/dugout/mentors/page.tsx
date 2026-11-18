@@ -34,18 +34,21 @@ const MENTOR_WAYS: [string, string][] = [
   ["Train the next leader.", "One day she'll mentor someone too. That's your legacy."],
 ];
 
-function Decide({ id, who }: { id: string; who: string }) {
+/** `what`: what they asked for, so two requests from one mentor don't read alike ("for the whole team", "for Maya Torres"). */
+function Decide({ id, who, what }: { id: string; who: string; what: string }) {
   return (
     <span className="flex flex-wrap items-center gap-2">
       <ActionForm action={decideMentorRequest} className="flex flex-wrap items-center gap-2">
         <input type="hidden" name="link_id" value={id} />
         <input type="hidden" name="decision" value="approve" />
-        <SubmitButton pendingLabel="Saving…">Approve</SubmitButton>
+        <SubmitButton pendingLabel="Saving…" aria-label={`Approve ${who} ${what}`}>
+          Approve
+        </SubmitButton>
       </ActionForm>
       <ActionForm action={decideMentorRequest} className="flex flex-wrap items-center gap-2">
         <input type="hidden" name="link_id" value={id} />
         <input type="hidden" name="decision" value="decline" />
-        <ConfirmSubmit message={`Decline ${who}?`} confirmLabel="Decline" className={buttonStyles("secondary")}>
+        <ConfirmSubmit message={`Decline ${who}?`} confirmLabel="Decline" label={`Decline ${who} ${what}`} className={buttonStyles("secondary")}>
           Decline
         </ConfirmSubmit>
       </ActionForm>
@@ -94,6 +97,39 @@ export default async function MentorsPage({ searchParams }: PageProps<"/dugout/m
   const approved = links.filter((l) => l.status === "approved");
   const working = [...new Set(approved.map((l) => l.mentor_id))].sort((a, b) => who(a).localeCompare(who(b)));
 
+  const waitingSection = (
+    <section aria-label="Waiting for approval" className={`rounded-2xl border p-4 sm:p-5 ${pendingTeam.length ? "border-pink/60 bg-pink/5" : "border-navy-700"}`}>
+      <h2 className={heading}>Waiting for approval ({pendingTeam.length})</h2>
+      {pendingTeam.length === 0 && pendingPlayer.length === 0 ? (
+        <p className="text-sm text-muted">
+          Nobody waiting. Mentors sign up at <span className="font-mono">/register</span>, pick &quot;Mentor&quot; and enter the parent code.
+        </p>
+      ) : (
+        <ul className="flex flex-col gap-3">
+          {pendingTeam.map((l) => (
+            <li key={l.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-navy-700 p-3">
+              <span className="text-sm">
+                <span className="font-semibold">{who(l.mentor_id)}</span>
+                {mentorOf(l.mentor_id)?.specialty && <span className="text-muted"> · {mentorOf(l.mentor_id)?.specialty}</span>}
+                <span className="text-muted"> · asks to work with the whole team · {formatDay(l.requested_at.slice(0, 10))}</span>
+              </span>
+              <Decide id={l.id} who={who(l.mentor_id)} what="for the whole team" />
+            </li>
+          ))}
+          {pendingPlayer.map((l) => (
+            <li key={l.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-navy-700 p-3">
+              <span className="text-sm">
+                <span className="font-semibold">{who(l.mentor_id)}</span>
+                <span className="text-muted"> · asks to mentor {nameOf(l.player_id!)}</span>
+              </span>
+              {admin ? <Decide id={l.id} who={who(l.mentor_id)} what={`for ${nameOf(l.player_id!)}`} /> : <Badge tone="pink">Waiting for her parents</Badge>}
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+
   return (
     <div className="flex flex-col gap-8">
       <TeamPicker teams={teams} current={team.id} basePath="/dugout/mentors" />
@@ -107,6 +143,8 @@ export default async function MentorsPage({ searchParams }: PageProps<"/dugout/m
           viewHref={working.length ? `/view-as/mentor/${working[0]}?team=${team.id}` : `/view-as/mentor/example?team=${team.id}`}
         />
       )}
+      {/* something to decide comes first, above the team's mentoring values (second audit round, 2026-11-18) */}
+      {(pendingTeam.length > 0 || pendingPlayer.length > 0) && waitingSection}
       <div className="flex flex-col gap-4">
         <div>
           <h2 className="text-3xl leading-tight font-bold tracking-tight text-highlight uppercase">Mentors</h2>
@@ -138,36 +176,8 @@ export default async function MentorsPage({ searchParams }: PageProps<"/dugout/m
         </Disclosure>
       </div>
 
-      <section aria-label="Waiting for approval" className={`rounded-2xl border p-4 sm:p-5 ${pendingTeam.length ? "border-pink/60 bg-pink/5" : "border-navy-700"}`}>
-        <h3 className={heading}>Waiting for approval ({pendingTeam.length})</h3>
-        {pendingTeam.length === 0 && pendingPlayer.length === 0 ? (
-          <p className="text-sm text-muted">
-            Nobody waiting. Mentors sign up at <span className="font-mono">/register</span>, pick &quot;Mentor&quot; and enter the parent code.
-          </p>
-        ) : (
-          <ul className="flex flex-col gap-3">
-            {pendingTeam.map((l) => (
-              <li key={l.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-navy-700 p-3">
-                <span className="text-sm">
-                  <span className="font-semibold">{who(l.mentor_id)}</span>
-                  {mentorOf(l.mentor_id)?.specialty && <span className="text-muted"> · {mentorOf(l.mentor_id)?.specialty}</span>}
-                  <span className="text-muted"> · asks to work with the whole team · {formatDay(l.requested_at.slice(0, 10))}</span>
-                </span>
-                <Decide id={l.id} who={who(l.mentor_id)} />
-              </li>
-            ))}
-            {pendingPlayer.map((l) => (
-              <li key={l.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-navy-700 p-3">
-                <span className="text-sm">
-                  <span className="font-semibold">{who(l.mentor_id)}</span>
-                  <span className="text-muted"> · asks to mentor {nameOf(l.player_id!)}</span>
-                </span>
-                {admin ? <Decide id={l.id} who={who(l.mentor_id)} /> : <Badge tone="pink">Waiting for her parents</Badge>}
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+
+      {pendingTeam.length === 0 && pendingPlayer.length === 0 && waitingSection}
 
       {working.length === 0 ? (
         <EmptyState>No mentors work with this team yet.</EmptyState>
@@ -246,14 +256,15 @@ export default async function MentorsPage({ searchParams }: PageProps<"/dugout/m
                     {nameOf(msg.player_id)}
                   </Link>
                 </span>
-                <span className="min-w-0 flex-1 truncate text-muted">
+                {/* its own line on phones, where beside the names it shrank to a letter (second round) */}
+                <span className="min-w-0 basis-full truncate text-muted sm:basis-auto sm:flex-1">
                   {[msg.body, msg.drill_name && `Drill: ${msg.drill_name}`, msg.photo_path && "Photo"].filter(Boolean).join(" · ")}
                 </span>
                 {admin && <Badge tone={msg.shared_with_coaches ? "pink" : "neutral"}>{msg.shared_with_coaches ? "Shared" : "Private"}</Badge>}
                 <span className="font-sans text-2xs tracking-wider text-muted uppercase">{msg.read_at ? "Seen" : "New"}</span>
                 <ActionForm action={removeMentorMessage} className="flex items-center gap-2">
                   <input type="hidden" name="message_id" value={msg.id} />
-                  <ConfirmSubmit message="Remove this message? The player won't see it any more." confirmLabel="Remove" tone="danger" className={buttonStyles("link", "text-xs text-muted")}>
+                  <ConfirmSubmit message="Remove this message? The player won't see it any more." confirmLabel="Remove" tone="danger" label={`Remove the message to ${nameOf(msg.player_id)}, ${formatDay(msg.created_at.slice(0, 10))}`} className={buttonStyles("removeQuiet")}>
                     Remove
                   </ConfirmSubmit>
                 </ActionForm>

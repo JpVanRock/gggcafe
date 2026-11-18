@@ -40,14 +40,14 @@ export function FocusBoard({ items, controls, empty }: { items: FocusItem[]; con
       {FOCUS_STATUSES.map((status) => {
         const list = items.filter((i) => i.status === status);
         return (
-          <section
+          // not a landmark each (they repeated per player), and an h3 under the page's h2 (second audit round)
+          <div
             key={status}
-            aria-label={FOCUS_LABEL[status]}
             className={`rounded-xl border p-3 ${status === "working" ? "border-neon-edge/50 bg-neon/5" : "border-pink/50 bg-pink/5"}`}
           >
-            <h4 className={label}>
+            <h3 className={label}>
               {FOCUS_LABEL[status]} <span className="text-muted">· {list.length}</span>
-            </h4>
+            </h3>
             {list.length === 0 ? (
               <p className="mt-2 text-xs text-muted">{status === "working" ? "Nothing moved here yet." : "Nothing in progress."}</p>
             ) : (
@@ -64,7 +64,7 @@ export function FocusBoard({ items, controls, empty }: { items: FocusItem[]; con
                 ))}
               </ul>
             )}
-          </section>
+          </div>
         );
       })}
     </div>

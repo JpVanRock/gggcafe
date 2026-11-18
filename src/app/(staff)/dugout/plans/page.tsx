@@ -3,7 +3,7 @@ import Link from "next/link";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { canEditPlanRole } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
-import { Disclosure, EmptyState, RECENT_LIMIT, ShowAllLink, badgeClass, cardClass, groupLabelClass } from "@/components/ui";
+import { ActionDisclosure, EmptyState, RECENT_LIMIT, ShowAllLink, badgeClass, cardClass, groupLabelClass } from "@/components/ui";
 import { formatDay, todayISO } from "@/lib/dates";
 import { PRACTICE_SETTING_LABEL, durationLabel, practiceRange, type PracticeSetting } from "@/lib/dugout";
 import { loadDugoutTeam } from "../data";
@@ -117,9 +117,9 @@ export default async function PracticePlansPage({ searchParams }: PageProps<"/du
       <SafetyNote audience="coach" />
 
       {editor && (
-        <Disclosure summary={`New practice plan for ${team.name}`} open={upcoming.length === 0 && pastTotal === 0}>
+        <ActionDisclosure label="New practice plan" open={upcoming.length === 0 && pastTotal === 0}>
           <NewPlanForm teamId={team.id} today={today} />
-        </Disclosure>
+        </ActionDisclosure>
       )}
 
       <section>

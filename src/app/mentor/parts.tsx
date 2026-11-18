@@ -53,28 +53,35 @@ export function PlayerTiles({ cards, off }: { cards: MenteeCard[]; off?: Map<str
         const sections = MENTOR_SECTIONS.filter((x) => !off?.get(p.id)?.has(x.key));
         return (
           <li key={p.id} className="flex flex-col rounded-2xl border border-navy-600 transition hover:border-pink">
-            <Link href={`/mentor/players/${p.id}`} className="flex items-center gap-4 rounded-2xl p-4 transition hover:bg-navy-800">
+            {/* tighter on phones: twelve tall tiles ran about 1,700px (second audit round, 2026-11-18) */}
+            <Link href={`/mentor/players/${p.id}`} className="flex items-center gap-3 rounded-2xl p-3 transition hover:bg-navy-800 sm:gap-4 sm:p-4">
               {photo ? (
                 // eslint-disable-next-line @next/next/no-img-element -- short-lived signed Storage URL
-                <img src={photo} alt="" className="size-14 shrink-0 rounded-full border-2 border-neon-edge object-cover" />
+                <img src={photo} alt="" className="size-11 shrink-0 rounded-full border-2 border-neon-edge object-cover sm:size-14" />
               ) : (
-                <span className="grid size-14 shrink-0 place-items-center rounded-full border-2 border-navy-600 font-display text-xl font-bold text-highlight">
+                <span className="grid size-11 shrink-0 place-items-center rounded-full border-2 border-navy-600 font-display text-lg font-bold text-highlight sm:size-14 sm:text-xl">
                   {jersey ?? p.primary_position ?? "–"}
                 </span>
               )}
               <span className="min-w-0">
-                <span className="block truncate font-display text-xl font-bold tracking-wide uppercase">{playerName(p)}</span>
+                <span className="block truncate font-display text-lg font-bold tracking-wide uppercase sm:text-xl">{playerName(p)}</span>
                 <span className="block truncate font-sans text-xs text-muted">{[jersey && `#${jersey}`, p.primary_position, team].filter(Boolean).join(" · ")}</span>
               </span>
             </Link>
             {sections.length > 0 && (
-              <nav aria-label={`${playerName(p)}: open`} className="flex flex-wrap gap-x-4 gap-y-1 border-t border-navy-700 px-4 py-2.5">
+              // links, not a landmark per player (twelve "navigation" regions), each named for her (A7)
+              <div className="flex flex-wrap gap-x-4 border-t border-navy-700 px-3 sm:px-4 sm:py-1.5">
                 {sections.map((x) => (
-                  <Link key={x.hash} href={`/mentor/players/${p.id}#${x.hash}`} className="text-sm font-semibold text-link hover:underline">
+                  <Link
+                    key={x.hash}
+                    href={`/mentor/players/${p.id}#${x.hash}`}
+                    aria-label={`${x.label}: ${playerName(p)}`}
+                    className="inline-flex min-h-10 items-center text-sm font-semibold text-link hover:underline sm:min-h-0"
+                  >
                     {x.label}
                   </Link>
                 ))}
-              </nav>
+              </div>
             )}
           </li>
         );

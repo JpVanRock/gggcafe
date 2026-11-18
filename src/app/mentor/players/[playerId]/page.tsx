@@ -165,7 +165,8 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
               {sent.map((m) => (
                 <li key={m.id} className="flex flex-wrap items-start gap-x-4 gap-y-2 px-4 py-3 text-sm">
                   <span className="w-24 shrink-0 font-display text-muted tabular-nums">{formatDay(m.created_at.slice(0, 10))}</span>
-                  <span className="min-w-0 flex-1">
+                  {/* at least 12rem, so on a phone the message wraps to its own line instead of shrinking to a word a line */}
+                  <span className="min-w-48 flex-1">
                     {m.body && <span className="block whitespace-pre-wrap">{m.body}</span>}
                     {m.drill_name && <span className="block text-pink-soft">Drill: {m.drill_name}</span>}
                     {m.photo_path && messagePhotos.get(m.photo_path) && (

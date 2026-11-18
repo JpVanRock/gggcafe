@@ -63,6 +63,8 @@ function StatusControl({ item, editor }: { item: ItemRow; editor: boolean }) {
             name="status"
             value={s}
             aria-pressed={on}
+            // which item: two "Taught" buttons read alike in a list (second audit round)
+            aria-label={`${INSTALL_STATUS_LABEL[s]}: ${item.title}`}
             className={`${badgeClass(on ? STATUS_TONE[s] : "neutral", "md")} transition ${on ? "" : "hover:border-pink hover:text-ink"}`}
           >
             {INSTALL_STATUS_LABEL[s]}
@@ -135,7 +137,8 @@ export default async function InstallPage({ searchParams }: PageProps<"/dugout/p
 
       <section className="rounded-2xl border border-navy-600 bg-navy-900/70 p-5">
         <h2 className={sectionLabelClass}>Road to opening day</h2>
-        <div className="mt-3 grid gap-4 sm:grid-cols-4">
+        {/* two columns on phones, not four numbers stacked (second audit round) */}
+        <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div>
             <p className="font-display text-3xl font-bold text-highlight tabular-nums">{pace.days ?? "–"}</p>
             <p className="text-xs text-muted">{opener ? `days to ${formatDay(opener)}` : "No first game on the schedule yet"}</p>
@@ -231,7 +234,7 @@ export default async function InstallPage({ searchParams }: PageProps<"/dugout/p
                                 {editor && (
                                   <ActionForm action={removeInstallItem}>
                                     <input type="hidden" name="id" value={item.id} />
-                                    <ConfirmSubmit message={`Remove “${item.title}” from the checklist?`} className={buttonStyles("removeQuiet")}>
+                                    <ConfirmSubmit message={`Remove “${item.title}” from the checklist?`} label={`Remove ${item.title}`} className={buttonStyles("removeQuiet")}>
                                       Remove
                                     </ConfirmSubmit>
                                   </ActionForm>

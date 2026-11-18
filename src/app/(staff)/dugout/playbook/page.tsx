@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { canEdit, requireStaffPage } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Disclosure, EmptyState, badgeClass } from "@/components/ui";
+import { Disclosure, EmptyState, badgeClass, buttonStyles } from "@/components/ui";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { INSTALL_STATUS_LABEL, type InstallStatus } from "@/lib/install";
 import { PLAY_CATEGORIES, PLAY_CATEGORY_LABEL } from "@/lib/playbook";
@@ -45,10 +45,16 @@ export default async function PlaybookPage({ searchParams }: PageProps<"/dugout/
     <div className="flex flex-col gap-8">
       <TeamPicker teams={teams} current={team.id} basePath="/dugout/playbook" />
       <PlaybookNav current="plays" teamId={team.id} />
-      <p className="text-sm text-muted">
-        {plays.length} play{plays.length === 1 ? "" : "s"} · {onSheet} on the call sheet {team.name} players drill as flashcards (Softball IQ → Team
-        Playbook). Plays for all our teams are the organization playbook. Staff only, except the call sheet.
-      </p>
+      {/* the count, then two plain sentences (it ran on: "3 on the call sheet GGG Sample 14U players drill as flashcards"; second audit round) */}
+      <div className="max-w-prose text-sm text-muted">
+        <p className="font-semibold text-ink">
+          {plays.length} play{plays.length === 1 ? "" : "s"} · {onSheet} on the call sheet
+        </p>
+        <p className="mt-1">
+          {team.name} players study the call sheet as flashcards in Softball IQ. The rest of the playbook is for coaches only; plays marked
+          All teams are shared across your teams.
+        </p>
+      </div>
 
       {editor && (
         <Disclosure summary="Add a play" open={plays.length === 0}>
@@ -94,7 +100,7 @@ export default async function PlaybookPage({ searchParams }: PageProps<"/dugout/
                             <ActionForm action={addPlayToInstall}>
                               <input type="hidden" name="id" value={p.id} />
                               <input type="hidden" name="team_id" value={team.id} />
-                              <button type="submit" className="font-semibold text-pink-soft hover:underline">
+                              <button type="submit" aria-label={`Add ${p.name} to the install checklist`} className="inline-flex min-h-10 items-center font-semibold text-pink-soft hover:underline sm:min-h-0">
                                 + Install checklist
                               </button>
                             </ActionForm>
@@ -115,7 +121,11 @@ export default async function PlaybookPage({ searchParams }: PageProps<"/dugout/
                           </div>
                           <ActionForm action={removePlay}>
                             <input type="hidden" name="id" value={p.id} />
-                            <ConfirmSubmit message={`Remove “${p.name}” from the playbook${p.team_id === null ? " for every team" : ""}?`} className="pt-2 text-xs text-muted hover:text-danger">
+                            <ConfirmSubmit
+                              message={`Remove “${p.name}” from the playbook${p.team_id === null ? " for every team" : ""}?`}
+                              label={`Remove ${p.name}`}
+                              className={buttonStyles("removeQuiet")}
+                            >
                               Remove
                             </ConfirmSubmit>
                           </ActionForm>

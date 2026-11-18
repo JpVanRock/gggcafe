@@ -108,7 +108,7 @@ export default async function QuizPage({ params }: PageProps<"/dugout/playbook/q
                 {editor && (
                   <ActionForm action={removeQuizQuestion}>
                     <input type="hidden" name="id" value={q.id} />
-                    <ConfirmSubmit message="Remove this question (and the answers to it)?" className={buttonStyles("removeQuiet")}>
+                    <ConfirmSubmit message="Remove this question (and the answers to it)?" label={`Remove question ${q.position}: ${q.question}`} className={buttonStyles("removeQuiet")}>
                       Remove
                     </ConfirmSubmit>
                   </ActionForm>

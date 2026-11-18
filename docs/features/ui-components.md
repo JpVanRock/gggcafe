@@ -51,6 +51,7 @@ the big outlined jersey number behind a name (faint pink at night, light by day 
 | `Card` | `title?`, `actions?`, `tone?` (`raised`/`inset`), `className?` | `rounded-xl`; `inset` for a box inside a card. |
 | `cardClass(tone)` | `raised` / `inset` | The same box for a tile, list item or form that isn't a titled `Card`; add your own padding. The cafe-menu boards (`rounded-2xl`) keep their own looks. |
 | `Disclosure` | `summary`, `open?` | A section that opens on tap. Flat (a divider above, no box), so it is never a card inside a card. |
+| `ActionDisclosure` | `label`, `open?` | A page's main "new" action as a primary button that opens its form in place ("+ New lineup", "+ New practice plan", "+ Add a drill"); open when there's nothing yet. Never hide the page's main action in a quiet `Disclosure`. |
 | `EmptyState` | `title?`, `children?`, `action?` | A whole section or list with nothing in it: say what will show up here, and give the action when the viewer can fix it. Inside a card that has other content, one muted sentence (`text-sm text-muted`) is lighter and enough. |
 | `Loading` | `label?` | Every `loading.tsx`: a pulsing outline of a page (still for reduced motion); screen readers hear "Loading…". |
 | `TabRow` (`tab-row.tsx`) | `label`, `current?` | A tab row that scrolls sideways (Dugout tabs, player sections, age groups): fades at the edge that has more tabs, and scrolls the current tab into view. |

@@ -10,7 +10,8 @@
   groups (Team, Game day, Development) and Roster, Parents and Mentors carry how many wait there. "Get started" shows a
   head coach only until the team, its roster and the parent code are in place.
 - GameDay (tab renamed from "GameDay Prep"; from the user's Lineup + Defensive Rotations tabs): "+ New lineup" is a primary
-  button over the list (a `<details>`, open when there are none; design audit 2026-11-18, N4), and a lineup's date shows
+  button over the list (`ActionDisclosure`, open when there are none; design audit 2026-11-18, N4; Practice Plans' "+ New
+  practice plan" and the Drill Library's "+ Add a drill" work the same way since the audit's second round), and a lineup's date shows
   its year when it isn't this year. Season player cards
   (`gameday_profiles`: hitting type power/contact/gap, base running pure/intelligent/average, typed
   AVG/OBP/K% used only until box scores exist, `batting_season` wins) and game lineups

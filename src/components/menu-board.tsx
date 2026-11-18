@@ -153,7 +153,7 @@ export function MenuPanel({
   children: ReactNode;
 }) {
   const style = BOARD[variant];
-  const ctaClass = `relative mt-6 self-start font-sans text-xs tracking-widest uppercase ${style.cta}`;
+  const ctaClass = `relative mt-6 inline-flex min-h-10 items-center gap-1 self-start font-sans text-xs tracking-widest uppercase sm:min-h-0 ${style.cta}`;
   return (
     <article className={`relative min-w-0 ${wide ? "md:col-span-2" : ""}`}>
       <div className={`relative flex h-full flex-col overflow-hidden rounded-2xl p-5 min-[400px]:p-6 sm:p-8 ${style.board}`}>

@@ -127,10 +127,20 @@ async function FamilyMentors({ searchParams }: Pick<PageProps<"/family/mentors">
         ) : (
           <ul className="divide-y divide-navy-700 rounded-xl border border-navy-700">
             {messages.map((m) => (
-              <li key={m.id} className="flex flex-wrap items-start gap-x-4 gap-y-2 px-4 py-3 text-sm">
-                <span className="w-24 shrink-0 font-display text-muted tabular-nums">{formatDay(m.created_at.slice(0, 10))}</span>
-                <span className="min-w-0 flex-1">
-                  <span className="block font-semibold">{m.sender_name}</span>
+              <li key={m.id} className="flex flex-col gap-1 px-4 py-3 text-sm">
+                {/* who, when and the status on one line; the message gets the full width under it (on a phone it
+                    was squeezed to one word a line beside the badge: second audit round, 2026-11-18) */}
+                <span className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                  <span>
+                    <span className="font-semibold">{m.sender_name}</span>
+                    <span className="font-display text-muted tabular-nums"> · {formatDay(m.created_at.slice(0, 10))}</span>
+                  </span>
+                  <span className="flex flex-wrap items-center gap-2">
+                    {m.shared_with_coaches && <Badge tone="pink">Shared with coaches</Badge>}
+                    <span className="font-sans text-2xs tracking-wider text-muted uppercase">{m.read_at ? "Seen" : "Not seen yet"}</span>
+                  </span>
+                </span>
+                <span className="min-w-0">
                   {m.body && <span className="block whitespace-pre-wrap">{m.body}</span>}
                   {m.drill_name && (
                     <span className="block text-pink-soft">
@@ -150,8 +160,6 @@ async function FamilyMentors({ searchParams }: Pick<PageProps<"/family/mentors">
                     <img src={photos.get(m.photo_path)!} alt={`Photo from ${m.sender_name}`} className="mt-2 h-28 rounded-lg object-cover" />
                   )}
                 </span>
-                {m.shared_with_coaches && <Badge tone="pink">Shared with coaches</Badge>}
-                <span className="font-sans text-2xs tracking-wider text-muted uppercase">{m.read_at ? "Seen" : "Not seen yet"}</span>
               </li>
             ))}
           </ul>

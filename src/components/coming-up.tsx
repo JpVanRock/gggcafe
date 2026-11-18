@@ -36,7 +36,7 @@ export function ComingUpCard({
           </h2>
           <p className="mt-2 font-sans text-xs tracking-[0.2em] text-pink-soft uppercase">{subtitle}</p>
         </div>
-        <Link href={calendarHref} className="font-sans text-xs tracking-widest text-highlight uppercase hover:underline">
+        <Link href={calendarHref} className="inline-flex min-h-10 items-center gap-1 font-sans text-xs tracking-widest text-highlight uppercase hover:underline sm:min-h-0">
           Full calendar <span aria-hidden="true">→</span>
         </Link>
       </div>

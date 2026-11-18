@@ -82,3 +82,8 @@ her requests, Coming up (the next two weeks of her calendar: `loadMentorCalendar
 Goals, Pop Report and Mental GP links per player), Training on Their Weeks (the next sessions; "Add & manage" opens
 `/mentor/training` with the form and the full list), Messages You Sent (the last five, seen or new) and Work With More
 Players (the request form). Helpers in `mentor/parts.tsx`: `trainingGroups`, `oneOnOne`, `menteeLabel`.
+- Second design-audit round (2026-11-18): on the Dugout's Mentors tab, requests waiting for approval come first when there
+  are any (above the team's mentoring values); Approve / Decline say who and for what. A message row gives the message the
+  full width under who sent it, when and its status (on phones it had squeezed to one word a line beside the badge). The
+  mentor menu's roster tiles are tighter on phones, and their Goals / Pop Report / Mental GP links are named for the player
+  and are no longer a landmark each. Focus boards (Working on / What's working) use h3 headings, not landmarks.

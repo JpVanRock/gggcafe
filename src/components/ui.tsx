@@ -296,6 +296,25 @@ export function Disclosure({ summary, children, open }: { summary: string; child
   );
 }
 
+/**
+ * A page's main "new" action as a button that opens its form in place ("+ New lineup", "+ New practice
+ * plan"): a <details>, so it works without JavaScript; `open` when there's nothing yet. Never hide the
+ * page's main action in a quiet collapsed row (design audit 2026-11-18, N4).
+ */
+export function ActionDisclosure({ label, open, children }: { label: string; open?: boolean; children: ReactNode }) {
+  return (
+    <details open={open} className="group">
+      <summary className={buttonStyles("primary", "cursor-pointer list-none select-none [&::-webkit-details-marker]:hidden")}>
+        <span aria-hidden="true" className="transition group-open:rotate-45">
+          +
+        </span>{" "}
+        {label}
+      </summary>
+      <div className={`${cardClass("raised")} mt-3 p-4`}>{children}</div>
+    </details>
+  );
+}
+
 // ---- States: empty and loading ----------------------------------------------------------------
 
 /**
