@@ -53,7 +53,9 @@
 
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-jost), ui-sans-serif, system-ui, sans-serif; /* titles, tables, stat numbers */
-  --font-mono: var(--font-space-mono), ui-monospace, monospace;
+  /* the system's monospace (nothing downloaded), only for text people type exactly: a username, a path, a
+     code field. Labels and kickers are DM Sans (user, 2026-11-18: Space Mono dropped). */
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 }
 
 :root {
@@ -230,7 +232,7 @@ html:has(dialog[open]) {
 /*
  * Jost where it does a better job than DM Sans: page and board titles, tables, and
  * numbers (anything marked tabular-nums, and definition values). In the base layer, so
- * an explicit utility such as font-mono still wins.
+ * an explicit utility such as font-sans (a small label) still wins.
  */
 @layer base {
   h1,

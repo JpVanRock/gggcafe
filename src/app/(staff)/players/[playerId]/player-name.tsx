@@ -25,7 +25,7 @@ export function PlayerName({ first, last, leaderHref }: { first: string; last: s
           className="relative flex shrink-0 flex-col items-center gap-1.5 transition hover:scale-105 sm:-top-2.5"
           title="Team Lead · Certificate of Leadership"
         >
-          <span className="pl-[0.35em] font-mono text-xs leading-none font-normal tracking-[0.35em] whitespace-nowrap text-pink-soft">TEAM LEAD</span>
+          <span className="pl-[0.35em] font-sans text-xs leading-none font-normal tracking-[0.35em] whitespace-nowrap text-pink-soft">TEAM LEAD</span>
           <LeaderBadge className="block h-auto w-11 sm:w-14" size={56} />
         </Link>
       )}

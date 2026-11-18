@@ -61,7 +61,7 @@ export function MvpBadge({
         className="fill-ink"
         fontSize={fit(caption, 9, 78)}
         letterSpacing="0.6"
-        style={{ fontFamily: "var(--font-mono)" }}
+        style={{ fontFamily: "var(--font-sans)" }}
       >
         {caption}
       </text>

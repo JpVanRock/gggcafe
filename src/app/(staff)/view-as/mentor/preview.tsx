@@ -42,7 +42,7 @@ export function MentorPreview({
       <MenuHeader eyebrow="Mentor menu" first={first} last={rest.join(" ") || undefined} line={line} />
       {requests.length > 0 && (
         <section aria-label="Their requests" className="rounded-2xl border-2 border-pink bg-pink/5 p-4 sm:p-5">
-          <h2 className="mb-3 flex items-center gap-2 font-mono text-xs font-bold tracking-[0.2em] text-pink-soft uppercase">
+          <h2 className="mb-3 flex items-center gap-2 font-sans text-xs font-bold tracking-[0.2em] text-pink-soft uppercase">
             <span className="grid size-6 place-items-center rounded-full bg-pink font-display text-sm text-on-accent tabular-nums">{requests.length}</span>
             Your requests
           </h2>
@@ -77,7 +77,7 @@ export function MentorPreview({
                             </span>
                             <span className="min-w-0">
                               <span className="block truncate font-display text-xl font-bold tracking-wide uppercase">{p.name}</span>
-                              <span className="block truncate font-mono text-xs text-muted">{[p.jersey && `#${p.jersey}`, p.position, p.team].filter(Boolean).join(" · ")}</span>
+                              <span className="block truncate font-sans text-xs text-muted">{[p.jersey && `#${p.jersey}`, p.position, p.team].filter(Boolean).join(" · ")}</span>
                             </span>
                           </div>
                           <p className="flex flex-wrap gap-x-4 gap-y-1 border-t border-navy-700 px-4 py-2.5">

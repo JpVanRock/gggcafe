@@ -44,7 +44,7 @@ export default async function LeadershipPlanPage({ params }: PageProps<"/players
           <div className="overflow-x-auto rounded-xl border border-navy-700">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left font-mono text-2xs tracking-wider text-muted uppercase">
+                <tr className="text-left font-sans text-2xs tracking-wider text-muted uppercase">
                   <th className="px-4 py-2 font-normal">Area</th>
                   <th className="px-4 py-2 font-normal">Me</th>
                   <th className="px-4 py-2 font-normal">My coach</th>

@@ -113,12 +113,12 @@ export default async function HealthPage({ searchParams }: PageProps<"/health">)
                     <td className={`${tdClass} whitespace-nowrap font-display tabular-nums`}>{when(e.last_seen)}</td>
                     <td className={tdClass}>
                       <Badge tone="neutral">{SOURCE_LABEL[e.source] ?? e.source}</Badge>
-                      <span className="mt-1 block font-mono text-xs break-all">{e.route ?? "–"}</span>
+                      <span className="mt-1 block font-sans text-xs break-all">{e.route ?? "–"}</span>
                     </td>
                     <td className={`${tdClass} min-w-56`}>
                       <span className="block font-semibold">{e.name}</span>
                       <span className="block text-xs break-words">{e.message}</span>
-                      {e.digest && <span className="block font-mono text-2xs text-muted">digest {e.digest}</span>}
+                      {e.digest && <span className="block font-sans text-2xs text-muted">digest {e.digest}</span>}
                     </td>
                     <td className={`${tdClass} font-display tabular-nums`}>{e.count}</td>
                     <td className={tdClass}>
@@ -164,7 +164,7 @@ export default async function HealthPage({ searchParams }: PageProps<"/health">)
               <tbody>
                 {jobs.map((j) => (
                   <tr key={j.kind}>
-                    <td className={`${tdClass} font-mono text-xs`}>{j.kind}</td>
+                    <td className={`${tdClass} font-sans text-xs`}>{j.kind}</td>
                     <td className={`${tdClass} font-display tabular-nums`}>{j.waiting}</td>
                     <td className={`${tdClass} font-display tabular-nums`}>{j.retrying}</td>
                     <td className={`${tdClass} font-display tabular-nums`}>{j.done}</td>
@@ -226,8 +226,8 @@ export default async function HealthPage({ searchParams }: PageProps<"/health">)
                         <Badge tone={LOG_TONE[l.level] ?? "neutral"}>{l.level}</Badge>
                       </td>
                       <td className={tdClass}>
-                        <span className="block font-mono text-xs">{l.event}</span>
-                        {l.route && <span className="mt-1 block font-mono text-xs break-all text-muted">{l.route}</span>}
+                        <span className="block font-sans text-xs">{l.event}</span>
+                        {l.route && <span className="mt-1 block font-sans text-xs break-all text-muted">{l.route}</span>}
                       </td>
                       <td className={`${tdClass} min-w-56`}>
                         {l.message && <span className="block text-xs break-words">{l.message}</span>}

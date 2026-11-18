@@ -64,7 +64,7 @@ export function GoalsForm({ playerId, chart }: { playerId: string; chart: Harada
           const p = pillar(i + 1);
           return (
             <fieldset key={i} className="rounded-xl border border-navy-700 p-4">
-              <legend className="px-1 font-mono text-xs font-bold tracking-widest text-highlight uppercase">Area {i + 1}</legend>
+              <legend className="px-1 font-sans text-xs font-bold tracking-widest text-highlight uppercase">Area {i + 1}</legend>
               <input
                 name={`pillar_${i + 1}`}
                 aria-label={`Area ${i + 1} name`}
@@ -75,7 +75,7 @@ export function GoalsForm({ playerId, chart }: { playerId: string; chart: Harada
               <ol className="mt-3 grid gap-1.5">
                 {Array.from({ length: 8 }, (_, j) => (
                   <li key={j} className="flex items-center gap-2">
-                    <span className="w-4 shrink-0 text-right font-mono text-xs text-muted">{j + 1}</span>
+                    <span className="w-4 shrink-0 text-right font-sans text-xs text-muted">{j + 1}</span>
                     <input
                       name={`pillar_${i + 1}_action_${j + 1}`}
                       aria-label={`Area ${i + 1}, action ${j + 1}`}

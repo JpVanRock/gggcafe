@@ -56,7 +56,7 @@ export function Flashcards({ cards }: { cards: CallCard[] }) {
           <>
             <span className="font-display text-4xl font-bold tracking-wide text-highlight uppercase">{card.name}</span>
             {card.situation && <span className="text-sm text-muted">{card.situation}</span>}
-            <span className="mt-2 font-mono text-2xs tracking-wider text-muted uppercase">Tap to see what you do</span>
+            <span className="mt-2 font-sans text-2xs tracking-wider text-muted uppercase">Tap to see what you do</span>
           </>
         )}
       </button>
@@ -136,7 +136,7 @@ export function TeamQuizRunner({ playerId, quizId, questions, canAct }: { player
     return (
       <div className="flex flex-col gap-5">
         <div className="rounded-2xl border border-neon-edge/60 bg-neon/5 p-6 text-center">
-          <p className="font-mono text-xs tracking-[0.2em] text-pink-soft uppercase">First try</p>
+          <p className="font-sans text-xs tracking-[0.2em] text-pink-soft uppercase">First try</p>
           <p className="mt-1 font-display text-5xl font-bold text-highlight tabular-nums">
             {score.firstTry}/{score.total}
           </p>

@@ -96,7 +96,7 @@ export default async function ScoutingPage({ searchParams }: PageProps<"/dugout/
                 }`}
               >
                 {o.name}
-                {count.get(o.id) ? <span className="ml-1.5 font-mono text-xs opacity-80">{count.get(o.id)}</span> : null}
+                {count.get(o.id) ? <span className="ml-1.5 font-sans text-xs opacity-80">{count.get(o.id)}</span> : null}
               </Link>
             ))}
           </nav>
@@ -137,7 +137,7 @@ export default async function ScoutingPage({ searchParams }: PageProps<"/dugout/
                                 )}
                               </div>
                               <p className="mt-1 whitespace-pre-line text-ink/90">{r.body}</p>
-                              <p className="mt-1 font-mono text-2xs text-muted">
+                              <p className="mt-1 font-sans text-2xs text-muted">
                                 {[r.observed_on && formatDay(r.observed_on), r.confidence && CONFIDENCE_LABEL[r.confidence]].filter(Boolean).join(" · ")}
                               </p>
                             </li>

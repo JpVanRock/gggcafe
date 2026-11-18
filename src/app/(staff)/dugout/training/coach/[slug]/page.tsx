@@ -51,7 +51,7 @@ export default async function CoachModulePage({ params, searchParams }: PageProp
             {work?.completed_at && <Badge tone="neon">Done · {formatLongDateAt(work.completed_at)}</Badge>}
           </div>
           <div>
-            <p className="font-mono text-xs tracking-[0.2em] text-pink-soft uppercase">
+            <p className="font-sans text-xs tracking-[0.2em] text-pink-soft uppercase">
               Coaching the Mental Game · Module {n} of {COACH_MODULES.length} · {mod.minutes} min
             </p>
             <h2 className="mt-1 text-2xl leading-tight font-bold tracking-wide text-highlight uppercase sm:text-3xl">{mod.title}</h2>

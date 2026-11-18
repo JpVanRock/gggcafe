@@ -34,7 +34,7 @@ export default async function IqPage({ params }: PageProps<"/players/[playerId]/
               {team.quizzes.length > 0 && ` · ${team.quizzes.length} team quiz${team.quizzes.length === 1 ? "" : "zes"}${open ? ` (${open} open)` : ""}`}
             </span>
           </span>
-          <span className="font-mono text-xs font-bold tracking-wider text-highlight uppercase">Flashcards →</span>
+          <span className="font-sans text-xs font-bold tracking-wider text-highlight uppercase">Flashcards →</span>
         </Link>
       )}
       <IqDetail

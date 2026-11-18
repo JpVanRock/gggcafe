@@ -45,7 +45,7 @@ export function GoalMethodSwitch({ playerId, method, canEdit }: { playerId: stri
             >
               <span className={`block text-sm font-bold tracking-wider uppercase ${selected ? "text-highlight" : "text-ink"}`}>
                 {GOAL_METHOD_LABEL[m]}
-                {selected && <span className="ml-2 font-mono text-2xs text-pink-soft">In use</span>}
+                {selected && <span className="ml-2 font-sans text-2xs text-pink-soft">In use</span>}
               </span>
               <span className="mt-1 block text-xs text-muted">{METHOD_BLURB[m]}</span>
             </button>
@@ -72,7 +72,7 @@ export function SmartGoalForm({
   metrics: MetricOption[];
 }) {
   const [state, action] = useActionState(saveSmartGoal, initialFormState);
-  const letter = (l: string) => <span className="mr-1 font-mono font-bold text-highlight">{l}</span>;
+  const letter = (l: string) => <span className="mr-1 font-sans font-bold text-highlight">{l}</span>;
 
   return (
     <form action={action} className="grid gap-4 sm:grid-cols-2">

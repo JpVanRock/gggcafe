@@ -107,7 +107,7 @@ export default async function TrainingPage({ searchParams }: PageProps<"/dugout/
             <p className="mt-1 text-sm text-muted">Players see the phase and the week in TWIS, with its focus.</p>
           </div>
           {now && (
-            <p className="rounded-full border border-neon-edge px-3 py-1 font-mono text-xs font-bold tracking-wider text-highlight uppercase">
+            <p className="rounded-full border border-neon-edge px-3 py-1 font-sans text-xs font-bold tracking-wider text-highlight uppercase">
               Now: {now.name} · Week {phaseWeek(now, today).week} of {phaseWeek(now, today).of}
             </p>
           )}

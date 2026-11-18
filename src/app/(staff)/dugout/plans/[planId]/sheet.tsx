@@ -37,7 +37,7 @@ export function PlanSheet({
       <header className="flex flex-col gap-4 rounded-2xl border border-navy-700 bg-navy-900/70 p-5 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">{plan.team.name}</p>
+            <p className="font-sans text-xs tracking-[0.25em] text-pink-soft uppercase">{plan.team.name}</p>
             <h2 className="mt-1 text-3xl leading-tight font-bold tracking-tight text-highlight uppercase">
               {formatLongDate(plan.practice_date)}
             </h2>
@@ -92,7 +92,7 @@ export function PlanSheet({
           <ol className="flex flex-col gap-3">
             {plan.blocks.map((b, i) => (
               <li key={i} className={`${cardClass("raised")} grid gap-x-5 gap-y-2 p-4 sm:grid-cols-[10.5rem_1fr_auto]`}>
-                <p className="font-mono text-xs tracking-wider whitespace-nowrap text-pink-soft">
+                <p className="font-sans text-xs tracking-wider whitespace-nowrap text-pink-soft">
                   <span className="font-display font-bold text-highlight tabular-nums">{String(i + 1).padStart(2, "0")}</span>
                   {"  ·  "}
                   {slots[i].label ?? "–"}

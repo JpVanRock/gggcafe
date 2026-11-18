@@ -89,7 +89,7 @@ export default async function GamedayPage({ searchParams }: PageProps<"/dugout/g
                     className={`${cardClass("raised")} flex items-center gap-4 p-4 transition hover:border-pink hover:bg-navy-800`}
                   >
                     <div className="w-16 shrink-0 text-center">
-                      <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">{weekday}</p>
+                      <p className="font-sans text-xs tracking-widest text-pink-soft uppercase">{weekday}</p>
                       <p className="font-display text-lg leading-tight font-bold text-highlight tabular-nums">{rest.join(", ")}</p>
                       {year && <p className="font-display text-xs text-muted tabular-nums">{year}</p>}
                     </div>

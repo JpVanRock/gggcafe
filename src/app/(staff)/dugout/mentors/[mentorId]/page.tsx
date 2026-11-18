@@ -105,7 +105,7 @@ export default async function MentorNotesPage({ params, searchParams }: PageProp
         ← Mentors
       </Link>
       <header>
-        <p className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">{team.name}</p>
+        <p className="font-sans text-xs tracking-[0.25em] text-pink-soft uppercase">{team.name}</p>
         <h2 className="mt-1 text-4xl leading-none font-bold tracking-tight text-highlight uppercase">{mentor.display_name}</h2>
         <p className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted">
           {mentor.specialty ?? "Mentor"}

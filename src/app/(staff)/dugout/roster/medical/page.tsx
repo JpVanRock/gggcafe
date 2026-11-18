@@ -51,7 +51,7 @@ export default async function MedicalPage({ searchParams }: PageProps<"/dugout/r
                   {p.number && <span className="mr-1.5 font-display text-muted tabular-nums">#{p.number}</span>}
                   {p.name}
                 </span>
-                <span className={`font-mono text-2xs font-bold tracking-wider uppercase ${ok ? "text-highlight" : "text-pink-soft"}`}>{ok ? "On file" : "Missing"}</span>
+                <span className={`font-sans text-2xs font-bold tracking-wider uppercase ${ok ? "text-highlight" : "text-pink-soft"}`}>{ok ? "On file" : "Missing"}</span>
               </p>
               {c && (
                 <dl className="mt-2 grid gap-1 text-sm">

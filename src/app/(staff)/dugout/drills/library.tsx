@@ -127,7 +127,7 @@ function DrillCard({ drill, canEdit }: { drill: LibraryDrill; canEdit: boolean }
       )}
       {drill.equipment && (
         <p className="mt-3 text-sm">
-          <span className="font-mono text-2xs font-bold tracking-wider text-pink-soft uppercase">Equipment </span>
+          <span className="font-sans text-2xs font-bold tracking-wider text-pink-soft uppercase">Equipment </span>
           {drill.equipment}
         </p>
       )}

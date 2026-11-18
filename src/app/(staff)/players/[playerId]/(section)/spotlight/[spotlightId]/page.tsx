@@ -41,7 +41,7 @@ export default async function SpotlightPage({ params }: PageProps<"/players/[pla
               <OutlineText stroke="var(--color-pink)">{s.jersey}</OutlineText>
             </span>
           )}
-          <p className="relative flex items-center gap-3 font-mono text-xs tracking-[0.35em] text-pink-soft uppercase">
+          <p className="relative flex items-center gap-3 font-sans text-xs tracking-[0.35em] text-pink-soft uppercase">
             <SpeedStripes className="h-3 w-9 text-link" />
             Player Spotlight
           </p>
@@ -52,7 +52,7 @@ export default async function SpotlightPage({ params }: PageProps<"/players/[pla
           <p className="relative mt-5 font-display text-2xl font-bold tracking-wide text-ink uppercase">{s.headline}</p>
           <p className="relative mt-3 whitespace-pre-wrap text-ink/90">{s.body}</p>
           <div className="relative mt-8 flex items-end justify-between gap-4">
-            <p className="font-mono text-2xs tracking-widest text-muted uppercase">
+            <p className="font-sans text-2xs tracking-widest text-muted uppercase">
               {s.team?.name}
               <br />
               {formatLongDate(s.published_on)}

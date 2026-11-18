@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans, Jost, Space_Mono } from "next/font/google";
+import { DM_Sans, Jost } from "next/font/google";
 import "./globals.css";
 import { SiteFooter } from "@/components/brand";
 import { SkipLink } from "@/components/ui";
@@ -22,14 +22,6 @@ const jost = Jost({
   display: "swap",
 });
 
-// Typewriter accent for menu item names on the player dashboard (cafe-menu look).
-const spaceMono = Space_Mono({
-  variable: "--font-space-mono",
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  display: "swap",
-});
-
 export const metadata: Metadata = {
   title: "GGG.Cafe",
   description: "Softball player development and team management",
@@ -47,7 +39,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     // suppressHydrationWarning: the boot script may set data-theme="day" before React loads
-    <html lang="en" className={`${dmSans.variable} ${jost.variable} ${spaceMono.variable} h-full antialiased`} suppressHydrationWarning>
+    <html lang="en" className={`${dmSans.variable} ${jost.variable} h-full antialiased`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
       </head>

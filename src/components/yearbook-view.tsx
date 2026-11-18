@@ -229,7 +229,7 @@ function Lightbox({
     >
       <div className="flex h-full flex-col gap-3 p-3 sm:p-5">
         <div className="flex items-center justify-between gap-3">
-          <span className="font-mono text-xs tracking-wider text-muted uppercase">
+          <span className="font-sans text-xs tracking-wider text-muted uppercase">
             {index + 1} / {photos.length} · {dayLabel(photoDay(photo))}
           </span>
           <button type="button" onClick={onClose} className={secondaryButtonClass} autoFocus>
@@ -343,7 +343,7 @@ function Tile({ photo, size, url, onOpen }: { photo: YearbookPhoto; size: Return
         <span className="absolute inset-x-0 bottom-0 bg-linear-to-t from-navy-950/95 via-navy-950/60 to-transparent px-3 pt-8 pb-2.5">
           {photo.caption && <span className={`block font-semibold text-white ${size === "feature" ? "text-lg" : "truncate text-sm"}`}>{photo.caption}</span>}
           {photo.tags.length > 0 && (
-            <span className="block truncate font-mono text-2xs tracking-wider text-neon uppercase">{photo.tags.map((t) => t.name.split(" ")[0]).join(" · ")}</span>
+            <span className="block truncate font-sans text-2xs tracking-wider text-neon uppercase">{photo.tags.map((t) => t.name.split(" ")[0]).join(" · ")}</span>
           )}
         </span>
       )}
@@ -396,7 +396,7 @@ export function YearbookView({
           ))}
         </div>
         <div className="relative max-w-xl">
-          <p className="flex items-center gap-3 font-mono text-xs tracking-[0.35em] text-pink-soft uppercase">
+          <p className="flex items-center gap-3 font-sans text-xs tracking-[0.35em] text-pink-soft uppercase">
             <SpeedStripes className="h-3 w-9 text-link" />
             {data.season?.name ?? "This season"}
           </p>
@@ -404,7 +404,7 @@ export function YearbookView({
           <h2 className="font-display text-6xl leading-[0.9] font-black tracking-tight text-highlight uppercase italic drop-shadow-[0_4px_18px_rgb(0_10_45/0.9)] sm:text-8xl">
             Yearbook
           </h2>
-          <p className="mt-4 font-mono text-sm text-muted">
+          <p className="mt-4 font-sans text-sm text-muted">
             {data.photos.length} photo{data.photos.length === 1 ? "" : "s"} · {taggedPlayers} player{taggedPlayers === 1 ? "" : "s"} tagged
           </p>
         </div>
@@ -512,7 +512,7 @@ export function YearbookView({
             <section key={s.key} aria-label={`${s.month} ${s.year}`}>
               <header className="relative mb-4 flex items-end gap-4">
                 <h3 className="font-display text-5xl leading-none font-black tracking-tight text-ink/90 uppercase sm:text-7xl">{s.month}</h3>
-                <span className="mb-1 flex items-center gap-2 font-mono text-xs tracking-[0.3em] text-pink-soft uppercase">
+                <span className="mb-1 flex items-center gap-2 font-sans text-xs tracking-[0.3em] text-pink-soft uppercase">
                   <SpeedStripes className="h-3 w-8 text-link" />
                   {s.year} · {s.photos.length} photo{s.photos.length === 1 ? "" : "s"}
                 </span>

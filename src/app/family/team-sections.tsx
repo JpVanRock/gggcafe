@@ -11,7 +11,7 @@ import type { DaughterGoals, FamilyTeamCulture } from "./team-data";
 export function TeamCultureSection({ data, showTeam }: { data: FamilyTeamCulture; showTeam: boolean }) {
   const { team, standards, culture, goals } = data;
   const H = showTeam ? "h3" : "h2";
-  const heading = "mb-4 font-mono text-xs font-bold tracking-[0.2em] text-pink-soft uppercase";
+  const heading = "mb-4 font-sans text-xs font-bold tracking-[0.2em] text-pink-soft uppercase";
   return (
     <section aria-label={`${team.name} Team Standards & Culture`} className="flex flex-col gap-8">
       {showTeam && <h2 className="font-display text-2xl leading-tight font-bold tracking-wide text-highlight uppercase">{team.name}</h2>}
@@ -54,7 +54,7 @@ export function GoalsBoardSummary({ first, goals }: { first: string; goals: Daug
       )}
       {goals.pledges.length > 0 && (
         <div>
-          <p className="font-mono text-xs font-bold tracking-[0.2em] uppercase">Her commitment to the team</p>
+          <p className="font-sans text-xs font-bold tracking-[0.2em] uppercase">Her commitment to the team</p>
           <ul className="mt-2 flex flex-col gap-2">
             {goals.pledges.map((p) => (
               <li key={p.team.id} className="text-sm">

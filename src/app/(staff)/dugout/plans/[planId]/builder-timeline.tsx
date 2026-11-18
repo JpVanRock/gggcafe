@@ -134,7 +134,7 @@ export function BlockCard({
             <GripIcon />
           </button>
           <div className="min-w-0 flex-1">
-            <p className="font-mono text-xs tracking-wider text-pink-soft">
+            <p className="font-sans text-xs tracking-wider text-pink-soft">
               <span className="font-display font-bold text-highlight tabular-nums">{String(index + 1).padStart(2, "0")}</span>
               {"  ·  "}
               {slotLabel ?? "Set a time limit"}

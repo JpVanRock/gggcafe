@@ -67,7 +67,7 @@ export default async function MentorTeamPage({ params }: PageProps<"/mentor/team
         ← My players
       </Link>
       <header>
-        <p className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">Whole team · {roster.length} players</p>
+        <p className="font-sans text-xs tracking-[0.25em] text-pink-soft uppercase">Whole team · {roster.length} players</p>
         <h1 className="mt-1 text-4xl leading-none font-bold tracking-tight text-highlight uppercase sm:text-5xl">{team.name}</h1>
       </header>
 

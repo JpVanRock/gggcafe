@@ -117,7 +117,7 @@ export default async function MentorHome() {
 
       {waiting.length > 0 && (
         <section aria-label="Your requests" className="rounded-2xl border-2 border-pink bg-pink/5 p-4 sm:p-5">
-          <h2 className="mb-3 flex items-center gap-2 font-mono text-xs font-bold tracking-[0.2em] text-pink-soft uppercase">
+          <h2 className="mb-3 flex items-center gap-2 font-sans text-xs font-bold tracking-[0.2em] text-pink-soft uppercase">
             <span className="grid size-6 place-items-center rounded-full bg-pink font-display text-sm text-on-accent tabular-nums">{waiting.length}</span>
             Your requests
           </h2>
@@ -129,7 +129,7 @@ export default async function MentorHome() {
                 <Badge tone={l.status === "pending" ? "pink" : "neutral"}>
                   {l.status === "pending" ? (l.player_id ? "Waiting for her parents" : "Waiting for the head coach") : "Not approved"}
                 </Badge>
-                <span className="font-mono text-2xs tracking-wider text-muted uppercase">Asked {formatDay(l.requested_at.slice(0, 10))}</span>
+                <span className="font-sans text-2xs tracking-wider text-muted uppercase">Asked {formatDay(l.requested_at.slice(0, 10))}</span>
                 <ActionForm action={withdrawMentorLink} className="ml-auto flex items-center gap-2">
                   <input type="hidden" name="link_id" value={l.id} />
                   <ConfirmSubmit message="Withdraw this request?" confirmLabel="Withdraw" className={buttonStyles("link", "text-muted")}>
@@ -164,9 +164,9 @@ export default async function MentorHome() {
                   <div key={t.id}>
                     <div className="mb-3 flex flex-wrap items-baseline justify-between gap-3">
                       <h3 className="font-display text-xl font-bold tracking-wide uppercase">
-                        {t.name} <span className="font-mono text-xs tracking-wider text-muted normal-case">· whole team · {roster.length} players</span>
+                        {t.name} <span className="font-sans text-xs tracking-wider text-muted normal-case">· whole team · {roster.length} players</span>
                       </h3>
-                      <Link href={`/mentor/teams/${t.id}`} className="font-mono text-xs tracking-widest text-highlight uppercase hover:underline">
+                      <Link href={`/mentor/teams/${t.id}`} className="font-sans text-xs tracking-widest text-highlight uppercase hover:underline">
                         Team focus &amp; notes <span aria-hidden="true">→</span>
                       </Link>
                     </div>

@@ -64,7 +64,7 @@ export function PlayerTiles({ cards, off }: { cards: MenteeCard[]; off?: Map<str
               )}
               <span className="min-w-0">
                 <span className="block truncate font-display text-xl font-bold tracking-wide uppercase">{playerName(p)}</span>
-                <span className="block truncate font-mono text-xs text-muted">{[jersey && `#${jersey}`, p.primary_position, team].filter(Boolean).join(" · ")}</span>
+                <span className="block truncate font-sans text-xs text-muted">{[jersey && `#${jersey}`, p.primary_position, team].filter(Boolean).join(" · ")}</span>
               </span>
             </Link>
             {sections.length > 0 && (

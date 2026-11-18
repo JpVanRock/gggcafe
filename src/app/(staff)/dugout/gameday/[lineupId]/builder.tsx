@@ -24,7 +24,7 @@ import { ShareButton } from "../../plans/[planId]/share-button";
 import { deleteLineup, finalizeLineup, saveLineup, shareLineup } from "../actions";
 import { ActionForm } from "@/components/action-form";
 
-const labelClass = "font-mono text-2xs font-bold tracking-wider text-muted uppercase";
+const labelClass = "font-sans text-2xs font-bold tracking-wider text-muted uppercase";
 const small = `${inputClass} px-2 py-1 text-sm`;
 
 function Grip() {
@@ -239,7 +239,7 @@ export function LineupBuilder({
     <div className="flex flex-col gap-8">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">{lineup.team.name} · Lineup</p>
+          <p className="font-sans text-xs tracking-[0.25em] text-pink-soft uppercase">{lineup.team.name} · Lineup</p>
           <h2 className="mt-1 text-3xl leading-tight font-bold tracking-tight text-highlight uppercase">
             {setup.opponent ? `vs ${setup.opponent}` : formatLongDate(setup.game_date)}
           </h2>
@@ -397,7 +397,7 @@ export function LineupBuilder({
                   <tr key={id} className="border-b border-navy-800">
                     <td className="py-1.5 pr-3">
                       <span className="font-semibold">{p.short}</span>
-                      {p.positions.length > 0 && <span className="ml-1.5 font-mono text-2xs text-muted">{p.positions.slice(0, 3).join(" ")}</span>}
+                      {p.positions.length > 0 && <span className="ml-1.5 font-sans text-2xs text-muted">{p.positions.slice(0, 3).join(" ")}</span>}
                     </td>
                     {rotations.map((r) => {
                       const spot = defense[r]?.[id] ?? "";

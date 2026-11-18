@@ -27,7 +27,7 @@ function PracticeNotes({ notes, many }: { notes: PracticeNote[]; many: boolean }
     <div className="mt-3 space-y-2">
       {notes.map((n, i) => (
         <div key={i} className="rounded-lg border-l-2 border-pink bg-navy-900/60 px-2.5 py-2 text-xs leading-snug">
-          <p className="font-mono text-2xs font-bold tracking-wider text-pink-soft uppercase">Practice plan{many ? ` · ${n.team}` : ""}</p>
+          <p className="font-sans text-2xs font-bold tracking-wider text-pink-soft uppercase">Practice plan{many ? ` · ${n.team}` : ""}</p>
           {n.objective && <p className="mt-1 text-ink">{n.objective}</p>}
           {n.rule && (
             <p className="mt-1 text-muted">
@@ -92,8 +92,8 @@ export function TwisChecklist({ playerId, cells, canEdit }: { playerId: string; 
     <li key={cell.key} className={`rounded-xl border p-3 ${cell.isToday ? "border-pink bg-pink/10" : "border-navy-700 bg-navy-950/40"}`}>
 
             <header className="flex items-baseline justify-between gap-2">
-              <span className="font-mono text-xs font-bold tracking-widest text-highlight uppercase">{cell.label}</span>
-              <span className="font-mono text-xs text-muted">{cell.isToday ? "Today" : cell.sublabel}</span>
+              <span className="font-sans text-xs font-bold tracking-widest text-highlight uppercase">{cell.label}</span>
+              <span className="font-sans text-xs text-muted">{cell.isToday ? "Today" : cell.sublabel}</span>
             </header>
             {cell.calls && cell.calls.length > 0 && (
               <ul className="mt-3 space-y-2">
@@ -159,7 +159,7 @@ export function TwisChecklist({ playerId, cells, canEdit }: { playerId: string; 
         <div className="h-2 flex-1 overflow-hidden rounded-full bg-navy-800" aria-hidden>
           <div className="h-full rounded-full bg-neon transition-all" style={{ width: `${items.length ? (done / items.length) * 100 : 0}%` }} />
         </div>
-        <p className="font-mono text-sm tabular-nums text-highlight" aria-live="polite">
+        <p className="font-display text-sm tabular-nums text-highlight" aria-live="polite">
           {done}/{items.length} done
         </p>
       </div>
@@ -172,10 +172,10 @@ export function TwisChecklist({ playerId, cells, canEdit }: { playerId: string; 
               key={group.cells[0].key}
               className="flex items-baseline justify-between gap-2 self-start rounded-xl border border-navy-700 bg-navy-950/20 px-3 py-2.5"
             >
-              <span className="font-mono text-xs font-bold tracking-widest text-muted uppercase">
+              <span className="font-sans text-xs font-bold tracking-widest text-muted uppercase">
                 {group.cells.length === 1 ? group.cells[0].label : `${group.cells[0].label} – ${group.cells[group.cells.length - 1].label}`}
               </span>
-              <span className="font-mono text-xs text-muted">
+              <span className="font-sans text-xs text-muted">
                 {group.cells.length === 1 ? `${group.cells[0].sublabel} · Rest day` : "Rest days"}
               </span>
             </li>

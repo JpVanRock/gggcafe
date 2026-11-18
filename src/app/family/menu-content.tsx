@@ -148,7 +148,7 @@ export function familyMenu(input: FamilyMenuInput, { preview = false }: { previe
           {input.budgets.map(({ team, summary }) =>
             summary ? (
               <div key={team.id} className="flex flex-col gap-4">
-                {input.budgets.length > 1 && <p className="font-mono text-xs font-bold tracking-[0.2em] uppercase">{team.name}</p>}
+                {input.budgets.length > 1 && <p className="font-sans text-xs font-bold tracking-[0.2em] uppercase">{team.name}</p>}
                 <MenuItem
                   name="Balance"
                   value={money(toCents(summary.collected) + toCents(summary.other_income) - toCents(summary.expenses))}
@@ -212,7 +212,7 @@ export function familyMenu(input: FamilyMenuInput, { preview = false }: { previe
     });
   }
   if (adminTeams.length) {
-    const linkClass = "font-mono text-xs tracking-widest text-pink-soft uppercase";
+    const linkClass = "font-sans text-xs tracking-widest text-pink-soft uppercase";
     boards.push({
       key: "admin",
       title: "Team Admin",
@@ -295,11 +295,11 @@ export function YearbookBanner({ teamNames, preview = false }: { teamNames: stri
   const body = (
     <>
       <span>
-        <span className="block font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">{teamNames.join(" · ")}</span>
+        <span className="block font-sans text-xs tracking-[0.25em] text-pink-soft uppercase">{teamNames.join(" · ")}</span>
         <span className="block font-display text-4xl font-black tracking-tight text-highlight uppercase italic sm:text-5xl">Yearbook</span>
         <span className="block text-sm text-muted">The season in photos. Add yours and tag the players in them.</span>
       </span>
-      <span className="font-mono text-xs tracking-wider text-ink uppercase">Open →</span>
+      <span className="font-sans text-xs tracking-wider text-ink uppercase">Open →</span>
     </>
   );
   const cls = "flex flex-wrap items-center justify-between gap-4 rounded-2xl border-2 border-neon-edge bg-linear-to-r from-neon/10 to-pink/10 p-5 sm:p-6";

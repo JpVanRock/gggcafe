@@ -23,7 +23,7 @@ export function AdvancedSummary({ book, leadership = null }: { book: AdvancedBoo
   const coming = chapters.filter((c) => c.status === "coming").length;
   return (
     <div>
-      <p className="font-mono text-xs tracking-[0.2em] text-[var(--menu-note)] uppercase">{BOOK_THEME}</p>
+      <p className="font-sans text-xs tracking-[0.2em] text-[var(--menu-note)] uppercase">{BOOK_THEME}</p>
       <div className="mt-4 grid gap-x-10 gap-y-4 sm:grid-cols-2">
         <MenuItem name="Chapters complete" value={`${progress.done}/${progress.total}`} note={coming ? `${coming} more chapter${coming === 1 ? "" : "s"} coming` : undefined} />
         <MenuItem
@@ -51,7 +51,7 @@ export function AdvancedLocked({ playerId, name }: { playerId: string; name: str
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-dashed border-navy-600 px-5 py-4">
       <div>
-        <p className="font-mono text-xs tracking-[0.2em] text-pink-soft uppercase">{LEVEL_LABEL} · Head coaches and admins</p>
+        <p className="font-sans text-xs tracking-[0.2em] text-pink-soft uppercase">{LEVEL_LABEL} · Head coaches and admins</p>
         <p className="mt-1 text-sm text-muted">
           Locked for {name}. Players don&apos;t see G3 Advanced until it&apos;s unlocked.
         </p>

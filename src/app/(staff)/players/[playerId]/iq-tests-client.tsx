@@ -179,7 +179,7 @@ function BadgeTrackPicker({ tracks, actions }: { tracks: BadgeTrackInfo[]; actio
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-bold">
                         Level {l.level}
-                        <span className="ml-2 font-mono text-2xs font-normal tracking-wider text-muted uppercase">
+                        <span className="ml-2 font-sans text-2xs font-normal tracking-wider text-muted uppercase">
                           {LEVEL_NAME[l.level]}
                           {l.questionCount > 0 && ` · ${l.questionCount} questions`}
                         </span>
@@ -240,7 +240,7 @@ function TrackPicker({ tracks, actions }: { tracks: TrackInfo[]; actions: Action
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-bold">
                         Level {l.level}
-                        <span className="ml-2 font-mono text-2xs font-normal tracking-wider text-muted uppercase">
+                        <span className="ml-2 font-sans text-2xs font-normal tracking-wider text-muted uppercase">
                           {LEVEL_NAME[l.level]}
                           {l.questionCount > 0 && ` · ${l.questionCount} questions`}
                         </span>
@@ -294,7 +294,7 @@ function PositionPicker({ positions, plate, actions }: { positions: PositionInfo
         {p.questionCount ? ` (${needed(p.questionCount)} of ${p.questionCount})` : ""} to earn the Golden Glove.
       </p>
       <label className="mt-4 block max-w-sm">
-        <span className="font-mono text-2xs tracking-wider text-muted uppercase">Position</span>
+        <span className="font-sans text-2xs tracking-wider text-muted uppercase">Position</span>
         <select value={selected} onChange={(e) => setSelected(e.target.value as FieldPosition)} className={`${inputClass} mt-1`}>
           {positions.map((x) => (
             <option key={x.position} value={x.position}>
@@ -338,7 +338,7 @@ function PositionPicker({ positions, plate, actions }: { positions: PositionInfo
       </div>
 
       {earned.length > 0 && (
-        <p className="mt-3 font-mono text-2xs tracking-wider text-muted uppercase">
+        <p className="mt-3 font-sans text-2xs tracking-wider text-muted uppercase">
           Golden Gloves: {earned.map((x) => x.label).join(" · ")}
         </p>
       )}
@@ -381,7 +381,7 @@ function LibraryPicker({ library, actions }: { library: LibraryInfo; actions: Ac
       {library.shelves.length > 0 && (
         <ul className="mt-4 flex flex-wrap gap-2">
           {library.shelves.map((s) => (
-            <li key={s.name} className="rounded-full border border-navy-600 px-3 py-1 font-mono text-2xs tracking-wider text-muted uppercase">
+            <li key={s.name} className="rounded-full border border-navy-600 px-3 py-1 font-sans text-2xs tracking-wider text-muted uppercase">
               {s.name} · {s.count}
             </li>
           ))}
@@ -547,7 +547,7 @@ export function IqTests({
     const perfect = result.total > 0 && result.correct === result.total;
     return (
       <div className={`rounded-xl border p-6 text-center ${result.passed ? "border-neon-edge bg-neon/10" : "border-pink/60 bg-pink/5"}`}>
-        <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">{testName(session)}</p>
+        <p className="font-sans text-xs tracking-widest text-pink-soft uppercase">{testName(session)}</p>
         {result.passed && !badge && (
           <div className="mt-4 flex justify-center">
             {position ? (
@@ -615,7 +615,7 @@ export function IqTests({
     const right = session.questions.filter((q) => session.done[q.id]?.correct).length;
     return (
       <div className="rounded-xl border border-neon-edge bg-neon/10 p-6 text-center">
-        <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">{testName(session)} · Review</p>
+        <p className="font-sans text-xs tracking-widest text-pink-soft uppercase">{testName(session)} · Review</p>
         <div className="mt-4 flex justify-center">
           <MvpBadge label={mvpLabel(session)} size={96} />
         </div>
@@ -642,7 +642,7 @@ export function IqTests({
     return (
       <div className={`rounded-xl border p-4 sm:p-6 ${reviewing ? "border-pink/50 bg-pink/5" : "border-navy-600 bg-navy-950/50"}`}>
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <span className="font-mono text-xs tracking-widest text-pink-soft uppercase">
+          <span className="font-sans text-xs tracking-widest text-pink-soft uppercase">
             {testName(session)}
             {reviewing && " · Reviewing misses"}
             {library && q.section && ` · ${q.section}`}
@@ -666,7 +666,7 @@ export function IqTests({
               type="button"
               onClick={() => pickShelf(null)}
               disabled={Boolean(feedback)}
-              className={`rounded-full border px-3 py-1 font-mono text-2xs tracking-wider uppercase ${session.shelf === null ? "border-pink bg-pink/15 text-ink" : "border-navy-600 text-muted hover:border-pink"}`}
+              className={`rounded-full border px-3 py-1 font-sans text-2xs tracking-wider uppercase ${session.shelf === null ? "border-pink bg-pink/15 text-ink" : "border-navy-600 text-muted hover:border-pink"}`}
             >
               Any shelf
             </button>
@@ -676,7 +676,7 @@ export function IqTests({
                 type="button"
                 onClick={() => pickShelf(s.name)}
                 disabled={Boolean(feedback) || s.answered === s.count}
-                className={`rounded-full border px-3 py-1 font-mono text-2xs tracking-wider uppercase disabled:opacity-50 ${session.shelf === s.name ? "border-pink bg-pink/15 text-ink" : "border-navy-600 text-muted hover:border-pink"}`}
+                className={`rounded-full border px-3 py-1 font-sans text-2xs tracking-wider uppercase disabled:opacity-50 ${session.shelf === s.name ? "border-pink bg-pink/15 text-ink" : "border-navy-600 text-muted hover:border-pink"}`}
               >
                 {s.name} <span className="tabular-nums">{s.answered}/{s.count}</span>
               </button>
@@ -698,7 +698,7 @@ export function IqTests({
                   </button>
                 ) : (
                   <p className="rounded-lg border border-pink/50 bg-pink/10 px-3 py-2 text-sm">
-                    <span className="mr-1 font-mono text-2xs font-bold tracking-wider text-pink-soft uppercase">Hint</span>
+                    <span className="mr-1 font-sans text-2xs font-bold tracking-wider text-pink-soft uppercase">Hint</span>
                     {hint}
                   </p>
                 )}
@@ -723,7 +723,7 @@ export function IqTests({
                             : "border-navy-600 hover:border-pink disabled:hover:border-navy-600"
                       }`}
                     >
-                      <span className={`font-mono font-bold ${isCorrect ? "text-highlight" : isWrongPick ? "text-pink-soft" : "text-muted"}`}>
+                      <span className={`font-sans font-bold ${isCorrect ? "text-highlight" : isWrongPick ? "text-pink-soft" : "text-muted"}`}>
                         {LETTERS[i]}
                       </span>
                       <span>{choice}</span>

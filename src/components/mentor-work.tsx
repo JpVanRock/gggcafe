@@ -56,7 +56,7 @@ export function FocusBoard({ items, controls, empty }: { items: FocusItem[]; con
                   <li key={item.id} className="rounded-lg border border-navy-700 bg-navy-950/40 p-2.5">
                     <p className="text-sm font-semibold">{item.title}</p>
                     {item.details && <p className="mt-0.5 text-xs whitespace-pre-wrap text-muted">{item.details}</p>}
-                    <p className="mt-1 font-mono text-2xs tracking-wider text-muted uppercase">
+                    <p className="mt-1 font-sans text-2xs tracking-wider text-muted uppercase">
                       {[item.mentor_name, `Updated ${formatDay(item.updated_at.slice(0, 10))}`].filter(Boolean).join(" · ")}
                     </p>
                     {controls && <div className="mt-2 flex flex-wrap items-center gap-2">{controls(item)}</div>}
@@ -87,7 +87,7 @@ export function NotesThread({ notes, controls, empty }: { notes: MentorNote[]; c
             <span className="text-sm font-semibold">{n.author_name}</span>
             <Badge tone={n.author_role === "mentor" ? "neutral" : "pink"}>{ROLE[n.author_role] ?? n.author_role}</Badge>
             {n.kind === "summary" && <Badge tone="neonOutline">{NOTE_KIND_LABEL.summary}</Badge>}
-            <span className="font-mono text-2xs tracking-wider text-muted uppercase">
+            <span className="font-sans text-2xs tracking-wider text-muted uppercase">
               {n.kind === "summary" && n.discussed_on ? `Talked ${formatDay(n.discussed_on)} · ` : ""}
               {formatDay(n.created_at.slice(0, 10))}
             </span>

@@ -139,7 +139,7 @@ export default async function LeadershipLessonPage({ params }: PageProps<"/playe
         {lesson.tool === "scenarios" && (
           <section>
             <Heading>What would you do?</Heading>
-            <p className="mb-4 font-mono text-2xs tracking-wider text-muted uppercase">
+            <p className="mb-4 font-sans text-2xs tracking-wider text-muted uppercase">
               {SCENARIOS.filter((s) => answers[s.key]).length} of {SCENARIOS.length} answered
             </p>
             <div className="grid gap-3">
@@ -150,7 +150,7 @@ export default async function LeadershipLessonPage({ params }: PageProps<"/playe
                   <details key={g} className="group rounded-xl border border-navy-700 open:border-pink/60">
                     <summary className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 font-semibold">
                       <span>{g}</span>
-                      <span className="font-mono text-2xs tracking-wider text-muted uppercase">
+                      <span className="font-sans text-2xs tracking-wider text-muted uppercase">
                         {answered} / {group.length} <span className="ml-1 inline-block transition group-open:rotate-90">›</span>
                       </span>
                     </summary>

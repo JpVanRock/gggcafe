@@ -75,16 +75,16 @@ export function MoveDial({ dial, size = 220, className = "" }: { dial: Record<Sp
       <line x1={130} y1={34} x2={130} y2={276} className="stroke-navy-600" strokeWidth={1.5} />
       <line x1={16} y1={170} x2={244} y2={170} className="stroke-navy-600" strokeWidth={1.5} />
       <path d="M130 18 l7 12 h-14 Z" className="fill-pink" />
-      <text x={146} y={28} fontSize={10} fontWeight={700} letterSpacing={1.5} className="fill-muted" style={{ fontFamily: "var(--font-mono)" }}>
+      <text x={146} y={28} fontSize={10} fontWeight={700} letterSpacing={1.5} className="fill-muted" style={{ fontFamily: "var(--font-sans)" }}>
         TOES
       </text>
-      <text x={146} y={288} fontSize={10} fontWeight={700} letterSpacing={1.5} className="fill-muted" style={{ fontFamily: "var(--font-mono)" }}>
+      <text x={146} y={288} fontSize={10} fontWeight={700} letterSpacing={1.5} className="fill-muted" style={{ fontFamily: "var(--font-sans)" }}>
         HEELS
       </text>
-      <text x={22} y={288} fontSize={10} fontWeight={700} letterSpacing={1.5} className="fill-muted" style={{ fontFamily: "var(--font-mono)" }}>
+      <text x={22} y={288} fontSize={10} fontWeight={700} letterSpacing={1.5} className="fill-muted" style={{ fontFamily: "var(--font-sans)" }}>
         LEFT
       </text>
-      <text x={238} y={28} textAnchor="end" fontSize={10} fontWeight={700} letterSpacing={1.5} className="fill-muted" style={{ fontFamily: "var(--font-mono)" }}>
+      <text x={238} y={28} textAnchor="end" fontSize={10} fontWeight={700} letterSpacing={1.5} className="fill-muted" style={{ fontFamily: "var(--font-sans)" }}>
         RIGHT
       </text>
       {/* feet */}

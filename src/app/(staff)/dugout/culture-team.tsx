@@ -35,7 +35,7 @@ export function GoalsBoard({ goals, teamId, editor }: { goals: TeamGoal[]; teamI
                 <div className="h-2 overflow-hidden rounded-full bg-navy-800" aria-hidden>
                   <div className="h-full bg-linear-to-r from-pink to-neon" style={{ width: `${pct ?? 0}%` }} />
                 </div>
-                <p className="mt-1 font-mono text-xs text-muted tabular-nums">
+                <p className="mt-1 font-display text-xs text-muted tabular-nums">
                   {g.current ?? 0} / {g.target} {g.unit ?? ""}
                 </p>
               </div>
@@ -45,7 +45,7 @@ export function GoalsBoard({ goals, teamId, editor }: { goals: TeamGoal[]; teamI
                 <ActionForm action={setGoalAchieved}>
                   <input type="hidden" name="id" value={g.id} />
                   {!g.achieved_at && <input type="hidden" name="achieved" value="on" />}
-                  <button type="submit" className={"inline-flex min-h-10 items-center text-xs font-semibold text-link hover:underline sm:min-h-0"}>
+                  <button type="submit" className={"inline-flex min-h-10 items-center gap-1 text-xs font-semibold text-link hover:underline sm:min-h-0"}>
                     {g.achieved_at ? "Mark not achieved" : "Mark achieved"}
                   </button>
                 </ActionForm>
@@ -112,7 +112,7 @@ export function CultureTeamSections({
               return (
                 <li key={p.id} className="flex items-center justify-between gap-2 border-b border-navy-800 py-1">
                   <span>{p.name}</span>
-                  <span className={`font-mono text-2xs ${st.complete ? "text-highlight" : "text-muted"}`}>
+                  <span className={`font-sans text-2xs ${st.complete ? "text-highlight" : "text-muted"}`}>
                     {st.signed ? "Signed" : "Not signed"} · {st.written ? "written" : "not written"}
                   </span>
                 </li>

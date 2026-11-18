@@ -33,7 +33,7 @@ export function SectionShell({
       <header>
         <h1 className="text-3xl leading-tight font-bold tracking-wide text-highlight uppercase sm:text-4xl">{title}</h1>
         <span aria-hidden className={`mt-2 block h-0.5 w-12 rounded-full ${a ? `${a.rule} h-1 w-16` : "bg-pink"}`} />
-        {subtitle && <p className="mt-2 font-mono text-xs tracking-[0.2em] text-pink-soft uppercase">{subtitle}</p>}
+        {subtitle && <p className="mt-2 font-sans text-xs tracking-[0.2em] text-pink-soft uppercase">{subtitle}</p>}
       </header>
       {notice}
       <div className={`rounded-2xl border border-navy-700 bg-navy-900/70 p-5 sm:p-8 ${a?.card ?? ""}`}>{children}</div>

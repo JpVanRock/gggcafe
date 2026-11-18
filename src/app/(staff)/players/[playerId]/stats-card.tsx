@@ -54,7 +54,7 @@ export async function loadPlayerStats(supabase: Supabase, playerId: string, seas
 function Stat({ label, k, value }: { label?: string; k?: StatKey; value: ReactNode }) {
   return (
     <div className="min-w-14">
-      <dt className="font-mono text-2xs font-bold tracking-wider text-muted uppercase">{k ? <StatTerm k={k} /> : label}</dt>
+      <dt className="font-sans text-2xs font-bold tracking-wider text-muted uppercase">{k ? <StatTerm k={k} /> : label}</dt>
       <dd className="font-display text-xl font-bold text-highlight tabular-nums">{value}</dd>
     </div>
   );
@@ -63,7 +63,7 @@ function Stat({ label, k, value }: { label?: string; k?: StatKey; value: ReactNo
 function Row({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className={`${cardClass("inset")} p-3`}>
-      <p className="mb-2 font-mono text-2xs font-bold tracking-[0.18em] text-pink-soft uppercase">{title}</p>
+      <p className="mb-2 font-sans text-2xs font-bold tracking-[0.18em] text-pink-soft uppercase">{title}</p>
       <dl className="flex flex-wrap gap-x-5 gap-y-3">{children}</dl>
     </div>
   );

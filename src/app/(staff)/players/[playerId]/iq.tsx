@@ -168,7 +168,7 @@ export function GloveCase({ positions, plate, size = 220 }: { positions: Positio
       {earned.map((p) => (
         <figure key={p.position} className="flex flex-col items-center gap-2">
           <GoldenGlove name={plate.name} number={plate.number} position={p.label} year={p.earnedYear} size={size} />
-          <figcaption className="font-mono text-2xs tracking-wider text-muted uppercase">
+          <figcaption className="font-sans text-2xs tracking-wider text-muted uppercase">
             {p.label} · {p.earnedOn}
           </figcaption>
         </figure>
@@ -248,7 +248,7 @@ export function IqSummary({
 function PracticeLine({ quizzes }: { quizzes: QuizInfo[] }) {
   const answered = quizzes.reduce((n, q) => n + q.stats.answered, 0);
   return (
-    <p className="mt-4 font-mono text-xs tracking-wider text-muted uppercase">
+    <p className="mt-4 font-sans text-xs tracking-wider text-muted uppercase">
       Practice: {quizzes.map((q) => q.label.replace(" IQ", "")).join(" · ")}
       {answered ? ` · ${answered} answered` : ""}
     </p>

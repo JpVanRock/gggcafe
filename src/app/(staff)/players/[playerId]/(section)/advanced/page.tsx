@@ -46,12 +46,12 @@ export default async function AdvancedPage({ params }: PageProps<"/players/[play
         <OutlineText stroke="rgb(254 31 124 / 0.35)" className="absolute -right-2 -bottom-6 text-[9rem] leading-none tracking-tighter sm:text-[12rem]">
           G3
         </OutlineText>
-        <p className="relative flex items-center gap-3 font-mono text-xs tracking-[0.3em] text-pink-soft uppercase">
+        <p className="relative flex items-center gap-3 font-sans text-xs tracking-[0.3em] text-pink-soft uppercase">
           <SpeedStripes className="h-3 w-9 text-link" />
           {possessive(name)} book
         </p>
         <h2 className="relative mt-3 text-4xl leading-none font-bold tracking-wide text-highlight uppercase sm:text-6xl">{book.title}</h2>
-        <p className="relative mt-3 font-mono text-sm tracking-[0.2em] text-ink/80 uppercase">{BOOK_THEME}</p>
+        <p className="relative mt-3 font-sans text-sm tracking-[0.2em] text-ink/80 uppercase">{BOOK_THEME}</p>
         <div className="relative mt-4">
           <BookTitle playerId={player.id} title={book.title} canEdit={access.canAct} maxLength={BOOK_TITLE_MAX} />
         </div>
@@ -69,10 +69,10 @@ export default async function AdvancedPage({ params }: PageProps<"/players/[play
           className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-neon-edge bg-neon/5 p-5 transition hover:bg-neon/10"
         >
           <span>
-            <span className="block font-mono text-2xs tracking-[0.2em] text-pink-soft uppercase">Picked by your coach</span>
+            <span className="block font-sans text-2xs tracking-[0.2em] text-pink-soft uppercase">Picked by your coach</span>
             <span className="block font-display text-2xl font-bold tracking-wide text-highlight uppercase">{programTitle(lead.program)}</span>
           </span>
-          <span className="font-mono text-xs tracking-wider text-ink uppercase">
+          <span className="font-sans text-xs tracking-wider text-ink uppercase">
             {leadProgress.done} of {leadProgress.total} lessons →
           </span>
         </Link>
@@ -97,7 +97,7 @@ export default async function AdvancedPage({ params }: PageProps<"/players/[play
                 href={advancedHref(player.id, c.slug)}
                 className="flex items-center gap-4 px-1 py-4 transition hover:bg-navy-800"
               >
-                <span className="w-24 shrink-0 font-mono text-2xs tracking-wider text-muted uppercase">{chapterLabel(c, chapters)}</span>
+                <span className="w-24 shrink-0 font-sans text-2xs tracking-wider text-muted uppercase">{chapterLabel(c, chapters)}</span>
                 <span className="min-w-0 flex-1">
                   <span className={`block font-semibold ${c.status === "coming" ? "text-muted" : "text-ink"}`}>
                     {c.title}
@@ -105,7 +105,7 @@ export default async function AdvancedPage({ params }: PageProps<"/players/[play
                   </span>
                   <span className="block text-sm text-muted">{c.summary}</span>
                 </span>
-                <span className={`hidden shrink-0 font-mono text-2xs tracking-wider uppercase sm:block ${work?.completedAt ? "text-highlight" : "text-muted"}`}>
+                <span className={`hidden shrink-0 font-sans text-2xs tracking-wider uppercase sm:block ${work?.completedAt ? "text-highlight" : "text-muted"}`}>
                   {status}
                 </span>
                 <span className="text-link">→</span>

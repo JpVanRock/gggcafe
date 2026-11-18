@@ -118,7 +118,7 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
                     ) : (
                       <ConfirmSubmit
                         message={`Make ${l.parent_name} a team admin? They can change ${team.name}'s calendar, GameDay (lineups, depth chart, box scores) and players' measurements. Nothing else.`}
-                        className={"inline-flex min-h-10 items-center text-xs font-semibold text-link hover:underline sm:min-h-0"}
+                        className={"inline-flex min-h-10 items-center gap-1 text-xs font-semibold text-link hover:underline sm:min-h-0"}
                         confirmLabel="Make team admin"
                         tone="primary"
                       >

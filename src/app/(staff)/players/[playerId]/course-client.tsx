@@ -31,7 +31,7 @@ function QuickCheck({ check }: { check: NonNullable<CourseStep["check"]> }) {
                   state === "right" ? "border-neon-edge bg-neon/15" : state === "wrong" ? "border-pink bg-pink/15" : "border-navy-600 hover:border-pink disabled:hover:border-navy-600"
                 }`}
               >
-                <span className="font-mono font-bold text-muted">{LETTERS[i]}</span>
+                <span className="font-sans font-bold text-muted">{LETTERS[i]}</span>
                 <span>{c}</span>
                 {state === "right" && <span className="ml-auto font-bold text-highlight">✓</span>}
               </button>
@@ -139,7 +139,7 @@ export function CourseRunner({
         ))}
         {step.tryIt && (
           <p className="mt-5 max-w-3xl rounded-xl border border-neon-edge/60 bg-neon/5 p-4 text-sm">
-            <span className="mr-2 font-mono text-2xs font-bold tracking-widest text-highlight uppercase">Try it</span>
+            <span className="mr-2 font-sans text-2xs font-bold tracking-widest text-highlight uppercase">Try it</span>
             {step.tryIt}
           </p>
         )}

@@ -218,7 +218,7 @@ export function HabitsTool({
   const groups = [...new Set(habits.map((h) => h.group))];
   return (
     <div>
-      <p className="mb-3 font-mono text-2xs tracking-wider text-muted uppercase">
+      <p className="mb-3 font-sans text-2xs tracking-wider text-muted uppercase">
         {strengths} strengths · {growth} working on it · {habits.length - strengths - growth} to go
       </p>
       <div className="grid gap-5">
@@ -317,7 +317,7 @@ export function RubricTool({
   const total = (ratings: Record<string, string>) => areas.reduce((sum, a) => sum + Number(ratings[a.key] || 0), 0);
   return (
     <div>
-      <p className="mb-3 font-mono text-2xs tracking-wider text-muted uppercase">
+      <p className="mb-3 font-sans text-2xs tracking-wider text-muted uppercase">
         {levels.map((l, i) => `${i + 1} ${l}`).join(" · ")}
       </p>
       <div className="grid gap-6">

@@ -21,8 +21,8 @@ export default function MePage({ searchParams }: PageProps<"/me">) {
         home={{ href: "/me", label: "GGG.Cafe" }}
         width="narrow"
         nav={
-          <Suspense fallback={<span className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">Player</span>}>
-            <MainNav fallback={<span className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">Player</span>} />
+          <Suspense fallback={<span className="font-sans text-xs tracking-[0.25em] text-pink-soft uppercase">Player</span>}>
+            <MainNav fallback={<span className="font-sans text-xs tracking-[0.25em] text-pink-soft uppercase">Player</span>} />
           </Suspense>
         }
         count={
@@ -58,16 +58,16 @@ function Welcome({ team, season, message }: { team: string; season: string | nul
   return (
     <section className="relative overflow-hidden rounded-2xl border border-navy-600 bg-navy-900/80 p-6 sm:p-8">
       <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-pink via-pink to-neon" />
-      <p className="flex items-center gap-3 font-mono text-xs tracking-[0.3em] text-pink-soft uppercase">
+      <p className="flex items-center gap-3 font-sans text-xs tracking-[0.3em] text-pink-soft uppercase">
         <SpeedStripes className="h-3 w-9 text-link" />
         Welcome to
       </p>
       <h2 className="mt-2 text-3xl leading-tight font-bold tracking-tight text-highlight uppercase sm:text-4xl">{team}</h2>
-      {season && <p className="mt-1 font-mono text-xs tracking-wider text-muted uppercase">{season}</p>}
+      {season && <p className="mt-1 font-sans text-xs tracking-wider text-muted uppercase">{season}</p>}
       {message ? (
         <blockquote className="mt-5 border-l-2 border-pink pl-4 text-base leading-relaxed whitespace-pre-line text-ink">
           {message}
-          <footer className="mt-2 font-mono text-2xs tracking-[0.2em] text-pink-soft uppercase">Your coaches</footer>
+          <footer className="mt-2 font-sans text-2xs tracking-[0.2em] text-pink-soft uppercase">Your coaches</footer>
         </blockquote>
       ) : (
         <p className="mt-4 text-sm text-muted">Glad you&apos;re here. Claim your profile below.</p>

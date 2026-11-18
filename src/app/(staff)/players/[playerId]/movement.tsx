@@ -48,7 +48,7 @@ function Cards({ categories, values }: { categories: Category[]; values: Values 
         const o = choiceOf(categories, c.key, values[c.key])!;
         return (
           <li key={c.key} className={`${cardClass("inset")} p-3`}>
-            <p className="font-mono text-2xs font-bold tracking-[0.15em] text-pink-soft uppercase">{c.title}</p>
+            <p className="font-sans text-2xs font-bold tracking-[0.15em] text-pink-soft uppercase">{c.title}</p>
             <p className="mt-1 text-lg leading-snug font-semibold text-highlight">{o.label}</p>
             {o.about && <p className="mt-1 text-sm text-muted">{o.about}</p>}
           </li>
@@ -86,7 +86,7 @@ export function MovementSection({ playerId, versions, canManage }: { playerId: s
               <div className={`${cardClass("inset")} flex gap-3 p-3`}>
                 <span aria-hidden className="mt-1 size-4 shrink-0 rounded-full" style={{ backgroundColor: focus.color }} />
                 <div>
-                  <p className="flex items-center gap-2 font-mono text-2xs font-bold tracking-[0.15em] text-pink-soft uppercase">
+                  <p className="flex items-center gap-2 font-sans text-2xs font-bold tracking-[0.15em] text-pink-soft uppercase">
                     <SpeedStripes className="h-3 w-7 text-link" /> At-bat focus · {focus.colorName}
                   </p>
                   <p className="mt-1 font-semibold">{focus.title}</p>

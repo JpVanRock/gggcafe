@@ -61,7 +61,7 @@ export default async function QuizPage({ params }: PageProps<"/dugout/playbook/q
       </Link>
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">Team quiz · {quiz.published_at ? "Published" : "Draft"}</p>
+          <p className="font-sans text-xs tracking-[0.25em] text-pink-soft uppercase">Team quiz · {quiz.published_at ? "Published" : "Draft"}</p>
           <h2 className="mt-1 text-3xl leading-tight font-bold tracking-tight text-highlight uppercase">{quiz.title}</h2>
         </div>
         {editor && (

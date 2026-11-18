@@ -34,7 +34,7 @@ async function FamilyNav() {
   );
 }
 
-const areaLabel = <span className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">Family</span>;
+const areaLabel = <span className="font-sans text-xs tracking-[0.25em] text-pink-soft uppercase">Family</span>;
 
 /**
  * The family pages' menu: parents get theirs; staff get the staff menu, except a coach who is

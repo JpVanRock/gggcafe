@@ -49,7 +49,7 @@ export default async function TeamPlaybookPage({ params }: PageProps<"/players/[
                           {done && q.to_fix > 0 && ` · ${q.to_fix} to fix`}
                         </span>
                       </span>
-                      <span className="font-mono text-xs font-bold tracking-wider text-pink-soft uppercase">
+                      <span className="font-sans text-xs font-bold tracking-wider text-pink-soft uppercase">
                         {done ? (q.to_fix ? "Fix →" : "Done ✓") : q.answered ? "Keep going →" : "Start →"}
                       </span>
                     </Link>

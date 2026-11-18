@@ -89,10 +89,10 @@ export function MenuBoard({ section, number }: { section: MenuSection; number: n
         </OutlineText>
         <h2 className="relative pr-18 text-2xl leading-none font-bold tracking-wide break-words uppercase min-[400px]:pr-20 min-[400px]:text-3xl sm:pr-28 sm:text-4xl">{section.title}</h2>
         {section.subtitle && (
-          <p className={`relative mt-2 font-mono text-xs tracking-[0.2em] uppercase ${style.subtitle}`}>{section.subtitle}</p>
+          <p className={`relative mt-2 font-sans text-xs tracking-[0.2em] uppercase ${style.subtitle}`}>{section.subtitle}</p>
         )}
         <div className="relative mt-6">{section.summary}</div>
-        <p aria-hidden className={`absolute bottom-5 left-5 font-mono text-xs tracking-widest uppercase min-[400px]:left-6 sm:left-8 ${style.cta}`}>
+        <p aria-hidden className={`absolute bottom-5 left-5 font-sans text-xs tracking-widest uppercase min-[400px]:left-6 sm:left-8 ${style.cta}`}>
           Full details →
         </p>
         {/* The whole board opens the section's page */}
@@ -111,7 +111,7 @@ export function MenuItem({ name, value, note }: { name: string; value?: ReactNod
   return (
     <div className="min-w-0">
       <div className="flex items-baseline justify-between gap-4">
-        <span className="truncate font-mono text-sm tracking-wide uppercase">{name}</span>
+        <span className="truncate font-sans text-sm tracking-wide uppercase">{name}</span>
         {value !== undefined && value !== null && (
           <span className="shrink-0 text-lg font-bold text-[var(--menu-value)] tabular-nums">{value}</span>
         )}
@@ -153,7 +153,7 @@ export function MenuPanel({
   children: ReactNode;
 }) {
   const style = BOARD[variant];
-  const ctaClass = `relative mt-6 self-start font-mono text-xs tracking-widest uppercase ${style.cta}`;
+  const ctaClass = `relative mt-6 self-start font-sans text-xs tracking-widest uppercase ${style.cta}`;
   return (
     <article className={`relative min-w-0 ${wide ? "md:col-span-2" : ""}`}>
       <div className={`relative flex h-full flex-col overflow-hidden rounded-2xl p-5 min-[400px]:p-6 sm:p-8 ${style.board}`}>
@@ -161,7 +161,7 @@ export function MenuPanel({
           {String(number).padStart(2, "0")}
         </OutlineText>
         <h2 className="relative pr-18 text-2xl leading-none font-bold tracking-wide break-words uppercase min-[400px]:pr-20 min-[400px]:text-3xl sm:pr-28 sm:text-4xl">{title}</h2>
-        {subtitle && <p className={`relative mt-2 font-mono text-xs tracking-[0.2em] uppercase ${style.subtitle}`}>{subtitle}</p>}
+        {subtitle && <p className={`relative mt-2 font-sans text-xs tracking-[0.2em] uppercase ${style.subtitle}`}>{subtitle}</p>}
         <div className="relative mt-6 flex-1">{children}</div>
         {cta?.href ? (
           <Link
@@ -217,7 +217,7 @@ export function MenuHeader({
         </div>
       )}
       <div className={`text-center ${sides ? "lg:col-start-2 lg:row-start-1" : ""}`}>
-        <p className="flex items-center justify-center gap-3 font-mono text-xs tracking-[0.35em] text-pink-soft uppercase">
+        <p className="flex items-center justify-center gap-3 font-sans text-xs tracking-[0.35em] text-pink-soft uppercase">
           <SpeedStripes className="h-3 w-9 text-link" />
           {eyebrow}
           <SpeedStripes className="h-3 w-9 text-link" />
@@ -227,7 +227,7 @@ export function MenuHeader({
           {first}
           {last && <span className="text-ink"> {last}</span>}
         </h1>
-        {line && <p className="mx-auto mt-4 max-w-2xl font-mono text-sm text-muted">{line}</p>}
+        {line && <p className="mx-auto mt-4 max-w-2xl font-sans text-sm text-muted">{line}</p>}
         {actions && <div className="mt-4 flex flex-wrap justify-center gap-3">{actions}</div>}
       </div>
     </header>
@@ -241,7 +241,7 @@ export function NeedsYou({ items, title = "Needs you" }: { items: NeedsItem[]; t
   if (items.length === 0) return null;
   return (
     <section aria-label={title} className="rounded-2xl border-2 border-pink bg-pink/5 p-4 sm:p-5">
-      <h2 className="mb-3 flex items-center gap-2 font-mono text-xs font-bold tracking-[0.2em] text-pink-soft uppercase">
+      <h2 className="mb-3 flex items-center gap-2 font-sans text-xs font-bold tracking-[0.2em] text-pink-soft uppercase">
         <span className="grid size-6 place-items-center rounded-full bg-pink font-display text-sm text-on-accent tabular-nums">{items.length}</span>
         {title}
       </h2>
@@ -254,7 +254,7 @@ export function NeedsYou({ items, title = "Needs you" }: { items: NeedsItem[]; t
                 href={i.href}
                 // "Add" and "Fill in" repeat per daughter: the name says which one (design audit A7)
                 aria-label={typeof i.text === "string" ? `${i.action ?? "Open"}: ${i.text}` : undefined}
-                className="inline-flex min-h-10 shrink-0 items-center font-semibold text-link hover:underline sm:min-h-0"
+                className="inline-flex min-h-10 shrink-0 items-center gap-1 font-semibold text-link hover:underline sm:min-h-0"
               >
                 {i.action ?? "Open"} <span aria-hidden="true">→</span>
               </Link>

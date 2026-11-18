@@ -127,7 +127,7 @@ export default async function ViewAsMentorPage({ params, searchParams }: PagePro
 
       {/* what they can't see themselves: for troubleshooting */}
       <section aria-labelledby="behind" className="flex flex-col gap-6">
-        <h2 id="behind" className="font-mono text-xs font-bold tracking-[0.2em] text-pink-soft uppercase">
+        <h2 id="behind" className="font-sans text-xs font-bold tracking-[0.2em] text-pink-soft uppercase">
           Behind the page · admins only
         </h2>
         <AccountFacts account={v.account} />

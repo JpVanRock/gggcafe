@@ -44,7 +44,7 @@ export function SubTracker({
     <Card title="In the game · substitutions">
       <div className="grid gap-6 lg:grid-cols-2">
         <div>
-          <p className="mb-2 font-mono text-2xs font-bold tracking-wider text-muted uppercase">Lineup now</p>
+          <p className="mb-2 font-sans text-2xs font-bold tracking-wider text-muted uppercase">Lineup now</p>
           <ol className="flex flex-col divide-y divide-navy-800 text-sm">
             {starters.map((_, i) => {
               const spot = i + 1;
@@ -65,7 +65,7 @@ export function SubTracker({
           )}
         </div>
         <div>
-          <p className="mb-2 font-mono text-2xs font-bold tracking-wider text-muted uppercase">Log a substitution</p>
+          <p className="mb-2 font-sans text-2xs font-bold tracking-wider text-muted uppercase">Log a substitution</p>
           <div className="grid grid-cols-[4.5rem_5rem_1fr] gap-2">
             <label className="flex flex-col gap-1 text-xs text-muted">
               Inning
@@ -115,7 +115,7 @@ export function SubTracker({
             <ol className="mt-4 flex flex-col gap-1.5 text-sm">
               {checks.map((c, i) => (
                 <li key={i} className="flex items-start gap-2">
-                  <span className="w-10 shrink-0 font-mono text-xs text-muted">Inn {c.entry.inning}</span>
+                  <span className="w-10 shrink-0 font-sans text-xs text-muted">Inn {c.entry.inning}</span>
                   <span className="min-w-0 flex-1">
                     <span className="font-semibold">{name.get(c.entry.in)}</span> in for {name.get(c.out ?? "") ?? "–"} ({spotLabel(c.entry.spot)})
                     {c.reentry && <span className="ml-1 text-xs text-highlight">re-entry</span>}

@@ -187,7 +187,7 @@ function Details({ rows }: { rows: [string, string | null][] }) {
         .filter(([, v]) => v)
         .map(([label, value]) => (
           <div key={label} className="contents">
-            <dt className="font-mono text-2xs leading-5 font-bold tracking-[0.15em] text-pink-soft uppercase">{label}</dt>
+            <dt className="font-sans text-2xs leading-5 font-bold tracking-[0.15em] text-pink-soft uppercase">{label}</dt>
             <dd className="text-sm whitespace-pre-line">{value}</dd>
           </div>
         ))}

@@ -177,7 +177,7 @@ export function Diamond({ spec, className = "" }: { spec: DiamondSpec; className
           return (
             <g key={f}>
               <circle cx={x} cy={y} r="11" fill={you ? "var(--color-pink)" : "var(--color-navy-700)"} stroke={you ? "#fff" : "var(--color-navy-600)"} strokeWidth="1.5" />
-              <text x={x} y={y + 3.5} textAnchor="middle" fontSize="9" fontWeight="700" fill={you ? "#fff" : "var(--color-ink)"} fontFamily="var(--font-mono)">
+              <text x={x} y={y + 3.5} textAnchor="middle" fontSize="9" fontWeight="700" fill={you ? "#fff" : "var(--color-ink)"} fontFamily="var(--font-sans)">
                 {f}
               </text>
             </g>
@@ -232,7 +232,7 @@ export function Diamond({ spec, className = "" }: { spec: DiamondSpec; className
           return (
             <g key={b}>
               <circle cx={x + dx} cy={y + dy} r="9" fill="var(--color-neon)" stroke={you ? "var(--color-pink)" : "var(--color-navy-950)"} strokeWidth={you ? 4 : 2} />
-              <text x={x + dx} y={y + dy + 3.5} textAnchor="middle" fontSize="9" fontWeight="700" fill="var(--color-navy-950)" fontFamily="var(--font-mono)">
+              <text x={x + dx} y={y + dy + 3.5} textAnchor="middle" fontSize="9" fontWeight="700" fill="var(--color-navy-950)" fontFamily="var(--font-sans)">
                 R
               </text>
             </g>
@@ -253,7 +253,7 @@ export function Diamond({ spec, className = "" }: { spec: DiamondSpec; className
           return (
             <g>
               <rect x={x - 17} y={y - 33} width="34" height="15" rx="3" fill="var(--color-pink)" />
-              <text x={x} y={y - 22.5} textAnchor="middle" fontSize="9" fontWeight="700" fill="#fff" fontFamily="var(--font-mono)" letterSpacing="1">
+              <text x={x} y={y - 22.5} textAnchor="middle" fontSize="9" fontWeight="700" fill="#fff" fontFamily="var(--font-sans)" letterSpacing="1">
                 YOU
               </text>
             </g>
@@ -263,7 +263,7 @@ export function Diamond({ spec, className = "" }: { spec: DiamondSpec; className
         {/* the count */}
         {spec.count && (
           <g>
-            <text x="386" y="26" textAnchor="end" fontSize="11" fontWeight="700" fill="var(--color-muted)" fontFamily="var(--font-mono)" letterSpacing="1.5">
+            <text x="386" y="26" textAnchor="end" fontSize="11" fontWeight="700" fill="var(--color-muted)" fontFamily="var(--font-sans)" letterSpacing="1.5">
               COUNT
             </text>
             <text x="386" y="48" textAnchor="end" fontSize="22" fontWeight="800" fill="var(--color-highlight)" fontFamily="var(--font-display)">
@@ -274,7 +274,7 @@ export function Diamond({ spec, className = "" }: { spec: DiamondSpec; className
 
         {/* outs */}
         <g>
-          <text x="14" y="26" fontSize="11" fontWeight="700" fill="var(--color-muted)" fontFamily="var(--font-mono)" letterSpacing="1.5">
+          <text x="14" y="26" fontSize="11" fontWeight="700" fill="var(--color-muted)" fontFamily="var(--font-sans)" letterSpacing="1.5">
             OUTS
           </text>
           {[0, 1].map((i) => (

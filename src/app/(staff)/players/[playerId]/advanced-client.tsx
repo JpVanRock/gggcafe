@@ -103,7 +103,7 @@ export function FoundationHabits({
   }
   return (
     <div>
-      <p className="mb-3 font-mono text-2xs tracking-wider text-muted uppercase">
+      <p className="mb-3 font-sans text-2xs tracking-wider text-muted uppercase">
         {owned.size} of {habits.length} owned
       </p>
       <ol className="grid gap-3">

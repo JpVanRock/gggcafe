@@ -26,7 +26,7 @@ const heading = `mb-3 text-pink-soft ${groupLabelClass}`;
 function BestVersion() {
   return (
     <header className="text-center">
-      <p className="flex items-center justify-center gap-3 font-mono text-xs tracking-[0.35em] text-pink-soft uppercase">
+      <p className="flex items-center justify-center gap-3 font-sans text-xs tracking-[0.35em] text-pink-soft uppercase">
         <SpeedStripes className="h-3 w-9 text-link" />
         Offseason Training
         <SpeedStripes className="h-3 w-9 -scale-x-100 text-link" />
@@ -129,7 +129,7 @@ export default async function LeaderboardPage({ params, searchParams }: PageProp
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
           {/* Player of the Week */}
           <section className="relative overflow-hidden rounded-2xl border-2 border-neon-edge bg-linear-to-br from-navy-950 to-navy-900 p-5 sm:p-6">
-            <p className="flex items-center gap-3 font-mono text-xs tracking-[0.3em] text-pink-soft uppercase">
+            <p className="flex items-center gap-3 font-sans text-xs tracking-[0.3em] text-pink-soft uppercase">
               <SpeedStripes className="h-3 w-9 text-link" />
               Player of the Week
             </p>
@@ -138,7 +138,7 @@ export default async function LeaderboardPage({ params, searchParams }: PageProp
                 <p className="mt-3 font-display text-4xl leading-none font-bold tracking-tight text-highlight uppercase sm:text-5xl">
                   {winnerRow.first_name} <span className="text-ink">{winnerRow.last_name}</span>
                 </p>
-                <p className="mt-2 font-mono text-sm text-muted">
+                <p className="mt-2 font-sans text-sm text-muted">
                   {winnerRow.jersey_number && `#${winnerRow.jersey_number} · `}
                   {weekRange(winner.week_start)} · {winner.points} points
                 </p>
@@ -149,7 +149,7 @@ export default async function LeaderboardPage({ params, searchParams }: PageProp
               </p>
             )}
             <div className="mt-5">
-              <p className="font-mono text-2xs tracking-wider text-muted uppercase">
+              <p className="font-sans text-2xs tracking-wider text-muted uppercase">
                 Round {round} · {named.size} of {board.players.length} named
               </p>
               <ul className="mt-2 flex flex-wrap gap-1.5">
@@ -179,7 +179,7 @@ export default async function LeaderboardPage({ params, searchParams }: PageProp
               <span className="block font-display text-3xl font-bold tracking-wide text-ink uppercase">+ Activity</span>
               <span className="mt-1 block text-sm text-muted">Log a training session, a workout or a private lesson.</span>
             </span>
-            <span className="grid grid-cols-2 gap-x-4 gap-y-1 font-mono text-xs tracking-wider text-muted uppercase">
+            <span className="grid grid-cols-2 gap-x-4 gap-y-1 font-sans text-xs tracking-wider text-muted uppercase">
               <span>
                 Training <b className="text-highlight">+{POINTS.training}</b>
               </span>
@@ -210,7 +210,7 @@ export default async function LeaderboardPage({ params, searchParams }: PageProp
                     <span className="font-display text-2xl font-bold tracking-wide uppercase">{sq.name}</span>
                     <span className="font-display text-3xl font-black text-highlight tabular-nums">{sq.points}</span>
                   </p>
-                  <p className="font-mono text-2xs tracking-wider text-muted uppercase">
+                  <p className="font-sans text-2xs tracking-wider text-muted uppercase">
                     {i === 0 ? "Leading · " : ""}+{sq.weekPoints} this week{sq.id === mySquad?.id ? " · your squad" : ""}
                   </p>
                   <p className="mt-3 text-sm text-ink/90">
@@ -242,7 +242,7 @@ export default async function LeaderboardPage({ params, searchParams }: PageProp
                   <span className="block truncate font-semibold">
                     {r.first_name} {r.last_name}
                   </span>
-                  <span className="block font-mono text-2xs tracking-wider text-muted uppercase">
+                  <span className="block font-sans text-2xs tracking-wider text-muted uppercase">
                     {r.status === "cooldown" ? `Back in the running ${formatDay(r.until!)}` : STATUS_LABEL[r.status]}
                   </span>
                 </span>
@@ -280,7 +280,7 @@ export default async function LeaderboardPage({ params, searchParams }: PageProp
                       <span className="font-semibold">
                         {r.first_name} {r.last_name}
                       </span>
-                      {r.jersey_number && <span className="ml-2 font-mono text-xs text-muted">#{r.jersey_number}</span>}
+                      {r.jersey_number && <span className="ml-2 font-sans text-xs text-muted">#{r.jersey_number}</span>}
                     </td>
                     <td className={`${tdClass} text-right tabular-nums`}>{r.training}</td>
                     <td className={`${tdClass} text-right tabular-nums`}>{r.workouts}</td>
@@ -310,7 +310,7 @@ export default async function LeaderboardPage({ params, searchParams }: PageProp
                     <span className="font-semibold">
                       {r.first_name} {r.last_name}
                     </span>
-                    {r.jersey_number && <span className="ml-1.5 font-mono text-xs text-muted">#{r.jersey_number}</span>}
+                    {r.jersey_number && <span className="ml-1.5 font-sans text-xs text-muted">#{r.jersey_number}</span>}
                   </span>
                   <span className="font-display tabular-nums">
                     <span className="text-lg font-bold text-highlight">{Number(r.production).toFixed(2)}</span>
@@ -328,7 +328,7 @@ export default async function LeaderboardPage({ params, searchParams }: PageProp
             <ul className="grid gap-1.5 sm:grid-cols-2">
               {board.weeks.map((w) => (
                 <li key={w.week_start} className="flex items-baseline justify-between gap-3 rounded-lg border border-navy-700 px-3 py-2 text-sm">
-                  <span className="font-mono text-xs text-muted">{weekRange(w.week_start)}</span>
+                  <span className="font-sans text-xs text-muted">{weekRange(w.week_start)}</span>
                   {w.player_id ? (
                     <span className="font-semibold">
                       {w.first_name} {w.last_name} <span className="font-display text-muted tabular-nums">· {w.points}</span>

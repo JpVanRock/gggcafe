@@ -255,7 +255,7 @@ export function PlanBuilder({
     <div className="flex flex-col gap-8">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">{plan.team.name} · Practice plan</p>
+          <p className="font-sans text-xs tracking-[0.25em] text-pink-soft uppercase">{plan.team.name} · Practice plan</p>
           <h2 className="mt-1 text-3xl leading-tight font-bold tracking-tight text-highlight uppercase">
             {formatLongDate(setup.practice_date)}
           </h2>

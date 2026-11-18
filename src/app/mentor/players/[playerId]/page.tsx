@@ -140,7 +140,7 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
           <h1 className="text-4xl leading-none font-bold tracking-tight text-highlight uppercase sm:text-5xl">
             {first} <span className="text-ink">{player.last_name}</span>
           </h1>
-          <p className="mt-2 font-mono text-sm text-muted">
+          <p className="mt-2 font-sans text-sm text-muted">
             {[spot?.jersey_number && `#${spot.jersey_number}`, player.primary_position, spot?.team?.name].filter(Boolean).join(" · ")}
           </p>
         </div>
@@ -173,7 +173,7 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
                       <img src={messagePhotos.get(m.photo_path)!} alt="Photo sent" className="mt-2 h-20 rounded-lg object-cover" />
                     )}
                   </span>
-                  <span className="font-mono text-2xs tracking-wider text-muted uppercase">{m.read_at ? "Seen" : "Not seen yet"}</span>
+                  <span className="font-sans text-2xs tracking-wider text-muted uppercase">{m.read_at ? "Seen" : "Not seen yet"}</span>
                   <ActionForm action={setMessageSharing} className="flex flex-wrap items-center gap-2">
                     <input type="hidden" name="message_id" value={m.id} />
                     <input type="hidden" name="shared" value={m.shared_with_coaches ? "0" : "1"} />
@@ -215,7 +215,7 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
           <ul className="flex flex-col divide-y divide-navy-800">
             {shared.map((j) => (
               <li key={j.id} className="flex flex-col gap-2 py-4 first:pt-0">
-                <p className="font-mono text-2xs tracking-widest text-pink-soft uppercase">{formatDay(j.session_date)}</p>
+                <p className="font-sans text-2xs tracking-widest text-pink-soft uppercase">{formatDay(j.session_date)}</p>
                 {j.topic && <p className="font-display text-lg leading-tight font-bold tracking-wide uppercase">{j.topic}</p>}
                 {j.notes && <p className="text-sm whitespace-pre-wrap text-ink/90">{j.notes}</p>}
                 {j.audio_path && memoUrls.get(j.audio_path) && (
@@ -260,7 +260,7 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
       {!off.has("mentor.goals") && (
         <Panel id="goals" title={`${first}'s Goals`}>
           <BestVersion playerId={player.id} answers={(best?.answers ?? {}) as BestVersionAnswers} canEdit={false} safety={null} />
-          <p className="-mt-2 font-mono text-xs tracking-[0.2em] text-pink-soft uppercase">{GOAL_METHOD_LABEL[method]}</p>
+          <p className="-mt-2 font-sans text-xs tracking-[0.2em] text-pink-soft uppercase">{GOAL_METHOD_LABEL[method]}</p>
           {method === "smart" ? (
             <SmartGoalsPanel playerId={player.id} goals={smartGoals} metrics={pop.metrics} metricOptions={metricOptions} canEdit={false} />
           ) : (

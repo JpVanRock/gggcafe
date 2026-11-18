@@ -36,7 +36,7 @@ function LessonList({ playerId, lessons, work, prefix }: { playerId: string; les
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-sm font-semibold text-ink">{l.title}</span>
-                <span className={`block font-mono text-2xs tracking-wider uppercase ${w?.completedAt ? "text-highlight" : "text-muted"}`}>
+                <span className={`block font-sans text-2xs tracking-wider uppercase ${w?.completedAt ? "text-highlight" : "text-muted"}`}>
                   {w?.completedAt ? "Complete ✓" : `${answered} of ${l.questions.length} answered`}
                 </span>
               </span>
@@ -105,13 +105,13 @@ export default async function LeadershipPage({ params }: PageProps<"/players/[pl
               <span className="block font-display text-2xl font-bold tracking-wide text-highlight uppercase">Team Leader</span>
               <span className="block text-sm text-muted">Course complete. View and print the Certificate of Leadership.</span>
             </span>
-            <span className="font-mono text-xs tracking-wider text-ink uppercase">Certificate →</span>
+            <span className="font-sans text-xs tracking-wider text-ink uppercase">Certificate →</span>
           </Link>
         )}
 
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
           <div>
-            <p className="flex items-center gap-3 font-mono text-xs tracking-[0.3em] text-pink-soft uppercase">
+            <p className="flex items-center gap-3 font-sans text-xs tracking-[0.3em] text-pink-soft uppercase">
               <SpeedStripes className="h-3 w-9 text-link" />
               Read this first
             </p>
@@ -152,8 +152,8 @@ export default async function LeadershipPage({ params }: PageProps<"/players/[pl
                 <li key={rung} className="flex items-center gap-3 border-b border-navy-700 pb-2 last:border-0">
                   <span className="w-7 font-display text-xl font-bold text-highlight tabular-nums">{i + 1}</span>
                   <span className="text-sm">{rung}</span>
-                  {i === 3 && <span className="ml-auto font-mono text-2xs tracking-wider text-muted uppercase">Lead yourself ↓</span>}
-                  {i === 6 && <span className="ml-auto font-mono text-2xs tracking-wider text-muted uppercase">Lead others ↓</span>}
+                  {i === 3 && <span className="ml-auto font-sans text-2xs tracking-wider text-muted uppercase">Lead yourself ↓</span>}
+                  {i === 6 && <span className="ml-auto font-sans text-2xs tracking-wider text-muted uppercase">Lead others ↓</span>}
                 </li>
               ))}
             </ol>
@@ -180,7 +180,7 @@ export default async function LeadershipPage({ params }: PageProps<"/players/[pl
                 : "Why you lead, your habits, your goals, your commitment, and your coach's sign-off."}
             </span>
           </span>
-          <span className="font-mono text-xs tracking-wider text-ink uppercase">{planStatus} →</span>
+          <span className="font-sans text-xs tracking-wider text-ink uppercase">{planStatus} →</span>
         </Link>
 
         {!light && (

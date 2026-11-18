@@ -153,7 +153,7 @@ export function MentalTools({
                 <p className="mt-2 text-sm whitespace-pre-wrap text-ink/90">{plan?.[s.signs] || <span className="text-muted">Not filled in yet.</span>}</p>
                 {s.release && plan?.[s.release] && (
                   <p className="mt-3 text-sm">
-                    <span className="font-mono text-2xs font-bold tracking-widest text-pink-soft uppercase">Release · </span>
+                    <span className="font-sans text-2xs font-bold tracking-widest text-pink-soft uppercase">Release · </span>
                     <span className="whitespace-pre-wrap">{plan[s.release]}</span>
                   </p>
                 )}
@@ -244,7 +244,7 @@ export function MentalTools({
                           <span key={n} className={`h-2 w-4 rounded-sm ${n <= latest.scores[i] ? "bg-neon" : "bg-navy-700"}`} />
                         ))}
                       </span>
-                      <span className={`w-6 text-right font-mono text-xs ${change && change > 0 ? "text-highlight" : change && change < 0 ? "text-pink-soft" : "text-muted"}`}>
+                      <span className={`w-6 text-right font-sans text-xs ${change && change > 0 ? "text-highlight" : change && change < 0 ? "text-pink-soft" : "text-muted"}`}>
                         {change ? (change > 0 ? `+${change}` : change) : ""}
                       </span>
                     </span>
@@ -256,9 +256,9 @@ export function MentalTools({
               <div className="flex h-24 items-end gap-2" aria-label="Average by month">
                 {[...scans].reverse().map((s) => (
                   <span key={s.month} className="flex flex-1 flex-col items-center gap-1">
-                    <span className="font-mono text-2xs text-muted tabular-nums">{scanAverage(s.scores)}</span>
+                    <span className="font-display text-2xs text-muted tabular-nums">{scanAverage(s.scores)}</span>
                     <span className="w-full rounded-t bg-linear-to-t from-pink to-neon" style={{ height: `${scanAverage(s.scores) * 12}px` }} />
-                    <span className="font-mono text-2xs text-muted uppercase">{monthName.format(new Date(`${s.month}T00:00:00Z`))}</span>
+                    <span className="font-sans text-2xs text-muted uppercase">{monthName.format(new Date(`${s.month}T00:00:00Z`))}</span>
                   </span>
                 ))}
               </div>

@@ -37,7 +37,7 @@ export default async function MentorTrainingPage() {
         <span aria-hidden="true">←</span> Mentor menu
       </Link>
       <header>
-        <p className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">Mentor menu</p>
+        <p className="font-sans text-xs tracking-[0.25em] text-pink-soft uppercase">Mentor menu</p>
         <h1 className="mt-1 text-4xl leading-none font-bold tracking-tight text-highlight uppercase sm:text-5xl">Training on their weeks</h1>
         <p className="mt-3 max-w-2xl text-sm text-muted">
           Tick one player or a group. It shows in their This Week in Softball on those days, marked as from you, and on your calendar.
@@ -51,7 +51,7 @@ export default async function MentorTrainingPage() {
             <TrainingForm groups={groups} />
           </Card>
           <section aria-labelledby="training-list">
-            <h2 id="training-list" className="mb-3 font-mono text-xs font-bold tracking-[0.2em] text-pink-soft uppercase">
+            <h2 id="training-list" className="mb-3 font-sans text-xs font-bold tracking-[0.2em] text-pink-soft uppercase">
               Coming up
             </h2>
             <TrainingList rows={training} nameOf={nameOf} />

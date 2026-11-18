@@ -223,13 +223,13 @@ export function PlayerMenu({
               className="mx-auto mb-5 size-28 rounded-full border-2 border-neon-edge object-cover shadow-[0_0_0_6px_rgb(0_10_45),0_0_0_7px_rgb(254_31_124)] sm:size-32"
             />
           )}
-          <p className="flex items-center justify-center gap-3 font-mono text-xs tracking-[0.35em] text-pink-soft uppercase">
+          <p className="flex items-center justify-center gap-3 font-sans text-xs tracking-[0.35em] text-pink-soft uppercase">
             <SpeedStripes className="h-3 w-9 text-link" />
             Player menu
             <SpeedStripes className="h-3 w-9 text-link" />
           </p>
           <PlayerName first={name} last={player.last_name} leaderHref={leader ? leadershipHref(player.id, "certificate") : null} />
-          {tagline && <p className="mx-auto mt-4 max-w-2xl font-mono text-sm text-muted">{tagline}</p>}
+          {tagline && <p className="mx-auto mt-4 max-w-2xl font-sans text-sm text-muted">{tagline}</p>}
           {player.walk_up_songs.length > 0 && (
             <p className="mx-auto mt-3 flex max-w-2xl flex-wrap items-baseline justify-center gap-x-4 gap-y-1 text-sm">
               <span className={eyebrowClass}>Walk-up</span>

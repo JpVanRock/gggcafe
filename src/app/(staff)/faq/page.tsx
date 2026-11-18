@@ -16,7 +16,7 @@ function Mark({ access, tier }: { access: Access; tier: string }) {
   return (
     <span className="inline-flex flex-col items-center gap-0.5">
       <Softball size={24} label={access === "coach" ? `In ${tier}, with a coach's OK` : `In ${tier}`} />
-      {access === "coach" && <span className="font-mono text-2xs leading-none tracking-wider text-pink-soft uppercase">Coach&apos;s OK</span>}
+      {access === "coach" && <span className="font-sans text-2xs leading-none tracking-wider text-pink-soft uppercase">Coach&apos;s OK</span>}
     </span>
   );
 }
@@ -64,7 +64,7 @@ export default async function FaqPage() {
             <tr>
               <th className={`px-4 py-3 text-left text-muted ${groupLabelClass}`}>Feature</th>
               {TIERS.map((t) => (
-                <th key={t.key} className="w-28 px-2 py-3 text-center font-mono text-2xs font-bold tracking-[0.15em] text-highlight uppercase sm:w-36">
+                <th key={t.key} className="w-28 px-2 py-3 text-center font-sans text-2xs font-bold tracking-[0.15em] text-highlight uppercase sm:w-36">
                   {t.label.replace(" Access", "")}
                   <span className="block text-2xs font-normal tracking-wider text-muted">Access</span>
                 </th>

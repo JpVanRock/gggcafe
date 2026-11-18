@@ -82,7 +82,7 @@ function BoxEditor({
   const bad = (f: string) => flagged.has(f);
   const row = (label: string, field: string, children: React.ReactNode) => (
     <div className="flex flex-wrap items-center gap-2">
-      <span className={`w-16 shrink-0 font-mono text-2xs tracking-wider uppercase ${bad(field) ? "text-pink-soft" : "text-muted"}`}>
+      <span className={`w-16 shrink-0 font-sans text-2xs tracking-wider uppercase ${bad(field) ? "text-pink-soft" : "text-muted"}`}>
         {label}
         {bad(field) && " ●"}
       </span>
@@ -320,7 +320,7 @@ export function GameRunner({
   const header = (
     <div className="flex flex-wrap items-end justify-between gap-3">
       <div>
-        <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">
+        <p className="font-sans text-xs tracking-widest text-pink-soft uppercase">
           How to Keep the Book · Game {n} of {GAME_COUNT}
         </p>
         <h2 className="mt-1 font-display text-3xl font-bold tracking-wide text-highlight uppercase">
@@ -354,7 +354,7 @@ export function GameRunner({
               Keep a clean book: at least {CLEAN_BOOK} of {GAME_PLAYS} batters right on the first try, and the right final line score.
             </li>
           </ul>
-          <p className="mt-4 font-mono text-xs tracking-widest text-pink-soft uppercase">
+          <p className="mt-4 font-sans text-xs tracking-widest text-pink-soft uppercase">
             {!found.worldSeries
               ? "A clean book unlocks something. That's all we're saying."
               : !found.allTen
@@ -390,7 +390,7 @@ export function GameRunner({
         {header}
         {result.passed && (result.allTenEarned || result.awardEarned) ? (
           <div className="flex flex-col items-center gap-3 rounded-xl border border-neon-edge bg-neon/10 p-6 text-center">
-            <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">
+            <p className="font-sans text-xs tracking-widest text-pink-soft uppercase">
               Clean book · {result.firstTry} of {GAME_PLAYS} first try
             </p>
             {result.allTenEarned ? <DynastyTrophy size={240} /> : <WorldSeriesTrophy size={240} />}
@@ -415,7 +415,7 @@ export function GameRunner({
           </div>
         ) : result.passed ? (
           <div className="flex flex-col items-center gap-3 rounded-xl border border-neon-edge bg-neon/10 p-6 text-center">
-            <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">Game {n} · clean book</p>
+            <p className="font-sans text-xs tracking-widest text-pink-soft uppercase">Game {n} · clean book</p>
             <p className="text-4xl font-bold text-highlight tabular-nums">
               {result.firstTry}/{GAME_PLAYS}
             </p>
@@ -435,7 +435,7 @@ export function GameRunner({
           </div>
         ) : (
           <div className="rounded-xl border border-pink/60 bg-pink/5 p-6 text-center">
-            <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">Book complete</p>
+            <p className="font-sans text-xs tracking-widest text-pink-soft uppercase">Book complete</p>
             <p className="mt-2 text-4xl font-bold text-highlight tabular-nums">
               {result.firstTry}/{GAME_PLAYS}
             </p>
@@ -503,12 +503,12 @@ export function GameRunner({
         {status}
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <div className={`${cardClass("inset")} p-5`}>
-            <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">Ballgame</p>
+            <p className="font-sans text-xs tracking-widest text-pink-soft uppercase">Ballgame</p>
             <p className="mt-1 text-lg font-semibold">Fill in the line score from your book.</p>
             <p className="mt-1 text-sm text-muted">Count the shaded diamonds in each inning column, on each team&apos;s page.</p>
             <table className="mt-4 w-full text-sm">
               <thead>
-                <tr className="text-left font-mono text-2xs tracking-wider text-muted uppercase">
+                <tr className="text-left font-sans text-2xs tracking-wider text-muted uppercase">
                   <th className="py-1 font-normal">Team</th>
                   <th className="w-16 py-1 text-center font-normal">1</th>
                   <th className="w-16 py-1 text-center font-normal">2</th>
@@ -564,7 +564,7 @@ export function GameRunner({
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <div className="flex flex-col gap-4">
           <div className={`${cardClass("inset")} p-4 sm:p-5`}>
-            <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">
+            <p className="font-sans text-xs tracking-widest text-pink-soft uppercase">
               {halfLabel(call.team, call.inning)} · {TEAMS[call.team].name} batting · batter {call.n} of {GAME_PLAYS}
             </p>
             {call.call.map((line, i) => (

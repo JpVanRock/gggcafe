@@ -185,7 +185,7 @@ export function PopDetail({
               <li key={e.area} className="rounded-lg border border-navy-700 p-3">
                 <div className="flex items-baseline justify-between">
                   <span className="text-sm capitalize">{e.area.replaceAll("_", " ")}</span>
-                  <span className="font-mono text-highlight" aria-label={`${e.rating} out of 5`}>
+                  <span className="font-sans text-highlight" aria-label={`${e.rating} out of 5`}>
                     {"●".repeat(e.rating)}
                     <span className="text-navy-600">{"●".repeat(5 - e.rating)}</span>
                   </span>

@@ -49,7 +49,7 @@ function PlanCard({ plan, viewOnly = false }: { plan: PlanRow; viewOnly?: boolea
         className={`${cardClass("raised")} flex items-center gap-4 p-4 transition hover:border-pink hover:bg-navy-800`}
       >
         <div className="w-16 shrink-0 text-center">
-          <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">{weekday}</p>
+          <p className="font-sans text-xs tracking-widest text-pink-soft uppercase">{weekday}</p>
           <p className="font-display text-lg leading-tight font-bold text-highlight tabular-nums">{rest.join(", ")}</p>
         </div>
         <div className="min-w-0 flex-1 border-l border-navy-700 pl-4">
@@ -68,7 +68,7 @@ function PlanCard({ plan, viewOnly = false }: { plan: PlanRow; viewOnly?: boolea
         </div>
         <span className="flex shrink-0 flex-col items-end gap-1">
           <StatusChip plan={plan} />
-          {viewOnly && <span className="font-mono text-2xs tracking-wider text-muted uppercase">View only</span>}
+          {viewOnly && <span className="font-sans text-2xs tracking-wider text-muted uppercase">View only</span>}
         </span>
       </Link>
     </li>

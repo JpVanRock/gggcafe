@@ -181,7 +181,7 @@ export default async function MentorsPage({ searchParams }: PageProps<"/dugout/m
               <Card key={mentorId} title={who(mentorId)}>
                 <div className="flex flex-col gap-3">
                   <p className="flex flex-wrap items-baseline justify-between gap-2">
-                    <span className="font-mono text-xs tracking-wider text-pink-soft uppercase">{mentorOf(mentorId)?.specialty ?? "Mentor"}</span>
+                    <span className="font-sans text-xs tracking-wider text-pink-soft uppercase">{mentorOf(mentorId)?.specialty ?? "Mentor"}</span>
                     {admin && (
                       <Link href={`/view-as/mentor/${mentorId}`} className="text-xs font-semibold text-link hover:underline" aria-label={`View as ${who(mentorId)}`}>
                         View as <span aria-hidden="true">→</span>
@@ -250,7 +250,7 @@ export default async function MentorsPage({ searchParams }: PageProps<"/dugout/m
                   {[msg.body, msg.drill_name && `Drill: ${msg.drill_name}`, msg.photo_path && "Photo"].filter(Boolean).join(" · ")}
                 </span>
                 {admin && <Badge tone={msg.shared_with_coaches ? "pink" : "neutral"}>{msg.shared_with_coaches ? "Shared" : "Private"}</Badge>}
-                <span className="font-mono text-2xs tracking-wider text-muted uppercase">{msg.read_at ? "Seen" : "New"}</span>
+                <span className="font-sans text-2xs tracking-wider text-muted uppercase">{msg.read_at ? "Seen" : "New"}</span>
                 <ActionForm action={removeMentorMessage} className="flex items-center gap-2">
                   <input type="hidden" name="message_id" value={msg.id} />
                   <ConfirmSubmit message="Remove this message? The player won't see it any more." confirmLabel="Remove" tone="danger" className={buttonStyles("link", "text-xs text-muted")}>

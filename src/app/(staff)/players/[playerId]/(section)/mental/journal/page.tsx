@@ -37,7 +37,7 @@ export default async function JournalPage({ params, searchParams }: PageProps<"/
           <Link href={`/players/${player.id}/mental`} className="text-sm text-link hover:underline">
             ← Mental GP
           </Link>
-          <nav aria-label="Choose week" className="flex items-center gap-2 font-mono text-sm">
+          <nav aria-label="Choose week" className="flex items-center gap-2 font-sans text-sm">
             <Link href={href(addDays(monday, -7))} className={secondaryButtonClass} aria-label="Previous week">
               ←
             </Link>

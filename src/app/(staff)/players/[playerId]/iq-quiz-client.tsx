@@ -57,7 +57,7 @@ export function QuizRunner({ playerId, quizzes, canEdit }: { playerId: string; q
             <div>
               <div className="flex items-baseline justify-between gap-3">
                 <p className="font-bold tracking-wide uppercase">{quiz.label}</p>
-                <p className="font-mono text-lg font-bold text-highlight">{quiz.stats.pct === null ? "New" : `${quiz.stats.pct}%`}</p>
+                <p className="font-sans text-lg font-bold text-highlight">{quiz.stats.pct === null ? "New" : `${quiz.stats.pct}%`}</p>
               </div>
               <p className="mt-1 text-xs text-muted">
                 {quiz.stats.mastered}/{quiz.stats.total} mastered · {quiz.stats.answered} answered
@@ -82,7 +82,7 @@ export function QuizRunner({ playerId, quizzes, canEdit }: { playerId: string; q
   if (done) {
     return (
       <div className="rounded-xl border border-neon-edge bg-neon/10 p-6 text-center">
-        <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">{run.label}</p>
+        <p className="font-sans text-xs tracking-widest text-pink-soft uppercase">{run.label}</p>
         <p className="mt-2 text-4xl font-bold text-highlight">
           {score}/{run.questions.length}
         </p>
@@ -114,7 +114,7 @@ export function QuizRunner({ playerId, quizzes, canEdit }: { playerId: string; q
 
   return (
     <div className={`${cardClass("inset")} p-4 sm:p-6`}>
-      <div className="flex items-center justify-between gap-3 font-mono text-xs tracking-widest text-muted uppercase">
+      <div className="flex items-center justify-between gap-3 font-sans text-xs tracking-widest text-muted uppercase">
         <span className="text-pink-soft">{run.label}</span>
         <span>
           Question {index + 1} of {run.questions.length} · {score} right
@@ -141,7 +141,7 @@ export function QuizRunner({ playerId, quizzes, canEdit }: { playerId: string; q
                       : "border-navy-600 hover:border-pink disabled:hover:border-navy-600"
                 }`}
               >
-                <span className={`font-mono font-bold ${isCorrect ? "text-highlight" : isWrongPick ? "text-pink-soft" : "text-muted"}`}>
+                <span className={`font-sans font-bold ${isCorrect ? "text-highlight" : isWrongPick ? "text-pink-soft" : "text-muted"}`}>
                   {LETTERS[i]}
                 </span>
                 <span>{choice}</span>
@@ -257,7 +257,7 @@ export function IqQuestionForm({ question }: { question?: IqQuestion }) {
               aria-label={`Choice ${LETTERS[i]} is correct`}
               className="size-4 accent-pink"
             />
-            <span className="w-4 font-mono text-sm text-muted">{LETTERS[i]}</span>
+            <span className="w-4 font-sans text-sm text-muted">{LETTERS[i]}</span>
             <input
               name={`choice_${i}`}
               required={i < 2}

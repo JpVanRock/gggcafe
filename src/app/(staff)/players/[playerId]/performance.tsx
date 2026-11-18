@@ -77,7 +77,7 @@ export function PerformanceSummary({ summary }: { summary: Summary }) {
         <p className="text-sm text-[var(--menu-note)]">No routines yet. Your coach&apos;s show up here, and you can add your own.</p>
       )}
       <div className="mt-6 flex flex-wrap items-center gap-2">
-        <span className="font-mono text-xs tracking-wider text-muted uppercase">
+        <span className="font-sans text-xs tracking-wider text-muted uppercase">
           {unlocked.length}/{summary.achievements.length} achievements
           {summary.streak.current > 0 && ` · ${summary.streak.current}-week streak`}
         </span>
@@ -104,7 +104,7 @@ export function HexBadge({ unlocked, pct }: { unlocked: boolean; pct: number }) 
       {unlocked ? (
         <path d="m13 22.5 5 5 9-10" fill="none" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="stroke-on-accent" />
       ) : (
-        <text x="20" y="26" textAnchor="middle" className="fill-muted font-mono text-2xs font-bold">
+        <text x="20" y="26" textAnchor="middle" className="fill-muted font-sans text-2xs font-bold">
           {pct}%
         </text>
       )}
@@ -133,7 +133,7 @@ function AchievementBadge({ a }: { a: AchievementProgress }) {
           <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-navy-800" aria-hidden>
             <div className="h-full rounded-full bg-pink" style={{ width: `${(a.current / a.target) * 100}%` }} />
           </div>
-          <span className="font-mono text-2xs text-muted tabular-nums">
+          <span className="font-display text-2xs text-muted tabular-nums">
             {a.current}/{a.target}
           </span>
         </div>
@@ -177,7 +177,7 @@ function RoutineCard({ r, today, canEdit, playerId }: { r: RoutineRow; today: st
           </div>
         )}
       </div>
-      {r.details && <p className="mt-2 font-mono text-sm text-highlight">{r.details}</p>}
+      {r.details && <p className="mt-2 font-sans text-sm text-highlight">{r.details}</p>}
       {r.drill?.description && <p className="mt-1.5 text-sm text-ink/85">{r.drill.description}</p>}
       {r.drill?.equipment && <p className="mt-1 text-xs text-muted">Equipment: {r.drill.equipment}</p>}
       {r.drill?.video_url && (
@@ -225,7 +225,7 @@ export function PerformanceDetail({
       <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {stats.map(([label, value]) => (
           <div key={label} className="rounded-xl border border-navy-700 p-3">
-            <dt className="font-mono text-2xs tracking-wider text-muted uppercase">{label}</dt>
+            <dt className="font-sans text-2xs tracking-wider text-muted uppercase">{label}</dt>
             <dd className="mt-1 text-2xl font-bold text-highlight tabular-nums">{value}</dd>
           </div>
         ))}
@@ -250,7 +250,7 @@ export function PerformanceDetail({
                       <span className="ml-1 text-xs font-normal text-muted">{r.test.unit}</span>
                     </span>
                     {change !== null && change !== 0 && (
-                      <span className={`ml-2 font-mono text-xs ${better ? "text-highlight" : "text-muted"}`}>
+                      <span className={`ml-2 font-sans text-xs ${better ? "text-highlight" : "text-muted"}`}>
                         {change > 0 ? "+" : ""}
                         {change} since last
                       </span>

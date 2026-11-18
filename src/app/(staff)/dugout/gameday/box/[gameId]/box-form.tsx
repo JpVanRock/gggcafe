@@ -15,7 +15,7 @@ import { saveBoxScore } from "../../actions";
 // these small inputs set their own width (fieldClass has none)
 const base = fieldClass;
 const cell = `${base} w-11 px-1 py-1 text-center text-sm tabular-nums`;
-const th = "px-0.5 pb-1 text-center font-mono text-2xs font-bold tracking-wider text-muted uppercase";
+const th = "px-0.5 pb-1 text-center font-sans text-2xs font-bold tracking-wider text-muted uppercase";
 
 function Num({ value, onChange, label, max = 99 }: { value: number; onChange: (n: number) => void; label: string; max?: number }) {
   return (
@@ -116,7 +116,7 @@ export function BoxScoreForm({
           <table className="text-sm">
             <thead>
               <tr>
-                <th className="pr-2 pb-1 text-left font-mono text-2xs font-bold tracking-wider text-muted uppercase">Player</th>
+                <th className="pr-2 pb-1 text-left font-sans text-2xs font-bold tracking-wider text-muted uppercase">Player</th>
                 {BATTING_COLUMNS.map((k) => (
                   <th key={k} className={th}>
                     {BATTING_LABEL[k]}
@@ -192,7 +192,7 @@ export function BoxScoreForm({
             <table className="text-sm">
               <thead>
                 <tr>
-                  <th className="pr-2 pb-1 text-left font-mono text-2xs font-bold tracking-wider text-muted uppercase">Pitcher</th>
+                  <th className="pr-2 pb-1 text-left font-sans text-2xs font-bold tracking-wider text-muted uppercase">Pitcher</th>
                   <th className={th}>IP</th>
                   {PITCHING_COLUMNS.map((k) => (
                     <th key={k} className={th}>
@@ -274,7 +274,7 @@ export function BoxScoreForm({
           <table className="text-sm">
             <thead>
               <tr>
-                <th className="pr-2 pb-1 text-left font-mono text-2xs font-bold tracking-wider text-muted uppercase">Player</th>
+                <th className="pr-2 pb-1 text-left font-sans text-2xs font-bold tracking-wider text-muted uppercase">Player</th>
                 {FIELDING_COLUMNS.map((k) => (
                   <th key={k} className={th}>
                     {FIELDING_LABEL[k]}

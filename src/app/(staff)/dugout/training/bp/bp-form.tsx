@@ -58,7 +58,7 @@ export function BpRoundForm({ players, today }: { players: { id: string; short: 
           ))}
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
-          <span className="font-mono tabular-nums">
+          <span className="font-display tabular-nums">
             {summary.graded} swing{summary.graded === 1 ? "" : "s"}
             {summary.production !== null && ` · production ${summary.production.toFixed(2)}`}
           </span>
@@ -73,7 +73,7 @@ export function BpRoundForm({ players, today }: { players: { id: string; short: 
             </>
           )}
         </div>
-        {swings.length > 0 && <p className="mt-1 font-mono text-xs tracking-wider break-all text-muted">{swings.join(" ")}</p>}
+        {swings.length > 0 && <p className="mt-1 font-sans text-xs tracking-wider break-all text-muted">{swings.join(" ")}</p>}
       </div>
       <div className="flex items-center gap-4">
         <SubmitButton disabled={swings.length === 0}>Save round</SubmitButton>

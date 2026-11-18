@@ -90,7 +90,7 @@ export default async function BoxScorePage({ params, searchParams }: PageProps<"
         ← Box scores · {team.name}
       </Link>
       <header>
-        <p className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">{team.name} · Box score</p>
+        <p className="font-sans text-xs tracking-[0.25em] text-pink-soft uppercase">{team.name} · Box score</p>
         <h2 className="mt-1 text-3xl leading-tight font-bold tracking-tight text-highlight uppercase">
           {home ? "vs" : "@"} {opponent}
         </h2>

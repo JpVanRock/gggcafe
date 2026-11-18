@@ -24,7 +24,7 @@ export function SectionTitle({ title, line, action, children }: { title: string;
         <span aria-hidden="true">←</span> Family menu
       </Link>
       <header>
-        <p className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">Family menu</p>
+        <p className="font-sans text-xs tracking-[0.25em] text-pink-soft uppercase">Family menu</p>
         <div className="mt-1 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
           <h1 className="text-4xl leading-none font-bold tracking-tight text-highlight uppercase sm:text-5xl">{title}</h1>
           {action}

@@ -76,7 +76,7 @@ export function BullpenRunner({ playerId, scriptId, pitches, canEdit, backHref }
       <div className="h-1.5 w-full max-w-md overflow-hidden rounded-full bg-navy-800" aria-hidden>
         <div className="h-full bg-linear-to-r from-pink to-neon" style={{ width: `${(i / pitches.length) * 100}%` }} />
       </div>
-      <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">
+      <p className="font-sans text-xs tracking-widest text-pink-soft uppercase">
         Pitch {i + 1} of {pitches.length}
         {p.count ? ` · Count ${p.count}` : ""}
       </p>

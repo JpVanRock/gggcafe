@@ -49,7 +49,7 @@ export function Modal({
           <header className="flex items-start justify-between gap-4 border-b border-navy-700 px-5 py-4 sm:px-6">
             <div>
               <h2 className="text-xl font-semibold uppercase tracking-[0.08em] text-highlight">{title}</h2>
-              {subtitle && <p className="mt-1 font-mono text-xs uppercase tracking-wider text-pink-soft">{subtitle}</p>}
+              {subtitle && <p className="mt-1 font-sans text-xs uppercase tracking-wider text-pink-soft">{subtitle}</p>}
             </div>
             <button
               type="button"

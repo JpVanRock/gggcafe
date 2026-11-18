@@ -90,7 +90,7 @@ export function ShareButton({
           <header className="flex items-start justify-between gap-4 border-b border-navy-700 px-5 py-4">
             <div>
               <h2 className="text-xl font-semibold tracking-[0.08em] text-highlight uppercase">Share with coaches</h2>
-              <p className="mt-1 font-mono text-xs tracking-wider text-pink-soft uppercase">
+              <p className="mt-1 font-sans text-xs tracking-wider text-pink-soft uppercase">
                 {emailReady ? "Emailed with the PDF attached" : "Opens your email app"}
               </p>
             </div>

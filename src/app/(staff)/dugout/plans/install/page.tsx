@@ -160,7 +160,7 @@ export default async function InstallPage({ searchParams }: PageProps<"/dugout/p
               <div className="bg-pink" style={{ width: `${(progress.repped / progress.total) * 100}%` }} />
               <div className="bg-pink/40" style={{ width: `${(progress.taught / progress.total) * 100}%` }} />
             </div>
-            <p className="mt-2 font-mono text-xs text-muted">
+            <p className="mt-2 font-sans text-xs text-muted">
               {progress.game_ready} game-ready · {progress.repped} repped · {progress.taught} taught · {progress.not_started} not started ({progress.readyPct}% ready)
             </p>
           </div>
@@ -217,7 +217,7 @@ export default async function InstallPage({ searchParams }: PageProps<"/dugout/p
                     <article key={g.group} className="rounded-2xl border border-navy-700 bg-navy-900/70 p-4">
                       <header className="flex items-baseline justify-between gap-3">
                         <h3 className="font-display text-lg font-bold text-ink">{g.group}</h3>
-                        <span className="font-mono text-xs text-muted tabular-nums">
+                        <span className="font-display text-xs text-muted tabular-nums">
                           {ready}/{g.items.length} game-ready
                         </span>
                       </header>

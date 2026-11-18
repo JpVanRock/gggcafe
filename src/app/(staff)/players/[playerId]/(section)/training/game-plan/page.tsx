@@ -33,7 +33,7 @@ export default async function GamePlanPage({ params }: PageProps<"/players/[play
         <p className="flex flex-wrap items-baseline gap-x-3">
           <span className="font-display text-lg font-bold tracking-wide uppercase">vs {g.opponent}</span>
           <span className="text-sm text-muted">{g.game_date === today ? "Today" : formatDay(g.game_date)}</span>
-          {plan?.strike_pct != null && <span className="font-mono text-xs text-highlight">{plan.strike_pct}% strikes</span>}
+          {plan?.strike_pct != null && <span className="font-sans text-xs text-highlight">{plan.strike_pct}% strikes</span>}
         </p>
         {plan && (
           <dl className="mt-2 grid gap-x-6 gap-y-1 text-sm sm:grid-cols-2">

@@ -82,7 +82,7 @@ export function MeasurementsBySeason({
                 key={y}
                 href={`${basePath}?year=${y}`}
                 aria-current={y === year ? "page" : undefined}
-                className={`rounded-full border px-3 py-1 font-mono text-2xs tracking-wider ${y === year ? "border-pink text-ink" : "border-navy-600 text-muted hover:border-pink"}`}
+                className={`rounded-full border px-3 py-1 font-sans text-2xs tracking-wider ${y === year ? "border-pink text-ink" : "border-navy-600 text-muted hover:border-pink"}`}
               >
                 {yearLabel(y)}
               </Link>

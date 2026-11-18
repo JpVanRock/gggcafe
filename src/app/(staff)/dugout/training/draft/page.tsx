@@ -65,7 +65,7 @@ export default async function DraftPage({ searchParams }: PageProps<"/dugout/tra
         <>
           {remaining.length > 0 && clock ? (
             <section className="flex flex-col gap-4 rounded-2xl border-2 border-neon-edge p-5">
-              <p className="font-mono text-xs tracking-[0.3em] text-pink-soft uppercase">On the clock · pick {picks + 1}</p>
+              <p className="font-sans text-xs tracking-[0.3em] text-pink-soft uppercase">On the clock · pick {picks + 1}</p>
               <p className="font-display text-4xl leading-none font-bold tracking-tight text-highlight uppercase">{clock.name}</p>
               <p className="text-sm text-muted">Captain {nameOf.get(clock.captain_id) ?? ""}. Tap the player she picks.</p>
               <ul className="flex flex-wrap gap-2">
@@ -93,13 +93,13 @@ export default async function DraftPage({ searchParams }: PageProps<"/dugout/tra
               {standings.map((s) => (
                 <li key={s.id} className={`rounded-2xl border p-4 ${clock?.id === s.id && remaining.length ? "border-neon-edge" : "border-navy-600"}`}>
                   <p className="font-display text-xl font-bold tracking-wide uppercase">{s.name}</p>
-                  <p className="font-mono text-xs text-muted">
+                  <p className="font-sans text-xs text-muted">
                     {s.points} pts · {s.weekPoints} this week
                   </p>
                   <ol className="mt-3 flex flex-col gap-1 text-sm">
                     {s.members.map((id, i) => (
                       <li key={id} className="flex gap-2">
-                        <span className="w-4 text-right font-mono text-xs text-muted">{i === 0 ? "C" : i}</span>
+                        <span className="w-4 text-right font-sans text-xs text-muted">{i === 0 ? "C" : i}</span>
                         <span>{nameOf.get(id) ?? "Off the roster"}</span>
                       </li>
                     ))}

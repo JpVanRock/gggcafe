@@ -36,7 +36,7 @@ export default async function ScorebookGamesPage({ params }: PageProps<"/players
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">How to Keep the Book · Extra credit</p>
+          <p className="font-sans text-xs tracking-widest text-pink-soft uppercase">How to Keep the Book · Extra credit</p>
           <h2 className="mt-1 font-display text-3xl font-bold tracking-wide text-highlight uppercase">Keep the book for real games</h2>
         </div>
         <Link href={`/players/${player.id}/iq`} className="text-sm text-link hover:underline">
@@ -71,7 +71,7 @@ export default async function ScorebookGamesPage({ params }: PageProps<"/players
         book takes 12 of {GAME_PLAYS} right on the first try and the right line score, and opens the next game.
       </p>
       <ProgressBar value={clean} max={GAME_COUNT} label={`${clean} of ${GAME_COUNT} clean books`} />
-      <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">
+      <p className="font-sans text-xs tracking-widest text-pink-soft uppercase">
         {!found.has("world-series")
           ? "A clean book unlocks something. That's all we're saying."
           : !found.has("all-ten")
@@ -88,7 +88,7 @@ export default async function ScorebookGamesPage({ params }: PageProps<"/players
                 <span className="block text-sm font-semibold text-ink">
                   {LEAGUE[game.visitors].name} at {LEAGUE[game.home].name}
                 </span>
-                <span className={`block font-mono text-2xs tracking-wider uppercase ${g.status === "clean" ? "text-highlight" : "text-muted"}`}>
+                <span className={`block font-sans text-2xs tracking-wider uppercase ${g.status === "clean" ? "text-highlight" : "text-muted"}`}>
                   {statusLine(g)}
                 </span>
               </span>

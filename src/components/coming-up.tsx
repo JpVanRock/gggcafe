@@ -34,9 +34,9 @@ export function ComingUpCard({
           <h2 id="coming-up" className="text-3xl leading-none font-bold tracking-wide text-highlight uppercase sm:text-4xl">
             Coming up
           </h2>
-          <p className="mt-2 font-mono text-xs tracking-[0.2em] text-pink-soft uppercase">{subtitle}</p>
+          <p className="mt-2 font-sans text-xs tracking-[0.2em] text-pink-soft uppercase">{subtitle}</p>
         </div>
-        <Link href={calendarHref} className="font-mono text-xs tracking-widest text-highlight uppercase hover:underline">
+        <Link href={calendarHref} className="font-sans text-xs tracking-widest text-highlight uppercase hover:underline">
           Full calendar <span aria-hidden="true">→</span>
         </Link>
       </div>

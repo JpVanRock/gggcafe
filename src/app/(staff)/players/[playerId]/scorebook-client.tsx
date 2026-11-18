@@ -40,7 +40,7 @@ function LessonCheck({ check }: { check: NonNullable<Step["check"]> }) {
           return (
             <li key={i}>
               <button type="button" disabled={chosen !== null} onClick={() => setChosen(i)} className={choiceClass(state)}>
-                <span className="font-mono font-bold text-muted">{LETTERS[i]}</span>
+                <span className="font-sans font-bold text-muted">{LETTERS[i]}</span>
                 <span>{c}</span>
                 {state === "right" && <span className="ml-auto font-bold text-highlight">✓</span>}
               </button>
@@ -110,7 +110,7 @@ function Explore({ items }: { items: NonNullable<Step["explore"]> }) {
             type="button"
             aria-pressed={k === i}
             onClick={() => setI(k)}
-            className={`rounded-full border px-3 py-1 font-mono text-2xs tracking-wider uppercase ${
+            className={`rounded-full border px-3 py-1 font-sans text-2xs tracking-wider uppercase ${
               k === i ? "border-pink bg-pink/15 text-ink" : "border-navy-600 text-muted hover:border-pink"
             }`}
           >
@@ -278,7 +278,7 @@ export function ChapterRunner({
   const heading = (
     <div className="flex flex-wrap items-end justify-between gap-3">
       <div>
-        <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">
+        <p className="font-sans text-xs tracking-widest text-pink-soft uppercase">
           How to Keep the Book · Chapter {n} of {CHAPTER_COUNT}
         </p>
         <h2 className="mt-1 font-display text-3xl font-bold tracking-wide text-highlight uppercase">{chapter.title}</h2>
@@ -301,7 +301,7 @@ export function ChapterRunner({
       <div className="flex flex-col gap-5">
         {heading}
         <div className={`rounded-xl border p-6 text-center ${result.passed ? "border-neon-edge bg-neon/10" : "border-pink/60 bg-pink/5"}`}>
-          <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">Chapter {n} quiz</p>
+          <p className="font-sans text-xs tracking-widest text-pink-soft uppercase">Chapter {n} quiz</p>
           {result.passed && (
             <div className="mt-4 flex justify-center">
               <ManagerAward name={plate.name} number={plate.number} year={new Date().getFullYear()} chapter={`Chapter ${n} · ${chapter.short}`} size={260} />
@@ -352,7 +352,7 @@ export function ChapterRunner({
         {heading}
         <div className={`${cardClass("inset")} p-4 sm:p-6`}>
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <span className="font-mono text-xs tracking-widest text-pink-soft uppercase">Chapter {n} quiz</span>
+            <span className="font-sans text-xs tracking-widest text-pink-soft uppercase">Chapter {n} quiz</span>
             <button type="button" onClick={() => setMode("ready")} className={secondaryButtonClass}>
               Save &amp; exit
             </button>
@@ -370,7 +370,7 @@ export function ChapterRunner({
                     return (
                       <li key={i}>
                         <button type="button" disabled={Boolean(feedback) || pending || !canEdit} onClick={() => answer(i)} className={choiceClass(state)}>
-                          <span className={`font-mono font-bold ${state === "right" ? "text-highlight" : state === "wrong" ? "text-pink-soft" : "text-muted"}`}>
+                          <span className={`font-sans font-bold ${state === "right" ? "text-highlight" : state === "wrong" ? "text-pink-soft" : "text-muted"}`}>
                             {LETTERS[i]}
                           </span>
                           <span>{choice}</span>
@@ -413,7 +413,7 @@ export function ChapterRunner({
         <div className={`${cardClass("inset")} flex flex-wrap items-center gap-6 p-6`}>
           <ManagerAward name={plate.name} earned={Boolean(earnedOn)} engrave={false} size={120} />
           <div className="min-w-56 flex-1">
-            <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">Lessons done</p>
+            <p className="font-sans text-xs tracking-widest text-pink-soft uppercase">Lessons done</p>
             <p className="mt-1 text-xl font-bold">Chapter {n} quiz</p>
             <p className="mt-1 text-sm text-muted">
               {QUIZ_LENGTH} questions on this chapter. Score {PASS_PCT}% or better ({Math.ceil((QUIZ_LENGTH * PASS_PCT) / 100)} of {QUIZ_LENGTH}) to

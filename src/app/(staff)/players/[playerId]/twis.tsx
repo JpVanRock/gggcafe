@@ -52,7 +52,7 @@ export function TwisBoard({
           <h2 id="twis-title" className="text-4xl leading-none font-bold tracking-wide text-highlight uppercase sm:text-5xl">
             TWIS
           </h2>
-          <p className="mt-2 font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">This Week in Softball</p>
+          <p className="mt-2 font-sans text-xs tracking-[0.25em] text-pink-soft uppercase">This Week in Softball</p>
           {week.phase && (
             <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1" title={week.phase.focus ?? undefined}>
               <span className={badgeClass("neonOutline")}>
@@ -62,7 +62,7 @@ export function TwisBoard({
             </p>
           )}
         </div>
-        <nav aria-label="Choose week" className="flex flex-wrap items-center gap-2 font-mono text-sm">
+        <nav aria-label="Choose week" className="flex flex-wrap items-center gap-2 font-sans text-sm">
           <Link href={href(addDays(week.monday, -7))} className={secondaryButtonClass} aria-label="Previous week">
             ←
           </Link>

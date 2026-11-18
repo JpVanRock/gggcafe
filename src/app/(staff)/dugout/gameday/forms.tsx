@@ -56,7 +56,7 @@ export function CardsForm({ teamId, seasonId, players }: { teamId: string; seaso
                 <td className="py-2 pr-3 max-sm:col-span-6 max-sm:p-0">
                   <input type="hidden" name="player_id" value={p.id} />
                   <span className="font-semibold">{p.short}</span>
-                  {p.positions.length > 0 && <span className="ml-2 font-mono text-2xs text-muted">{p.positions.join(" ")}</span>}
+                  {p.positions.length > 0 && <span className="ml-2 font-sans text-2xs text-muted">{p.positions.join(" ")}</span>}
                 </td>
                 <td className="py-2 pr-3 max-sm:col-span-3 max-sm:p-0">
                   <span className="mb-1 block text-2xs font-semibold tracking-wider text-muted uppercase sm:hidden">Hitting type</span>

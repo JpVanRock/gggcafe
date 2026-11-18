@@ -64,7 +64,7 @@ export default async function LineupPage({ params, searchParams }: PageProps<"/d
           <header className="flex flex-col gap-4 rounded-2xl border border-navy-700 bg-navy-900/70 p-5 sm:p-6">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">{lineup.team.name} · Lineup</p>
+                <p className="font-sans text-xs tracking-[0.25em] text-pink-soft uppercase">{lineup.team.name} · Lineup</p>
                 <h2 className="mt-1 text-3xl leading-tight font-bold tracking-tight text-highlight uppercase">
                   {lineup.opponent ? `vs ${lineup.opponent}` : formatLongDate(lineup.game_date)}
                 </h2>
@@ -121,7 +121,7 @@ export default async function LineupPage({ params, searchParams }: PageProps<"/d
                       <span className="w-6 font-display text-lg font-bold text-highlight tabular-nums">{i + 1}</span>
                       <span className="min-w-0 flex-1">
                         <span className="font-semibold">{p?.short ?? "Player"}</span>
-                        {id === lineup.dp_player_id && lineup.flex_player_id && <span className="ml-1.5 font-mono text-2xs font-bold text-pink-soft">DP</span>}
+                        {id === lineup.dp_player_id && lineup.flex_player_id && <span className="ml-1.5 font-sans text-2xs font-bold text-pink-soft">DP</span>}
                         <span className="ml-2 text-xs text-muted">
                           {[p?.hitting_type && HITTING_TYPE_LABEL[p.hitting_type], p?.base_running && BASE_RUNNING_LABEL[p.base_running]].filter(Boolean).join(" · ")}
                         </span>

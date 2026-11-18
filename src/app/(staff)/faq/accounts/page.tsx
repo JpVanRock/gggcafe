@@ -20,7 +20,7 @@ function Mark({ level, who }: { level: Level; who: string }) {
   return (
     <span className="inline-flex flex-col items-center gap-0.5">
       <Softball size={22} label={`${who}: ${SAYS[level]}`} />
-      {TAG[level] && <span className="font-mono text-2xs leading-none tracking-wider text-pink-soft uppercase">{TAG[level]}</span>}
+      {TAG[level] && <span className="font-sans text-2xs leading-none tracking-wider text-pink-soft uppercase">{TAG[level]}</span>}
     </span>
   );
 }
@@ -77,7 +77,7 @@ export default async function AccountTypesPage() {
             <tr>
               <th className={`px-4 py-3 text-left text-muted ${groupLabelClass}`}>Feature</th>
               {ACCOUNT_TYPES.map((t) => (
-                <th key={t.key} className="w-20 px-1 py-3 text-center font-mono text-2xs font-bold tracking-[0.1em] text-highlight uppercase sm:w-24">
+                <th key={t.key} className="w-20 px-1 py-3 text-center font-sans text-2xs font-bold tracking-[0.1em] text-highlight uppercase sm:w-24">
                   {t.label.split(" ").map((w) => (
                     <span key={w} className="block">
                       {w}

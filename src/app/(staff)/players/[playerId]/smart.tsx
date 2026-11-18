@@ -52,7 +52,7 @@ export function SmartSummary({ goals, metrics }: { goals: SmartGoal[]; metrics: 
           );
         })}
       </div>
-      <p className="mt-5 font-mono text-xs tracking-wider uppercase opacity-75">
+      <p className="mt-5 font-sans text-xs tracking-wider uppercase opacity-75">
         {active.length} active{achieved ? ` · ${achieved} achieved` : ""}
       </p>
     </div>
@@ -87,7 +87,7 @@ function SmartGoalCard({
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h4 className={`text-lg font-semibold ${done ? "text-muted" : "text-ink"}`}>{goal.title}</h4>
-          <p className="mt-0.5 font-mono text-xs tracking-wider text-muted uppercase">{SKILL_AREA_LABEL[goal.area as SkillArea]}</p>
+          <p className="mt-0.5 font-sans text-xs tracking-wider text-muted uppercase">{SKILL_AREA_LABEL[goal.area as SkillArea]}</p>
         </div>
         <span
           className={badgeClass(done ? "neon" : "pink")}
@@ -99,7 +99,7 @@ function SmartGoalCard({
       <dl className="mt-4 grid gap-2">
         {rows.map(([letter, label, value]) => (
           <div key={letter} className="grid grid-cols-[1.75rem_1fr] gap-2">
-            <dt className="font-mono text-lg leading-6 font-bold text-highlight" title={label}>
+            <dt className="font-sans text-lg leading-6 font-bold text-highlight" title={label}>
               {letter}
             </dt>
             <dd className="text-sm leading-6">

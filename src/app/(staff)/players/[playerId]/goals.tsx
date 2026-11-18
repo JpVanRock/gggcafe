@@ -17,7 +17,7 @@ export function GoalsSummary({ chart }: { chart: HaradaChart | null }) {
   return (
     <div>
       <p className="max-w-3xl text-xl leading-snug font-semibold sm:text-2xl">“{chart.main_goal}”</p>
-      <p className="mt-2 font-mono text-xs tracking-wider uppercase opacity-75">
+      <p className="mt-2 font-sans text-xs tracking-wider uppercase opacity-75">
         {chart.target_date && `By ${formatLongDate(chart.target_date)} · `}
         {done}/{total} actions done
       </p>
@@ -126,7 +126,7 @@ export function GoalsDetail({ playerId, chart, canEdit }: { playerId: string; ch
         <DetailHeading>Main goal</DetailHeading>
         <p className="text-2xl leading-snug font-semibold text-highlight">{chart.main_goal}</p>
         {chart.purpose && <p className="mt-3 max-w-3xl whitespace-pre-wrap text-ink/90">{chart.purpose}</p>}
-        <p className="mt-3 font-mono text-xs tracking-wider text-muted uppercase">
+        <p className="mt-3 font-sans text-xs tracking-wider text-muted uppercase">
           {chart.target_date && `Target ${formatLongDate(chart.target_date)} · `}
           {done}/{total} actions done
         </p>
@@ -147,7 +147,7 @@ export function GoalsDetail({ playerId, chart, canEdit }: { playerId: string; ch
               <div key={p.id} className={`${cardClass("inset")} p-4`}>
                 <div className="flex items-baseline justify-between gap-3">
                   <h4 className="font-semibold">{p.title}</h4>
-                  <span className="font-mono text-sm text-highlight tabular-nums">
+                  <span className="font-display text-sm text-highlight tabular-nums">
                     {p.actions.filter((a) => a.done_on).length}/{p.actions.length}
                   </span>
                 </div>

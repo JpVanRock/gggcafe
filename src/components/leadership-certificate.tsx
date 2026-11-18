@@ -57,7 +57,7 @@ export function LeadershipCertificate({
         <div className="absolute inset-[3.6cqw] flex flex-col items-center text-center">
           {/* the band */}
           <div className="flex h-[10cqw] w-full shrink-0 items-start justify-between px-[2.4cqw] pt-[2cqw]" style={{ background: NAVY }}>
-            <span className="font-mono text-[1.15cqw] font-bold tracking-[0.3em] uppercase" style={{ color: NEON }}>
+            <span className="font-sans text-[1.15cqw] font-bold tracking-[0.3em] uppercase" style={{ color: NEON }}>
               G3 Advanced
             </span>
             {/* eslint-disable-next-line @next/next/no-img-element -- printed sheet; plain img keeps the print sizing simple */}
@@ -76,10 +76,10 @@ export function LeadershipCertificate({
           <p className="mt-[2cqw] font-display text-[2.5cqw] leading-none font-bold tracking-[0.32em] uppercase">{text.title}</p>
           <span className="mt-[1.1cqw] h-[0.3cqw] w-[6cqw]" style={{ background: PINK }} />
 
-          <p className="mt-[1.8cqw] font-mono text-[1.15cqw] tracking-[0.3em] uppercase opacity-70">{text.presented}</p>
+          <p className="mt-[1.8cqw] font-sans text-[1.15cqw] tracking-[0.3em] uppercase opacity-70">{text.presented}</p>
           <p className="mt-[0.8cqw] font-display text-[6.2cqw] leading-none font-bold tracking-tight uppercase">{name}</p>
           {sub && (
-            <p className="mt-[0.9cqw] font-mono text-[1.35cqw] font-bold tracking-[0.2em] uppercase" style={{ color: PINK_TEXT }}>
+            <p className="mt-[0.9cqw] font-sans text-[1.35cqw] font-bold tracking-[0.2em] uppercase" style={{ color: PINK_TEXT }}>
               {sub}
             </p>
           )}
@@ -105,12 +105,12 @@ export function LeadershipCertificate({
             <div className="text-left">
               <div className="h-[5.4cqw]" />
               <div className="h-[0.12cqw]" style={{ background: NAVY }} />
-              <p className="mt-[0.5cqw] font-mono text-[0.95cqw] tracking-[0.25em] uppercase opacity-70">Head Coach signature</p>
+              <p className="mt-[0.5cqw] font-sans text-[0.95cqw] tracking-[0.25em] uppercase opacity-70">Head Coach signature</p>
               {coachName && <p className="mt-[0.2cqw] font-display text-[1.25cqw] font-semibold">{coachName}</p>}
             </div>
             <ol className="flex flex-col-reverse items-center gap-[0.25cqw]" aria-label="The leadership ladder">
               {rungs.map((r, i) => (
-                <li key={r} className="flex items-center gap-[0.6cqw] font-mono text-[0.8cqw] tracking-[0.15em] uppercase">
+                <li key={r} className="flex items-center gap-[0.6cqw] font-sans text-[0.8cqw] tracking-[0.15em] uppercase">
                   <span className="h-[0.25cqw] w-[2.4cqw]" style={{ background: i === rungs.length - 1 ? PINK : NAVY, opacity: 0.35 + (0.65 * (i + 1)) / rungs.length }} />
                   <span className="w-[19cqw] text-left opacity-80">{r}</span>
                 </li>
@@ -121,7 +121,7 @@ export function LeadershipCertificate({
                 <p className="font-display text-[1.6cqw] font-semibold tabular-nums">{date}</p>
               </div>
               <div className="h-[0.12cqw]" style={{ background: NAVY }} />
-              <p className="mt-[0.5cqw] font-mono text-[0.95cqw] tracking-[0.25em] uppercase opacity-70">Date</p>
+              <p className="mt-[0.5cqw] font-sans text-[0.95cqw] tracking-[0.25em] uppercase opacity-70">Date</p>
               {coachName && <p className="mt-[0.2cqw] text-[1.25cqw]">&nbsp;</p>}
             </div>
           </div>

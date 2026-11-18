@@ -240,7 +240,7 @@ export function CreditsSummary({ credits }: { credits: NonNullable<BudgetSummary
         <TableScroll label="Tournament credits">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-navy-700 text-left font-mono text-2xs tracking-[0.15em] text-muted uppercase">
+              <tr className="border-b border-navy-700 text-left font-sans text-2xs tracking-[0.15em] text-muted uppercase">
                 <th className="py-2 pr-3 font-semibold">Date</th>
                 <th className="py-2 pr-3 font-semibold">Tournament</th>
                 <th className="py-2 pr-3 text-right font-semibold">Won</th>

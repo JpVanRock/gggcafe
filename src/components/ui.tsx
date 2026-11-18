@@ -138,14 +138,14 @@ export function Spinner({ className = "" }: { className?: string }) {
 /** Small uppercase pink label for a card or section heading, echoing "CAFE" in the logo. */
 export const sectionLabelClass = "text-2xs font-semibold uppercase tracking-[0.14em] text-pink-soft";
 
-/** The typewriter kicker above a title or a group ("FROM THE DUGOUT", "PLAYER MENU"). */
-export const eyebrowClass = "font-mono text-2xs uppercase tracking-widest text-pink-soft";
+/** The spaced-caps kicker above a title or a group ("FROM THE DUGOUT", "PLAYER MENU"), in DM Sans. */
+export const eyebrowClass = "font-sans text-2xs uppercase tracking-widest text-pink-soft";
 
 /**
- * The label over a group, list or column ("UPCOMING", "WELCOME PACKET", "NOTES"): Space Mono caps, bold.
+ * The label over a group, list or column ("UPCOMING", "WELCOME PACKET", "NOTES"): DM Sans caps, bold, spaced.
  * Add its color (text-pink-soft, text-muted). Short labels only: a sentence goes in DM Sans.
  */
-export const groupLabelClass = "font-mono text-2xs font-bold uppercase tracking-[0.2em]";
+export const groupLabelClass = "font-sans text-2xs font-bold uppercase tracking-[0.2em]";
 
 export function Eyebrow({ children, className = "" }: { children: ReactNode; className?: string }) {
   return <p className={className ? `${eyebrowClass} ${className}` : eyebrowClass}>{children}</p>;
@@ -179,7 +179,7 @@ const BADGE_TONE: Record<BadgeTone, string> = {
  */
 export function badgeClass(tone: BadgeTone = "neutral", size: "sm" | "md" = "sm") {
   const box = size === "md" ? "min-h-8 px-2.5 py-1" : "px-1.5 py-0.5";
-  return `inline-flex items-center gap-1 rounded border ${box} font-mono text-2xs font-bold uppercase tracking-wider whitespace-nowrap ${BADGE_TONE[tone]}`;
+  return `inline-flex items-center gap-1 rounded border ${box} font-sans text-2xs font-bold uppercase tracking-wider whitespace-nowrap ${BADGE_TONE[tone]}`;
 }
 
 /** A short status word in a chip: FINAL, GAME-READY, VIEW ONLY. Two words at most. */
@@ -199,7 +199,7 @@ export function CountBadge({ count, label, tone = "pink" }: { count: number; lab
   if (!(count > 0)) return null;
   return (
     <span
-      className={`inline-grid h-5 min-w-5 place-items-center rounded-full px-1 font-mono text-2xs font-bold text-on-accent ${tone === "neon" ? "bg-neon" : "bg-pink"}`}
+      className={`inline-grid h-5 min-w-5 place-items-center rounded-full px-1 font-sans text-2xs font-bold text-on-accent ${tone === "neon" ? "bg-neon" : "bg-pink"}`}
       title={label}
     >
       <span aria-hidden>{count > 99 ? "99+" : count}</span>

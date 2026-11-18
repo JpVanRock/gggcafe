@@ -277,7 +277,7 @@ export default async function TeamPage({
             <ul className="divide-y divide-navy-800">
               {schedule.map((row) => (
                 <li key={row.key} className="flex flex-wrap items-center gap-x-4 gap-y-1 py-2.5 text-sm">
-                  <span className="w-28 shrink-0 font-mono text-xs text-highlight uppercase">{formatDay(row.date)}</span>
+                  <span className="w-28 shrink-0 font-sans text-xs text-highlight uppercase">{formatDay(row.date)}</span>
                   <span
                     className={badgeClass(row.tag === "Game" ? "neon" : row.tag === "Cancelled" ? "neutral" : "pinkSolid")}
                   >

@@ -15,6 +15,14 @@ strings. `tests/unit/ui-rules.test.ts` checks the rules marked **(tested)** on e
 
 Never `text-[10px]`/`text-[11px]` or other arbitrary sizes under 12px **(tested)**.
 
+## Fonts
+
+DM Sans for body, interface and every small label, kicker, chip and table header; Jost for titles, tables' numbers
+and anything `tabular-nums`. Space Mono was dropped (the user, 2026-11-18): `font-mono` is now the system monospace,
+nothing downloaded, and only for text someone types exactly (the username on Logins & Teams, the `/register` path on
+the Mentors tab, the team-code field on the mentor page) **(tested)**. A label that showed numbers in Space Mono with
+`tabular-nums` is Jost (`font-display`), since DM Sans has no tabular figures.
+
 ## Color by role
 
 `text-highlight` for emphasis, `text-link` for pink text and links (brand pink at night, a darker
@@ -37,9 +45,9 @@ the big outlined jersey number behind a name (faint pink at night, light by day 
 | `confirmAction(message, options?)` | | The same dialog from code: `if (!(await confirmAction("Remove this session?"))) return;`. Never `window.confirm` **(tested)**. |
 | `Badge` / `badgeClass(tone, size?)` | tone: `neutral` `ink` `pink` `pinkSolid` `neonOutline` `neon` `danger`; size `sm`/`md` | Status chips (Draft, Final, Game-ready). `md` (32px tall) for chips that are buttons. No hand-made chips **(tested)**. |
 | `CountBadge` | `count`, `label`, `tone?` | Round counts in menus and tabs. Nothing at 0, "99+" past 99; screen readers hear `label`. |
-| `Eyebrow` / `eyebrowClass` | | The typewriter kicker above a title or group. |
+| `Eyebrow` / `eyebrowClass` | | The spaced-caps kicker above a title or group. |
 | `sectionLabelClass` | | Card and section headings (what `Card` uses). |
-| `groupLabelClass` | | The bold Space Mono label over a group, list or column ("UPCOMING", "NOTES"); add its color (`text-pink-soft`, `text-muted`). These three are the only small-label recipes: a hand-written `font-mono text-2xs font-bold tracking-[0.2em]` fails `ui-rules`. Labels stay short; a rule or sentence goes under the label in DM Sans (`text-sm text-muted`), not in spaced-out capitals. |
+| `groupLabelClass` | | The bold DM Sans label over a group, list or column ("UPCOMING", "NOTES"); add its color (`text-pink-soft`, `text-muted`). These three are the only small-label recipes: a hand-written `font-mono text-2xs font-bold tracking-[0.2em]` fails `ui-rules`. Labels stay short; a rule or sentence goes under the label in DM Sans (`text-sm text-muted`), not in spaced-out capitals. |
 | `Card` | `title?`, `actions?`, `tone?` (`raised`/`inset`), `className?` | `rounded-xl`; `inset` for a box inside a card. |
 | `cardClass(tone)` | `raised` / `inset` | The same box for a tile, list item or form that isn't a titled `Card`; add your own padding. The cafe-menu boards (`rounded-2xl`) keep their own looks. |
 | `Disclosure` | `summary`, `open?` | A section that opens on tap. Flat (a divider above, no box), so it is never a card inside a card. |

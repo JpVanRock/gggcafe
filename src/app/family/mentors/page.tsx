@@ -76,7 +76,7 @@ async function FamilyMentors({ searchParams }: Pick<PageProps<"/family/mentors">
         <span aria-hidden="true">←</span> Family menu
       </Link>
       <header>
-        <p className="font-mono text-xs tracking-[0.25em] text-pink-soft uppercase">Mentors</p>
+        <p className="font-sans text-xs tracking-[0.25em] text-pink-soft uppercase">Mentors</p>
         <h1 className="mt-1 text-4xl leading-none font-bold tracking-tight text-highlight uppercase">{daughter.player_name}</h1>
         {daughters.length > 1 && (
           <nav aria-label="Daughter" className="mt-3 flex flex-wrap gap-1.5">
@@ -151,7 +151,7 @@ async function FamilyMentors({ searchParams }: Pick<PageProps<"/family/mentors">
                   )}
                 </span>
                 {m.shared_with_coaches && <Badge tone="pink">Shared with coaches</Badge>}
-                <span className="font-mono text-2xs tracking-wider text-muted uppercase">{m.read_at ? "Seen" : "Not seen yet"}</span>
+                <span className="font-sans text-2xs tracking-wider text-muted uppercase">{m.read_at ? "Seen" : "Not seen yet"}</span>
               </li>
             ))}
           </ul>

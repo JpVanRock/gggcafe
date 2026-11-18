@@ -28,7 +28,7 @@ export default async function ScorebookChapterPage({ params }: PageProps<"/playe
     <div className="rounded-2xl border border-navy-700 bg-navy-900 p-4 sm:p-6">
       {c.status === "locked" ? (
         <div className="flex flex-col gap-4">
-          <p className="font-mono text-xs tracking-widest text-pink-soft uppercase">How to Keep the Book · Chapter {n}</p>
+          <p className="font-sans text-xs tracking-widest text-pink-soft uppercase">How to Keep the Book · Chapter {n}</p>
           <h2 className="font-display text-3xl font-bold tracking-wide text-highlight uppercase">{c.title}</h2>
           <EmptyState>
             Chapter {n} opens once Chapter {n - 1} is complete.{" "}

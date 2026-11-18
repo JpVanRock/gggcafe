@@ -450,7 +450,7 @@ async function AssistantHome({ user, counts }: { user: StaffUser; counts: TileCo
                   <Link href={`/dugout/plans/${p.id}`} className="font-semibold hover:underline">
                     {when(p.practice_date, p.start_time)} · {p.focus ?? "Practice"}
                   </Link>
-                  <span className="font-mono text-2xs tracking-wider text-muted uppercase">
+                  <span className="font-sans text-2xs tracking-wider text-muted uppercase">
                     {canEditPlanRole(user.staff.role, user.id, p.created_by) ? "Yours" : "View only"} · {p.status}
                   </span>
                 </li>

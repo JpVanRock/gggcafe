@@ -132,7 +132,7 @@ export function CourseCard({ playerId, course, plate }: { playerId: string; cour
               </OutlineText>
               <span className="min-w-0 flex-1">
                 <span className={`block text-sm font-semibold ${locked ? "text-muted" : "text-ink"}`}>{c.title}</span>
-                <span className={`block font-mono text-2xs tracking-wider uppercase ${c.status === "complete" ? "text-highlight" : "text-muted"}`}>
+                <span className={`block font-sans text-2xs tracking-wider uppercase ${c.status === "complete" ? "text-highlight" : "text-muted"}`}>
                   {statusLine(c)}
                 </span>
               </span>
@@ -165,7 +165,7 @@ export function CourseCard({ playerId, course, plate }: { playerId: string; cour
                 </OutlineText>
                 <span className="min-w-0 flex-1">
                   <span className={`block text-sm font-semibold ${course.game.unlocked ? "text-ink" : "text-muted"}`}>Extra credit: keep the book for real games</span>
-                  <span className={`block font-mono text-2xs tracking-wider uppercase ${course.game.clean ? "text-highlight" : "text-pink-soft"}`}>
+                  <span className={`block font-sans text-2xs tracking-wider uppercase ${course.game.clean ? "text-highlight" : "text-pink-soft"}`}>
                     {gameLine(course.game)}
                   </span>
                 </span>

@@ -28,7 +28,7 @@ export function RosterChip({ player, count, selected, onTap }: { player: RosterP
       >
         <span className="w-8 shrink-0 font-display font-bold text-highlight tabular-nums">{player.number ? `#${player.number}` : "–"}</span>
         <span className="min-w-0 flex-1 truncate">{player.name}</span>
-        {player.primary && <span className="font-mono text-2xs text-muted">{player.primary}</span>}
+        {player.primary && <span className="font-sans text-2xs text-muted">{player.primary}</span>}
         <CountBadge count={count} label={`On the field ${count} time${count === 1 ? "" : "s"}`} tone="neon" />
       </button>
     </li>

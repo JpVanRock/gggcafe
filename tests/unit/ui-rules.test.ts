@@ -83,7 +83,7 @@ test("form fields get their edge and placeholder from fieldClass (3:1 edges, rea
 
 test("small group labels use groupLabelClass, not a hand-written copy", () => {
   // one recipe for the mono label over a group or list (design audit G1: it had drifted into ~70 copies)
-  assert.deepEqual(find(/font-mono text-2xs font-bold tracking-\[0\.2em\]/, (p) => p === "components/ui.tsx"), [], "use groupLabelClass from components/ui.tsx");
+  assert.deepEqual(find(/font-sans text-2xs font-bold tracking-\[0\.2em\]/, (p) => p === "components/ui.tsx"), [], "use groupLabelClass from components/ui.tsx");
 });
 
 test("neon edges use the neon-edge token (navy by day, where neon on white is 1.15:1)", () => {
@@ -92,6 +92,12 @@ test("neon edges use the neon-edge token (navy by day, where neon on white is 1.
 
 test("corners are rounded-2xl at most (no bubbly 3xl or 2rem radii on boards and cards)", () => {
   assert.deepEqual(find(/(?<![\w-])rounded(?:-[trblse]{1,2})?-(?:3xl|4xl|\[(?:[2-9]|1\.[5-9])\d*rem\])(?![\w-])/), [], "use rounded-2xl or less (CLAUDE.md, Design audience)");
+});
+
+test("monospace only for text people type exactly (labels are DM Sans; Space Mono was dropped)", () => {
+  // the user, 2026-11-18: small labels switch to DM Sans. Kept: a username, the /register path, a code field
+  const allowed = new Set(["app/family/logins/page.tsx", "app/(staff)/dugout/mentors/page.tsx", "app/mentor/mentor-client.tsx"]);
+  assert.deepEqual(find(/(?<![\w-])font-mono(?![\w-])/, (p) => allowed.has(p)), [], "use font-sans for labels (font-display for numbers)");
 });
 
 test("text on neon or pink fills is navy (text-on-accent)", () => {
@@ -111,6 +117,6 @@ test("colors by role, not by palette", () => {
 
 test("status chips and counts use Badge, badgeClass or CountBadge", () => {
   // a hand-made chip: a rounded box of tiny bold uppercase mono text
-  const chips = find(/className=["`{][^"`]*\brounded\b[^"`]*\bpx-(?:1|1\.5|2) py-(?:px|0\.5)\b[^"`]*\bfont-mono text-2xs font-bold\b[^"`]*/, (p) => p === "components/ui.tsx");
+  const chips = find(/className=["`{][^"`]*\brounded\b[^"`]*\bpx-(?:1|1\.5|2) py-(?:px|0\.5)\b[^"`]*\bfont-(?:mono|sans) text-2xs font-bold\b[^"`]*/, (p) => p === "components/ui.tsx");
   assert.deepEqual(chips, []);
 });
