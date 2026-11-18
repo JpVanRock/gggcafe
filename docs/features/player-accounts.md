@@ -24,8 +24,12 @@
 - Parental consent since 2026-11-16 (user; migration 20261117020138; legal.md "Consent by clicking Accept"): the parent
   reads the notice on Logins & Teams and clicks Accept (`ConsentAccept` in `family/consent.tsx`, `acceptParentalConsent`,
   `accept_parental_consent`): verified at once with their sign-in email, the time, IP address and browser; no admin
-  check, no printed form, no video call. The rest of this bullet is how it worked before, and what still handles older
-  requests.
+  check, no printed form, no video call. On phones the notice shows as short sections the parent taps to open (from
+  640px up, the whole notice in one box), with the exact `CONSENT_NOTICE` words, and the card is marked "Step 1 of 2 ·
+  then her login" (user, 2026-11-18, design audit P6); what Accept records is unchanged. The rest of this bullet is how it
+  worked before, and what still handles older requests. For those, on the Roster tab (`roster/consent-review.tsx`),
+  Verify works only once the admin has opened the signed form; when the form can't be opened, "Ask to upload again"
+  declines with a note asking the parent to upload it again (user, 2026-11-18, P8).
 - Verified parental consent for players under 13 (COPPA; user, 2026-11-11; migration 20261111235221_parental_consent):
   a parent-made login, and any approved profile claim, for a player under 13 (by her profile's birth date) needs a
   verified `parental_consents` row first. On /family (`family/consent.tsx`) the parent downloads the consent form

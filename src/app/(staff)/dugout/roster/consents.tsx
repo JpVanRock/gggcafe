@@ -1,11 +1,10 @@
 // Parental consents waiting for a GGG.Cafe admin (COPPA): the signed form (a link that expires)
-// or a video-call request, with Verify / Decline and a note. Admins only (the database returns
-// the list to admins and nobody else). Roster tab, "Waiting for approval".
-import { ActionForm } from "@/components/action-form";
-import { buttonClass, inputClass, secondaryButtonClass } from "@/components/ui";
+// or a video-call request, with Verify / Decline and a note (consent-review.tsx: Verify works only once
+// the signed form has been opened). Admins only (the database returns the list to admins and nobody
+// else). Roster tab, "Waiting for approval".
 import { RELATIONSHIP_LABEL, ageOn, type Relationship } from "@/lib/consent";
 import { formatLongDate, formatLongDateAt, todayISO } from "@/lib/dates";
-import { reviewParentalConsent } from "./actions";
+import { ConsentReview } from "./consent-review";
 
 export type PendingConsent = {
   id: string;
@@ -52,37 +51,14 @@ export function PendingConsentList({ consents, formUrls }: { consents: PendingCo
                 <dd className="break-all">{[c.parent_account, c.parent_email].filter(Boolean).join(" · ") || "–"}</dd>
               </div>
             </dl>
-            {video ? (
+            {video && (
               <p className="text-sm">
                 Asked for a <span className="font-semibold">video call</span>. Email the parent to set it up, check that the name matches their
                 photo ID (don&apos;t keep a copy), then verify with a note of the date and who you spoke with.
               </p>
-            ) : url ? (
-              <a href={url} target="_blank" rel="noopener" className="self-start text-sm font-semibold text-link underline underline-offset-2">
-                Open the signed form (link expires in 10 minutes)
-              </a>
-            ) : (
-              <p className="text-sm text-danger">The signed form couldn&apos;t be opened. Reload the page.</p>
             )}
-            {!video && (
-              <p className="text-xs text-muted">
-                Check: it&apos;s our form, signed by hand, the player&apos;s name matches, and the printed name matches the parent account.
-              </p>
-            )}
-            <ActionForm action={reviewParentalConsent} className="flex flex-wrap items-end gap-3">
-              <input type="hidden" name="consent_id" value={c.id} />
-              <label className="flex min-w-0 flex-1 basis-64 flex-col gap-1.5">
-                <span className="text-sm font-medium">{video ? "Note (required to verify or decline)" : "Note (required to decline; the parent sees it)"}</span>
-                <input name="note" maxLength={500} className={inputClass} />
-              </label>
-              {/* each named for her, so a list of buttons isn't "Verify, Decline, Verify, Decline" (design audit A7) */}
-              <button type="submit" name="decision" value="verify" aria-label={`Verify ${c.player_name}`} className={buttonClass}>
-                Verify
-              </button>
-              <button type="submit" name="decision" value="decline" aria-label={`Decline ${c.player_name}`} className={secondaryButtonClass}>
-                Decline
-              </button>
-            </ActionForm>
+            {/* the form link, the checks and Verify / Decline: Verify waits until the form has been opened (P8) */}
+            <ConsentReview id={c.id} playerName={c.player_name} video={video} url={url} />
           </li>
         );
       })}

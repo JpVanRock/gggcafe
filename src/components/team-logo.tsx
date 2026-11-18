@@ -5,8 +5,11 @@
 import { Suspense, type ReactNode } from "react";
 import { myTeamLogo, type TeamLogo } from "@/lib/team-logos";
 
-/** Twice the first size (user, 2026-11-13), then 20% smaller (user, 2026-11-14): 104px on phones, 152px from tablets up. */
-const LOGO_SIZE = "h-26 w-26 sm:h-38 sm:w-38";
+/**
+ * Twice the first size (user, 2026-11-13), then 20% smaller (user, 2026-11-14): 152px from tablets up. On phones
+ * 64px (user, 2026-11-18, design audit N1b: at 104px it pushed the page's work down a phone screen).
+ */
+const LOGO_SIZE = "h-16 w-16 sm:h-38 sm:w-38";
 
 export function TeamLogoMark({ logo, className = "", sizeClass = LOGO_SIZE }: { logo: TeamLogo | null; className?: string; sizeClass?: string }) {
   if (!logo) return null;

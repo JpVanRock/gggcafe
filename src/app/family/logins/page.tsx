@@ -39,14 +39,6 @@ async function FamilyLogins() {
       <SectionTitle
         title="Logins & teams"
         line="Your daughter's login, parental consent for players under 13, and the teams you belong to."
-        action={
-          links.length > 0 && (
-            // a quiet way back, called what the header calls it: the page's own work comes first (design audit P6, C5)
-            <Link href="/family" className="text-sm font-semibold text-link hover:underline">
-              <span aria-hidden="true">←</span> Family menu
-            </Link>
-          )
-        }
       />
 
       {daughters.length > 0 && (

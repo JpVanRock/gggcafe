@@ -3,6 +3,7 @@
   Practice Plans (`/dugout/plans`), Training, GameDay (`/dugout/gameday`), Playbook (`/dugout/playbook`), Drill Library (`/dugout/drills`),
   Budget (`/dugout/budget`; the tab says just "Budget" so the row fits, user 2026-11-12), Parents (`/dugout/parents`).
   The header is the title and the team logo with no description (the tabs say what's here; design audit 2026-11-18, N1).
+  The team logo is 64px on phones (user, 2026-11-18, N1b) and 152px from tablets up, here and on every page that shows it.
 - The coach dashboard (`/dashboard`, `dashboard/page.tsx` + `dashboard/needs.ts`; design audit 2026-11-18, P1) opens with
   "Needs you" (`NeedsYou`): approvals by the tab they're decided on (player claims, coach sign-ups and parental consents →
   Roster; parents asking to join → Parents; mentors → Mentors), players who still owe fees (→ Budget), the next game in

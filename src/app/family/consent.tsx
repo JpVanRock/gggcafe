@@ -6,7 +6,7 @@
 // sign-in email, the time, and the IP address and browser as the record. Then her login can be made.
 // Withdrawing deletes her login right away.
 import { useActionState } from "react";
-import { Field, buttonClass, inputClass } from "@/components/ui";
+import { Field, buttonClass, groupLabelClass, inputClass } from "@/components/ui";
 import { FormMessage } from "@/components/form-message";
 import { ActionForm } from "@/components/action-form";
 import { ConfirmSubmit } from "@/components/confirm-submit";
@@ -32,6 +32,7 @@ export function ConsentAccept({
   return (
     <div className="flex flex-col gap-4 rounded-xl border border-pink/60 bg-pink/5 p-4">
       <div className="flex flex-col gap-1">
+        <p className={`text-pink-soft ${groupLabelClass}`}>Step 1 of 2 · then her login</p>
         <p className="font-semibold">Your consent comes first</p>
         <p className="text-sm text-muted">
           {firstName} is under 13. A federal law (COPPA) requires a parent&apos;s consent before she can sign in. Read the notice, then accept
@@ -43,11 +44,26 @@ export function ConsentAccept({
           <span className="font-semibold">Your earlier form wasn&apos;t accepted:</span> {declinedNote}
         </p>
       )}
-      {/* tabIndex: keyboard users can focus the box and scroll the notice with the arrow keys */}
+      {/* Phones (user, 2026-11-18, design audit P6): the notice as short sections the parent taps to open, not a
+          scroll box inside a card. The words are CONSENT_NOTICE exactly, and what Accept records doesn't change. */}
+      <section aria-label="Parental consent notice" className="flex flex-col text-sm sm:hidden">
+        {CONSENT_NOTICE.map((n) => (
+          <details key={n.heading} className="group border-t border-navy-700 last:border-b">
+            <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 font-semibold select-none [&::-webkit-details-marker]:hidden">
+              <span aria-hidden className="inline-block text-link transition group-open:rotate-90">
+                ›
+              </span>
+              {n.heading}
+            </summary>
+            <p className="pb-3 text-muted">{n.text}</p>
+          </details>
+        ))}
+      </section>
+      {/* from 640px up, the whole notice in a box; tabIndex: keyboard users can focus it and scroll with the arrow keys */}
       <section
         aria-label="Parental consent notice"
         tabIndex={0}
-        className="flex max-h-72 flex-col gap-3 overflow-y-auto rounded-lg border border-navy-700 bg-navy-900/60 p-4 text-sm focus-visible:outline-2 focus-visible:outline-pink"
+        className="hidden max-h-72 flex-col gap-3 overflow-y-auto rounded-lg border border-navy-700 bg-navy-900/60 p-4 text-sm focus-visible:outline-2 focus-visible:outline-pink sm:flex"
       >
         {CONSENT_NOTICE.map((n) => (
           <div key={n.heading}>
