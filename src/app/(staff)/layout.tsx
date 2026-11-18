@@ -47,7 +47,7 @@ async function UserMenu() {
   const user = await getCurrentUser();
   if (!user) return null;
   return (
-    <div className="flex w-full flex-wrap items-center justify-between gap-3 sm:w-auto">
+    <div className="flex w-full flex-wrap items-center justify-between gap-3">
       {user.staff && (
         <span className="text-sm text-muted">
           {user.staff.displayName} · {ROLE_LABEL[user.staff.role]}

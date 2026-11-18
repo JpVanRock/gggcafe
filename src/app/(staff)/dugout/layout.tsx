@@ -18,9 +18,11 @@ export default function DugoutLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        {/* the team logo on the right, beside the title (user, 2026-11-13); it never wraps under it */}
+        {/* the team logo on the right, beside the title (user, 2026-11-13); it never wraps under it. No
+            description: the tabs say what's here, and a paragraph repeated on every tab pushed the work
+            down a phone screen (design audit 2026-11-18, N1). */}
         <TitleWithTeamLogo>
-          <PageHeader title="Coaches Dugout" description="Organize your team: standards, culture, calendar, drills and practice plans." />
+          <PageHeader title="Coaches Dugout" />
         </TitleWithTeamLogo>
         {/* until her role is known, only the tabs every coach has */}
         <Suspense fallback={<TabList role="assistant" />}>

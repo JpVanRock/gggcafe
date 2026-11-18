@@ -2,10 +2,10 @@
 
 import { useActionState } from "react";
 import { setNewPassword, type NewPasswordState } from "./actions";
+import { fieldClass } from "@/components/ui";
 
 const initialState: NewPasswordState = { error: null };
-const inputClass =
-  "rounded-md border border-navy-600 bg-navy-950 px-3 py-2 outline-none focus:border-pink focus:ring-2 focus:ring-pink/30";
+const inputClass = fieldClass;
 
 export function ResetForm({ email }: { email: string | null }) {
   const [state, formAction, pending] = useActionState(setNewPassword, initialState);

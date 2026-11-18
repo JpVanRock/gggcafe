@@ -2,11 +2,14 @@
 
 // The header's menu on phones: the links and the account controls fold behind one "Menu"
 // button, so the header is a single row (logo, Night/Day switch, Menu). From 640px up there is
-// no button: the panel turns into plain header items (display: contents) and lays out inline.
+// no Menu button: the panel turns into plain header items (display: contents) and lays out inline,
+// with the account and the Night/Day switch behind one Account button at the right (AccountMenu),
+// so the header stays one row on a laptop.
 // The panel closes when a link is tapped or Esc is pressed; Esc puts focus back on the button.
-// The Night/Day switch is rendered twice (top row on phones, next to the account from 640px
-// up); only one is ever displayed.
+// The switch and the account are rendered twice (phone layout and Account panel); only one of each
+// is ever displayed.
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { AccountMenu } from "@/components/account-menu";
 import { buttonStyles } from "@/components/ui";
 
 export function HeaderMenu({
@@ -50,11 +53,9 @@ export function HeaderMenu({
         className={`${open ? "flex" : "hidden"} order-3 basis-full flex-col gap-2 border-t border-navy-700 pt-2 sm:contents`}
       >
         <div className="sm:order-1">{nav}</div>
-        {/* from 640px up the switch sits with the account, so the two wrap together like before */}
-        <div className="flex items-center justify-between gap-4 border-t border-navy-700 py-3 sm:order-2 sm:ml-auto sm:border-0 sm:py-0">
-          <span className="hidden sm:inline-flex">{toggle}</span>
-          {account}
-        </div>
+        {/* phones: who is signed in and Sign out close the menu panel */}
+        <div className="flex items-center justify-between gap-4 border-t border-navy-700 py-3 sm:hidden">{account}</div>
+        <AccountMenu account={account} toggle={toggle} className="hidden sm:order-2 sm:ml-auto sm:block" />
       </div>
       <div className="order-2 ml-auto flex items-center gap-3 sm:hidden">
         {toggle}

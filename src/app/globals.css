@@ -19,6 +19,7 @@
   --color-navy-800: #0d1a4a; /* inputs, hover rows */
   --color-navy-700: #1b2a63; /* borders */
   --color-navy-600: #2c3d80; /* stronger borders */
+  --color-field: #5b6bb0;    /* form field edges: 3:1 or more on the page and cards (WCAG 1.4.11) */
   --color-ink: #f1f3fb;      /* main text */
   --color-muted: #a3acd1;    /* secondary text (8:1 on navy) */
   --color-neon: #e7fb06;     /* brand kit neon yellow: primary buttons, headings, numbers */
@@ -70,6 +71,7 @@
   --color-navy-800: #e9edf6; /* inputs, hover rows */
   --color-navy-700: #d3d9e8; /* borders */
   --color-navy-600: #a9b3ce; /* stronger borders */
+  --color-field: #7c87a8;    /* form field edges: 3.3:1 on cards, 3.6:1 on white */
   --color-ink: #000a2d;      /* main text: brand navy */
   --color-muted: #4a5578;    /* secondary text (7:1 on white) */
   --color-highlight: #000a2d;
@@ -90,6 +92,7 @@
   --color-navy-800: #0d1a4a;
   --color-navy-700: #1b2a63;
   --color-navy-600: #2c3d80;
+  --color-field: #5b6bb0;
   --color-ink: #f1f3fb;
   --color-muted: #a3acd1;
   --color-highlight: #e7fb06;
@@ -107,6 +110,34 @@ body {
   line-height: var(--text-base--line-height);
   /* decorative doodles may hang off a board's edge, never off the page */
   overflow-x: clip;
+}
+
+/*
+ * The header sticks to the top from 640px up. Scrolling to a focused control or an #anchor leaves
+ * room for it, so keyboard focus never hides under it (WCAG 2.4.11). --header-h is the header's
+ * height, kept current by <StickyHeaderOffset> (components/site-header.tsx); 0 when it doesn't stick.
+ */
+html {
+  scroll-padding-top: calc(var(--header-h, 0px) + 0.75rem);
+}
+@media (min-width: 40rem) {
+  /* the one-row header, until the script measures it (its inline value wins) */
+  :root {
+    --header-h: 4.1rem;
+  }
+}
+
+/*
+ * iPhones zoom the page into a field whose text is under 16px. On phones every text field, drop-down
+ * and text area is at least 16px (or its surroundings' size when that's larger). Outside any layer,
+ * so it wins over a field's own text-xs or text-sm; from 640px up the field's own size applies.
+ */
+@media (max-width: 39.999rem) {
+  input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"], [type="hidden"], [type="submit"], [type="button"], [type="reset"], [type="image"]),
+  select,
+  textarea {
+    font-size: max(1rem, 1em);
+  }
 }
 
 ::selection {

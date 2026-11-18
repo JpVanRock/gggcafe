@@ -16,9 +16,13 @@ import { cloneElement, isValidElement, useId, type ReactElement, type ReactNode 
 
 // ---- Form fields ------------------------------------------------------------------------------
 
-/** A form field's look without a width: for inputs that set their own (w-20, w-14...). */
+/**
+ * A form field's look without a width: for inputs that set their own (w-20, w-14...). The edge is the
+ * `field` token (3:1 or more in both themes); on phones globals.css keeps the text at 16px or more so
+ * iPhones don't zoom in.
+ */
 export const fieldClass =
-  "rounded-md border border-navy-600 bg-navy-950 px-3 py-2 text-ink outline-none placeholder:text-muted/60 focus:border-pink focus:ring-2 focus:ring-pink/30 disabled:cursor-not-allowed disabled:opacity-60 aria-[invalid=true]:border-danger";
+  "rounded-md border border-field bg-navy-950 px-3 py-2 text-ink outline-none placeholder:text-muted focus:border-pink focus:ring-2 focus:ring-pink/30 disabled:cursor-not-allowed disabled:opacity-60 aria-[invalid=true]:border-danger";
 
 /** A full-width form field. Don't add another w-* to it (both would apply and full width wins): use fieldClass. */
 export const inputClass = `w-full ${fieldClass}`;

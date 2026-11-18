@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { useSearchParams } from "next/navigation";
 import { requestPasswordReset, type ResetRequestState } from "./actions";
+import { fieldClass } from "@/components/ui";
 
 const initialState: ResetRequestState = { sent: false, error: null, email: "" };
 
@@ -40,7 +41,7 @@ export function ForgotForm() {
           spellCheck={false}
           required
           defaultValue={state.email}
-          className="rounded-md border border-navy-600 bg-navy-950 px-3 py-2 outline-none focus:border-pink focus:ring-2 focus:ring-pink/30"
+          className={fieldClass}
         />
       </label>
 

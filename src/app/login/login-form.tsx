@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { signIn, type SignInState } from "./actions";
+import { fieldClass } from "@/components/ui";
 
 const initialState: SignInState = { error: null, email: "" };
 
@@ -20,7 +21,7 @@ export function LoginForm() {
           spellCheck={false}
           required
           defaultValue={state.email}
-          className="rounded-md border border-navy-600 bg-navy-950 px-3 py-2 outline-none focus:border-pink focus:ring-2 focus:ring-pink/30"
+          className={fieldClass}
         />
       </label>
 
@@ -31,7 +32,7 @@ export function LoginForm() {
           name="password"
           autoComplete="current-password"
           required
-          className="rounded-md border border-navy-600 bg-navy-950 px-3 py-2 outline-none focus:border-pink focus:ring-2 focus:ring-pink/30"
+          className={fieldClass}
         />
       </label>
 

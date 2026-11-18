@@ -41,8 +41,44 @@ test("pink text uses the link token (brand pink is too faint on white in Day Gam
 });
 
 test("secondary text is text-muted at full strength (a faded grey fails contrast)", () => {
-  // placeholder:text-muted/60 is fine: the variant prefix is excluded
-  assert.deepEqual(find(/(?<![\w:/-])text-muted\/\d+/), [], "use text-muted, and dashed borders or a label for a locked or inactive state");
+  assert.deepEqual(find(/(?<![\w/-])text-muted\/\d+/), [], "use text-muted, and dashed borders or a label for a locked or inactive state");
+});
+
+/** Every opening <input>, <select> and <textarea> tag (across lines), with its file and line. */
+function fieldTags() {
+  const tags: { at: string; tag: string }[] = [];
+  for (const f of files) {
+    if (!f.path.endsWith(".tsx")) continue;
+    for (const m of f.text.matchAll(/<(input|select|textarea)\b/g)) {
+      // to the tag's closing ">", skipping any inside {…} and quotes
+      let depth = 0;
+      let quote = "";
+      let end = m.index;
+      for (let i = m.index + 1; i < f.text.length; i++) {
+        const c = f.text[i];
+        if (quote) {
+          if (c === quote) quote = "";
+        } else if (c === '"' || c === "'" || c === "`") quote = c;
+        else if (c === "{") depth++;
+        else if (c === "}") depth--;
+        else if (c === ">" && depth === 0) {
+          end = i;
+          break;
+        }
+      }
+      const tag = f.text.slice(m.index, end + 1);
+      if (/type="(checkbox|radio|hidden|file|range|color|submit)"/.test(tag) || tag.includes("ui-rules: ok")) continue;
+      tags.push({ at: `${f.path}:${f.text.slice(0, m.index).split("\n").length}`, tag });
+    }
+  }
+  return tags;
+}
+
+test("form fields get their edge and placeholder from fieldClass (3:1 edges, readable placeholders)", () => {
+  // the field token is 3:1 against the page and cards (WCAG 1.4.11); navy-600 was 1.9:1
+  const handMade = fieldTags().filter((t) => /\bborder-navy-\d+|placeholder:text-/.test(t.tag)).map((t) => t.at);
+  assert.deepEqual(handMade, [], "use fieldClass or inputClass from components/ui.tsx");
+  assert.deepEqual(find(/placeholder:text-muted\/\d+/), [], "placeholders are full text-muted (a faded one is 3.7:1)");
 });
 
 test("text on neon or pink fills is navy (text-on-accent)", () => {

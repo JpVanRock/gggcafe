@@ -6,7 +6,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useEffect, useRef, useState } from "react";
 import { DrillTags } from "@/components/drill-tags";
-import { inputClass } from "@/components/ui";
+import { fieldClass, inputClass } from "@/components/ui";
 import { MAX_BLOCK_MINUTES } from "@/lib/dugout";
 import { GripIcon, chip, labelClass, type Block } from "./builder-shared";
 
@@ -74,7 +74,7 @@ export function CoachPicker({
             maxLength={60}
             placeholder="Coach name"
             aria-label="New coach name"
-            className="w-32 rounded-full border border-navy-600 bg-navy-950 px-2.5 py-0.5 text-xs outline-none focus:border-pink"
+            className={`${fieldClass} w-32 px-2.5 py-0.5 text-xs`}
           />
         </span>
       ) : (
@@ -175,9 +175,7 @@ export function BlockCard({
                 }}
                 aria-invalid={missing}
                 aria-label={`Minutes for ${block.name}`}
-                className={`w-20 rounded-md border bg-navy-950 px-2 py-1.5 text-center font-display font-semibold tabular-nums outline-none focus:border-pink focus:ring-2 focus:ring-pink/30 ${
-                  missing ? "border-pink" : "border-navy-600"
-                }`}
+                className={`${fieldClass} w-20 px-2 py-1.5 text-center font-display font-semibold tabular-nums`}
               />
               <span className="text-sm text-muted">min</span>
             </span>
