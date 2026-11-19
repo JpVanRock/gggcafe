@@ -52,3 +52,7 @@ __pycache__/
 
 # npm run screens output (CI keeps them as an artifact)
 /screens
+
+# design checker: config.json is shared (rules kept on purpose); these two are per machine
+.impeccable/config.local.json
+.impeccable/hook.cache.json
