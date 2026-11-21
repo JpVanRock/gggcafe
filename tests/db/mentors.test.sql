@@ -59,6 +59,16 @@ set role authenticated;
 select pg_temp.as_user('cccccccc-0000-0000-0000-000000000004');
 select pg_temp.expect('a player can''t ask to mentor', pg_temp.err($$select public.request_mentor('MNTR42', '')$$), '42501');
 reset role;
+-- relabelling her own metadata later (supabase.auth.updateUser) changes nothing: the role is the one she signed up as
+update auth.users set raw_user_meta_data = '{"role": "mentor"}' where id = 'cccccccc-0000-0000-0000-000000000004';
+set role authenticated;
+select pg_temp.as_user('cccccccc-0000-0000-0000-000000000004');
+select pg_temp.expect('a player relabelled as mentor still can''t ask', pg_temp.err($$select public.request_mentor('MNTR42', '')$$), '42501');
+reset role;
+update auth.users set raw_user_meta_data = '{"role": "player"}' where id = 'cccccccc-0000-0000-0000-000000000004';
+select pg_temp.expect('sign-up roles kept from account creation',
+  (select string_agg(role, ',' order by user_id) from private.signup_roles where user_id::text like 'cccccccc-%'),
+  'mentor,player,parent,mentor,parent');
 set role authenticated;
 select pg_temp.as_user('cccccccc-0000-0000-0000-000000000001');
 select pg_temp.expect('wrong code', pg_temp.err($$select public.request_mentor('NOPE99', 'Jordan Kim')$$), 'P0006');

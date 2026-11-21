@@ -29,6 +29,9 @@
   Player accounts (a player login, or a claim that isn't declined) can't join as parents (P0011). `rematch_parent_link`:
   a parent fixes the name on a waiting request. Removing a wrong parent: Remove access, and make a new parent code.
   DB tests: `tests/db/parent_codes.test.sql`.
+- The sign-up type (metadata `role`: head-coach, assistant-coach, player, parent, mentor) is also kept in
+  `private.signup_roles`, written once by a trigger when the account is created (2026-11-21). Users can edit their own
+  metadata, so access checks read the table (`request_mentor`), never the metadata.
 - Coach sign-ups: metadata `role` head-coach/assistant-coach (+ `note`; older accounts `team`); the first /dashboard visit
   after confirming calls `request_staff_access()` (table `staff_requests`; an assistant with no team yet gets the
   "Join your team" code form, `AssistantJoin`, first); `staff_requests_to_decide()` /

@@ -11,6 +11,8 @@ after, retries what fails, and keeps a record.
    - The same `dedupe_key` twice is one job, so enqueueing can safely happen more than once.
 2. **Supabase calls the worker.**
    - Every new job kicks it right away: a statement trigger, then pg_net, sent after the commit.
+     pg_net is installed in the `extensions` schema (moved out of public 2026-11-21, migration
+     20261121132504); its functions are in `net` either way.
    - pg_cron also checks every minute (`kick-jobs-worker`), and only calls when jobs are due.
    - The call is `GET <jobs_worker_url>` with `Authorization: Bearer <jobs_secret>`.
 3. **The worker** (`src/app/api/jobs/route.ts`, `src/lib/jobs/worker.ts`):

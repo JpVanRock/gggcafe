@@ -74,7 +74,8 @@ export function friendlyDbError(
     case "42501":
       return "You don't have permission to change this. Ask an admin to make you a coach.";
     case "23514":
-      return "One of the values is out of range. Check the numbers and try again.";
+      // a check constraint: a number out of range, or text over a column's limit (migration 20261121132502)
+      return "One of the values is too long or out of range. Shorten it or check the numbers, then try again.";
     case "23503":
       return "Something this refers to no longer exists. Reload the page and try again.";
     case "P0010":

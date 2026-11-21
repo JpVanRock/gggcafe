@@ -108,7 +108,9 @@ tests/unit/              node --test unit tests (npm run test:unit)
   fetch per request).
 - Lists that grow every season (past plans, lineups, games) show the latest `RECENT_LIMIT` (30) with
   `<ShowAllLink>` (`?past=all`, `?lineups=all`, `?games=all`). New lists of that kind do the same.
-- Index a foreign key the app filters or joins on (Postgres doesn't index them; see migration 20261109120000).
+- Index every foreign key, except links to auth.users (who made or changed a row): Postgres doesn't index them, and
+  deletes that cascade scan them. Every table has a primary key. `tests/db/zz_keys.test.sql` fails without either
+  (migration 20261121132501).
 - Load independent queries together (`Promise.all`); only what needs an earlier result waits for it (see the player
   dashboard, `players/[playerId]/page.tsx`: two rounds).
 
@@ -148,6 +150,10 @@ tests/unit/              node --test unit tests (npm run test:unit)
   same moves in `src/lib/lifecycles.ts` and `guarded: true`; `tests/unit/lifecycles.test.ts` fails when they differ.
 - Run `npm run db:test` before `npm run db:push`. It checks stat math, RLS on every table,
   security_invoker on every view, and the viewer/coach/admin access rules.
+- Free text that players, parents or mentors can write gets a limit in the database (`check (char_length(x) <= N)`;
+  jsonb `pg_column_size(x) <= N`): the API takes their writes past the forms' maxLength (migration 20261121132502).
+- Never decide access from user metadata (`raw_user_meta_data`, `user_metadata`): users can change their own at any time.
+  It's fine for display text. The role an account signed up as is `private.signup_roles` (written once, at sign-up).
 - Never edit an applied migration; add a new one (`npm run db:new <name>`).
 - The app is typed from the schema: `src/lib/supabase/database.types.ts` is generated from the migrations by
   `npm run db:types` (`scripts/gen-types.py` over a throwaway local Postgres; no Docker or `supabase login`). Run it

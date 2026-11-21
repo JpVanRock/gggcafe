@@ -2,7 +2,8 @@
 - Mentors and skill coaches (pitching, hitting...) are NOT staff. They sign up at /register ("Mentor", optional
   specialty), confirm their email, then on /mentor enter the team's parent code (the one join code since 2026-11-16) and ask
   to work with ONE PLAYER (her name as on the roster) or THE WHOLE TEAM (`request_mentor(code, name)`; makes her `mentors`
-  profile the first time). User, 2026-11-11: the player's approved parents approve a one-player
+  profile the first time). Only an account made as a mentor (`private.signup_roles`, recorded when the account is created)
+  or one with a mentor profile can ask: changing her own metadata later doesn't count (2026-11-21, migration 20261121132503). User, 2026-11-11: the player's approved parents approve a one-player
   request (family page); a head coach approves a whole-team request (Coaches Dugout → Mentors); admins can approve
   either (`decide_mentor_link`). What she sees follows the approvals (`mentor_links`, status pending/approved/declined):
   a whole-team link = that team's current active roster; a player link = that player. `private.my_mentee_ids()`
