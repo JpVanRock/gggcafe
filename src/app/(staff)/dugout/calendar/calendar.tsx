@@ -54,13 +54,17 @@ const KIND_ACCENT: Record<EventKind, string> = {
   meeting: "border-l-muted",
   other: "border-l-muted",
 };
+// a video call (user, 2026-11-22: "highlighted in pink so they stick out"): pink-tinted with a pink edge all round,
+// so it stands out without looking like a game (games are solid pink)
+const CALL_CHIP = "border border-l-[3px] border-pink bg-pink/15 hover:bg-pink/25";
+const chipClass = (e: CalEvent) => (e.href ? CALL_CHIP : `border-l-[3px] bg-navy-800 hover:bg-navy-700 ${KIND_ACCENT[e.kind]}`);
 
 function EventChip({ event, onOpen }: { event: CalEvent; onOpen: () => void }) {
   return (
     <button
       type="button"
       onClick={onOpen}
-      className={`block w-full truncate rounded border-l-[3px] bg-navy-800 px-1.5 py-0.5 text-left text-xs leading-5 hover:bg-navy-700 ${KIND_ACCENT[event.kind]}`}
+      className={`block w-full truncate rounded px-1.5 py-0.5 text-left text-xs leading-5 ${chipClass(event)}`}
       title={eventTitle(event)}
       // time, title and day, so a weekly event isn't "4 PMSpeed and agility" three times over (design audit A7)
       aria-label={[time(event.start), eventTitle(event), dayLabel(event.date)].filter(Boolean).join(", ")}
