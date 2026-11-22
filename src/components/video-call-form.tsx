@@ -4,12 +4,13 @@
 // a head coach on the Dugout Calendar (pick the player). The day and time are in the booker's own
 // time zone; the browser turns them into an exact time for the server. "Show on calendars" (user,
 // 2026-11-14) picks which calendars list it; the booker's own always does. With a list of players, any
-// number of them can be ticked for a group call (user, 2026-11-14), all on one team, up to 20 (12 until 2026-11-22).
+// number of them can be ticked for a group call (user, 2026-11-14), all on one team, up to the whole roster (12 until
+// 2026-11-22).
 import { useActionState, useState } from "react";
 import { Field, FormMessage, inputClass, groupLabelClass } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
 import { initialFormState } from "@/lib/form";
-import { CALL_CALENDARS, CALL_MAX_PLAYERS, CALL_MINUTES, TOPIC_MAX, type CallCalendar } from "@/lib/video-calls";
+import { CALL_CALENDARS, CALL_MINUTES, TOPIC_MAX, type CallCalendar } from "@/lib/video-calls";
 import { scheduleVideoCall } from "@/app/calls/actions";
 
 export function VideoCallForm({
@@ -35,16 +36,15 @@ export function VideoCallForm({
   const teamOf = new Map((players ?? []).map((p) => [p.id, p.team ?? ""]));
   const pickedTeam = picked.size ? teamOf.get([...picked][0]) : undefined;
   const teamNames = [...new Set((players ?? []).map((p) => p.team ?? ""))];
-  // "Select all" (user, 2026-11-22: "so don't have to check one by one") ticks a team's players, up to the
-  // call's limit, and clears any other team's; with everyone on, it clears them. The player boxes stay
-  // uncontrolled (see their onChange), so it sets the boxes and then reads them back.
+  // "Select all players" (user, 2026-11-22: "so don't have to check one by one") ticks all of a team's players
+  // and clears any other team's; with everyone on, it clears them. The player boxes stay uncontrolled (see their
+  // onChange), so it sets the boxes and then reads them back.
   const selectAll = (team: string) => {
     const onTeam = (players ?? []).filter((p) => (p.team ?? "") === team);
     if (onTeam.length < 2) return null;
     const ticked = onTeam.filter((p) => picked.has(p.id)).length;
-    const allOn = ticked > 0 && ticked === Math.min(onTeam.length, CALL_MAX_PLAYERS);
+    const allOn = ticked === onTeam.length;
     const lockedOut = pickedTeam !== undefined && team !== pickedTeam;
-    const tooMany = onTeam.length > CALL_MAX_PLAYERS;
     return (
       <label className={`flex items-center gap-2.5 border-b border-navy-700 pb-2 ${lockedOut ? "opacity-50" : "cursor-pointer"}`}>
         <input
@@ -57,17 +57,14 @@ export function VideoCallForm({
           }}
           onChange={(e) => {
             const boxes = [...(e.currentTarget.form?.querySelectorAll<HTMLInputElement>('input[name="player_id"]') ?? [])];
-            let n = 0;
-            for (const b of boxes) b.checked = !allOn && b.dataset.team === team && n++ < CALL_MAX_PLAYERS;
+            for (const b of boxes) b.checked = !allOn && b.dataset.team === team;
             setPicked(new Set(boxes.filter((b) => b.checked).map((b) => b.value)));
           }}
           className="size-5 shrink-0 accent-pink"
         />
         <span className="text-sm font-semibold">
-          {tooMany ? `Select the first ${CALL_MAX_PLAYERS}` : "Select all"}
-          <span className="ml-1.5 text-xs font-normal text-muted">
-            {onTeam.length} players{tooMany && `; a call holds up to ${CALL_MAX_PLAYERS}`}
-          </span>
+          Select all players
+          <span className="ml-1.5 text-xs font-normal text-muted">{onTeam.length} players</span>
         </span>
       </label>
     );
@@ -97,7 +94,7 @@ export function VideoCallForm({
             With <span className="ml-1.5 text-xs font-normal text-muted">Required</span>
           </legend>
           <p className="text-xs text-muted">
-            Tick one player, or several for a group call (up to {CALL_MAX_PLAYERS}, one team). Every player&apos;s parents are invited.
+            Tick one player, or several for a group call (one team). Every player&apos;s parents are invited.
             {picked.size > 0 && ` ${picked.size} picked.`}
           </p>
           {teamNames.map((team) => (
@@ -109,15 +106,14 @@ export function VideoCallForm({
                   .filter((p) => (p.team ?? "") === team)
                   .map((p) => {
                     const otherTeam = pickedTeam !== undefined && (p.team ?? "") !== pickedTeam;
-                    const full = picked.size >= CALL_MAX_PLAYERS && !picked.has(p.id);
                     return (
-                      <label key={p.id} className={`flex items-center gap-2.5 ${otherTeam || full ? "opacity-50" : "cursor-pointer"}`}>
+                      <label key={p.id} className={`flex items-center gap-2.5 ${otherTeam ? "opacity-50" : "cursor-pointer"}`}>
                         <input
                           type="checkbox"
                           name="player_id"
                           value={p.id}
                           data-team={p.team ?? ""}
-                          disabled={otherTeam || full}
+                          disabled={otherTeam}
                           // read every box, so the count and the team lock match them even after a tick made before the page was ready
                           onChange={(e) => {
                             const boxes = e.currentTarget.form?.querySelectorAll<HTMLInputElement>('input[name="player_id"]') ?? [];

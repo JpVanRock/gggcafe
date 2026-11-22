@@ -6,9 +6,13 @@
 export const CALL_MINUTES = [15, 30, 45, 60, 90] as const;
 export type CallMinutes = (typeof CALL_MINUTES)[number];
 export const TOPIC_MAX = 120;
-/** A group call has up to this many players, all on one team (user, 2026-11-14; 20 from 2026-11-22, migration
- * 20261122161228; book_video_call checks it too). */
-export const CALL_MAX_PLAYERS = 20;
+/**
+ * A group call can include a team's whole roster, all on one team (user, 2026-11-22: "select all players the team
+ * max on the roster"; 12 until then): book_video_call takes only players on the team's current roster. This bound
+ * only stops a malformed request: no roster is this big, and it's the most people a Zoom meeting holds. book_video_call
+ * checks it too (migration 20261122161707).
+ */
+export const CALL_PLAYER_BOUND = 100;
 
 /** "Group call · 3 players" for a call with more than one player, else null. */
 export function groupLabel(groupSize: number): string | null {

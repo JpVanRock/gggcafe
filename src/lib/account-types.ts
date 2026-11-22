@@ -235,7 +235,7 @@ export const QUESTIONS: { q: string; a: string[] }[] = [
     q: "How do video calls work, and who can use them?",
     a: [
       "They're off for every team until a site admin turns them on for that team on the Switchboard. Then the team's head coach decides whether mentors can book them too (Mentors → Video calls, off at first). With a team's calls off, nobody on it can book, start or join one; a player on two teams needs both to allow it.",
-      "Head coaches book calls on Coaches Dugout → Calendar, mentors on their dashboard or the player's page, with one player or a group of up to 20 from one team (every player's parents are invited; a family sees only its own daughter named). Every invited player and her approved parents are told (the bell) and join from the call page, which opens 10 minutes early; head coaches can drop in. Everyone waits in Zoom's waiting room until the host lets them in, and nothing is recorded.",
+      "Head coaches book calls on Coaches Dugout → Calendar, mentors on their dashboard or the player's page, with one player or a group from one team, up to the whole roster (every player's parents are invited; a family sees only its own daughter named). Every invited player and her approved parents are told (the bell) and join from the call page, which opens 10 minutes early; head coaches can drop in. Everyone waits in Zoom's waiting room until the host lets them in, and nothing is recorded.",
       "When booking, \"Show on calendars\" picks where the call is listed: her week on her player page, her parents' calendar and (for a mentor's call) the Coaches Dugout calendar, all ticked to start. The person who booked it always has it on their own calendar. Her parents are told about every call either way.",
     ],
   },

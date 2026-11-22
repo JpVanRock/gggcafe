@@ -11,7 +11,7 @@ import { createClient } from "@/lib/supabase/server";
 import { friendlyDbError, invalid, text, type FormState } from "@/lib/form";
 import { STALE, failed, runAction } from "@/lib/actions";
 import { isUuid, playerName } from "@/lib/softball";
-import { CALL_MAX_PLAYERS, callCalendars, callState, cleanCallInput } from "@/lib/video-calls";
+import { CALL_PLAYER_BOUND, callCalendars, callState, cleanCallInput } from "@/lib/video-calls";
 import { ZOOM_NOT_CONNECTED, createZoomMeeting, deleteZoomMeeting, zoomConfigured, zoomJoinDetails, type JoinDetails } from "@/lib/zoom";
 
 const OFF_FOR_HER = "Video calls are off for her team. A site admin turns them on for the team, and the head coach for mentors (the Switchboard).";
@@ -24,7 +24,8 @@ export async function scheduleVideoCall(_prev: FormState, fd: FormData): Promise
     // one player, or several on one team for a group call (user, 2026-11-14)
     const playerIds = [...new Set(fd.getAll("player_id").filter((v): v is string => typeof v === "string" && isUuid(v)))];
     if (!playerIds.length) return invalid("player_id", "Pick who the call is with.");
-    if (playerIds.length > CALL_MAX_PLAYERS) return invalid("player_id", `A call can have up to ${CALL_MAX_PLAYERS} players.`);
+    // the roster is the real limit (book_video_call); this only stops a malformed form
+    if (playerIds.length > CALL_PLAYER_BOUND) return failed(STALE);
     const clean = cleanCallInput({ startsAt: fd.get("starts_at"), minutes: fd.get("minutes"), topic: fd.get("topic") });
     // the form's day-and-time box is "when"; the browser turns it into starts_at
     if (!clean.ok) return invalid(clean.field === "starts_at" ? "when" : clean.field, clean.error);
@@ -66,7 +67,7 @@ export async function scheduleVideoCall(_prev: FormState, fd: FormData): Promise
       if (saveError.code === "P0008") return invalid("when", "Another video call is booked then. Pick another time.");
       if (saveError.code === "P0007") return invalid("when", "Pick a time that's still ahead.");
       if (saveError.code === "P0009") return failed("You can book up to 4 video calls an hour. Try again later.");
-      if (saveError.code === "22023") return invalid("player_id", `Pick 1 to ${CALL_MAX_PLAYERS} players.`);
+      if (saveError.code === "22023") return invalid("player_id", "Pick who the call is with.");
       if (saveError.code === "42501") return failed(playerIds.length > 1 ? OFF_FOR_ONE : OFF_FOR_HER);
       return failed(friendlyDbError(saveError));
     }
