@@ -25,9 +25,13 @@ export type VideoCallRow = CallTimes & {
   player?: { first_name: string; preferred_name: string | null; last_name: string } | null;
 };
 
-/** The columns VideoCallList reads (with the player's name). */
+/**
+ * The columns VideoCallList reads (with the player's name). `players!player_id`: the call's first player. A plain
+ * `players(...)` has two links since group calls (video_call_players too), and the API refuses the whole query
+ * (2026-11-22: calls had vanished from every calendar; tests/unit/embeds.test.ts now checks every select).
+ */
 export const VIDEO_CALL_COLUMNS =
-  "id, player_id, host_id, host_kind, host_name, topic, starts_at, minutes, cancelled_at, calendars, group_size, player:players(first_name, preferred_name, last_name), mentors:video_call_mentors(mentor_name)" as const;
+  "id, player_id, host_id, host_kind, host_name, topic, starts_at, minutes, cancelled_at, calendars, group_size, player:players!player_id(first_name, preferred_name, last_name), mentors:video_call_mentors(mentor_name)" as const;
 
 export function VideoCallList({
   calls,

@@ -23,7 +23,7 @@ export default async function CallPage({ params }: PageProps<"/calls/[callId]">)
   const [{ data: call }, { data: role }, myPlayers, { data: invites }, { data: mentorRows }] = await Promise.all([
     supabase
       .from("video_calls")
-      .select("id, team_id, player_id, host_kind, host_name, topic, starts_at, minutes, cancelled_at, group_size, player:players(first_name, preferred_name, last_name)")
+      .select("id, team_id, player_id, host_kind, host_name, topic, starts_at, minutes, cancelled_at, group_size, player:players!player_id(first_name, preferred_name, last_name)")
       .eq("id", callId)
       .maybeSingle(),
     supabase.rpc("video_call_role", { p_call_id: callId }),
