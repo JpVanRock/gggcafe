@@ -5,7 +5,7 @@
 export type Row = Record<string, any>;
 
 const id = (prefix: string, n: number) => `${prefix}00-0000-4000-8000-${String(n).padStart(12, "0")}`;
-export const U = { admin: id("aaaaaa", 1), coach: id("aaaaaa", 2), assistant: id("aaaaaa", 3), mentor: id("aaaaaa", 4) };
+export const U = { admin: id("aaaaaa", 1), coach: id("aaaaaa", 2), assistant: id("aaaaaa", 3), mentor: id("aaaaaa", 4), mentor2: id("aaaaaa", 5) };
 const T = { us: id("bbbbbb", 1), storm: id("bbbbbb", 2), venom: id("bbbbbb", 3), rebels: id("bbbbbb", 4) };
 const S = { fall: id("cccccc", 1) };
 const G = { g1: id("dddddd", 1), g2: id("dddddd", 2), g3: id("dddddd", 3), opener: id("dddddd", 4), scrim: id("dddddd", 5) };
@@ -196,12 +196,15 @@ const measurements: Row[] = [
 const mentors: Row[] = [
   { user_id: U.admin, display_name: "Coach Sample", specialty: "Pitching", created_at: "2026-11-01T00:00:00Z" },
   { user_id: U.mentor, display_name: "Jess Moreno", specialty: "Hitting", created_at: "2026-11-09T00:00:00Z" },
+  { user_id: U.mentor2, display_name: "Dana Ortiz", specialty: "Catching", created_at: "2026-11-10T00:00:00Z" },
 ];
 const mentor_links: Row[] = [
   { id: id("acac00", 1), mentor_id: U.admin, team_id: T.us, player_id: null, player_name: null, status: "approved", requested_at: "2026-11-01T00:00:00Z" },
   { id: id("acac00", 2), mentor_id: U.admin, team_id: T.us, player_id: jordan, player_name: "Jordan Kim", status: "approved", requested_at: "2026-11-02T00:00:00Z" },
   { id: id("acac00", 3), mentor_id: U.mentor, team_id: T.us, player_id: null, player_name: null, status: "pending", requested_at: "2026-11-09T00:00:00Z" },
   { id: id("acac00", 4), mentor_id: U.mentor, team_id: T.us, player_id: emma, player_name: "Emma Nguyen", status: "pending", requested_at: "2026-11-09T00:00:00Z" },
+  // Emma's one-on-one mentor (her parents approved), invited to the head coach's call with her
+  { id: id("acac00", 5), mentor_id: U.mentor2, team_id: T.us, player_id: emma, player_name: "Emma Nguyen", status: "approved", requested_at: "2026-11-10T00:00:00Z" },
 ];
 const mentor_messages: Row[] = [
   { id: id("adad00", 1), player_id: maya, sender_id: U.admin, sender_name: "Coach Sample", body: "Great pen today. Keep your front side closed on the drop.", photo_path: null, drill_id: null, drill_name: "Towel drill", drill_video_url: "https://example.com/towel", created_at: "2026-11-09T18:00:00Z", read_at: null, shared_with_coaches: true },
@@ -376,6 +379,8 @@ const video_call_players: Row[] = [
   { call_id: id("a0ca11", 2), player_id: emma },
   { call_id: id("a0ca11", 3), player_id: maya },
 ];
+// mentors a head coach invited (user, 2026-11-22): Emma's mentor on the head coach's call with her
+const video_call_mentors: Row[] = [{ call_id: id("a0ca11", 2), mentor_id: U.mentor2, mentor_name: "Dana Ortiz" }];
 const video_calls: Row[] = [
   { id: id("a0ca11", 1), team_id: T.us, player_id: maya, host_id: U.admin, host_kind: "mentor", host_name: "Coach Sample", topic: "Changeup grip and release", starts_at: "2027-01-12T00:00:00Z", minutes: 30, zoom_meeting_id: "81000000101", cancelled_at: null, cancelled_by: null, created_at: "2026-11-12T19:00:00Z", calendars: ["player", "family", "coaches"], group_size: 2 },
   { id: id("a0ca11", 2), team_id: T.us, player_id: emma, host_id: U.admin, host_kind: "coach", host_name: "Pat Torres", topic: "Winter plan check-in", starts_at: "2027-01-14T23:30:00Z", minutes: 45, zoom_meeting_id: "81000000102", cancelled_at: null, cancelled_by: null, created_at: "2026-11-12T19:10:00Z", calendars: ["player", "coaches"], group_size: 1 },
@@ -391,14 +396,14 @@ export const TABLES: Record<string, Row[]> = {
   mentors, mentor_links, mentor_messages, mentor_focus, mentor_notes, player_activities,
   budget_fees, budget_entries, budget_credits, budget_coach_expenses, player_mental_lessons, coach_mental_lessons, mental_game_plans,
   team_hitting_philosophy, team_throwing_programs, player_journal_entries, parent_links, team_parent_codes, hitting_styles, hitting_zones, team_features_off, team_admins,
-  team_video_access, video_calls, video_call_players,
+  team_video_access, video_calls, video_call_players, video_call_mentors,
 };
 
 /** table -> the column other tables use to point at it (for embedded selects) */
 export const FK: Record<string, string> = {
   players: "player_id", teams: "team_id", seasons: "season_id", practice_plans: "plan_id", playbook_plays: "play_id", games: "game_id",
   team_quizzes: "quiz_id", team_quiz_questions: "question_id", install_items: "item_id", team_routines: "team_routine_id",
-  harada_pillars: "pillar_id", drills: "drill_id",
+  harada_pillars: "pillar_id", drills: "drill_id", video_calls: "call_id",
 };
 
 const leaderboard = () => {

@@ -11,6 +11,7 @@ to every call.
   join one, including calls already booked.
 - **Head coaches**, once a site admin has turned calls on for their team:
   - book calls on Coaches Dugout → Calendar (pick a player);
+  - can invite mentors to a call they book (see "Mentors on a head coach's call" below);
   - can drop in on any call on the team;
   - can cancel any call;
   - decide whether mentors can book calls (Switchboard → Mentors → Video calls, off at first).
@@ -30,6 +31,23 @@ to every call.
   daughter). A player or parent reads only her own invite row, so lists and calendars say "Group call · 3
   players" and never name the other children; coaches and the host see who's on it.
   Where calls are listed, a player's are found through her invites (`callsForPlayers`, `src/lib/video-call-data.ts`).
+- **Mentors on a head coach's call** (user, 2026-11-22: "invite mentor ... show on the mentors calendar and approve
+  access"; migration 20261122203659, `video_call_mentors`): the Dugout Calendar's form has "Invite mentors" under the
+  players, listing the team's approved whole-team mentors and the approved one-on-one mentors of players on its roster
+  (`callMentorsForTeam` in `src/lib/video-call-data.ts`; the head coach themself is left out). A mentor can be invited
+  only when they work with every picked player (`mentorFits`): a whole-team mentor fits any call on the team, a
+  one-on-one mentor only calls with their own players; the others grey out, and `book_video_call(..., p_mentor_ids)`
+  refuses them (P0012). It needs no Mentors switch on the Switchboard: that one is for mentors booking their own calls.
+  An invited mentor:
+  - has the call on their mentor calendar and Coming up, and on their dashboard's Video Calls board and the player's
+    page (`callsForMentor`), always: it isn't one of the "Show on calendars" choices;
+  - is told (the bell, linking to the call page) when invited and when it's cancelled;
+  - joins from the call page as "Name (mentor)" (`video_call_role`: a guest), only while they still work with every
+    player on the call (her parents or the head coach can remove a mentor after the invite);
+  - can't cancel it or invite anyone.
+  Everyone on the call (the host, head coaches, the invited players and their parents, the other invited mentors)
+  sees which mentors are invited: in the call lists ("Mentor: Jess Moreno") and on the call page. Only head coaches
+  invite mentors; a mentor's own call stays theirs alone.
 - **The player and her approved parents** are told of every booking and cancellation (the bell).
   They see coming calls on her dashboard and on the family page, and join from the call page.
 - **Assistants and viewers** see the calls on the Calendar but can't book or join them.
@@ -38,7 +56,7 @@ to every call.
   on each invited player's page), Parents' calendars (the family Calendar) and, for a mentor's call, the Coaches
   Dugout calendar. The booker's own calendar always shows it: a head coach's is the Dugout calendar (the
   database requires `coaches` on a coach's call), a mentor's is their mentor calendar (every call they
-  host). Each entry links to the call page (`src/lib/call-events.ts`; on her week, a "Video call" line
+  host). Every invited mentor's calendar shows it too (2026-11-22). Each entry links to the call page (`src/lib/call-events.ts`; on her week, a "Video call" line
   with Open, not a check-off). It only changes the calendars: her parents are still told of every call,
   her dashboard and the family page still list her coming calls, and the Dugout's Video calls list has
   them all. Calls booked before it show on every calendar.
@@ -177,3 +195,5 @@ into the call.
 - Calls across teams: a group call is one team's players (up to its whole roster, 2026-11-22); there's no broadcast to
   more than one team.
 - Calls at the same time (see "One call at a time" under Rules).
+- Emails to invited mentors: they get the bell and the calendar entry; only parents are emailed. A mentor can't
+  invite other mentors, and mentors can't be added to a call after it's booked (cancel and book again).

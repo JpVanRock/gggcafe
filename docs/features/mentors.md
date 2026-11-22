@@ -61,6 +61,9 @@ Roster"): a neon "+ Schedule a video call" button first (user, 2026-11-14: the f
 opens the form under it (tick one player, or several from one team for a group call, from the players she may call
 now, `mentor_call_players()`), then the calls she booked that are ahead, with Cancel. The admin's Mentor View shows
 the same board, read only: the button is drawn but not clickable.
+A head coach can invite a mentor to a call they book (user, 2026-11-22), when the mentor works with every player on it:
+it goes on the mentor's calendar and Video Calls board, they're told, and they join from the call page (they can't
+cancel it). See "Mentors on a head coach's call" in video-calls.md.
 
 ## My roster and calendar (user, 2026-11-13)
 - `/mentor` groups every player she mentors under "My roster" (by whole-team team, then One-on-one). Each tile opens the

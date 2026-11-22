@@ -6,7 +6,7 @@ import type { VideoCallRow } from "@/components/video-calls";
 import { APP_TIME_ZONE } from "@/lib/dates";
 import { callDateAndClock, callEnds, type CallCalendar } from "@/lib/video-calls";
 
-/** Calls not cancelled, on `calendar` (or every call, for the host's own calendar), between `from` and `to`. */
+/** Calls not cancelled, on `calendar` (or every call, for the host's own calendar and an invited mentor's), between `from` and `to`. */
 export function callEvents(rows: VideoCallRow[], from: string, to: string, calendar: CallCalendar | "host"): CalEvent[] {
   return rows.flatMap((c) => {
     if (c.cancelled_at || (calendar !== "host" && !c.calendars.includes(calendar))) return [];

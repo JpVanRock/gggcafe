@@ -14,6 +14,33 @@ export const TOPIC_MAX = 120;
  */
 export const CALL_PLAYER_BOUND = 100;
 
+/**
+ * Mentors a head coach invites to a call (user, 2026-11-22: "invite mentor ... show on the mentors calendar and
+ * approve access"; migration 20261122203659). Each one must work with every player on the call: a whole-team mentor
+ * fits any call on that team, a one-on-one mentor only calls with their own players. book_video_call checks the same.
+ */
+export const CALL_MENTOR_BOUND = 20;
+export type CallMentor = {
+  id: string;
+  name: string;
+  /** the players on this team they work with; null for a whole-team mentor */
+  players: string[] | null;
+  /** who they work with, for the form ("Whole team", "Maya Lopez") */
+  note: string;
+};
+
+/** Whether this mentor works with every picked player (no players picked yet: any mentor). */
+export function mentorFits(mentor: Pick<CallMentor, "players">, picked: Iterable<string>): boolean {
+  if (mentor.players === null) return true;
+  const theirs = new Set(mentor.players);
+  return [...picked].every((id) => theirs.has(id));
+}
+
+/** "Mentor: Jess Moreno" / "Mentors: Jess Moreno, Dana Ortiz" for a call's line, else null. */
+export function mentorsLabel(names: string[]): string | null {
+  return names.length ? `${names.length === 1 ? "Mentor" : "Mentors"}: ${names.join(", ")}` : null;
+}
+
 /** "Group call · 3 players" for a call with more than one player, else null. */
 export function groupLabel(groupSize: number): string | null {
   return groupSize > 1 ? `Group call · ${groupSize} players` : null;

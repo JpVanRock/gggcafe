@@ -17,6 +17,7 @@ import { VideoCallForm } from "@/components/video-call-form";
 import { zoomConfigured } from "@/lib/zoom";
 import { recentSinceISO } from "@/lib/video-calls";
 import { callEvents, callRange } from "@/lib/call-events";
+import { callMentorsForTeam } from "@/lib/video-call-data";
 
 export const metadata: Metadata = { title: "Calendar · Coaches Dugout · GGG.Cafe" };
 
@@ -140,11 +141,17 @@ export default async function CalendarPage({ searchParams }: PageProps<"/dugout/
           .gte("starts_at", recentSinceISO())
           .order("starts_at")
           .limit(RECENT_LIMIT),
-        headCoach ? loadRoster(supabase, team.id, { order: "name" }) : Promise.resolve([]),
+        // a head coach books: the roster, and the mentors they can invite (user, 2026-11-22)
+        headCoach
+          ? loadRoster(supabase, team.id, { order: "name" }).then(async (players) => {
+              const list = players.map((p) => ({ id: p.id, name: p.name }));
+              return { players: list, mentors: await callMentorsForTeam(supabase, team.id, list, access.user.id) };
+            })
+          : Promise.resolve({ players: [], mentors: [] }),
         // this month's calls on the grid (user, 2026-11-14): the ones booked to show on the Dugout calendar
         supabase.from("video_calls").select(VIDEO_CALL_COLUMNS).eq("team_id", team.id).gte("starts_at", callFrom).lte("starts_at", callTo).order("starts_at"),
       ])
-    : [{ data: null }, { data: [] }, [], { data: [] }];
+    : [{ data: null }, { data: [] }, { players: [], mentors: [] }, { data: [] }];
   const calls = (callRows ?? []) as VideoCallRow[];
   const gridEvents = [...events, ...callEvents((monthCallRows ?? []) as VideoCallRow[], from, to, "coaches")];
 
@@ -208,11 +215,11 @@ export default async function CalendarPage({ searchParams }: PageProps<"/dugout/
             </h2>
             <p className="mt-2 text-sm text-muted">
               {videoAccess
-                ? `Zoom calls with one player, held on GGG.Cafe. Her parents are told and can join; head coaches can drop in; nothing is recorded. Mentors: ${videoAccess.mentors_on ? "on" : "off"} (the Switchboard).`
+                ? `Zoom calls with one player or a group, held on GGG.Cafe. Her parents are told and can join; head coaches can drop in; invite her mentors if you like; nothing is recorded. Mentors booking their own calls: ${videoAccess.mentors_on ? "on" : "off"} (the Switchboard).`
                 : `Off for ${team.name}. Only a site admin can turn video calls on for a team (the Switchboard).`}
             </p>
           </div>
-          {videoAccess && headCoach && (zoomConfigured() ? <VideoCallForm teamId={team.id} players={roster.map((p) => ({ id: p.id, name: p.name }))} /> : (
+          {videoAccess && headCoach && (zoomConfigured() ? <VideoCallForm teamId={team.id} players={roster.players} mentors={roster.mentors} /> : (
             <p className="text-sm">Zoom isn&apos;t connected yet. A site admin adds the Zoom keys in Vercel first.</p>
           ))}
           <VideoCallList calls={calls} showPlayer canCancel={() => headCoach} empty={videoAccess ? "No calls booked in the last 30 days or ahead." : undefined} />

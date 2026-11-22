@@ -5963,6 +5963,39 @@ export type Database = {
           },
         ]
       }
+      video_call_mentors: {
+        Row: {
+          call_id: string
+          mentor_id: string
+          mentor_name: string
+        }
+        Insert: {
+          call_id: string
+          mentor_id: string
+          mentor_name: string
+        }
+        Update: {
+          call_id?: string
+          mentor_id?: string
+          mentor_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_call_mentors_call_id_fkey"
+            columns: ["call_id"]
+            isOneToOne: false
+            referencedRelation: "video_calls"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_call_mentors_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "mentors"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       video_call_players: {
         Row: {
           call_id: string
@@ -6355,7 +6388,7 @@ export type Database = {
       admin_view_parent: { Args: { p_user: string | null }; Returns: Json }
       allow_password_reset: { Args: { p_email: string | null }; Returns: boolean }
       answer_team_quiz: { Args: { p_player_id: string | null; p_question_id: string | null; p_chosen: number | null }; Returns: { is_correct: boolean; correct_index: number; explanation: string }[] }
-      book_video_call: { Args: { p_team_id: string | null; p_player_ids: string[] | null; p_host_name: string | null; p_topic: string | null; p_starts_at: string | null; p_minutes: number | null; p_zoom_meeting_id: string | null; p_calendars: string[] | null }; Returns: string }
+      book_video_call: { Args: { p_team_id: string | null; p_player_ids: string[] | null; p_host_name: string | null; p_topic: string | null; p_starts_at: string | null; p_minutes: number | null; p_zoom_meeting_id: string | null; p_calendars: string[] | null; p_mentor_ids?: string[] | null }; Returns: string }
       change_authors: { Args: { p_user_ids: string[] | null }; Returns: { user_id: string; name: string }[] }
       claim_my_daughter: { Args: { p_player_id: string | null }; Returns: string }
       coaching_staff: { Args: Record<PropertyKey, never>; Returns: { user_id: string; display_name: string; email: string }[] }

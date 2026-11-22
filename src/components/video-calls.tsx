@@ -1,12 +1,12 @@
-// A list of video calls (user, 2026-11-12; docs/features/video-calls.md): when, what about, who,
-// where it stands, Join while it's ahead, and Cancel for whoever may cancel it.
+// A list of video calls (user, 2026-11-12; docs/features/video-calls.md): when, what about, who (and any mentors
+// a head coach invited), where it stands, Join while it's ahead, and Cancel for whoever may cancel it.
 import Link from "next/link";
 import { ActionForm } from "@/components/action-form";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { badgeClass, buttonStyles } from "@/components/ui";
 import { APP_TIME_ZONE } from "@/lib/dates";
 import { playerName } from "@/lib/softball";
-import { CALL_STATE_LABEL, callState, formatCallTime, groupLabel, isComing, type CallTimes } from "@/lib/video-calls";
+import { CALL_STATE_LABEL, callState, formatCallTime, groupLabel, isComing, mentorsLabel, type CallTimes } from "@/lib/video-calls";
 import { cancelVideoCall } from "@/app/calls/actions";
 
 export type VideoCallRow = CallTimes & {
@@ -20,12 +20,14 @@ export type VideoCallRow = CallTimes & {
   calendars: string[];
   /** how many players are invited (video_call_players; 1 for one-on-one) */
   group_size: number;
+  /** mentors a head coach invited (video_call_mentors, user 2026-11-22; each reader sees those RLS lets them) */
+  mentors?: { mentor_name: string }[];
   player?: { first_name: string; preferred_name: string | null; last_name: string } | null;
 };
 
 /** The columns VideoCallList reads (with the player's name). */
 export const VIDEO_CALL_COLUMNS =
-  "id, player_id, host_id, host_kind, host_name, topic, starts_at, minutes, cancelled_at, calendars, group_size, player:players(first_name, preferred_name, last_name)" as const;
+  "id, player_id, host_id, host_kind, host_name, topic, starts_at, minutes, cancelled_at, calendars, group_size, player:players(first_name, preferred_name, last_name), mentors:video_call_mentors(mentor_name)" as const;
 
 export function VideoCallList({
   calls,
@@ -53,6 +55,7 @@ export function VideoCallList({
       {calls.map((c) => {
         const state = callState(c, now);
         const coming = isComing(c, now);
+        const mentors = mentorsLabel((c.mentors ?? []).map((m) => m.mentor_name));
         return (
           <li key={c.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 py-3">
             {/* on phones the time sits on its own line above the call */}
@@ -61,7 +64,8 @@ export function VideoCallList({
               <span className={`block font-semibold ${coming ? "" : "text-muted"}`}>{c.topic}</span>
               <span className="block text-xs text-muted">
                 {[who(c), groupLabel(c.group_size)].filter(Boolean).map((t) => `${t} · `)}
-                {c.host_name} ({c.host_kind === "mentor" ? "mentor" : "head coach"}) · {c.minutes} min
+                {c.host_name} ({c.host_kind === "mentor" ? "mentor" : "head coach"}) · {mentors && `${mentors} · `}
+                {c.minutes} min
               </span>
             </span>
             <span className={badgeClass(state === "open" ? "neon" : state === "cancelled" ? "danger" : "neutral")}>{CALL_STATE_LABEL[state]}</span>

@@ -12,14 +12,15 @@ import { CallRoom } from "./call-room";
 export const metadata: Metadata = { title: "Video call · GGG.Cafe" };
 
 // A video call (user, 2026-11-12; docs/features/video-calls.md), held here on Zoom: the mentor or
-// head coach who booked it hosts; she, her parents and head coaches join. Anyone else gets a 404.
+// head coach who booked it hosts; she, her parents, head coaches and any mentors a head coach invited (user,
+// 2026-11-22) join. Anyone else gets a 404.
 export default async function CallPage({ params }: PageProps<"/calls/[callId]">) {
   const { callId } = await params;
   if (!isUuid(callId)) notFound();
   const user = await getCurrentUser();
   if (!user) redirect("/login");
   const supabase = await createClient();
-  const [{ data: call }, { data: role }, myPlayers, { data: invites }] = await Promise.all([
+  const [{ data: call }, { data: role }, myPlayers, { data: invites }, { data: mentorRows }] = await Promise.all([
     supabase
       .from("video_calls")
       .select("id, team_id, player_id, host_kind, host_name, topic, starts_at, minutes, cancelled_at, group_size, player:players(first_name, preferred_name, last_name)")
@@ -29,6 +30,8 @@ export default async function CallPage({ params }: PageProps<"/calls/[callId]">)
     getMyPlayerIds(),
     // her own invite (a player or parent reads only their own; a group call has several players)
     supabase.from("video_call_players").select("player_id").eq("call_id", callId),
+    // mentors a head coach invited (everyone who can join reads them)
+    supabase.from("video_call_mentors").select("mentor_id, mentor_name").eq("call_id", callId).order("mentor_name"),
   ]);
   if (!call) notFound();
   const state = callState(call);
@@ -36,11 +39,13 @@ export default async function CallPage({ params }: PageProps<"/calls/[callId]">)
   const myInvite = (invites ?? []).map((r) => r.player_id).find((id) => myPlayers.includes(id));
   const her = group ? `A group of ${call.group_size} players` : call.player ? playerName(call.player) : "her";
   const hostLabel = call.host_kind === "mentor" ? "mentor" : "head coach";
+  const mentors = mentorRows ?? [];
+  const invitedMentor = mentors.some((m) => m.mentor_id === user.id);
   // back to where this person keeps their calls
   const back = user.staff
     ? { href: `/dugout/calendar?team=${call.team_id}`, label: "Calendar" }
-    : role === "host"
-      ? group
+    : role === "host" || invitedMentor
+      ? group || invitedMentor
         ? { href: "/mentor", label: "Mentor home" }
         : { href: `/mentor/players/${call.player_id}`, label: her }
       : myInvite
@@ -57,7 +62,8 @@ export default async function CallPage({ params }: PageProps<"/calls/[callId]">)
         <Eyebrow>Video call · {formatCallTime(call.starts_at, APP_TIME_ZONE)} · {call.minutes} min</Eyebrow>
         <h1 className="text-3xl leading-tight font-bold tracking-tight text-highlight uppercase sm:text-4xl">{call.topic}</h1>
         <p className="text-sm text-muted">
-          {her} with {call.host_name} ({hostLabel}). <Badge tone={state === "open" ? "neon" : "neutral"}>{CALL_STATE_LABEL[state]}</Badge>
+          {her} with {call.host_name} ({hostLabel})
+          {mentors.length > 0 && ` and ${mentors.map((m) => `${m.mentor_name} (mentor)`).join(", ")}`}. <Badge tone={state === "open" ? "neon" : "neutral"}>{CALL_STATE_LABEL[state]}</Badge>
         </p>
       </header>
 
@@ -67,7 +73,9 @@ export default async function CallPage({ params }: PageProps<"/calls/[callId]">)
         <p className="rounded-xl border border-navy-700 px-4 py-3 text-sm">Video calls are turned off for her team right now, so this call can&apos;t go ahead.</p>
       ) : role !== "host" && role !== "guest" ? (
         <p className="rounded-xl border border-navy-700 px-4 py-3 text-sm">
-          {group ? "Only the host, the invited players, their parents and head coaches can join this call." : `Only the host, ${her}, her parents and head coaches can join this call.`}
+          {group
+            ? "Only the host, the invited players and their parents, invited mentors and head coaches can join this call."
+            : `Only the host, ${her}, her parents, invited mentors and head coaches can join this call.`}
         </p>
       ) : state === "upcoming" ? (
         <p className="rounded-xl border border-navy-700 px-4 py-3 text-sm">

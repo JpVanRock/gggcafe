@@ -168,6 +168,57 @@ update public.video_calls set cancelled_at = now() where zoom_meeting_id = '8100
 select pg_temp.expect('the cancellation reaches Jordan''s parent', (select count(*) from public.notifications where user_id = 'e7e7e7e7-0000-0000-0000-000000000008' and title like 'Video call cancelled%'), 1::bigint);
 delete from vault.decrypted_secrets where name = 'jobs_secret';
 
+-- Mentors on a head coach's call (migration 20261122203659): only mentors approved for every player on it; the
+-- invited mentor reads the call and its players, joins as a guest, is told; the players' parents see who's coming
+insert into auth.users (id, email, raw_user_meta_data) values ('e7e7e7e7-0000-0000-0000-000000000009', 'vc-mentor2@example.test', '{"role": "mentor"}');
+insert into public.mentors (user_id, display_name) values ('e7e7e7e7-0000-0000-0000-000000000009', 'VC Mentor Two');
+insert into public.mentor_links (mentor_id, player_id, status) values ('e7e7e7e7-0000-0000-0000-000000000009', '00000000-0000-0000-0000-0000000000c3', 'approved');
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000001"}', false);
+select pg_temp.expect('not a mentor who doesn''t work with her', pg_temp.err($$select public.book_video_call('00000000-0000-0000-0000-0000000000b1',
+  array['00000000-0000-0000-0000-0000000000c1']::uuid[], 'VC Head', 'Plan', now() + interval '4 days', 30, '81000000011', '{}',
+  array['e7e7e7e7-0000-0000-0000-000000000009']::uuid[])$$), 'P0012');
+select pg_temp.expect('not a mentor missing one of the players', pg_temp.err($$select public.book_video_call('00000000-0000-0000-0000-0000000000b1',
+  array['00000000-0000-0000-0000-0000000000c1', '00000000-0000-0000-0000-0000000000c3']::uuid[], 'VC Head', 'Plan', now() + interval '4 days', 30, '81000000011', '{}',
+  array['e7e7e7e7-0000-0000-0000-000000000005']::uuid[])$$), 'P0012');
+select pg_temp.expect('20 mentors at most', pg_temp.err($$select public.book_video_call('00000000-0000-0000-0000-0000000000b1',
+  array['00000000-0000-0000-0000-0000000000c1']::uuid[], 'VC Head', 'Plan', now() + interval '4 days', 30, '81000000011', '{}',
+  (select array_agg(gen_random_uuid()) from generate_series(1, 21)))$$), '22023');
+select public.book_video_call('00000000-0000-0000-0000-0000000000b1',
+  array['00000000-0000-0000-0000-0000000000c1', '00000000-0000-0000-0000-0000000000c2']::uuid[], 'VC Head', 'Pitching plan', now() + interval '4 days', 30, '81000000011', '{}',
+  array['e7e7e7e7-0000-0000-0000-000000000005']::uuid[]);
+select pg_temp.expect('one mentor invited', (select string_agg(mentor_name, ',') from public.video_call_mentors
+  where call_id = (select id from public.video_calls where zoom_meeting_id = '81000000011')), 'VC Mentor');
+select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000005"}', false);
+select pg_temp.expect('the invited mentor reads the call', (select count(*) from public.video_calls where zoom_meeting_id = '81000000011'), 1::bigint);
+select pg_temp.expect('and who''s on it', (select count(*) from public.video_call_players where call_id = (select id from public.video_calls where zoom_meeting_id = '81000000011')), 2::bigint);
+select pg_temp.expect('the invited mentor joins as a guest', (select public.video_call_role(id) from public.video_calls where zoom_meeting_id = '81000000011'), 'guest');
+select pg_temp.expect('the invited mentor was told', (select count(*) from public.notifications where href like '/calls/%' and body like 'VC Head (head coach) invited you%'), 1::bigint);
+select pg_temp.expect('a mentor can''t invite mentors', pg_temp.err($$select public.book_video_call('00000000-0000-0000-0000-0000000000b1',
+  array['00000000-0000-0000-0000-0000000000c1']::uuid[], 'VC Mentor', 'Plan', now() + interval '5 days', 30, '81000000012', '{}',
+  array['e7e7e7e7-0000-0000-0000-000000000009']::uuid[])$$), '42501');
+select pg_temp.expect('nobody writes mentor invites directly', pg_temp.err($$insert into public.video_call_mentors (call_id, mentor_id, mentor_name)
+  values ((select id from public.video_calls where zoom_meeting_id = '81000000011'), 'e7e7e7e7-0000-0000-0000-000000000009', 'Me')$$), '42501');
+select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000009"}', false);
+select pg_temp.expect('another mentor doesn''t read it', (select count(*) from public.video_calls where zoom_meeting_id = '81000000011'), 0::bigint);
+select pg_temp.expect('another mentor can''t join it', pg_temp.err($$select public.video_call_role((select id from vc_ids limit 1))$$), '42501');
+select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000006"}', false);
+select pg_temp.expect('Avery''s parent sees the mentor coming', (select string_agg(mentor_name, ',') from public.video_call_mentors), 'VC Mentor');
+select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000007"}', false);
+select pg_temp.expect('Casey sees no mentor invites', (select count(*) from public.video_call_mentors), 0::bigint);
+reset role;
+-- Jordan's parents remove that mentor: they can't join the call any more
+delete from public.mentor_links where mentor_id = 'e7e7e7e7-0000-0000-0000-000000000005' and player_id = '00000000-0000-0000-0000-0000000000c2';
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000005"}', false);
+select pg_temp.expect('a removed mentor can''t join', pg_temp.err($$select public.video_call_role((select id from public.video_calls where zoom_meeting_id = '81000000011'))$$), '42501');
+-- the head coach cancels it; the invited mentor hears
+select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000001"}', false);
+update public.video_calls set cancelled_at = now(), cancelled_by = 'e7e7e7e7-0000-0000-0000-000000000001' where zoom_meeting_id = '81000000011';
+select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000005"}', false);
+select pg_temp.expect('the invited mentor hears it''s off', (select count(*) from public.notifications where title like 'Video call cancelled%' and body like '%Pitching plan%'), 1::bigint);
+reset role;
+
 -- Mentors switched off: her mentor's call can't happen
 set role authenticated;
 select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000001"}', false);
@@ -180,8 +231,8 @@ select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-0000000
 update public.video_calls set cancelled_at = now(), cancelled_by = 'e7e7e7e7-0000-0000-0000-000000000005' where zoom_meeting_id = '81000000006';
 select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000006"}', false);
 select pg_temp.expect('cancelled', (select public.video_call_role(id) from public.video_calls where zoom_meeting_id = '81000000006'), 'cancelled');
--- (and of the group call cancelled above: Avery was invited to it too)
-select pg_temp.expect('her parent was told', (select count(*) from public.notifications where title like 'Video call cancelled%'), 2::bigint);
+-- (and of the group call and the coach's call with a mentor cancelled above: Avery was invited to both)
+select pg_temp.expect('her parent was told', (select count(*) from public.notifications where title like 'Video call cancelled%'), 3::bigint);
 -- the admin turns the team off: nothing on b1 can happen
 select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000003"}', false);
 delete from public.team_video_access where team_id = '00000000-0000-0000-0000-0000000000b1';

@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
 import {
   BOOK_AHEAD_DAYS, CALL_MINUTES, TOPIC_MAX, callDateAndClock, callEnds, callState, cleanCallInput, comingSinceISO, formatCallTime, isComing,
-  callCalendars,
+  callCalendars, mentorFits, mentorsLabel,
 } from "../../src/lib/video-calls.ts";
 
 test("a call's day and clock in the team's time zone (the mentor's calendar)", () => {
@@ -67,4 +67,16 @@ test("which calendars show a call: the picked ones, and a head coach's always on
   assert.deepEqual(callCalendars([], "mentor"), []);
   assert.deepEqual(callCalendars(["player"], "coach"), ["player", "coaches"]);
   assert.deepEqual(callCalendars(["coaches", "everyone", null, "player", "player"], "mentor"), ["player", "coaches"]);
+});
+
+test("a head coach invites only mentors who work with every player on the call", () => {
+  const team = { players: null };
+  const maya = { players: ["maya"] };
+  assert.equal(mentorFits(team, ["maya", "emma"]), true);
+  assert.equal(mentorFits(maya, []), true);
+  assert.equal(mentorFits(maya, ["maya"]), true);
+  assert.equal(mentorFits(maya, ["maya", "emma"]), false);
+  assert.equal(mentorsLabel([]), null);
+  assert.equal(mentorsLabel(["Jess Moreno"]), "Mentor: Jess Moreno");
+  assert.equal(mentorsLabel(["Jess Moreno", "Dana Ortiz"]), "Mentors: Jess Moreno, Dana Ortiz");
 });

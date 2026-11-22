@@ -1,6 +1,7 @@
 import "server-only";
 // A mentor's calendar entries for a date range (user, 2026-11-13): the training she put on her
-// players' weeks, the video calls she booked, and her players' team practices, events and games
+// players' weeks, the video calls she booked or a head coach invited her to (user, 2026-11-22), and her players'
+// team practices, events and games
 // (mentor_calendar(): mentors can't read the team schedule tables themselves). The calendar page and
 // the mentor menu's Coming up both use it.
 import type { createClient } from "@/lib/supabase/server";
@@ -9,7 +10,7 @@ import { EVENT_KINDS, type EventKind } from "@/lib/dugout";
 import { trainingDates } from "@/lib/mentors";
 import { callEvents } from "@/lib/call-events";
 import type { ComingUpItem } from "@/lib/family";
-import { VIDEO_CALL_COLUMNS, type VideoCallRow } from "@/components/video-calls";
+import { callsForMentor } from "@/lib/video-call-data";
 import type { CalEvent, CalGame } from "@/app/(staff)/dugout/calendar/calendar";
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
@@ -26,7 +27,7 @@ export async function loadMentorCalendar(
    */
   { teamSchedule = true }: { teamSchedule?: boolean } = {},
 ): Promise<{ events: CalEvent[]; games: CalGame[] }> {
-  const [{ data: trainingRows }, { data: callRows }, { data: teamRows }] = await Promise.all([
+  const [{ data: trainingRows }, { calls: callRows }, { data: teamRows }] = await Promise.all([
     supabase
       .from("player_activities")
       .select("id, player_id, title, details, days, starts_on, ends_on")
@@ -34,15 +35,8 @@ export async function loadMentorCalendar(
       .eq("created_by", mentorId)
       .lte("starts_on", to)
       .gte("ends_on", from),
-    // a day either side, for time zones
-    supabase
-      .from("video_calls")
-      .select(VIDEO_CALL_COLUMNS)
-      .eq("host_id", mentorId)
-      .is("cancelled_at", null)
-      .gte("starts_at", `${addDays(from, -1)}T00:00:00Z`)
-      .lte("starts_at", `${addDays(to, 1)}T23:59:59Z`)
-      .order("starts_at"),
+    // the calls she hosts and the ones a head coach invited her to; a day either side, for time zones
+    callsForMentor(supabase, mentorId, { since: `${addDays(from, -1)}T00:00:00Z`, until: `${addDays(to, 1)}T23:59:59Z`, limit: 200 }),
     // her players' team practices, events and games (nothing for a mentor not approved yet)
     teamSchedule ? supabase.rpc("mentor_calendar", { p_from: from, p_to: to }) : Promise.resolve({ data: [] }),
   ]);
@@ -97,8 +91,9 @@ export async function loadMentorCalendar(
   const games: CalGame[] = schedule
     .filter((r) => r.item === "game")
     .map((r) => ({ id: r.id, date: r.on_date, start: hhmm(r.start_time), label: whose(r.team_name, r.title), place: r.place }));
-  // every call she hosts is on her own calendar, linking to the call (user, 2026-11-14)
-  const calls = callEvents((callRows ?? []) as VideoCallRow[], from, to, "host");
+  // every call she hosts is on her own calendar, linking to the call (user, 2026-11-14), and every call a head coach
+  // invited her to (user, 2026-11-22)
+  const calls = callEvents(callRows, from, to, "host");
 
   return { events: [...teamEvents, ...training, ...calls], games };
 }

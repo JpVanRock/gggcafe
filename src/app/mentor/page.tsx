@@ -16,7 +16,8 @@ import { RequestForm } from "./mentor-client";
 import { asComingUp, loadMentorCalendar } from "./calendar-data";
 import { withdrawMentorLink } from "./actions";
 import { PlayerTiles, loadMentees, loadTraining, oneOnOne } from "./parts";
-import { VIDEO_CALL_COLUMNS, VideoCallList, type VideoCallRow } from "@/components/video-calls";
+import { VideoCallList } from "@/components/video-calls";
+import { callsForMentor } from "@/lib/video-call-data";
 import { VideoCallForm } from "@/components/video-call-form";
 import { comingSinceISO, isComing } from "@/lib/video-calls";
 import { zoomConfigured } from "@/lib/zoom";
@@ -63,7 +64,7 @@ export default async function MentorHome() {
   }
 
   const today = todayISO();
-  const [cards, training, { data: teamRows }, { data: sent }, { data: callPlayers }, { data: callRows }] = await Promise.all([
+  const [cards, training, { data: teamRows }, { data: sent }, { data: callPlayers }, mentorCalls] = await Promise.all([
     loadMentees(supabase, access.menteeIds),
     mentor ? loadTraining(supabase, mentor.userId) : Promise.resolve([]),
     access.teamIds.length ? supabase.from("teams").select("id, name").in("id", access.teamIds).order("name") : Promise.resolve({ data: [] }),
@@ -75,11 +76,10 @@ export default async function MentorHome() {
           .order("created_at", { ascending: false })
           .limit(5)
       : Promise.resolve({ data: [] }),
-    // video calls (user, 2026-11-14): the players she may call now, and the calls she booked that are ahead
+    // video calls (user, 2026-11-14): the players she may call now, and the calls ahead she booked or a head coach
+    // invited her to (user, 2026-11-22)
     mentor ? supabase.rpc("mentor_call_players") : Promise.resolve({ data: [] }),
-    mentor
-      ? supabase.from("video_calls").select(VIDEO_CALL_COLUMNS).eq("host_id", mentor.userId).is("cancelled_at", null).gte("starts_at", comingSinceISO()).order("starts_at").limit(10)
-      : Promise.resolve({ data: [] }),
+    mentor ? callsForMentor(supabase, mentor.userId, { since: comingSinceISO(), limit: 10 }) : Promise.resolve({ calls: [], invitedTo: new Set<string>() }),
   ]);
   const teams = (teamRows ?? []) as { id: string; name: string }[];
   const nameOf = (id: string) => {
@@ -99,7 +99,7 @@ export default async function MentorHome() {
   // the next few training sessions, one line per session (a group's comes once)
   const sessions = [...new Map(training.map((r) => [[r.title, r.starts_on, r.ends_on, r.days.join(",")].join("|"), r])).values()].slice(0, 3);
   const [nameFirst, ...nameRest] = (mentor?.displayName ?? meta.display_name ?? "Mentor").split(" ");
-  const myCalls = ((callRows ?? []) as VideoCallRow[]).filter((c) => isComing(c));
+  const myCalls = mentorCalls.calls.filter((c) => isComing(c));
   // the players she can book with, by team then name (a group call is for one team)
   const callable = ((callPlayers ?? []) as { player_id: string; team_id: string }[])
     .map((c) => ({ id: c.player_id, name: nameOf(c.player_id), team: cards.get(c.player_id)?.team ?? "Team" }))
@@ -193,8 +193,8 @@ export default async function MentorHome() {
               {/* a clear button first (user, 2026-11-14: "I do not see an actual link ... to schedule a call"); the form opens under it */}
               {callable.length === 0 ? (
                 <p className={menuNote}>
-                  Video calls aren&apos;t on for your players&apos; teams yet. A site admin turns them on for a team, then the head coach lets mentors book them
-                  (the Switchboard).
+                  You can&apos;t book video calls for your players&apos; teams yet. A site admin turns them on for a team, then the head coach lets mentors book them
+                  (the Switchboard). Calls a head coach invites you to show here.
                 </p>
               ) : !zoomConfigured() ? (
                 <p className={menuNote}>Video calls aren&apos;t connected to Zoom yet. A site admin adds the Zoom keys first.</p>
@@ -212,7 +212,7 @@ export default async function MentorHome() {
                   </div>
                 </details>
               )}
-              <VideoCallList calls={myCalls} showPlayer canCancel={() => true} linkClass="text-highlight" empty="No calls booked yet." />
+              <VideoCallList calls={myCalls} showPlayer canCancel={(c) => c.host_id === mentor?.userId} linkClass="text-highlight" empty="No calls booked yet." />
               <p className="text-xs text-[var(--menu-note)]">
                 Held here on GGG.Cafe. Every player&apos;s parents are invited and told; head coaches can drop in; nothing is recorded.
               </p>

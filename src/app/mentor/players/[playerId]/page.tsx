@@ -87,7 +87,7 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
     // her signals, intensity checks and self-scans (never the journal)
     loadMentalTools(supabase, player.id, todayISO()),
   ]);
-  const [{ data: journalRows }, { data: callTeam }, { data: callRows }] = await Promise.all([
+  const [{ data: journalRows }, { data: callTeam }, { data: callRows }, { data: inviteRows }] = await Promise.all([
     // My Journal: only the entries she shared with this mentor (the database shows nothing else)
     supabase
       .from("player_journal_entries")
@@ -100,14 +100,23 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
     // video calls (user, 2026-11-12): her team when an admin turned calls on and her head coach
     // switched them on for mentors; null otherwise
     supabase.rpc("video_call_team", { p_player_id: player.id }),
-    // the calls she booked that invite her (group calls too: the host reads every invite of her calls)
+    // the calls with her that this mentor booked or a head coach invited them to (user, 2026-11-22); group calls
+    // too: the host, and an invited mentor, read every invite of the call
     supabase.from("video_call_players").select("call_id").eq("player_id", player.id),
+    supabase.from("video_call_mentors").select("call_id").eq("mentor_id", mentor.userId),
   ]);
   const callIds = (callRows ?? []).map((r) => r.call_id);
-  const { data: hosted } = callIds.length
-    ? await supabase.from("video_calls").select(VIDEO_CALL_COLUMNS).in("id", callIds).eq("host_id", mentor.userId).order("starts_at", { ascending: false }).limit(RECENT_LIMIT)
+  const invitedTo = (inviteRows ?? []).map((r) => r.call_id);
+  const { data: theirs } = callIds.length
+    ? await supabase
+        .from("video_calls")
+        .select(VIDEO_CALL_COLUMNS)
+        .in("id", callIds)
+        .or(invitedTo.length ? `host_id.eq.${mentor.userId},id.in.(${invitedTo.join(",")})` : `host_id.eq.${mentor.userId}`)
+        .order("starts_at", { ascending: false })
+        .limit(RECENT_LIMIT)
     : { data: [] };
-  const calls = (hosted ?? []) as VideoCallRow[];
+  const calls = (theirs ?? []) as VideoCallRow[];
   const shared = journalRows ?? [];
   const memoPaths = shared.flatMap((j) => (j.audio_path ? [j.audio_path] : []));
   const memoUrls = new Map<string, string>();
@@ -198,7 +207,10 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
             recorded.
           </p>
           {!callTeam ? (
-            <p className="text-sm">Video calls are off for her team right now. Calls already booked can&apos;t go ahead until they&apos;re back on.</p>
+            <p className="text-sm">
+              Video calls are off for mentors on her team right now, so you can&apos;t book one, and calls you booked can&apos;t go ahead until
+              they&apos;re back on.
+            </p>
           ) : zoomConfigured() ? (
             <VideoCallForm player={{ id: player.id, name: first }} />
           ) : (

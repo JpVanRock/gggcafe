@@ -5,18 +5,19 @@
 // time zone; the browser turns them into an exact time for the server. "Show on calendars" (user,
 // 2026-11-14) picks which calendars list it; the booker's own always does. With a list of players, any
 // number of them can be ticked for a group call (user, 2026-11-14), all on one team, up to the whole roster (12 until
-// 2026-11-22).
+// 2026-11-22). A head coach can invite mentors too (user, 2026-11-22): the ones who work with every picked player.
 import { useActionState, useState } from "react";
 import { Field, FormMessage, inputClass, groupLabelClass } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
 import { initialFormState } from "@/lib/form";
-import { CALL_CALENDARS, CALL_MINUTES, TOPIC_MAX, type CallCalendar } from "@/lib/video-calls";
+import { CALL_CALENDARS, CALL_MINUTES, TOPIC_MAX, mentorFits, type CallCalendar, type CallMentor } from "@/lib/video-calls";
 import { scheduleVideoCall } from "@/app/calls/actions";
 
 export function VideoCallForm({
   teamId,
   player,
   players,
+  mentors,
 }: {
   /** a head coach books on this team */
   teamId?: string;
@@ -24,6 +25,8 @@ export function VideoCallForm({
   player?: { id: string; name: string };
   /** the Dugout Calendar's roster, or a mentor's players (with their team): tick one or several */
   players?: { id: string; name: string; team?: string }[];
+  /** a head coach's form: mentors they can invite (each fits only calls with players they work with) */
+  mentors?: CallMentor[];
 }) {
   const [state, action] = useActionState(scheduleVideoCall, initialFormState);
   const [when, setWhen] = useState("");
@@ -36,6 +39,9 @@ export function VideoCallForm({
   const teamOf = new Map((players ?? []).map((p) => [p.id, p.team ?? ""]));
   const pickedTeam = picked.size ? teamOf.get([...picked][0]) : undefined;
   const teamNames = [...new Set((players ?? []).map((p) => p.team ?? ""))];
+  // ticked mentors; one who doesn't work with every picked player is greyed out and left off the booking
+  const [invited, setInvited] = useState<Set<string>>(() => new Set());
+  const invitedNow = (mentors ?? []).filter((m) => invited.has(m.id) && mentorFits(m, picked));
   // "Select all players" (user, 2026-11-22: "so don't have to check one by one") ticks all of a team's players
   // and clears any other team's; with everyone on, it clears them. The player boxes stay uncontrolled (see their
   // onChange), so it sets the boxes and then reads them back.
@@ -69,7 +75,11 @@ export function VideoCallForm({
       </label>
     );
   };
-  const summary = [booker === "coach" ? "Coaches Dugout (yours)" : "Your calendar", ...choices.filter((c) => shown.has(c.key)).map((c) => c.label)].join(", ");
+  const summary = [
+    booker === "coach" ? "Coaches Dugout (yours)" : "Your calendar",
+    ...choices.filter((c) => shown.has(c.key)).map((c) => c.label),
+    ...(invitedNow.length ? ["Invited mentors' calendars"] : []),
+  ].join(", ");
   const startsAt = (() => {
     const d = when ? new Date(when) : null;
     return d && !Number.isNaN(d.getTime()) ? d.toISOString() : "";
@@ -81,6 +91,7 @@ export function VideoCallForm({
       onReset={() => {
         setShown(new Set(choices.map((c) => c.key)));
         setPicked(new Set());
+        setInvited(new Set());
       }}
       className="grid gap-4 sm:grid-cols-2"
     >
@@ -130,6 +141,46 @@ export function VideoCallForm({
           ))}
         </fieldset>
       )}
+      {mentors && mentors.length > 0 && (
+        <fieldset className="flex min-w-0 flex-col gap-2 sm:col-span-2">
+          <legend className="mb-1.5 text-sm font-medium">
+            Invite mentors <span className="ml-1.5 text-xs font-normal text-muted">Optional</span>
+          </legend>
+          <p className="text-xs text-muted">
+            It goes on their mentor calendar and they can join. A mentor can join only calls with players they work with.
+          </p>
+          <div className="grid gap-x-4 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
+            {mentors.map((m) => {
+              const fits = mentorFits(m, picked);
+              return (
+                <label key={m.id} className={`flex items-start gap-2.5 ${fits ? "cursor-pointer" : "opacity-50"}`}>
+                  <input
+                    type="checkbox"
+                    name="mentor_id"
+                    value={m.id}
+                    checked={fits && invited.has(m.id)}
+                    disabled={!fits}
+                    onChange={(e) => {
+                      const on = e.currentTarget.checked;
+                      setInvited((prev) => {
+                        const next = new Set(prev);
+                        if (on) next.add(m.id);
+                        else next.delete(m.id);
+                        return next;
+                      });
+                    }}
+                    className="mt-0.5 size-5 shrink-0 accent-pink"
+                  />
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-medium">{m.name}</span>
+                    <span className="block truncate text-xs text-muted">{m.note}</span>
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        </fieldset>
+      )}
       <Field label="Day and time" hint="In your time zone." required>
         <input type="datetime-local" name="when" required value={when} onChange={(e) => setWhen(e.target.value)} className={inputClass} />
       </Field>
@@ -155,7 +206,7 @@ export function VideoCallForm({
             </span>
           </summary>
           <div className="mt-2 flex flex-col gap-3 rounded-md border border-navy-600 bg-navy-900 p-3">
-            <p className="text-xs text-muted">{booker === "coach" ? "Always on the Coaches Dugout calendar (yours)." : "Always on your own calendar."}</p>
+            <p className="text-xs text-muted">{booker === "coach" ? "Always on the Coaches Dugout calendar (yours), and on each invited mentor's calendar." : "Always on your own calendar."}</p>
             {choices.map((c) => (
               <label key={c.key} className="flex cursor-pointer items-start gap-2.5">
                 <input
