@@ -41,7 +41,7 @@ export default async function LeadershipPlanPage({ params }: PageProps<"/players
         {!light && (
         <section>
           <h2 className={`mb-3 text-pink-soft ${groupLabelClass}`}>Where I stand</h2>
-          <div className="overflow-x-auto rounded-xl border border-navy-700">
+          <div className="relative overflow-x-auto rounded-xl border border-navy-700">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left font-sans text-2xs tracking-wider text-muted uppercase">

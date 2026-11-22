@@ -6,8 +6,9 @@
 export const CALL_MINUTES = [15, 30, 45, 60, 90] as const;
 export type CallMinutes = (typeof CALL_MINUTES)[number];
 export const TOPIC_MAX = 120;
-/** A group call has up to this many players, all on one team (user, 2026-11-14; book_video_call checks it too). */
-export const CALL_MAX_PLAYERS = 12;
+/** A group call has up to this many players, all on one team (user, 2026-11-14; 20 from 2026-11-22, migration
+ * 20261122161228; book_video_call checks it too). */
+export const CALL_MAX_PLAYERS = 20;
 
 /** "Group call · 3 players" for a call with more than one player, else null. */
 export function groupLabel(groupSize: number): string | null {

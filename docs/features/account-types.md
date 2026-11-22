@@ -2,7 +2,7 @@
 - Four sign-ups at /register, each confirms its email first (Supabase Auth "Confirm email" is on; keep it on), each with
   its own home: Head Coach (staff role `coach`, an admin approves) and Assistant Coach (role `assistant`, a head coach or
   admin approves) → /dashboard; Parent → /family; Mentor → /mentor. Players don't sign up (user, 2026-11-16): a parent
-  makes every player's login (below); players who signed up earlier keep /me. Admin (`admin`) isn't a sign-up: head
+  creates every player's login (below); players who signed up earlier keep /me. Admin (`admin`) isn't a sign-up: head
   coach + staff, mentors, G3 Advanced, FAQ. `viewer` stays as read-only staff (admins set it).
 - Every sign-up checks the Terms of Service box; accounts without an agreement are asked once on /terms/accept
   (`docs/features/legal.md`).

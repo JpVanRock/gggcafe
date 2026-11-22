@@ -20,7 +20,7 @@ HOSTING:  Vercel team "GGG", project `gggcafe`, https://www.ggg.cafe (main addre
 
 ## Layout
 ```
-src/app/                 pages (App Router): /, /login and /register are public (sign-up has no code: parents, assistant coaches and mentors join a team with its parent code once signed in; players don't sign up, a parent makes their login); /family is the parents' home (the family menu: boards that open /family/team, budget, forms, packet, logins, mentors, calendar, yearbook),
+src/app/                 pages (App Router): /, /login and /register are public (sign-up has no code: parents, assistant coaches and mentors join a team with its parent code once signed in; players don't sign up, a parent creates their login); /family is the parents' home (the family menu: boards that open /family/team, budget, forms, packet, logins, mentors, calendar, yearbook),
                          /me the players' home (claims; then her dashboard at /players/[id])
 src/app/(staff)/         signed-in area with shared nav: dashboard (own view per role), teams, players
                          (each feature folder has page.tsx, actions.ts, client forms)
@@ -123,7 +123,10 @@ tests/unit/              node --test unit tests (npm run test:unit)
   route needs a sample value in `scripts/lib/sample-site.mjs` (`fill`) and, if it reads new tables, sample rows in
   `sample/data.ts`. To look at pages with sample data: launch config `site-sample` (port 3159) after a build.
   The accessibility check runs axe-core (WCAG 2.2 A/AA) on every sample page in headless Chrome (`CHROME_PATH`, or the
-  runner's google-chrome), then contrast again in Day Game; it fails on critical or serious problems (`scripts/test-a11y.mjs`).
+  runner's google-chrome), then contrast again in Day Game, then reflow on a 320px phone (nothing wider than the screen:
+  phones zoom out and the page sits in the left part of the screen); it fails on critical or serious problems
+  (`scripts/test-a11y.mjs`). A sideways scroller (`overflow-x-auto`) is `relative`, like `TableScroll`, so `sr-only`
+  labels inside it can't widen the page.
   `npm run screens` saves the key pages at phone and desktop width in both themes to `screens/` (`-- --compare <dir>` marks
   what changed since an earlier run); CI keeps each run's screens as the `screens` artifact.
 
@@ -256,7 +259,8 @@ like a sports brand or media-day graphics. Never childish or preschool.
   stretch/outline/add effects/recolor. Sign-in page: logo 8.4rem, tagline, "Good Vibes Only".
 - Night Game (dark, default) / Day Game (white) switch at the top right (`src/components/theme-toggle.tsx`,
   `html[data-theme="day"]`, saved in localStorage `ggg-theme`, applied before paint by a script in the
-  root layout). Day Game only re-maps tokens in `globals.css`, so use tokens by ROLE:
+  root layout). Browsers' night modes are kept off (`<meta name="darkreader-lock">` in the root layout for
+  Firefox iPhone and Dark Reader; `color-scheme: only light` by day for Chrome's auto dark). Day Game only re-maps tokens in `globals.css`, so use tokens by ROLE:
   `text-highlight` for emphasis text (neon at night, navy by day; never `text-neon`), `text-link` for pink text,
   `text-on-accent` for text on neon/pink fills (never `text-navy-950`), `bg-neon`/`bg-pink` for fills.
   `keep-night` keeps a piece in night colors (the field diagram; the navy chip behind the footer

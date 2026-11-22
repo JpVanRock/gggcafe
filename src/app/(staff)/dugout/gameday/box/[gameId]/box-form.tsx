@@ -188,7 +188,7 @@ export function BoxScoreForm({
 
       <Card title="Pitching">
         {pitching.length > 0 && (
-          <div className="mb-3 overflow-x-auto">
+          <div className="relative mb-3 overflow-x-auto">
             <table className="text-sm">
               <thead>
                 <tr>

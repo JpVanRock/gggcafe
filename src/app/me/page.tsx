@@ -168,7 +168,7 @@ async function Me({ searchParams }: Pick<PageProps<"/me">, "searchParams">) {
         <Card title="Your login comes from a parent">
           <p className="text-sm text-muted">
             Players don&apos;t join a team on their own. Ask your parent to join your team on GGG.Cafe with the parent code from your coach, then
-            make your login from their family page (Logins &amp; Teams). You&apos;ll sign in with that username and password.
+            create your login on their family page (Logins &amp; Teams). You&apos;ll sign in with that username and password.
           </p>
         </Card>
       )}

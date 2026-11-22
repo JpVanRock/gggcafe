@@ -45,7 +45,7 @@ export function TabRow({ label, current = "", children }: { label: string; curre
   const fade = "pointer-events-none absolute inset-y-0 w-10 from-navy-950 to-transparent transition-opacity duration-200";
   return (
     <nav aria-label={label} className="relative -mx-4">
-      <div ref={scroller} className="overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div ref={scroller} className="relative overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {children}
       </div>
       <span aria-hidden className={`${fade} left-0 bg-linear-to-r ${more.before ? "opacity-100" : "opacity-0"}`} />

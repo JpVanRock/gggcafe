@@ -71,7 +71,7 @@ export default async function AccountTypesPage() {
         </span>
       </p>
 
-      <div className="overflow-x-auto rounded-2xl border border-navy-700">
+      <div className="relative overflow-x-auto rounded-2xl border border-navy-700">
         <table className="w-full min-w-[40rem] text-sm">
           <thead className="bg-navy-900">
             <tr>

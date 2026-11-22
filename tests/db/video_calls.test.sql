@@ -134,8 +134,11 @@ select pg_temp.expect('not a player she doesn''t mentor', pg_temp.err($$select p
   array['00000000-0000-0000-0000-0000000000c1', '00000000-0000-0000-0000-0000000000c3']::uuid[], 'VC Mentor', 'Group', now() + interval '3 days', 30, '81000000010', '{}')$$), '42501');
 select pg_temp.expect('at least one player', pg_temp.err($$select public.book_video_call('00000000-0000-0000-0000-0000000000b1',
   '{}'::uuid[], 'VC Mentor', 'Group', now() + interval '3 days', 30, '81000000010', '{}')$$), '22023');
-select pg_temp.expect('at most 12', pg_temp.err($$select public.book_video_call('00000000-0000-0000-0000-0000000000b1',
-  (select array_agg(gen_random_uuid()) from generate_series(1, 13)), 'VC Mentor', 'Group', now() + interval '3 days', 30, '81000000010', '{}')$$), '22023');
+-- up to 20 players (migration 20261122161228): 21 is too many; 20 passes the count and fails on the unknown players
+select pg_temp.expect('at most 20', pg_temp.err($$select public.book_video_call('00000000-0000-0000-0000-0000000000b1',
+  (select array_agg(gen_random_uuid()) from generate_series(1, 21)), 'VC Mentor', 'Group', now() + interval '3 days', 30, '81000000010', '{}')$$), '22023');
+select pg_temp.expect('20 is within the limit', pg_temp.err($$select public.book_video_call('00000000-0000-0000-0000-0000000000b1',
+  (select array_agg(gen_random_uuid()) from generate_series(1, 20)), 'VC Mentor', 'Group', now() + interval '3 days', 30, '81000000010', '{}')$$), '42501');
 select public.book_video_call('00000000-0000-0000-0000-0000000000b1',
   array['00000000-0000-0000-0000-0000000000c1', '00000000-0000-0000-0000-0000000000c2', '00000000-0000-0000-0000-0000000000c1']::uuid[],
   'VC Mentor', 'Group hitting', now() + interval '3 days', 30, '81000000009', array['player', 'family']);

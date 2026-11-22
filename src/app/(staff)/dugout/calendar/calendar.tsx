@@ -368,7 +368,7 @@ export function CalendarView({
                       type="button"
                       onClick={() => setMode({ type: "add", date })}
                       aria-label={`Add an event on ${dayLabel(date)}`}
-                      className="rounded px-1.5 text-sm leading-5 text-muted opacity-60 transition group-hover:opacity-100 hover:bg-navy-800 hover:text-highlight focus-visible:opacity-100"
+                      className="rounded px-1.5 text-sm leading-5 text-muted transition hover:bg-navy-800 hover:text-highlight"
                     >
                       +
                     </button>

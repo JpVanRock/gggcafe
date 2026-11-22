@@ -320,7 +320,7 @@ export async function decidePlayerClaim(_prev: FormState, fd: FormData): Promise
       .select("id");
     // under 13 without verified parental consent (COPPA): the database refuses
     if (result.error?.code === "P0008") {
-      return failed("She's under 13, so she can't have her own account yet. Decline this claim: her parent gives verified consent on the family page, then makes her login.");
+      return failed("She's under 13, so she can't have her own account yet. Decline this claim: her parent gives verified consent on the family page, then creates her login.");
     }
     if (!must(result).data?.length) return failed(ALREADY_DECIDED);
     refresh();

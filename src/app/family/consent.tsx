@@ -36,7 +36,7 @@ export function ConsentAccept({
         <p className="font-semibold">Your consent comes first</p>
         <p className="text-sm text-muted">
           {firstName} is under 13. A federal law (COPPA) requires a parent&apos;s consent before she can sign in. Read the notice, then accept
-          it below; you can make her login right after.
+          it below; you can create her login right after.
         </p>
       </div>
       {declinedNote && (
@@ -127,7 +127,7 @@ export function ConsentOnFile({
         {waiting
           ? method === "video_call"
             ? `You asked for a video call on ${date}. A GGG.Cafe admin will email you to set it up.`
-            : `You sent your signed form on ${date}. GGG.Cafe staff check it, usually within two business days; then you can make ${firstName}'s login here.`
+            : `You sent your signed form on ${date}. GGG.Cafe staff check it, usually within two business days; then you can create ${firstName}'s login here.`
           : `${method === "online" ? "You accepted it" : "Checked"} on ${date}. You can withdraw it at any time: ${firstName}'s login is deleted right away and she can't sign in.`}
       </p>
       <ActionForm action={withdrawParentalConsent} className="flex flex-wrap items-center gap-3">

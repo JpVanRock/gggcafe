@@ -368,10 +368,15 @@ export const tdClass = "border-b border-navy-800 py-2 pr-4";
 /**
  * A wide table that scrolls sideways on phones. The scroll area can be focused and scrolled with
  * the arrow keys, and screen readers announce it by `label` ("Batting stats").
+ *
+ * `relative` keeps the table's screen-reader-only labels (`sr-only` is absolutely positioned) inside
+ * the scroll area. Without it they sat past the screen's edge and widened the whole page, so phones
+ * zoomed out and the page filled only the left part of the screen (user, 2026-11-22: Team Budget on
+ * iPhone). Any other sideways scroller needs `relative` too.
  */
 export function TableScroll({ label, children, className = "" }: { label: string; children: ReactNode; className?: string }) {
   return (
-    <div role="region" aria-label={label} tabIndex={0} className={`overflow-x-auto ${className}`}>
+    <div role="region" aria-label={label} tabIndex={0} className={`relative overflow-x-auto ${className}`}>
       {children}
     </div>
   );

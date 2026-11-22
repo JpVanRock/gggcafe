@@ -69,7 +69,9 @@
  * (`on-accent`). Small-text pink and red go darker so they read on white.
  */
 :root[data-theme="day"] {
-  color-scheme: light;
+  /* "only": browsers that force a dark look on light pages (Chrome's auto dark) leave Day Game alone;
+     the darkreader-lock tag in the root layout does the same for Dark Reader and Firefox's night mode */
+  color-scheme: only light;
   --color-navy-950: #ffffff; /* page */
   --color-navy-900: #f4f6fb; /* cards */
   --color-navy-800: #e9edf6; /* inputs, hover rows */
@@ -79,11 +81,13 @@
   --color-neon-edge: #000a2d; /* a neon edge becomes a navy outline (design audit 2026-11-18, G3) */
   --color-numeral: #dfe4ef;  /* by day it stays light, so it never runs through the name (design audit P5) */
   --color-ink: #000a2d;      /* main text: brand navy */
-  --color-muted: #4a5578;    /* secondary text (7:1 on white) */
+  /* Text colors by day are 7:1 or more on white and the cards (user, 2026-11-21: the earlier
+     5.5:1 pink and red, in small letter-spaced labels, were hard to read on white). */
+  --color-muted: #3a4466;    /* secondary text (9.5:1 on white, 6.8:1 on the navy-700 boards) */
   --color-highlight: #000a2d;
-  --color-pink-soft: #c2135d; /* pink text (5.6:1 on white) */
-  --color-link: #c2135d;      /* brand pink is 3.7:1 on white, too faint for text */
-  --color-danger: #c62828;
+  --color-pink-soft: #a50d4e; /* pink text (7.6:1 on white, 7:1 on cards) */
+  --color-link: #a50d4e;      /* brand pink is 3.7:1 on white, too faint for text */
+  --color-danger: #a61d1d;    /* errors (7.5:1 on white) */
 }
 
 /*
@@ -115,7 +119,17 @@ body {
   font-family: var(--font-sans);
   font-size: var(--text-base);
   line-height: var(--text-base--line-height);
-  /* decorative doodles may hang off a board's edge, never off the page */
+  /* Nothing may make the page wider than the screen: phones zoom out to fit a too-wide page, so it
+     fills only the left part of the screen (user, 2026-11-22). The body clips sideways overflow
+     itself (the overflow on html keeps the body's from passing to the window, where it clipped
+     nothing on iPhone), and `relative` makes it the box that absolutely positioned pieces sit in, so
+     they're clipped too. `clip`, not `hidden`: it doesn't make a scroll box, so the sticky header
+     still sticks. Decorative pieces may hang off a board's edge, never off the page. */
+  position: relative;
+  overflow-x: clip;
+}
+
+html {
   overflow-x: clip;
 }
 
@@ -287,6 +301,7 @@ select:not([multiple]):not([size]) {
     background: #fff !important;
     margin: 0 !important;
     padding: 0 !important;
+    overflow: visible !important;
   }
   .certificate-print {
     page: certificate;

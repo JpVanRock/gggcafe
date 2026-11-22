@@ -4,7 +4,7 @@
 // a head coach on the Dugout Calendar (pick the player). The day and time are in the booker's own
 // time zone; the browser turns them into an exact time for the server. "Show on calendars" (user,
 // 2026-11-14) picks which calendars list it; the booker's own always does. With a list of players, any
-// number of them can be ticked for a group call (user, 2026-11-14), all on one team, up to 12.
+// number of them can be ticked for a group call (user, 2026-11-14), all on one team, up to 20 (12 until 2026-11-22).
 import { useActionState, useState } from "react";
 import { Field, FormMessage, inputClass, groupLabelClass } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
@@ -35,6 +35,43 @@ export function VideoCallForm({
   const teamOf = new Map((players ?? []).map((p) => [p.id, p.team ?? ""]));
   const pickedTeam = picked.size ? teamOf.get([...picked][0]) : undefined;
   const teamNames = [...new Set((players ?? []).map((p) => p.team ?? ""))];
+  // "Select all" (user, 2026-11-22: "so don't have to check one by one") ticks a team's players, up to the
+  // call's limit, and clears any other team's; with everyone on, it clears them. The player boxes stay
+  // uncontrolled (see their onChange), so it sets the boxes and then reads them back.
+  const selectAll = (team: string) => {
+    const onTeam = (players ?? []).filter((p) => (p.team ?? "") === team);
+    if (onTeam.length < 2) return null;
+    const ticked = onTeam.filter((p) => picked.has(p.id)).length;
+    const allOn = ticked > 0 && ticked === Math.min(onTeam.length, CALL_MAX_PLAYERS);
+    const lockedOut = pickedTeam !== undefined && team !== pickedTeam;
+    const tooMany = onTeam.length > CALL_MAX_PLAYERS;
+    return (
+      <label className={`flex items-center gap-2.5 border-b border-navy-700 pb-2 ${lockedOut ? "opacity-50" : "cursor-pointer"}`}>
+        <input
+          type="checkbox"
+          checked={allOn}
+          disabled={lockedOut}
+          // part of the team ticked: the box shows a dash
+          ref={(el) => {
+            if (el) el.indeterminate = ticked > 0 && !allOn;
+          }}
+          onChange={(e) => {
+            const boxes = [...(e.currentTarget.form?.querySelectorAll<HTMLInputElement>('input[name="player_id"]') ?? [])];
+            let n = 0;
+            for (const b of boxes) b.checked = !allOn && b.dataset.team === team && n++ < CALL_MAX_PLAYERS;
+            setPicked(new Set(boxes.filter((b) => b.checked).map((b) => b.value)));
+          }}
+          className="size-5 shrink-0 accent-pink"
+        />
+        <span className="text-sm font-semibold">
+          {tooMany ? `Select the first ${CALL_MAX_PLAYERS}` : "Select all"}
+          <span className="ml-1.5 text-xs font-normal text-muted">
+            {onTeam.length} players{tooMany && `; a call holds up to ${CALL_MAX_PLAYERS}`}
+          </span>
+        </span>
+      </label>
+    );
+  };
   const summary = [booker === "coach" ? "Coaches Dugout (yours)" : "Your calendar", ...choices.filter((c) => shown.has(c.key)).map((c) => c.label)].join(", ");
   const startsAt = (() => {
     const d = when ? new Date(when) : null;
@@ -66,6 +103,7 @@ export function VideoCallForm({
           {teamNames.map((team) => (
             <div key={team || "team"} className="flex flex-col gap-2">
               {teamNames.length > 1 && <p className={`text-pink-soft ${groupLabelClass}`}>{team}</p>}
+              {selectAll(team)}
               <div className="grid gap-x-4 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
                 {(players ?? [])
                   .filter((p) => (p.team ?? "") === team)
@@ -78,6 +116,7 @@ export function VideoCallForm({
                           type="checkbox"
                           name="player_id"
                           value={p.id}
+                          data-team={p.team ?? ""}
                           disabled={otherTeam || full}
                           // read every box, so the count and the team lock match them even after a tick made before the page was ready
                           onChange={(e) => {

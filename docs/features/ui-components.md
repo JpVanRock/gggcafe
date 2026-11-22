@@ -30,6 +30,11 @@ pink by day, because brand pink is 3.7:1 on white) **(tested)**, `text-on-accent
 fills, `text-pink-soft` for small pink labels. No zinc/gray/slate and no `dark:` **(tested)**. Neon edges (borders, rings)
 use `border-neon-edge`: neon at night, brand navy by day, where neon on white is 1.15:1 **(tested)**. `--color-numeral` is
 the big outlined jersey number behind a name (faint pink at night, light by day so it never fights the name).
+Day Game's text colors (muted, pink, red) are 7:1 or more on white and the cards (user, 2026-11-21: the 5.5:1 pink in
+small letter-spaced labels was hard to read). Text on a pink board is full navy (5.3:1, the most navy gets on brand pink),
+never faded. Browsers' own night modes stay off, so both games show as designed: the root layout's
+`<meta name="darkreader-lock">` (Firefox for iPhone's night mode and the Dark Reader extensions; they had turned Day Game
+into pale text and black fields on white, user 2026-11-21) and Day Game's `color-scheme: only light` (Chrome's auto dark).
 
 ## Components (`src/components/ui.tsx` unless noted)
 
@@ -55,7 +60,7 @@ the big outlined jersey number behind a name (faint pink at night, light by day 
 | `EmptyState` | `title?`, `children?`, `action?` | A whole section or list with nothing in it: say what will show up here, and give the action when the viewer can fix it. Inside a card that has other content, one muted sentence (`text-sm text-muted`) is lighter and enough. |
 | `Loading` | `label?` | Every `loading.tsx`: a pulsing outline of a page (still for reduced motion); screen readers hear "Loading…". |
 | `TabRow` (`tab-row.tsx`) | `label`, `current?` | A tab row that scrolls sideways (Dugout tabs, player sections, age groups): fades at the edge that has more tabs, and scrolls the current tab into view. |
-| `TableScroll` | `label`, `className?` | Wraps a wide table: scrolls sideways on phones, focusable and named for keyboard and screen-reader users. |
+| `TableScroll` | `label`, `className?` | Wraps a wide table: scrolls sideways on phones, focusable and named for keyboard and screen-reader users. It is `relative`, so a column's screen-reader-only label (`sr-only`, absolutely positioned) scrolls with the table; any other sideways scroller (`overflow-x-auto`) needs `relative` too. Unpositioned, those labels widened the page and phones zoomed out (user, 2026-11-22: Team Budget on iPhone sat in the left part of the screen). The body also clips anything wider than the screen (globals.css), and `npm run test:a11y` fails a page that is wider than a 320px phone (WCAG 1.4.10 Reflow). |
 | `SiteHeader` (`site-header.tsx`) | `home`, `nav`, `account?` (Sign out), `count?`, `width?` | The one header for staff, player, family and mentor pages. On phones the links and account fold behind a Menu button (`HeaderMenu`) that carries the approvals/notifications count (`MenuCount`); from 640px up it is one row that sticks to the top, with who is signed in, the Night/Day switch and Sign out behind one Account button (`AccountMenu`, `account-menu.tsx`). `StickyHeaderOffset` keeps `--header-h` on `<html>` at the sticky header's height, and `scroll-padding-top` (globals.css) uses it, so keyboard focus and `#anchors` never land under the header (WCAG 2.4.11). Header links use `navClass` and `navItemClass` (40px tap targets on phones). |
 | `NavLink` (`nav-link.tsx`) | `href`, `section?`, `exact?` | Header links; the current section is highlighted and `aria-current="page"`. `exact` for a home link. |
 | `SkipLink` | | First thing a keyboard user reaches; jumps to `<main id="main">`. Every layout's `<main>` has `id="main"`. |

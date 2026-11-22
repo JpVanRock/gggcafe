@@ -42,7 +42,7 @@ export async function registerAccount(_prev: RegisterState, fd: FormData): Promi
   };
   const fail = (error: string, field?: string): RegisterState => ({ error, values, ...(field ? { fields: { [field]: error } } : {}) });
   if (!role) return fail("Choose your account type.", "role");
-  if (role === "player") return fail("Players don't sign up here. Your parent makes your login from their family page.", "role");
+  if (role === "player") return fail("Players don't sign up here. Your parent creates your login on their family page.", "role");
   const mentor = role === "mentor";
   const headCoach = role === "head-coach";
   const assistant = role === "assistant-coach";

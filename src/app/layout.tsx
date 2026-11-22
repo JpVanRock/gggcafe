@@ -41,6 +41,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     // suppressHydrationWarning: the boot script may set data-theme="day" before React loads
     <html lang="en" className={`${dmSans.variable} ${jost.variable} h-full antialiased`} suppressHydrationWarning>
       <head>
+        {/* The site has its own dark look (Night Game), so browsers' "night mode" recoloring stays off:
+            Firefox for iPhone's night mode and the Dark Reader extensions skip pages with this tag. Their
+            recoloring had made Day Game unreadable (pale text on white, black fields; user, 2026-11-21).
+            Chrome's forced dark is turned off in globals.css (color-scheme: only light). */}
+        <meta name="darkreader-lock" />
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
       </head>
       <body className="flex min-h-full flex-col">

@@ -61,7 +61,7 @@ export const TERMS_SECTIONS: LegalSection[] = [
     blocks: [
       "You accept these Terms when you create an account, check the box agreeing to them, or use the Service. Checking the box is your electronic signature and has the same effect as signing on paper. If you don't agree, don't use the Service.",
       "If you're under 18, your parent or legal guardian must read and agree to these Terms for you. A parent or guardian who lets a minor use the Service agrees to these Terms on the minor's behalf and on their own, and is responsible for the minor's use, including the assumption of risk, the release, the indemnity and the arbitration agreement below.",
-      "Children under 13 can't create their own account. Their parent or guardian first gives consent on the family page by reading our notice and accepting it, then makes the player's login there, as our Privacy & Security Notice describes.",
+      "Children under 13 can't create their own account. Their parent or guardian first gives consent on the family page by reading our notice and accepting it, then creates the player's login there, as our Privacy & Security Notice describes.",
       "If you use the Service for a team, club, school or other organization, you confirm that you're allowed to accept these Terms for it, and these Terms bind both you and the organization. Either way, you're personally bound.",
       "You can't use the Service if the law doesn't allow you to, or if we've removed you from it before.",
     ],
@@ -81,7 +81,7 @@ export const TERMS_SECTIONS: LegalSection[] = [
     title: "Your account",
     blocks: [
       "Give accurate information and keep it current. Use one account per person and don't sell, lend or share it. Keep your password private: you're responsible for everything done with your account. Tell your coach or us right away if you think someone else has used it.",
-      "A parent who makes a player login for their child is responsible for that login and how it's used.",
+      "A parent who creates a player login for their child is responsible for that login and how it's used.",
       "Team codes are for the people a coach invites. Don't post or share them publicly. Coaches are responsible for who they invite and approve.",
       "We, and the coaches and admins who approve accounts, can decline, limit, suspend or remove any account at any time, including for breaking these Terms.",
     ],
@@ -322,7 +322,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     title: "What we collect",
     blocks: [
       [
-        "Account information: name, email address (or the username a parent made for a player), account type, team and the team code used to join. Passwords are stored by our sign-in provider as secure hashes; nobody at GGG.Cafe can see them.",
+        "Account information: name, email address (or the username a parent created for a player), account type, team and the team code used to join. Passwords are stored by our sign-in provider as secure hashes; nobody at GGG.Cafe can see them.",
         "Player information: profile details (for example birth date, graduation year, positions, jersey number, bats and throws), photos, walk-up songs, training and test results, measurements, stats, goals, check-offs, journal entries (typed, or voice memos she records), mental-game entries, quiz and test results, notes and messages.",
         "Family and medical information that parents and coaches choose to add: emergency contacts, allergies, conditions, medications, physician and insurance details, and preseason questionnaire answers (such as uniform sizes).",
         "Coach, mentor and parent information: name, role, specialty, team and the content you add.",

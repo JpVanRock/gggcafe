@@ -18,8 +18,9 @@ to every call.
   dashboard (`/mentor`, user 2026-11-14). This needs both the admin's switch and the head coach's switch to be
   on, for every one of her current teams.
 - **Group calls** (user, 2026-11-14; migration 20261114224959): the dashboard's form, and the Dugout Calendar's,
-  tick one player or several (up to 12, `CALL_MAX_PLAYERS`), all on one team (picking one greys out the other
-  teams). `video_calls.player_id` stays the first player; `video_call_players` lists everyone invited (a trigger
+  tick one player or several (up to 20, `CALL_MAX_PLAYERS`; 12 until 2026-11-22, migration 20261122161228), all on one team (picking one greys out the other
+  teams). A "Select all" box over each team's players ticks them all at once (user, 2026-11-22; a team over 20
+  gets "Select the first 20"), with a dash when only some are ticked. `video_calls.player_id` stays the first player; `video_call_players` lists everyone invited (a trigger
   adds the first, so every call has its list) and `group_size` how many. Booking is one step,
   `book_video_call()`, which checks every player as the insert rules do (a mentor: her approved roster too).
   Every invited player and her parents read the call, join it (`video_call_role`), are told (a notice as each
@@ -171,5 +172,6 @@ into the call.
 - (Done 2026-11-13: the job worker emails her approved parents when a call is booked or cancelled,
   once Resend and the jobs secret are set up; docs/architecture/jobs.md. A cancelled call's Zoom
   meeting is also deleted by a job, with retries.)
-- Team-wide calls: a group call has up to 12 players from one team (2026-11-14); there's no whole-team broadcast.
+- Team-wide calls: a group call has up to 20 players from one team (12 from 2026-11-14, 20 from 2026-11-22); there's no
+  broadcast to more than one team.
 - Calls at the same time (see "One call at a time" under Rules).

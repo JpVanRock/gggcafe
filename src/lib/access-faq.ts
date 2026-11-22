@@ -4,7 +4,7 @@
 // with the site when features change. No imports, so it runs in unit tests.
 
 export const TIERS = [
-  { key: "standard", label: "Standard Access", note: "Every player whose profile claim a coach approves, or whose parent made her login." },
+  { key: "standard", label: "Standard Access", note: "Every player whose profile claim a coach approves, or whose parent created her login." },
   { key: "advanced", label: "Advanced Access", note: "G3 Advanced: a head coach or admin unlocks it per player today; a paid subscription later." },
 ] as const;
 
@@ -97,7 +97,7 @@ export const FAQ: { q: string; a: string[] }[] = [
   {
     q: "What's the difference between Standard and Advanced Access?",
     a: [
-      "Standard Access is everything on the site for a player whose profile claim a coach has approved (or whose parent made her login): her menu, TWIS, goals, Softball IQ, the Trophy Room, training and the offseason Leaderboard.",
+      "Standard Access is everything on the site for a player whose profile claim a coach has approved (or whose parent created her login): her menu, TWIS, goals, Softball IQ, the Trophy Room, training and the offseason Leaderboard.",
       "Advanced Access adds G3 Advanced: Movement Preferences in her Pop Report, her How to Cook book, position chapters, and the G3 Leadership Guide for players her coach picks.",
     ],
   },

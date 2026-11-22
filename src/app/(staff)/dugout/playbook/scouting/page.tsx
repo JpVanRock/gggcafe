@@ -96,7 +96,7 @@ export default async function ScoutingPage({ searchParams }: PageProps<"/dugout/
                 }`}
               >
                 {o.name}
-                {count.get(o.id) ? <span className="ml-1.5 font-sans text-xs opacity-80">{count.get(o.id)}</span> : null}
+                {count.get(o.id) ? <span className="ml-1.5 font-sans text-xs">{count.get(o.id)}</span> : null}
               </Link>
             ))}
           </nav>

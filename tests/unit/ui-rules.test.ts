@@ -40,6 +40,12 @@ test("pink text uses the link token (brand pink is too faint on white in Day Gam
   assert.deepEqual(find(/(?<![\w-])text-pink(?![\w-])/), [], "use text-link (or text-pink-soft for labels)");
 });
 
+test("sideways scrollers are relative, so sr-only labels inside can't widen the page on phones", () => {
+  // className strings with overflow-x-auto but no `relative` (TableScroll is the usual wrapper)
+  const hits = find(/(?:"|`)[^"`]*\boverflow-x-(?:auto|scroll)\b[^"`]*(?:"|`)/).filter((h) => !/\brelative\b/.test(h));
+  assert.deepEqual(hits, [], "add `relative` (or use TableScroll): an unpositioned scroller lets sr-only labels stick out and phones zoom out");
+});
+
 test("secondary text is text-muted at full strength (a faded grey fails contrast)", () => {
   assert.deepEqual(find(/(?<![\w/-])text-muted\/\d+/), [], "use text-muted, and dashed borders or a label for a locked or inactive state");
 });

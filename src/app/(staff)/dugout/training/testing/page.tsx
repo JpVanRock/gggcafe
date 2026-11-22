@@ -52,7 +52,7 @@ export default async function TestingPage({ searchParams }: PageProps<"/dugout/t
         ) : tested.length === 0 ? (
           <EmptyState>No results yet.{editor && " Enter the first testing session below."}</EmptyState>
         ) : (
-          <div className="overflow-x-auto rounded-2xl border border-navy-700">
+          <div className="relative overflow-x-auto rounded-2xl border border-navy-700">
             <table className="w-full min-w-max text-sm">
               <thead className="bg-navy-900">
                 <tr>

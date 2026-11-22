@@ -75,11 +75,11 @@ async function FamilyLogins() {
                 ) : d.has_account ? (
                   <p className="text-sm text-muted">{first} has her own account and signs in with her email.</p>
                 ) : !d.on_roster ? (
-                  <p className="text-sm text-muted">{first} isn&apos;t on the team&apos;s current roster yet. Once the head coach adds her, you can make her login here.</p>
+                  <p className="text-sm text-muted">{first} isn&apos;t on the team&apos;s current roster yet. Once the head coach adds her, you can create her login here.</p>
                 ) : step === "birth-date" ? (
                   <>
                     <p className="text-sm text-muted">
-                      Add {first}&apos;s birth date to make her login. Players under 13 need your verified consent first; the next step shows how.
+                      Add {first}&apos;s birth date to create her login. Players under 13 need your verified consent first; the next step shows how.
                     </p>
                     <BirthDateForm playerId={d.player_id} firstName={first} />
                   </>

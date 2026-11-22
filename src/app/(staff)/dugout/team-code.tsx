@@ -32,7 +32,7 @@ export async function ParentCodeCard({ team, code, head }: { team: Team; code: s
           <li>
             The sign-up page is <span className="font-semibold text-ink">{signUpUrl}</span>.
           </li>
-          <li>A parent makes each player&apos;s login, so players never need the code.</li>
+          <li>A parent creates each player&apos;s login, so players never need the code.</li>
           <li>
             A parent who enters it with their daughter&apos;s name as it is on the roster gets in right away, and you get a notification.
           </li>

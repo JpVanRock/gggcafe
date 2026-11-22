@@ -40,7 +40,7 @@ export const ACCOUNT_TYPES: AccountType[] = [
   {
     key: "player",
     label: "Player",
-    signup: "Doesn't sign up: her parent makes her username login on the family page, with no email and nothing to confirm. Players never get the code. Under 13: her parent's verified consent comes first. (Players who signed up with an email before 2026-11-16 keep their accounts.)",
+    signup: "Doesn't sign up: her parent creates her username login on the family page, with no email and nothing to confirm. Players never get the code. Under 13: her parent's verified consent comes first. (Players who signed up with an email before 2026-11-16 keep their accounts.)",
     home: "Her player menu",
   },
   {
@@ -155,7 +155,7 @@ export const SECTIONS: { title: string; rows: Row[] }[] = [
         "An approved parent, for a daughter on the team's current roster. If her birth date isn't on her profile, the parent adds it first. Under 13: only after the parent accepts the consent notice. No email and no confirmation: she signs in right away."),
       row("Give parental consent", "Accept the consent notice before a player under 13 can sign in (COPPA).", ["no", "no", "no", "own", "no"],
         "Parents accept it and can withdraw it on the family page. It's on file at once, with their name, sign-in email, the time, IP address and browser as the record; no admin check. Coaches never see consent records. Signed forms sent before 2026-11-16 that are still waiting are checked by an admin on the Roster tab."),
-      row("Reset that login's password", "A new password for a parent-made player login.", ["yes", "no", "no", "own", "no"]),
+      row("Reset that login's password", "A new password for a player login a parent created.", ["yes", "no", "no", "own", "no"]),
       row("Medical & emergency card", "Emergency contacts, allergies, conditions and medications; a game-day view.", ["yes", "no", "no", "own", "no"],
         "Head coaches and her approved parents only (not assistants, teammates or the player)."),
       row("Preseason questionnaire", "Sizes (jersey, pants, socks), top three jersey numbers, positions she wants, goals.", ["view", "view", "no", "own", "no"],
@@ -182,7 +182,7 @@ export const QUESTIONS: { q: string; a: string[] }[] = [
     q: "What is the parent code, and who gets it?",
     a: [
       "Each team has one six-character code to join, the parent code (the old team code is retired). Parents, assistant coaches and mentors sign up, confirm their email, then enter it on their own page; head coaches don't need one (an admin approves them).",
-      "Never give it to players: anyone with it can join as a parent of a girl on the roster. Players don't sign up at all: a parent makes each player's login. Players can't see the code.",
+      "Never give it to players: anyone with it can join as a parent of a girl on the roster. Players don't sign up at all: a parent creates each player's login. Players can't see the code.",
       "Coaches see it in Coaches Dugout → Parents and Roster. A head coach turns it on, makes a new one (the old one stops working) or turns it off; everyone already approved keeps access. If someone joined as a parent who shouldn't have, remove them and make a new code.",
       "Signed-out visitors can't see the list of teams.",
     ],
@@ -235,7 +235,7 @@ export const QUESTIONS: { q: string; a: string[] }[] = [
     q: "How do video calls work, and who can use them?",
     a: [
       "They're off for every team until a site admin turns them on for that team on the Switchboard. Then the team's head coach decides whether mentors can book them too (Mentors → Video calls, off at first). With a team's calls off, nobody on it can book, start or join one; a player on two teams needs both to allow it.",
-      "Head coaches book calls on Coaches Dugout → Calendar, mentors on their dashboard or the player's page, with one player or a group of up to 12 from one team (every player's parents are invited; a family sees only its own daughter named). Every invited player and her approved parents are told (the bell) and join from the call page, which opens 10 minutes early; head coaches can drop in. Everyone waits in Zoom's waiting room until the host lets them in, and nothing is recorded.",
+      "Head coaches book calls on Coaches Dugout → Calendar, mentors on their dashboard or the player's page, with one player or a group of up to 20 from one team (every player's parents are invited; a family sees only its own daughter named). Every invited player and her approved parents are told (the bell) and join from the call page, which opens 10 minutes early; head coaches can drop in. Everyone waits in Zoom's waiting room until the host lets them in, and nothing is recorded.",
       "When booking, \"Show on calendars\" picks where the call is listed: her week on her player page, her parents' calendar and (for a mentor's call) the Coaches Dugout calendar, all ticked to start. The person who booked it always has it on their own calendar. Her parents are told about every call either way.",
     ],
   },
@@ -249,7 +249,7 @@ export const QUESTIONS: { q: string; a: string[] }[] = [
   {
     q: "What does everyone agree to?",
     a: [
-      "The Terms of Service and the Privacy & Security Notice: with a checkbox at sign-up, or on a one-time page the next time they open GGG.Cafe (accounts made before the Terms, and player logins a parent made). A parent or guardian agrees for a player under 18. Players under 13 can't sign themselves up: a parent gives verified consent, then makes their login.",
+      "The Terms of Service and the Privacy & Security Notice: with a checkbox at sign-up, or on a one-time page the next time they open GGG.Cafe (accounts made before the Terms, and player logins a parent created). A parent or guardian agrees for a player under 18. Players under 13 can't sign themselves up: a parent gives verified consent, then makes their login.",
       "Each agreement is saved with its date and version. When the Terms change in a way that matters, everyone is asked again.",
     ],
   },

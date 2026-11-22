@@ -58,7 +58,7 @@ export default async function FaqPage() {
         </span>
       </p>
 
-      <div className="overflow-x-auto rounded-2xl border border-navy-700">
+      <div className="relative overflow-x-auto rounded-2xl border border-navy-700">
         <table className="w-full text-sm">
           <thead className="bg-navy-900">
             <tr>

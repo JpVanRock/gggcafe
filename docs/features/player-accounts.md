@@ -1,5 +1,5 @@
 # Player accounts (claims) — user's choices: full edit, find her spot by name + jersey
-- Players no longer sign up or get a code (user, 2026-11-16): a parent makes every player's login. The rest of this
+- Players no longer sign up or get a code (user, 2026-11-16): a parent creates every player's login. The rest of this
   bullet is how accounts made before then work. Teams have a coach `welcome_message` (team form). Players signed up at
   `/register` (account type Player and the team code, checked by `signup_team()`; the team is saved in her metadata),
   then `/me` shows the welcome message and "Claim my

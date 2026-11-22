@@ -101,7 +101,7 @@ export async function createPlayerLogin(_prev: FormState, fd: FormData): Promise
     if (error.code === "P0006") return { error: "She isn't on the team's current roster yet. Ask your head coach to add her first." };
     if (error.code === "P0007") return { error: "She already has her own account. She signs in with her email." };
     if (error.code === "P0008") return { error: "She's under 13, so your verified consent comes first. Use the consent steps above." };
-    if (error.code === "P0009") return { error: "Her birth date isn't on her profile yet. Add it above, then make her login." };
+    if (error.code === "P0009") return { error: "Her birth date isn't on her profile yet. Add it above, then create her login." };
     if (error.code === "42501") return { error: "Your coach needs to approve you as her parent first." };
     if (error.code === "22023") return { error: "Check the username and password." };
     return { error: "Couldn't create her login. Try again." };
