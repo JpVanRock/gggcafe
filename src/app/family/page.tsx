@@ -7,10 +7,12 @@ import { Card, buttonClass, secondaryButtonClass } from "@/components/ui";
 import { MenuHeader, NeedsYou } from "@/components/menu-board";
 import { MyTeamLogo } from "@/components/team-logo";
 import { isStaffParent } from "@/components/role-switch";
-import { VideoCallList, type VideoCallRow } from "@/components/video-calls";
+import { VideoCallList } from "@/components/video-calls";
 import { callsForPlayers } from "@/lib/video-call-data";
 import { yearbookTeams } from "@/lib/yearbook-data";
-import { medicalOnFile } from "@/lib/family";
+import { comingUp, daughtersOnCall, medicalOnFile } from "@/lib/family";
+import { callComingUp } from "@/lib/call-events";
+import { addDays, todayISO } from "@/lib/dates";
 import { consentStep } from "@/lib/consent";
 import { comingSinceISO, isComing } from "@/lib/video-calls";
 import { JoinForm } from "./join-form";
@@ -18,7 +20,7 @@ import { WaitingRequests } from "./waiting-requests";
 import { loadFamilyMentors } from "./mentors";
 import { firstOf, loadFamily } from "./family-data";
 import { ParentPlayerToggle } from "@/components/parent-player-toggle";
-import { loadComingUp, loadDaughterGoals, loadTeamCulture } from "./team-data";
+import { COMING_UP_DAYS, loadComingUp, loadDaughterGoals, loadTeamCulture } from "./team-data";
 import { FamilyBoards, YearbookBanner, familyMenu } from "./menu-content";
 import { ComingUpCard } from "@/components/coming-up";
 import { FamilyShell } from "./shell";
@@ -95,8 +97,10 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
   const consents = new Map((consentRows ?? []).map((c) => [c.player_id, c]));
   const calls = callRows.filter((c) => isComing(c));
   // on a group call, name only their own daughters
-  const daughtersOn = (c: VideoCallRow) =>
-    (invited.get(c.id) ?? []).map((id) => daughters.find((d) => d.player_id === id)?.player_name).filter(Boolean).join(", ") || null;
+  const daughtersOn = daughtersOnCall(invited, daughters);
+  // Coming up: the team calendar and the calls booked to show on parents' calendars, each linking to its call page
+  const today = todayISO();
+  const upcoming = comingUp([...comingUpItems, ...callComingUp(calls, today, addDays(today, COMING_UP_DAYS), "family")], 10);
   // Needs you, the page links and the boards: the same builder as an admin's Parent View
   const { needs, menuItems, boards } = familyMenu({
     daughters,
@@ -172,7 +176,7 @@ async function Family({ searchParams }: Pick<PageProps<"/family">, "searchParams
         </Card>
       )}
 
-      {calendarTeams.length > 0 && <ComingUpCard items={comingUpItems} teams={calendarTeams} calendarHref="/family/calendar" />}
+      {calendarTeams.length > 0 && <ComingUpCard items={upcoming} teams={calendarTeams} calendarHref="/family/calendar" />}
 
       {links.length === 0 ? (
         <Card title="Join your daughter's team">

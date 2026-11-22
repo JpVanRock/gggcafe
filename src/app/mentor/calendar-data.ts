@@ -109,6 +109,8 @@ export function asComingUp({ events, games }: { events: CalEvent[]; games: CalGa
       title: e.title || (e.kind === "practice" ? "Practice" : "Team event"),
       place: e.location,
       game: false,
+      // a video call links to its call page (user, 2026-11-22)
+      href: e.href ?? null,
     })),
     ...games.map((g) => ({ key: `game-${g.id}`, teamId: "", date: g.date, start: g.start, title: g.label, place: g.place, game: true })),
   ];

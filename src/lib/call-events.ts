@@ -2,6 +2,7 @@
 // list a call on its day, in the site's time zone, and opening it links to the call page. Which
 // calendars show a call was picked when it was booked (video_calls.calendars; the host's always does).
 import type { CalEvent } from "@/app/(staff)/dugout/calendar/calendar";
+import type { ComingUpItem } from "@/lib/family";
 import type { VideoCallRow } from "@/components/video-calls";
 import { APP_TIME_ZONE } from "@/lib/dates";
 import { callDateAndClock, callEnds, type CallCalendar } from "@/lib/video-calls";
@@ -31,6 +32,20 @@ export function callEvents(rows: VideoCallRow[], from: string, to: string, calen
       },
     ];
   });
+}
+
+/** The same calls as "Coming up" lines (the family and mentor menus), each linking to its call page. */
+export function callComingUp(rows: VideoCallRow[], from: string, to: string, calendar: CallCalendar | "host"): ComingUpItem[] {
+  return callEvents(rows, from, to, calendar).map((e) => ({
+    key: `call-${e.id}`,
+    teamId: "",
+    date: e.date,
+    start: e.start,
+    title: e.title ?? "Video call",
+    place: e.notes,
+    game: false,
+    href: e.href,
+  }));
 }
 
 /** The first and last moment to ask the database for, a day either side for time zones. */

@@ -95,7 +95,23 @@ export const PACKET_STARTERS: { title: string; body: string }[] = [
 // ---------------------------------------------------------------------------
 
 /** One line of "Coming up": a team event (practice, workout…) or a game. `start` is "HH:MM" or null. */
-export type ComingUpItem = { key: string; teamId: string; date: string; start: string | null; title: string; place: string | null; game: boolean };
+export type ComingUpItem = {
+  key: string;
+  teamId: string;
+  date: string;
+  start: string | null;
+  title: string;
+  place: string | null;
+  game: boolean;
+  /** a video call (user, 2026-11-22: "show the call link on the parents' calendar too"): its page; drawn in pink */
+  href?: string | null;
+};
+
+/** On a group call, a family sees only its own daughters named: "Maya, Emma", or null when none is theirs. */
+export function daughtersOnCall(invited: Map<string, string[]>, daughters: { player_id: string; player_name: string }[]) {
+  return (call: { id: string }): string | null =>
+    (invited.get(call.id) ?? []).map((id) => daughters.find((d) => d.player_id === id)?.player_name).filter(Boolean).join(", ") || null;
+}
 
 /** Events and games together, by day then start time (no time last that day), each once, the first `limit`. */
 export function comingUp(items: ComingUpItem[], limit: number): ComingUpItem[] {

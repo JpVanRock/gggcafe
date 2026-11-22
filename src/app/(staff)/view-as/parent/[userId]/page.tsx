@@ -9,13 +9,18 @@ import { PageLinks } from "@/components/page-menu";
 import { PillNav } from "@/components/pill-nav";
 import { TeamLogoMark } from "@/components/team-logo";
 import { ComingUpCard } from "@/components/coming-up";
-import { PACKET_KIND_LABEL, medicalOnFile, type PacketKind } from "@/lib/family";
+import { PACKET_KIND_LABEL, comingUp, daughtersOnCall, medicalOnFile, type PacketKind } from "@/lib/family";
+import { VideoCallList } from "@/components/video-calls";
+import { callsForPlayers } from "@/lib/video-call-data";
+import { callComingUp } from "@/lib/call-events";
+import { comingSinceISO, isComing } from "@/lib/video-calls";
+import { addDays, todayISO } from "@/lib/dates";
 import { signedLogoUrl } from "@/lib/team-logos";
 import type { SwitchKey } from "@/lib/switchboard";
 import { loginStatus, type ParentView } from "@/lib/view-as";
 import { PARENT_LINK } from "@/lib/lifecycles";
 import { FamilyBoards, YearbookBanner, familyMenu, type ConsentStep } from "@/app/family/menu-content";
-import { loadComingUp, loadDaughterGoals, loadTeamCulture } from "@/app/family/team-data";
+import { COMING_UP_DAYS, loadComingUp, loadDaughterGoals, loadTeamCulture } from "@/app/family/team-data";
 import { AccountFacts, ViewBanner, ViewToggle, requireAdminPage } from "../../parts";
 
 export const metadata: Metadata = { title: "Parent view · GGG.Cafe" };
@@ -57,13 +62,18 @@ export default async function ViewAsParentPage({ params, searchParams }: PagePro
   const offFor = (teamName: string, feature: SwitchKey) => teamsOf(teamName).some((t) => offOn(t.id, feature));
   const goalDaughters = v.daughters.filter((d) => d.on_roster && !offFor(d.team_name, "parent.goals") && !offFor(d.team_name, "player.goals"));
   const parentIds = [...new Set((teamParents ?? []).map((p) => p.parent_id))];
-  const [teamCulture, comingUpItems, daughterGoals, logo, { data: parentNames }] = await Promise.all([
+  const [teamCulture, comingUpItems, daughterGoals, logo, { data: parentNames }, { calls: callRows, invited }] = await Promise.all([
     loadTeamCulture(supabase, teamsWith("parent.team")),
     loadComingUp(supabase, teamsWith("parent.calendar")),
     Promise.all(goalDaughters.map(async (d) => ({ daughter: d, goals: await loadDaughterGoals(supabase, d.player_id, teamsOf(d.team_name)) }))),
     v.logos[0] ? signedLogoUrl(supabase, v.logos[0].logo_path).then((url) => (url ? { name: v.logos[0].team_name, url } : null)) : Promise.resolve(null),
     parentIds.length ? supabase.from("parent_accounts").select("user_id, display_name").in("user_id", parentIds) : Promise.resolve({ data: [] }),
+    // their daughters' video calls, as the family page lists them (user, 2026-11-22)
+    callsForPlayers(supabase, v.daughters.map((d) => d.player_id), { since: comingSinceISO(), limit: 10 }),
   ]);
+  const calls = callRows.filter((c) => isComing(c));
+  const today = todayISO();
+  const upcoming = comingUp([...comingUpItems, ...callComingUp(calls, today, addDays(today, COMING_UP_DAYS), "family")], 10);
 
   const consentStepOf = (playerId: string): ConsentStep => {
     const c = v.consent.find((x) => x.player_id === playerId);
@@ -132,7 +142,15 @@ export default async function ViewAsParentPage({ params, searchParams }: PagePro
             <PageLinks items={menuItems} label="Family pages" />
             {yearbooks.length > 0 && <YearbookBanner teamNames={yearbooks.map((t) => t.name)} preview />}
             <NeedsYou items={needs} />
-            {calendarTeams.length > 0 && <ComingUpCard items={comingUpItems} teams={calendarTeams} calendarHref={`/dugout/calendar?team=${calendarTeams[0].id}`} />}
+            {calls.length > 0 && (
+              <Card title="Video calls">
+                <p className="text-sm text-muted">
+                  You&apos;re invited to every call a mentor or head coach books with your daughter. Join from the call page; it opens 10 minutes before the start.
+                </p>
+                <VideoCallList calls={calls} showPlayer playerLabel={daughtersOnCall(invited, v.daughters)} />
+              </Card>
+            )}
+            {calendarTeams.length > 0 && <ComingUpCard items={upcoming} teams={calendarTeams} calendarHref={`/dugout/calendar?team=${calendarTeams[0].id}`} />}
             <FamilyBoards boards={boards} />
           </>
         )}

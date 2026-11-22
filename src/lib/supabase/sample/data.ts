@@ -378,12 +378,17 @@ const video_call_players: Row[] = [
   { call_id: id("a0ca11", 1), player_id: emma },
   { call_id: id("a0ca11", 2), player_id: emma },
   { call_id: id("a0ca11", 3), player_id: maya },
+  { call_id: id("a0ca11", 4), player_id: maya },
 ];
+// a call a few days from whenever the sample runs, so Coming up (family and mentor menus) shows one (user, 2026-11-22)
+const soon = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+soon.setUTCHours(23, 30, 0, 0);
 // mentors a head coach invited (user, 2026-11-22): Emma's mentor on the head coach's call with her
 const video_call_mentors: Row[] = [{ call_id: id("a0ca11", 2), mentor_id: U.mentor2, mentor_name: "Dana Ortiz" }];
 const video_calls: Row[] = [
   { id: id("a0ca11", 1), team_id: T.us, player_id: maya, host_id: U.admin, host_kind: "mentor", host_name: "Coach Sample", topic: "Changeup grip and release", starts_at: "2027-01-12T00:00:00Z", minutes: 30, zoom_meeting_id: "81000000101", cancelled_at: null, cancelled_by: null, created_at: "2026-11-12T19:00:00Z", calendars: ["player", "family", "coaches"], group_size: 2 },
   { id: id("a0ca11", 2), team_id: T.us, player_id: emma, host_id: U.admin, host_kind: "coach", host_name: "Pat Torres", topic: "Winter plan check-in", starts_at: "2027-01-14T23:30:00Z", minutes: 45, zoom_meeting_id: "81000000102", cancelled_at: null, cancelled_by: null, created_at: "2026-11-12T19:10:00Z", calendars: ["player", "coaches"], group_size: 1 },
+  { id: id("a0ca11", 4), team_id: T.us, player_id: maya, host_id: U.coach, host_kind: "coach", host_name: "Pat Torres", topic: "Pitch plan for the weekend", starts_at: soon.toISOString(), minutes: 30, zoom_meeting_id: "81000000104", cancelled_at: null, cancelled_by: null, created_at: "2026-11-20T19:00:00Z", calendars: ["player", "family", "coaches"], group_size: 1 },
   { id: id("a0ca11", 3), team_id: T.us, player_id: maya, host_id: U.admin, host_kind: "mentor", host_name: "Coach Sample", topic: "Spin drills", starts_at: "2026-12-02T00:00:00Z", minutes: 30, zoom_meeting_id: "81000000103", cancelled_at: "2026-11-12T20:00:00Z", cancelled_by: U.admin, created_at: "2026-11-12T19:20:00Z", calendars: ["player", "family", "coaches"], group_size: 1 },
 ];
 
