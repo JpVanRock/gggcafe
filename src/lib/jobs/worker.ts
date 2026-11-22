@@ -11,7 +11,7 @@ import { APP_TIME_ZONE } from "@/lib/dates";
 import { emailConfigured, sendEmail } from "@/lib/email";
 import { formatCallTime } from "@/lib/video-calls";
 import { deleteZoomMeeting, zoomConfigured } from "@/lib/zoom";
-import { errorAlertEmail, isJobKind, jobPayload, videoCallEmail } from "@/lib/jobs/rules";
+import { errorAlertEmail, isJobKind, jobPayload, mentorCallEmail, videoCallEmail } from "@/lib/jobs/rules";
 import { reportError } from "@/lib/errors";
 import { logAndKeep } from "@/lib/log-drain";
 
@@ -59,15 +59,24 @@ async function runOne(db: Db, secret: string, origin: string, kind: string, payl
 
   if (kind === "email.video_call" && "event" in job) {
     if (!emailConfigured()) return { outcome: "skipped", why: "Email isn't set up (RESEND_API_KEY, EMAIL_FROM)." };
-    const { data, error } = await db.rpc("jobs_video_call_email", { p_secret: secret, p_call_id: job.callId });
-    if (error) throw new Error(`Couldn't read the call: ${error.message}`);
+    // the invited players' parents, and the mentors a head coach invited (user, 2026-11-22)
+    const [parents, mentors] = await Promise.all([
+      db.rpc("jobs_video_call_email", { p_secret: secret, p_call_id: job.callId }),
+      db.rpc("jobs_video_call_mentor_email", { p_secret: secret, p_call_id: job.callId }),
+    ]);
+    if (parents.error) throw new Error(`Couldn't read the call: ${parents.error.message}`);
+    if (mentors.error) throw new Error(`Couldn't read the call's mentors: ${mentors.error.message}`);
     // one row per invited player (a group call has several; user, 2026-11-14), each with her own parents
-    const rows = data ?? [];
+    const rows = parents.data ?? [];
+    const invited = mentors.data ?? [];
     if (!rows.length) return { outcome: "skipped", why: "The call no longer exists." };
-    if (!rows.some((r) => r.recipients.length)) return { outcome: "skipped", why: "No invited player has approved parents with an email." };
     // a booking that was cancelled before its email went out: the cancellation email covers it
     if (job.event === "booked" && rows[0].cancelled) return { outcome: "skipped", why: "Cancelled before the email went out." };
-    // one email per parent, naming their own daughter, so parents don't see each other's addresses
+    if (!rows.some((r) => r.recipients.length) && !invited.length)
+      return { outcome: "skipped", why: "No invited player has approved parents with an email, and no mentor with an email was invited." };
+    const cancelled = job.event === "cancelled";
+    const when = formatCallTime(rows[0].starts_at, APP_TIME_ZONE);
+    // one email per person, so nobody sees anyone else's address; each family's names their own daughter
     const sentTo = new Set<string>();
     for (const call of rows) {
       const email = videoCallEmail({
@@ -75,9 +84,9 @@ async function runOne(db: Db, secret: string, origin: string, kind: string, payl
         hostName: call.host_name,
         hostKind: call.host_kind,
         topic: call.topic,
-        when: formatCallTime(call.starts_at, APP_TIME_ZONE),
+        when,
         minutes: call.minutes,
-        cancelled: job.event === "cancelled",
+        cancelled,
         familyUrl: `${origin}/family`,
         others: rows.length - 1,
       });
@@ -87,6 +96,25 @@ async function runOne(db: Db, secret: string, origin: string, kind: string, payl
         const sent = await sendEmail({ to: [to], ...email });
         if (sent.error) throw new Error(sent.error);
       }
+    }
+    // each invited mentor (a parent who's also one already has the family's email)
+    for (const m of invited) {
+      if (sentTo.has(m.email)) continue;
+      sentTo.add(m.email);
+      const email = mentorCallEmail({
+        mentor: m.mentor_name,
+        player: m.player_first,
+        others: m.group_size - 1,
+        hostName: m.host_name,
+        topic: m.topic,
+        when,
+        minutes: m.minutes,
+        cancelled,
+        callUrl: `${origin}/calls/${job.callId}`,
+        mentorUrl: `${origin}/mentor`,
+      });
+      const sent = await sendEmail({ to: [m.email], ...email });
+      if (sent.error) throw new Error(sent.error);
     }
     return { outcome: "done" };
   }

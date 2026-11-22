@@ -28,8 +28,9 @@ after, retries what fails, and keeps a record.
    - Finished jobs stay 30 days (`purge-jobs`, daily), then go.
 
 **Security:**
-- The worker has no user session and no database password. It calls four functions without
-  signing in: `jobs_claim`, `jobs_finish`, `jobs_fail` and `jobs_video_call_email`.
+- The worker has no user session and no database password. It calls these functions without
+  signing in: `jobs_claim`, `jobs_finish`, `jobs_fail`, `jobs_video_call_email`, `jobs_video_call_mentor_email` and
+  `jobs_error_alert`.
 - Each function refuses anyone without the jobs secret. The database compares it with the copy in
   Supabase Vault.
 - `tests/db/zz_functions.test.sql` lists them as the only signed-out functions besides sign-up and
@@ -38,7 +39,7 @@ after, retries what fails, and keeps a record.
 ## Jobs
 | Kind | Added when | Does | Skipped when |
 |---|---|---|---|
-| `email.video_call` | A video call is booked or cancelled | Emails her approved parents, one email each (no shared addresses) | Email isn't set up; no approved parent has an email; a booking was cancelled before its email went out |
+| `email.video_call` | A video call is booked or cancelled | Emails her approved parents, one email each (no shared addresses), and each mentor a head coach invited (`jobs_video_call_mentor_email`, user 2026-11-22: their own email, linking to the call page) | Email isn't set up; no approved parent and no invited mentor has an email; a booking was cancelled before its email went out |
 | `zoom.delete_meeting` | A video call is cancelled | Deletes the Zoom meeting; one already gone counts as done | Zoom isn't connected |
 | `email.error_alert` | `report_error` sees a new error, or one back after it was resolved (at most one a day per error, 10 a day in all; user, 2026-11-14) | Emails every admin, one email each, with the error and a link to /health (`jobs_error_alert`) | Email isn't set up; the error was purged; no admin has an email |
 

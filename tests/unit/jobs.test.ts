@@ -2,7 +2,7 @@
 // The job worker (docs/architecture/jobs.md): job kinds, payload checks and the parents' emails.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { errorAlertEmail, isJobKind, jobPayload, videoCallEmail } from "../../src/lib/jobs/rules.ts";
+import { errorAlertEmail, isJobKind, jobPayload, mentorCallEmail, videoCallEmail } from "../../src/lib/jobs/rules.ts";
 
 const CALL = "e9e9e9e9-0000-4000-8000-0000000000ca";
 
@@ -55,4 +55,31 @@ test("a group call's email names her and how many others", () => {
   assert.match(videoCallEmail({ ...base, others: 1 }).text, /with Maya and 1 other player\./);
   assert.match(videoCallEmail(base).text, /booked a video call with Maya\./);
   assert.match(videoCallEmail({ ...base, cancelled: true, others: 1 }).text, /The group video call Pat \(mentor\) booked with Maya and 1 other player is cancelled\./);
+});
+
+test("an invited mentor's email: who invited them, with whom, and the call page (user, 2026-11-22)", () => {
+  const base = {
+    mentor: "Dana <Ortiz>",
+    player: "Emma",
+    others: 0,
+    hostName: "Pat Torres",
+    topic: "Winter plan",
+    when: "Thu, Jan 14 · 6:30 PM",
+    minutes: 45,
+    cancelled: false,
+    callUrl: "https://www.ggg.cafe/calls/abc",
+    mentorUrl: "https://www.ggg.cafe/mentor",
+  };
+  const booked = mentorCallEmail(base);
+  assert.equal(booked.subject, "Video call invite: Emma, Thu, Jan 14 · 6:30 PM");
+  assert.match(booked.text, /Pat Torres \(head coach\) invited you to a video call with Emma\./);
+  assert.match(booked.text, /When: Thu, Jan 14 · 6:30 PM \(45 minutes\)/);
+  assert.match(booked.text, /https:\/\/www\.ggg\.cafe\/calls\/abc$/);
+  assert.match(booked.html, /Hi Dana &lt;Ortiz&gt;,/);
+  assert.match(booked.html, /<a href="https:\/\/www\.ggg\.cafe\/calls\/abc">Open the call page<\/a>/);
+  assert.match(mentorCallEmail({ ...base, others: 2 }).text, /a group video call with Emma and 2 other players\./);
+  const cancelled = mentorCallEmail({ ...base, cancelled: true });
+  assert.equal(cancelled.subject, "Video call cancelled: Thu, Jan 14 · 6:30 PM");
+  assert.match(cancelled.text, /The video call with Emma that Pat Torres \(head coach\) invited you to is cancelled\./);
+  assert.match(cancelled.html, /Open your mentor home/);
 });

@@ -27,6 +27,49 @@ export function jobPayload(
 const escape = (value: string) => value.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
 /**
+ * The email a mentor gets when a head coach invites them to a video call, and when that call is cancelled (user,
+ * 2026-11-22: "Also email invited mentors when a call is booked"). `callUrl` is the call page, `mentorUrl` their
+ * mentor home. A mentor works with every player on the call, so it can name the first one.
+ */
+export function mentorCallEmail(call: {
+  mentor: string;
+  player: string;
+  /** how many other players are on the call; 0 for one-on-one */
+  others: number;
+  hostName: string;
+  topic: string;
+  when: string;
+  minutes: number;
+  cancelled: boolean;
+  callUrl: string;
+  mentorUrl: string;
+}): { subject: string; text: string; html: string } {
+  const kind = call.others > 0 ? "group video call" : "video call";
+  const withWho = call.others > 0 ? `${call.player} and ${call.others} other player${call.others === 1 ? "" : "s"}` : call.player;
+  const host = `${call.hostName} (head coach)`;
+  const details = [`What: ${call.topic}`, `When: ${call.when} (${call.minutes} minutes)`];
+  if (call.cancelled) {
+    const lines = [`Hi ${call.mentor},`, `The ${kind} with ${withWho} that ${host} invited you to is cancelled.`, ...details];
+    return {
+      subject: `Video call cancelled: ${call.when}`,
+      text: [...lines, `Your mentor home on GGG.Cafe: ${call.mentorUrl}`].join("\n\n"),
+      html: `${lines.map((l) => `<p>${escape(l)}</p>`).join("")}<p><a href="${escape(call.mentorUrl)}">Open your mentor home</a></p>`,
+    };
+  }
+  const lines = [
+    `Hi ${call.mentor},`,
+    `${host} invited you to a ${kind} with ${withWho}.`,
+    ...details,
+    "It's on your mentor calendar on GGG.Cafe. Join from the call page: it opens 10 minutes before the start. Her parents are invited too, and calls aren't recorded.",
+  ];
+  return {
+    subject: `Video call invite: ${withWho}, ${call.when}`,
+    text: [...lines, call.callUrl].join("\n\n"),
+    html: `${lines.map((l) => `<p>${escape(l)}</p>`).join("")}<p><a href="${escape(call.callUrl)}">Open the call page</a></p>`,
+  };
+}
+
+/**
  * The email her parents get when a video call is booked or cancelled. `when` is already in the
  * team's time zone ("Tue, Nov 17 · 7:00 PM"); `familyUrl` is the family page on this site.
  */

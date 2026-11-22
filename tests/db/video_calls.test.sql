@@ -207,6 +207,16 @@ select pg_temp.expect('Avery''s parent sees the mentor coming', (select string_a
 select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000007"}', false);
 select pg_temp.expect('Casey sees no mentor invites', (select count(*) from public.video_call_mentors), 0::bigint);
 reset role;
+-- the invited mentor's email (migration 20261122205913): only the job worker, with the secret, reads it
+insert into vault.decrypted_secrets (name, decrypted_secret) values ('jobs_secret', 'vc-test-secret-0123456789abcdefghijklmnop');
+select pg_temp.expect('no mentor emails without the secret', pg_temp.err($$select * from public.jobs_video_call_mentor_email('nope',
+  (select id from public.video_calls where zoom_meeting_id = '81000000011'))$$), '42501');
+select pg_temp.expect('one email per invited mentor', (select string_agg(email || ' ' || mentor_name || ' ' || player_first || ' ' || group_size, ',')
+  from public.jobs_video_call_mentor_email('vc-test-secret-0123456789abcdefghijklmnop', (select id from public.video_calls where zoom_meeting_id = '81000000011'))),
+  'vc-mentor@example.test VC Mentor Avery 2');
+select pg_temp.expect('none for a call without mentors', (select count(*) from public.jobs_video_call_mentor_email('vc-test-secret-0123456789abcdefghijklmnop',
+  (select id from public.video_calls where zoom_meeting_id = '81000000001'))), 0::bigint);
+delete from vault.decrypted_secrets where name = 'jobs_secret';
 -- Jordan's parents remove that mentor: they can't join the call any more
 delete from public.mentor_links where mentor_id = 'e7e7e7e7-0000-0000-0000-000000000005' and player_id = '00000000-0000-0000-0000-0000000000c2';
 set role authenticated;

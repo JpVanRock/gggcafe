@@ -41,7 +41,8 @@ to every call.
   An invited mentor:
   - has the call on their mentor calendar and Coming up, and on their dashboard's Video Calls board and the player's
     page (`callsForMentor`), always: it isn't one of the "Show on calendars" choices;
-  - is told (the bell, linking to the call page) when invited and when it's cancelled;
+  - is told (the bell, linking to the call page) and emailed (user, 2026-11-22: the `email.video_call` job, their own
+    email with a link to the call page; `mentorCallEmail` in `src/lib/jobs/rules.ts`) when invited and when it's cancelled;
   - joins from the call page as "Name (mentor)" (`video_call_role`: a guest), only while they still work with every
     player on the call (her parents or the head coach can remove a mentor after the invite);
   - can't cancel it or invite anyone.
@@ -195,5 +196,4 @@ into the call.
 - Calls across teams: a group call is one team's players (up to its whole roster, 2026-11-22); there's no broadcast to
   more than one team.
 - Calls at the same time (see "One call at a time" under Rules).
-- Emails to invited mentors: they get the bell and the calendar entry; only parents are emailed. A mentor can't
-  invite other mentors, and mentors can't be added to a call after it's booked (cancel and book again).
+- A mentor can't invite other mentors, and mentors can't be added to a call after it's booked (cancel and book again).
