@@ -103,7 +103,7 @@ export type ComingUpItem = {
   title: string;
   place: string | null;
   game: boolean;
-  /** a video call (user, 2026-11-22: "show the call link on the parents' calendar too"): its page; drawn in pink */
+  /** a video call (user, 2026-11-22: "show the call link on the parents' calendar too"): its page */
   href?: string | null;
 };
 

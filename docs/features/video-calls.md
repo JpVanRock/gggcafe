@@ -121,12 +121,12 @@ to every call.
   - **Dugout Calendar:** the Video calls section, and on the month grid when booked to show there.
   - **Her week (This Week), the family Calendar, the mentor calendar:** see "Which calendars show a call" above.
   - **Player dashboard:** coming calls, above her menu.
-  - **Family page:** a Video calls card, and Coming up lists the calls booked to show on parents' calendars, in pink,
-    each linking to its call page (user, 2026-11-22: "show the call link on the parents' calendar too"; `callComingUp` in
+  - **Family page:** a Video calls card, and Coming up lists the calls booked to show on parents' calendars, each
+    linking to its call page (user, 2026-11-22: "show the call link on the parents' calendar too"; `callComingUp` in
     `src/lib/call-events.ts`). The mentor menu's Coming up links its calls the same way. An admin's View as → Parent
     shows both, as the parent sees them.
-  - **Calendars** (Dugout, family, mentor): a call is a pink-tinted entry with a pink edge (games are solid pink); tapping
-    it opens its details with "Open the call →".
+  - **Calendars** (Dugout, family, mentor): a call is an entry like any other (a grey edge, as meetings have; user,
+    2026-11-23: the pink highlight was taken back off); tapping it opens its details with "Open the call →".
   - **Switchboard:** the admin's switch and the mentors' switch.
   - **Notifications:** the bell is now in the players', parents' and mentors' menus too, and
     `/notifications` is open to every signed-in user.

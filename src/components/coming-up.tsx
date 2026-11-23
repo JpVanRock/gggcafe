@@ -1,7 +1,7 @@
 // "Coming up" (user, 2026-11-13): the next few weeks of a calendar, by day, as a board like the
 // player's This Week: the family menu (team practices and games, and their daughters' video calls) and the mentor
-// menu (her training, video calls and her players' team schedule). A video call is pink, like on the calendars, and
-// links to its call page (user, 2026-11-22).
+// menu (her training, video calls and her players' team schedule). A video call links to its call page (user,
+// 2026-11-22; the pink highlight was taken back off the same day, user 2026-11-23).
 import Link from "next/link";
 import { byDay, type ComingUpItem } from "@/lib/family";
 import { clockLabel, parseClock } from "@/lib/dugout";
@@ -52,9 +52,7 @@ export function ComingUpCard({
                 {day.items.map((i) => (
                   <li
                     key={i.key}
-                    className={`flex flex-wrap items-baseline gap-x-3 gap-y-0.5 rounded-lg px-3 py-2 text-sm ${
-                      i.href ? "border border-l-[3px] border-pink bg-pink/15" : `border-l-[3px] bg-navy-800/60 ${i.game ? "border-l-pink" : "border-l-neon-edge"}`
-                    }`}
+                    className={`flex flex-wrap items-baseline gap-x-3 gap-y-0.5 rounded-lg border-l-[3px] bg-navy-800/60 px-3 py-2 text-sm ${i.game ? "border-l-pink" : "border-l-neon-edge"}`}
                   >
                     <span className="w-14 shrink-0 font-display text-muted tabular-nums">{time(i.start) ?? "TBA"}</span>
                     {i.href ? (
