@@ -1,7 +1,7 @@
 import "server-only";
 // A mentor's calendar entries for a date range (user, 2026-11-13): the training she put on her
-// players' weeks, the video calls she booked or a head coach invited her to (user, 2026-11-22), and her players'
-// team practices, events and games
+// players' weeks, the video calls she booked or a head coach invited her to (user, 2026-11-22), and the practices,
+// events and games of the teams she checked on her Calendar (user, 2026-11-23; none until she checks one)
 // (mentor_calendar(): mentors can't read the team schedule tables themselves). The calendar page and
 // the mentor menu's Coming up both use it.
 import type { createClient } from "@/lib/supabase/server";

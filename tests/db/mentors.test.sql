@@ -119,13 +119,23 @@ select pg_temp.expect('no coach notes', (select count(*) from public.coach_notes
 select pg_temp.expect('no team schedule', (select count(*) from public.team_events), 0::bigint);
 select pg_temp.expect('no games table', (select count(*) from public.games), 0::bigint);
 select pg_temp.expect('no staff list', (select count(*) from public.staff), 0::bigint);
--- her calendar (user, 2026-11-13): her players' team practices and games, only through mentor_calendar()
+-- her calendar (user, 2026-11-13): her players' team practices and games, only through mentor_calendar(), and
+-- (user, 2026-11-23, migration 20261123233718) only for the teams she checks: none at first
+select pg_temp.expect('her calendar starts with no team schedule', (select count(*) from public.mentor_calendar('2026-09-01', '2026-09-30')), 0::bigint);
+select pg_temp.expect('a box for Jordan''s team, unchecked', (select team_name || '/' || shown || '/' || off from public.my_calendar_teams()), 'Sample/false/false');
+insert into public.mentor_calendar_teams (team_id) values ('00000000-0000-0000-0000-0000000000b1');
+select pg_temp.expect('checked', (select shown from public.my_calendar_teams()), true);
+select pg_temp.expect('not a team she mentors', pg_temp.err($$insert into public.mentor_calendar_teams (team_id) values ('00000000-0000-0000-0000-0000000000b2')$$), '42501');
+select pg_temp.expect('not for someone else', pg_temp.err($$insert into public.mentor_calendar_teams (mentor_id, team_id) values ('cccccccc-0000-0000-0000-000000000006', '00000000-0000-0000-0000-0000000000b1')$$), '42501');
 select pg_temp.expect('her calendar: the practice and both games, opponents named',
   (select string_agg(item || ' ' || on_date::text || ' ' || coalesce(title, kind) || ' ' || team_name, ', ' order by on_date)
      from public.mentor_calendar('2026-09-01', '2026-09-30')),
   'game 2026-09-12 vs Blaze Sample, event 2026-09-15 practice Sample, game 2026-09-19 @ Blaze Sample');
 select pg_temp.expect('the practice''s details', (select place || ' ' || start_time::text from public.mentor_calendar('2026-09-15', '2026-09-15')), 'Field 2 17:30:00');
 select pg_temp.expect('a month at a time', pg_temp.err($$select * from public.mentor_calendar('2026-01-01', '2026-12-31')$$), '22023');
+delete from public.mentor_calendar_teams where team_id = '00000000-0000-0000-0000-0000000000b1';
+select pg_temp.expect('unchecked: gone again', (select count(*) from public.mentor_calendar('2026-09-01', '2026-09-30')), 0::bigint);
+insert into public.mentor_calendar_teams (team_id) values ('00000000-0000-0000-0000-0000000000b1');
 reset role;
 -- the head coach hides the team calendar from mentors (the Switchboard)
 insert into public.team_features_off (team_id, feature) values ('00000000-0000-0000-0000-0000000000b1', 'mentor.calendar');
@@ -138,6 +148,8 @@ set role authenticated;
 -- not a mentor: refused
 select pg_temp.as_user('cccccccc-0000-0000-0000-000000000005');
 select pg_temp.expect('a parent can''t read the mentor calendar', pg_temp.err($$select * from public.mentor_calendar('2026-09-01', '2026-09-30')$$), '42501');
+select pg_temp.expect('a parent can''t list calendar teams', pg_temp.err($$select * from public.my_calendar_teams()$$), '42501');
+select pg_temp.expect('a parent reads no mentor''s choice', (select count(*) from public.mentor_calendar_teams), 0::bigint);
 select pg_temp.as_user('cccccccc-0000-0000-0000-000000000001');
 do $$ begin
   update public.players set notes = 'x' where id = '00000000-0000-0000-0000-0000000000c2';
@@ -433,6 +445,7 @@ delete from public.player_activities where source = 'mentor';
 delete from public.mentor_messages where sender_id::text like 'cccccccc-%';
 delete from public.practice_drills where id = 'cccccccc-0000-0000-0000-0000000000d1';
 delete from public.mental_game_plans where player_id = '00000000-0000-0000-0000-0000000000c2';
+delete from public.mentor_calendar_teams where mentor_id::text like 'cccccccc-%';
 delete from public.mentors where user_id::text like 'cccccccc-%';
 delete from public.parent_links where parent_id::text like 'cccccccc-%';
 delete from public.parent_accounts where user_id::text like 'cccccccc-%';

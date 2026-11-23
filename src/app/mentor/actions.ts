@@ -275,3 +275,25 @@ export async function removeMentorFocus(_prev: FormState, fd: FormData): Promise
     refresh();
   });
 }
+
+// ---------------------------------------------------------------------------
+// Her calendar: which teams' schedules show (user, 2026-11-23; none until she checks one)
+// ---------------------------------------------------------------------------
+
+/** Check or uncheck a team she mentors: its practices, events and games show on her calendar and Coming up. */
+export async function setCalendarTeam(teamId: string, shown: boolean): Promise<Result> {
+  if (!isUuid(teamId)) return { error: STALE };
+  const mentor = await getMentor();
+  if (!mentor) return { error: "Only mentors can do that." };
+  const supabase = await createClient();
+  if (shown) {
+    const { error } = await supabase.from("mentor_calendar_teams").insert({ team_id: teamId });
+    // already checked (another tab) is fine
+    if (error && error.code !== "23505") return { error: error.code === "42501" ? "You don't mentor anyone on that team now." : friendlyDbError(error) };
+  } else {
+    const { error } = await supabase.from("mentor_calendar_teams").delete().eq("mentor_id", mentor.userId).eq("team_id", teamId);
+    if (error) return { error: friendlyDbError(error) };
+  }
+  refresh();
+  return { error: null };
+}

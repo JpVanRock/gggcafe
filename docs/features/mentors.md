@@ -130,6 +130,14 @@ cancel it). See "Mentors on a head coach's call" in video-calls.md.
   calendar rows for her players' current teams (whole-team links, and her one-on-one players' teams this season) with
   the opponent's name. The Switchboard's "See the team calendar" (`mentor.calendar`) hides a team's, in the database.
   DB tests: `tests/db/mentors.test.sql`.
+- Team boxes (user, 2026-11-23: "check and uncheck team schedules they are mentoring. Default calendar items will only
+  be meeting they add on the calendar. Once check team box then the team's calendar with populate."; migration
+  20261123233718): her calendar starts with only her own items (the training she added, her video calls). Above it, a
+  box per team she mentors (`my_calendar_teams()`: name, checked, and whether the head coach turned the team calendar
+  off for mentors, which greys the box out); checking one (`setCalendarTeam`, `TeamBoxes` in
+  `mentor/calendar/team-boxes.tsx`) adds that team's practices, events and games. The choice is saved per mentor
+  (`mentor_calendar_teams`, so it follows her to any device), and `mentor_calendar()` returns only checked teams, so
+  Coming up on her menu follows it too, as does the admin's Mentor View.
 
 ## The mentor menu (user, 2026-11-13)
 /mentor looks like the player dashboard's menu: the media-day header ("Mentor menu", her name, specialty and players),

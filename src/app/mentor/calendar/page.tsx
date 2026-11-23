@@ -10,13 +10,14 @@ import { todayISO } from "@/lib/dates";
 import { CalendarView } from "@/app/(staff)/dugout/calendar/calendar";
 import { loadMentees } from "../parts";
 import { loadMentorCalendar } from "../calendar-data";
+import { TeamBoxes, type CalendarTeam } from "./team-boxes";
 
 export const metadata: Metadata = { title: "My calendar · Mentor · GGG.Cafe" };
 
 // A mentor's own calendar (user, 2026-11-13): the training she put on her players' weeks (one day
-// or every week on chosen days), the video calls she booked, and her players' team practices,
-// events and games (mentor_calendar(): mentors can't read the team schedule tables themselves; the
-// Switchboard's "See the team calendar" hides a team's). View only: training is added on My players
+// or every week on chosen days), the video calls she booked, and (user, 2026-11-23) the practices, events and
+// games of the teams she checks above it, none at first (mentor_calendar(): mentors can't read the team schedule
+// tables themselves; the Switchboard's "See the team calendar" hides a team's). View only: training is added on My players
 // or a player's page, calls on the player's page.
 export default async function MentorCalendarPage({ searchParams }: PageProps<"/mentor/calendar">) {
   const user = await getCurrentUser();
@@ -35,7 +36,12 @@ export default async function MentorCalendarPage({ searchParams }: PageProps<"/m
     const c = cards.get(id);
     return c ? playerName(c.player) : "A player";
   };
-  const { events, games } = await loadMentorCalendar(supabase, mentor.userId, nameOf, from, to);
+  // her own items, plus the teams she checked (user, 2026-11-23: none until she checks one)
+  const [{ events, games }, { data: teamRows }] = await Promise.all([
+    loadMentorCalendar(supabase, mentor.userId, nameOf, from, to),
+    supabase.rpc("my_calendar_teams"),
+  ]);
+  const teams = (teamRows ?? []) as CalendarTeam[];
 
   const link = (m: string) => `/mentor/calendar?month=${m}`;
   return (
@@ -43,6 +49,7 @@ export default async function MentorCalendarPage({ searchParams }: PageProps<"/m
       <Link href="/mentor" className="self-start text-sm text-muted hover:text-ink">
         <span aria-hidden="true">←</span> Mentor menu
       </Link>
+      {teams.length > 0 && <TeamBoxes teams={teams} />}
       <CalendarView
         key={month}
         teamId=""
@@ -56,7 +63,7 @@ export default async function MentorCalendarPage({ searchParams }: PageProps<"/m
           <div>
             <h2 className="text-3xl leading-tight font-bold tracking-tight text-highlight uppercase">{monthLabel(month)}</h2>
             <p className="mt-1 text-sm text-muted">
-              Your training and video calls, and your players&apos; team practices, events and games (pink). Tap one for the details.
+              Your training and video calls, and the practices, events and games of the teams you check (pink). Tap one for the details.
             </p>
           </div>
         }

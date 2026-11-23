@@ -46,9 +46,12 @@ export default async function ViewAsMentorPage({ params, searchParams }: PagePro
   const today = todayISO();
 
   // the next two weeks of their calendar: their training and video calls, and their players' team schedule
+  // their Coming up shows the teams they checked on their Calendar (user, 2026-11-23)
+  const { data: checkedRows } = await supabase.from("mentor_calendar_teams").select("team_id").eq("mentor_id", userId);
+  const checked = new Set((checkedRows ?? []).map((r) => r.team_id));
   const [calendar, teamItems, { data: teamMentors }, training, mentorCalls] = await Promise.all([
     loadMentorCalendar(supabase, userId, playerName, today, addDays(today, 13), { teamSchedule: false }),
-    loadComingUp(supabase, teams, 20),
+    loadComingUp(supabase, teams.filter((t) => checked.has(t.id)), 20),
     pickerTeam ? supabase.from("mentor_links").select("mentor_id").eq("team_id", pickerTeam).eq("status", "approved") : Promise.resolve({ data: [] }),
     // the training they added, as their own Training board reads it
     loadTraining(supabase, userId),

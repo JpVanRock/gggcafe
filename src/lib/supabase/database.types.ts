@@ -2117,6 +2117,32 @@ export type Database = {
           },
         ]
       }
+      mentor_calendar_teams: {
+        Row: {
+          mentor_id: string
+          team_id: string
+          created_at: string
+        }
+        Insert: {
+          mentor_id?: string
+          team_id: string
+          created_at?: string
+        }
+        Update: {
+          mentor_id?: string
+          team_id?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_calendar_teams_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mentor_focus: {
         Row: {
           id: string
@@ -6471,6 +6497,7 @@ export type Database = {
       mentor_call_players: { Args: Record<PropertyKey, never>; Returns: { player_id: string; team_id: string }[] }
       mentor_requests_waiting: { Args: Record<PropertyKey, never>; Returns: number }
       my_admin_team_ids: { Args: Record<PropertyKey, never>; Returns: string[] }
+      my_calendar_teams: { Args: Record<PropertyKey, never>; Returns: { team_id: string; team_name: string; shown: boolean; off: boolean }[] }
       my_child_ids: { Args: Record<PropertyKey, never>; Returns: string[] }
       my_claims: { Args: Record<PropertyKey, never>; Returns: { claim_id: string; team_id: string; team_name: string; season_name: string; typed_name: string; typed_jersey: string; status: Database["public"]["Enums"]["player_claim_status"]; is_current: boolean; player_id: string; welcome_message: string }[] }
       my_mentor_links: { Args: Record<PropertyKey, never>; Returns: { id: string; team_id: string; team_name: string; player_id: string; player_name: string; status: Database["public"]["Enums"]["mentor_link_status"]; requested_at: string }[] }

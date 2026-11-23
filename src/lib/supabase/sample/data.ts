@@ -414,6 +414,8 @@ export const TABLES: Record<string, Row[]> = {
   budget_fees, budget_entries, budget_credits, budget_coach_expenses, player_mental_lessons, coach_mental_lessons, mental_game_plans,
   team_hitting_philosophy, team_throwing_programs, player_journal_entries, parent_links, team_parent_codes, hitting_styles, hitting_zones, team_features_off, team_admins,
   team_video_access, video_calls, video_call_players, video_call_mentors, video_call_messages,
+  // the teams a mentor checked for her calendar (user, 2026-11-23)
+  mentor_calendar_teams: [{ mentor_id: U.admin, team_id: T.us, created_at: "2026-11-23T00:00:00Z" }],
 };
 
 /** table -> the column other tables use to point at it (for embedded selects) */
@@ -561,6 +563,8 @@ export function sampleRpc(name: string, args: Row = {}): unknown {
         .filter((l) => l.mentor_id === U.admin)
         .map((l) => ({ id: l.id, team_id: l.team_id, team_name: "GGG Sample 14U", player_id: l.player_id, player_name: l.player_name, status: l.status, requested_at: l.requested_at }));
     // the mentor's calendar: her players' team practices, events and games (the sample admin mentors the whole team)
+    // the team boxes on the mentor calendar (user, 2026-11-23): checked, so the sample shows the team schedule
+    case "my_calendar_teams": return [{ team_id: T.us, team_name: "GGG Sample 14U", shown: true, off: false }];
     case "mentor_calendar": {
       const inRange = (d: unknown) => String(d) >= String(args.p_from) && String(d) <= String(args.p_to);
       return [

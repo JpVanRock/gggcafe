@@ -149,7 +149,7 @@ export default async function MentorHome() {
           items={upcoming}
           calendarHref="/mentor/calendar"
           subtitle="The next two weeks"
-          empty="Nothing on your calendar in the next two weeks: no training, calls or team games."
+          empty="Nothing on your calendar in the next two weeks. Add training or a video call, or check a team on your Calendar to see its schedule."
         />
       )}
 
