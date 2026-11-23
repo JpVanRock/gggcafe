@@ -1,16 +1,17 @@
-// The mental-game tools on her Mental GP page (Standard, Phase 1): My signals,
-// intensity checks, the monthly self-scan, guided sessions and the practice
-// journal, with the Mental GP lessons first. Server component; the forms are in
+// The mental-game tools on her Mental GP page (Standard, Phase 1): intensity
+// checks against her zone, the monthly self-scan, guided sessions and the practice
+// journal, with the Mental GP lessons first. (My signals, green / yellow / red, was
+// archived 2026-11-23, user: hidden, its answers kept in the database.) Server component; the forms are in
 // mental-game-client.tsx.
 import Link from "next/link";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { Disclosure, eyebrowClass, cardClass, buttonStyles } from "@/components/ui";
 import { formatDay } from "@/lib/dates";
 import {
-  CONTEXT_LABEL, DEFAULT_ZONE, GUIDED_SESSIONS, SCAN_LABELS, SCAN_SKILLS, SIGNALS, monthStart, scanAverage, scanChange, scanExtremes, zoneStatus,
+  CONTEXT_LABEL, DEFAULT_ZONE, GUIDED_SESSIONS, SCAN_LABELS, SCAN_SKILLS, monthStart, scanAverage, scanChange, scanExtremes, zoneStatus,
 } from "@/lib/mental";
 import { removeIntensityCheck } from "./mental-actions";
-import { IntensityForm, ScanForm, SignalsForm } from "./mental-game-client";
+import { IntensityForm, ScanForm, ZoneForm } from "./mental-game-client";
 import type { IntensityCheck, MentalScan } from "./mental-data";
 import type { MentalPlan } from "./shared";
 import { DetailHeading } from "./menu";
@@ -18,8 +19,6 @@ import { ActionForm } from "@/components/action-form";
 import { OutlineText } from "@/components/athletic";
 import { MENTAL_LESSONS, lessonNumber, lessonsDone as countDone, nextLesson, twoDigits } from "@/lib/mental-lessons";
 
-// Cards stay in brand colors; only the small signal light uses traffic colors (red is the brand pink).
-const DOT: Record<"green" | "yellow" | "red", string> = { green: "bg-[#2bd576]", yellow: "bg-[#ffc93c]", red: "bg-pink" };
 const monthName = new Intl.DateTimeFormat("en-US", { timeZone: "UTC", month: "short" });
 
 function Section({ id, title, note, children }: { id?: string; title: string; note?: string; children: React.ReactNode }) {
@@ -54,7 +53,6 @@ export function MentalTools({
   canEdit: boolean;
 }) {
   const zone = { low: plan?.zone_low ?? null, high: plan?.zone_high ?? null };
-  const hasSignals = SIGNALS.some((s) => plan?.[s.signs] || (s.release && plan?.[s.release]));
   const thisMonth = scans.find((s) => s.month === monthStart(today)) ?? null;
   const latest = scans[0] ?? null;
   const previous = scans[1] ?? null;
@@ -140,29 +138,8 @@ export function MentalTools({
         </ol>
       </Section>
 
-      {/* My signals ------------------------------------------------------------ */}
-      <Section id="signals" title="My signals" note="Green, yellow, red: catch yellow early and use your release before it gets to red.">
-        {hasSignals ? (
-          <div className="grid gap-3 md:grid-cols-3">
-            {SIGNALS.map((s) => (
-              <div key={s.light} className="rounded-2xl border border-navy-600 bg-navy-900/60 p-4">
-                <p className="flex items-center gap-2 font-display text-lg font-bold tracking-wide uppercase">
-                  <span aria-hidden className={`size-3 rounded-full shadow-[0_0_8px_currentColor] ${DOT[s.light]}`} />
-                  {s.label}
-                </p>
-                <p className="mt-2 text-sm whitespace-pre-wrap text-ink/90">{plan?.[s.signs] || <span className="text-muted">Not filled in yet.</span>}</p>
-                {s.release && plan?.[s.release] && (
-                  <p className="mt-3 text-sm">
-                    <span className="font-sans text-2xs font-bold tracking-widest text-pink-soft uppercase">Release · </span>
-                    <span className="whitespace-pre-wrap">{plan[s.release]}</span>
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-sm text-muted">No signals yet.{canEdit && " Fill them in below."}</p>
-        )}
+      {/* Intensity -------------------------------------------------------------- */}
+      <Section id="intensity" title="Intensity check" note="Before games and practices: rate yourself 1 to 10 and compare it with your zone.">
         <p className="text-sm">
           <span className="text-muted">My zone: </span>
           <span className="font-display font-bold text-highlight tabular-nums">
@@ -170,14 +147,10 @@ export function MentalTools({
           </span>
         </p>
         {canEdit && (
-          <Disclosure summary="Edit my signals" open={!hasSignals}>
-            <SignalsForm playerId={playerId} plan={plan} />
+          <Disclosure summary="Set my zone">
+            <ZoneForm playerId={playerId} zone={zone} />
           </Disclosure>
         )}
-      </Section>
-
-      {/* Intensity -------------------------------------------------------------- */}
-      <Section id="intensity" title="Intensity check" note="Before games and practices: rate yourself 1 to 10 and compare it with your zone.">
         {canEdit && <IntensityForm playerId={playerId} zone={zone} />}
         {checks.length > 0 ? (
           <div className="flex flex-col gap-3">

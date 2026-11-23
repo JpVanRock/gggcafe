@@ -84,7 +84,7 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
       .eq("player_id", player.id)
       .eq("mentor_id", mentor.userId)
       .order("created_at"),
-    // her signals, intensity checks and self-scans (never the journal)
+    // her zone, intensity checks and self-scans (never the journal)
     loadMentalTools(supabase, player.id, todayISO()),
   ]);
   const [{ data: journalRows }, { data: callTeam }, { data: callRows }, { data: inviteRows }] = await Promise.all([

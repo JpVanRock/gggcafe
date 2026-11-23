@@ -33,7 +33,7 @@ test("player lessons point only to tools that exist", () => {
   for (const l of MENTAL_LESSONS) {
     for (const t of l.tools) {
       if (t.startsWith("session:")) assert.ok(sessions.has(t.slice(8)), `${l.slug}: no guided session ${t}`);
-      else assert.ok(["signals", "intensity", "scan", "journal"].includes(t), `${l.slug}: unknown tool ${t}`);
+      else assert.ok(["intensity", "scan", "journal"].includes(t), `${l.slug}: unknown tool ${t}`);
     }
   }
 });
@@ -140,4 +140,17 @@ test("coach course: lookups, numbers, neighbors and counts", () => {
 test("player and coach slugs don't collide (each table has its own, but links stay unambiguous)", () => {
   const players = new Set(MENTAL_LESSONS.map((l) => l.slug));
   for (const m of COACH_MODULES) assert.ok(!players.has(m.slug), m.slug);
+});
+
+// My signals (green / yellow / red) was archived on 2026-11-23 (user: "remove references in any training"). The
+// player lessons, the coach course and the G3 Mental Toughness chapter don't talk in those colors. Tool and session
+// slugs are stored identifiers, so they're left out of the check. (A team's "reset signal" after a mistake is a
+// coach's cue, not the lights.)
+test("archived: no green / yellow / red signals in the lessons, the coach course or Mental Toughness", () => {
+  const lessons = JSON.stringify(MENTAL_LESSONS, (key, value) => (key === "tools" ? undefined : value));
+  const coach = JSON.stringify(COACH_MODULES);
+  const toughness = JSON.stringify(CHAPTERS.find((c) => c.slug === "mental-toughness"));
+  for (const [name, words] of [["lessons", lessons], ["coach course", coach], ["Mental Toughness", toughness]]) {
+    assert.doesNotMatch(words, /\b(green|yellow)\b|\bred\b|\bsignals\b/i, name);
+  }
 });

@@ -12,7 +12,7 @@
 // player_mental_lessons.lesson: never rename one; add new lessons at the end.
 
 /** A Mental GP tool a lesson points to: a section of her Mental GP page, the journal, or a guided session. */
-export type LessonTool = "signals" | "intensity" | "scan" | "journal" | `session:${string}`;
+export type LessonTool = "intensity" | "scan" | "journal" | `session:${string}`;
 
 /** Mental Game Plan fields a lesson's answer can save to (columns of mental_game_plans). */
 export type LessonPlanField = "pre_game_routine" | "pre_pitch_routine" | "reset_routine" | "pressure_plan";
@@ -79,7 +79,7 @@ export const MENTAL_LESSONS: MentalLesson[] = [
     },
     planField: "pre_pitch_routine",
     lockIn: "Same routine every pitch. The moment can get big; your routine doesn't.",
-    tools: ["session:reset-breath", "signals"],
+    tools: ["session:reset-breath", "intensity"],
     skills: ["focus", "composure"],
     deeper: ["every-pitch", "mental-toughness"],
   },
@@ -140,7 +140,7 @@ export const MENTAL_LESSONS: MentalLesson[] = [
       hint: "Example: \"My legs feel shaky and I want to rush. I'll tell myself: I'm ready, this is my body getting going.\"",
     },
     lockIn: "Nerves are fuel. Point them at the next pitch.",
-    tools: ["intensity", "session:box-breathing", "signals"],
+    tools: ["intensity", "session:box-breathing"],
     skills: ["confidence", "breathing"],
     deeper: ["pre-game", "mental-toughness"],
   },
@@ -177,7 +177,7 @@ export const MENTAL_LESSONS: MentalLesson[] = [
     },
     planField: "reset_routine",
     lockIn: "One move, one phrase, ready before the next pitch.",
-    tools: ["signals", "session:red-light-breath", "journal"],
+    tools: ["session:red-light-breath", "journal"],
     skills: ["reset", "self_talk"],
     deeper: ["response-to-failure", "mental-toughness"],
   },
@@ -243,7 +243,7 @@ export const MENTAL_LESSONS: MentalLesson[] = [
       hint: "Example: \"Loud parents behind the backstop. I'll use the third-base coach as my focal point and run my routine.\"",
     },
     lockIn: "Notice it, share it, adjust to it, play the next pitch.",
-    tools: ["signals", "session:reset-breath"],
+    tools: ["session:reset-breath", "journal"],
     skills: ["perspective", "composure", "communication"],
     deeper: ["mental-toughness", "response-to-failure"],
   },

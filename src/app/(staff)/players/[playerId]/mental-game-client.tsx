@@ -6,45 +6,26 @@ import { Field, FormMessage, buttonClass, fieldClass, inputClass } from "@/compo
 import { initialFormState } from "@/lib/form";
 import {
   ADJUSTMENT_MAX, CONTEXT_LABEL, DEFAULT_ZONE, INTENSITY_CONTEXTS, INTENSITY_LEVELS, JOURNAL_LIMITS, JOURNAL_PROMPTS, SCAN_LABELS,
-  SCAN_NOTE_MAX, SCAN_SKILLS, SIGNALS, SIGNAL_MAX, ZONE_TIP, zoneStatus,
+  SCAN_NOTE_MAX, SCAN_SKILLS, ZONE_TIP, zoneStatus,
 } from "@/lib/mental";
 import { LESSON_ANSWER_MAX } from "@/lib/mental-lessons";
-import { logIntensity, saveJournalEntry, saveJournalWeek, saveMentalLesson, saveScan, saveSignals } from "./mental-actions";
+import { logIntensity, saveJournalEntry, saveJournalWeek, saveMentalLesson, saveScan, saveZone } from "./mental-actions";
 import { SubmitButton } from "@/components/submit-button";
 
 const pill =
   "cursor-pointer rounded-full border border-navy-600 px-2.5 py-1 text-center text-sm font-semibold text-muted transition select-none has-checked:border-pink has-checked:bg-pink has-checked:text-on-accent has-focus-visible:ring-2 has-focus-visible:ring-pink/40";
 
-type Signals = Partial<Record<"green_signs" | "yellow_signs" | "red_signs" | "yellow_release" | "red_release", string | null>> & {
-  zone_low?: number | null;
-  zone_high?: number | null;
-};
-
-export function SignalsForm({ playerId, plan }: { playerId: string; plan: Signals | null }) {
-  const [state, action] = useActionState(saveSignals, initialFormState);
+/** Her zone, the intensity she plays her best at (My signals, which used to hold it, was archived 2026-11-23). */
+export function ZoneForm({ playerId, zone }: { playerId: string; zone: { low: number | null; high: number | null } }) {
+  const [state, action] = useActionState(saveZone, initialFormState);
   return (
     <form action={action} className="flex flex-col gap-4">
       <input type="hidden" name="player_id" value={playerId} />
-      <div className="grid gap-4 md:grid-cols-3">
-        {SIGNALS.map((s) => (
-          <fieldset key={s.light} className="flex flex-col gap-3">
-            <legend className="mb-1 font-display text-lg font-bold tracking-wide uppercase">{s.label}</legend>
-            <Field label="How it feels" hint={s.signsHint}>
-              <textarea name={s.signs} rows={3} maxLength={SIGNAL_MAX} defaultValue={plan?.[s.signs] ?? ""} className={inputClass} />
-            </Field>
-            {s.release && (
-              <Field label="My release" hint={s.releaseHint}>
-                <textarea name={s.release} rows={2} maxLength={SIGNAL_MAX} defaultValue={plan?.[s.release] ?? ""} className={inputClass} />
-              </Field>
-            )}
-          </fieldset>
-        ))}
-      </div>
       <fieldset className="flex flex-wrap items-end gap-3">
         <legend className="mb-1.5 text-sm font-medium">My zone: the intensity I play my best at</legend>
         <label className="flex items-center gap-2 text-sm">
           From
-          <select name="zone_low" defaultValue={plan?.zone_low ?? ""} className={`${fieldClass} w-20`}>
+          <select name="zone_low" defaultValue={zone.low ?? ""} className={`${fieldClass} w-20`}>
             <option value="">–</option>
             {INTENSITY_LEVELS.map((n) => (
               <option key={n} value={n}>
@@ -55,7 +36,7 @@ export function SignalsForm({ playerId, plan }: { playerId: string; plan: Signal
         </label>
         <label className="flex items-center gap-2 text-sm">
           to
-          <select name="zone_high" defaultValue={plan?.zone_high ?? ""} className={`${fieldClass} w-20`}>
+          <select name="zone_high" defaultValue={zone.high ?? ""} className={`${fieldClass} w-20`}>
             <option value="">–</option>
             {INTENSITY_LEVELS.map((n) => (
               <option key={n} value={n}>
@@ -67,7 +48,7 @@ export function SignalsForm({ playerId, plan }: { playerId: string; plan: Signal
         <span className="pb-2 text-xs text-muted">Not sure yet? Leave it; your intensity checks will show you.</span>
       </fieldset>
       <div className="flex items-center gap-4">
-        <SubmitButton>Save my signals</SubmitButton>
+        <SubmitButton>Save my zone</SubmitButton>
         <FormMessage error={state.error} saved={state.saved} fields={state.fields} />
       </div>
     </form>

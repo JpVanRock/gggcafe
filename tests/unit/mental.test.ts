@@ -3,13 +3,15 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import {
-  GUIDED_SESSIONS, SCAN_LABELS, SCAN_SKILLS, SIGNALS, isValidScan, monthStart, patternSeconds, scanAverage, scanChange,
+  GUIDED_SESSIONS, SCAN_LABELS, SCAN_SKILLS, isValidScan, monthStart, patternSeconds, scanAverage, scanChange,
   scanExtremes, sessionBySlug, zoneStatus,
 } from "../../src/lib/mental.ts";
 
-test("signals: three lights, releases for yellow and red", () => {
-  assert.deepEqual(SIGNALS.map((s) => s.light), ["green", "yellow", "red"]);
-  assert.deepEqual(SIGNALS.filter((s) => s.release).map((s) => s.light), ["yellow", "red"]);
+// My signals (green / yellow / red) was archived on 2026-11-23 (user); no lesson, session or course talks in those
+// colors any more. Slugs stay (they're stored), so only the words players read are checked.
+test("archived: no green / yellow / red signals in the mental training", () => {
+  const words = JSON.stringify(GUIDED_SESSIONS, (key, value) => (key === "slug" ? undefined : value));
+  assert.doesNotMatch(words, /\b(green|yellow|red)\b/i);
 });
 
 test("zone status against her zone or the default 6-8", () => {
@@ -44,7 +46,10 @@ test("the database stores ten scores", () => {
 });
 
 test("guided sessions: seeded as drills, breathing has a pattern, imagery has steps", () => {
-  const sql = readFileSync(new URL("../../supabase/migrations/20261109000100_mental_game.sql", import.meta.url), "utf8");
+  // seeded in the mental game migration; Long Exhale renamed when My signals was archived
+  const sql = ["20261109000100_mental_game.sql", "20261123113941_archive_mental_signals.sql"]
+    .map((f) => readFileSync(new URL(`../../supabase/migrations/${f}`, import.meta.url), "utf8"))
+    .join("\n");
   assert.equal(new Set(GUIDED_SESSIONS.map((s) => s.slug)).size, GUIDED_SESSIONS.length);
   for (const s of GUIDED_SESSIONS) {
     assert.ok(sql.includes(`'${s.slug}')`), `${s.slug} is seeded as a drill`);

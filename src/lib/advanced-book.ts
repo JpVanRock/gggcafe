@@ -504,18 +504,17 @@ export const CHAPTERS: BookChapter[] = [
         },
       },
       {
-        lesson: "Green, Yellow, Red",
-        title: "Know your signals",
+        lesson: "Catch It Early",
+        title: "Know your warning signs",
         body: [
-          "Green: you're locked in. Loose hands, clear head, seeing the ball.",
-          "Yellow: the first warning signs. Rushing, gripping tight, thinking about the score or who's watching.",
-          "Red: it's gotten away from you. Racing thoughts, short breath, head down, can't let the last play go.",
-          "The skill is catching yellow early. A quick release at yellow keeps you from ever getting to red.",
+          "Every player speeds up in her own way when the game gets big: rushing, gripping tight, thinking about the score or who's watching.",
+          "Let it run and it snowballs: racing thoughts, short breath, head down, can't let the last play go.",
+          "The skill is catching it early. Know your first warning signs, and a quick release then keeps it from getting away from you.",
         ],
-        tryIt: "Fill in your own green, yellow and red signs in your Mental GP, with a release for yellow and red.",
+        tryIt: "Write your first warning signs and your release into the reset routine in your Mental GP.",
       },
       {
-        lesson: "Green, Yellow, Red",
+        lesson: "Catch It Early",
         title: "Release, then refocus",
         body: [
           "A release is something physical that ends the last play: fix your batting gloves, wipe the dirt off your hands, tap your glove twice, look at a spot on the fence.",

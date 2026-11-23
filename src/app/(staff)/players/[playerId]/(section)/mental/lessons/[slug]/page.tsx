@@ -25,8 +25,6 @@ function toolLink(base: string, tool: LessonTool): { href: string; label: string
     return s ? { href: `${base}/session/${s.slug}`, label: s.title, note: `${s.kind === "breathing" ? "Breathing" : "Imagery"} · ${s.minutes} min` } : null;
   }
   switch (tool) {
-    case "signals":
-      return { href: `${base}#signals`, label: "My signals", note: "Green, yellow, red and your releases" };
     case "intensity":
       return { href: `${base}#intensity`, label: "Intensity check", note: "Rate yourself 1 to 10 against your zone" };
     case "scan":

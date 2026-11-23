@@ -17,7 +17,7 @@ export const SWITCHES = [
   // players: her menu boards and section pages
   { key: "player.goals", audience: "players", label: "Goals", detail: "Harada or SMART goals and The Best Version of You" },
   { key: "player.pop", audience: "players", label: "Pop Report", detail: "Her profile, stats, measurements and hitting style" },
-  { key: "player.mental", audience: "players", label: "Mental GP", detail: "Game plan, lessons, signals, self-scan, guided sessions, practice journal" },
+  { key: "player.mental", audience: "players", label: "Mental GP", detail: "Game plan, lessons, intensity checks, self-scan, guided sessions, practice journal" },
   { key: "player.journal", audience: "players", label: "My Journal", detail: "Notes and voice memos from mentor sessions (a pill in Mental GP; off with it too)" },
   { key: "player.training", audience: "players", label: "Performance Training", detail: "Routines, workouts, testing results, bullpens" },
   { key: "player.iq", audience: "players", label: "Softball IQ", detail: "IQ tests, Golden Gloves, Keep the Book, team quizzes" },
@@ -42,7 +42,7 @@ export const SWITCHES = [
   { key: "mentor.notes", audience: "mentors", label: "Focus areas & notes", detail: "Working with the coaches about a player or the team" },
   { key: "mentor.goals", audience: "mentors", label: "See Goals", detail: "A player's goals and The Best Version of You" },
   { key: "mentor.pop", audience: "mentors", label: "See Pop Report", detail: "Her profile, stats and measurements" },
-  { key: "mentor.mental", audience: "mentors", label: "See Mental GP", detail: "Her game plan, signals and self-scans" },
+  { key: "mentor.mental", audience: "mentors", label: "See Mental GP", detail: "Her game plan, intensity checks and self-scans" },
   { key: "mentor.journal", audience: "mentors", label: "Shared journal entries", detail: "Entries a player chooses to share from My Journal" },
   { key: "mentor.calendar", audience: "mentors", label: "See the team calendar", detail: "Practices, events and games on their calendar (user, 2026-11-13)" },
 ] as const satisfies readonly { key: string; audience: Audience; label: string; detail: string }[];

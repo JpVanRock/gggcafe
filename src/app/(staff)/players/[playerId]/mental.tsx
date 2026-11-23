@@ -15,7 +15,7 @@ export function MentalSummary({ plan }: { plan: MentalPlan | null }) {
     return (
       <div className="flex flex-col gap-4">
         <MenuItem name="Not set up yet" note="Focus words, routines, and a reset for tough moments." />
-        <MenuItem name="Mental game" note="My signals · intensity checks · self-scan · guided sessions · practice journal" />
+        <MenuItem name="Mental game" note="Lessons · intensity checks · self-scan · guided sessions · practice journal" />
       </div>
     );
   }
@@ -26,7 +26,7 @@ export function MentalSummary({ plan }: { plan: MentalPlan | null }) {
         const field = MENTAL_FIELDS.find((f) => f.name === name)!;
         return <MenuItem key={name} name={field.label} value={plan[name] ? "✓" : "—"} note={firstLine(plan[name])} />;
       })}
-      <MenuItem name="Mental game" value={plan.green_signs || plan.yellow_signs || plan.red_signs ? "✓" : "—"} note="My signals · intensity checks · self-scan · guided sessions · practice journal" />
+      <MenuItem name="Mental game" value={plan.zone_low && plan.zone_high ? "✓" : "—"} note="Lessons · intensity checks · self-scan · guided sessions · practice journal" />
     </div>
   );
 }

@@ -1,8 +1,8 @@
 # Mental game (SB Blueprint Phase 1, user 2026-11-08; migrations 20261109000000 + 20261109000100)
 - Standard tools on her Mental GP page (`mental-game.tsx`, forms `mental-game-client.tsx`, actions `mental-actions.ts`,
-  data `mental-data.ts`, content `src/lib/mental.ts`, no imports, unit-tested): My signals (green/yellow/red + a
-  release for yellow and red, her zone: columns on `mental_game_plans`), intensity checks 1-10 vs her zone
-  (`mental_intensity_checks`), monthly self-scan of ten skills 1-5 (`mental_scans.scores`, order = `SCAN_SKILLS`,
+  data `mental-data.ts`, content `src/lib/mental.ts`, no imports, unit-tested): intensity checks 1-10 vs her zone
+  (`mental_intensity_checks`; her zone is `zone_low`/`zone_high` on `mental_game_plans`, set in the Intensity check
+  section, `saveZone`), monthly self-scan of ten skills 1-5 (`mental_scans.scores`, order = `SCAN_SKILLS`,
   append only), guided breathing/imagery sessions (`/mental/session/[slug]`, `session-client.tsx`) and the practice
   journal (`/mental/journal?week=`: `journal_entries` per day, `journal_weeks` look-back; practice days marked).
 - Guided sessions are training drills (`drills.guide` = slug, seeded) in the new `mental` training category: as a
@@ -30,7 +30,14 @@
   The last module covers wellbeing and when to get help (988, parents, licensed professionals). Progress and notes in
   `coach_mental_lessons` (exception to staff RLS: each staff member keeps their own, viewers included; admins read
   everyone's and see a staff progress list). The course page also shows the team's progress on the player lessons.
-- Mentors read her signals, intensity checks and self-scans, not the journal or her lesson answers (except what's in her plan).
+- Mentors read her zone, intensity checks and self-scans, not the journal or her lesson answers (except what's in her plan).
+- My signals archived (user, 2026-11-23: "archive the green yellow red section … remove references in any training";
+  migration 20261123113941): the green / yellow / red signs and releases are no longer shown or edited anywhere. Their
+  columns on `mental_game_plans` (`green_signs`, `yellow_signs`, `red_signs`, `yellow_release`, `red_release`) keep what
+  players wrote, so it can come back; the app doesn't load them. The lessons, guided sessions, coach course and the G3
+  Mental Toughness course no longer talk in those colors: the G3 steps "Green, Yellow, Red" became "Catch It Early"
+  (rewritten in place: saved places are step numbers), and the Red-Light Breath session is now Long Exhale (its slug
+  `red-light-breath` stays, it's stored). Unit tests fail if the colors come back into that training.
 - G3 Advanced: the Mental Toughness chapter is written (no longer "coming"): a `course` of step-through lessons with
   quick checks (`CourseStep` in advanced-book.ts, `course-client.tsx`; place saved in
   `player_advanced_chapters.course_step/course_done_at`), then the foundation habits; "Mark chapter complete" waits

@@ -538,7 +538,7 @@ export type GameRunRow = { id: string; game: number; next_play: number; first_tr
 export async function loadMentalPlan(supabase: Supabase, playerId: string): Promise<MentalPlan | null> {
   const { data } = await supabase
     .from("mental_game_plans")
-    .select(`${MENTAL_FIELDS.map((f) => f.name).join(", ")}, green_signs, yellow_signs, red_signs, yellow_release, red_release, zone_low, zone_high, updated_at`)
+    .select(`${MENTAL_FIELDS.map((f) => f.name).join(", ")}, zone_low, zone_high, updated_at`)
     .eq("player_id", playerId)
     .maybeSingle();
   return (data as MentalPlan | null) ?? null;

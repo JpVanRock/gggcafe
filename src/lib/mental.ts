@@ -1,37 +1,9 @@
 // The mental game (Phase 1, user 2026-11-08): the Standard tools on her Mental GP
-// page. My signals (green / yellow / red), the intensity check and her zone, the
-// monthly self-scan, guided breathing and imagery sessions, and the practice
-// journal. The G3 Advanced Mental Toughness course lives in advanced-book.ts.
+// page. The intensity check and her zone, the monthly self-scan, guided breathing
+// and imagery sessions, and the practice journal. (My signals, green / yellow / red,
+// was archived on 2026-11-23: its columns on mental_game_plans are kept, not shown.) The G3 Advanced Mental Toughness course lives in advanced-book.ts.
 // Original wording, written for fastpitch. No imports, so it runs in unit tests
 // (and client components can use it).
-
-// ---------------------------------------------------------------------------
-// My signals
-// ---------------------------------------------------------------------------
-
-export type SignalField = "green_signs" | "yellow_signs" | "red_signs" | "yellow_release" | "red_release";
-
-export const SIGNALS: { light: "green" | "yellow" | "red"; label: string; signs: SignalField; signsHint: string; release?: SignalField; releaseHint?: string }[] = [
-  { light: "green", label: "Green", signs: "green_signs", signsHint: "What it feels like when you're locked in. Loose hands, clear head, seeing the ball…" },
-  {
-    light: "yellow",
-    label: "Yellow",
-    signs: "yellow_signs",
-    signsHint: "The first signs you're speeding up. Rushing, gripping tight, thinking about the score…",
-    release: "yellow_release",
-    releaseHint: "A quick release to get back to green: a breath and your cue word.",
-  },
-  {
-    light: "red",
-    label: "Red",
-    signs: "red_signs",
-    signsHint: "What it looks like when it gets away from you. Racing thoughts, short breath, head down…",
-    release: "red_release",
-    releaseHint: "A bigger reset: step out, a physical release, a long breath out, your cue word.",
-  },
-];
-
-export const SIGNAL_MAX = 500;
 
 // ---------------------------------------------------------------------------
 // Intensity: 1-10, against her zone
@@ -165,23 +137,23 @@ export const GUIDED_SESSIONS: GuidedSession[] = [
   },
   {
     slug: "red-light-breath",
-    title: "Red-Light Breath",
+    title: "Long Exhale",
     kind: "breathing",
     minutes: 2,
-    summary: "A long, slow breath out to come back from red.",
+    summary: "A long, slow breath out to settle down when the game speeds up.",
     intro: [
-      "When you're at red, your breathing gets short and high in your chest. This brings it back down.",
+      "When the game gets away from you, your breathing gets short and high in your chest. This brings it back down.",
       "Breathe in for four, hold for two, then let it out slowly for eight, like you're fogging up a window.",
     ],
     pattern: { inhale: 4, hold: 2, exhale: 8, rounds: 6 },
-    close: "At red: step out, use your release, then one or two of these breaths before you step back in.",
+    close: "When it's getting away from you: step out, use your release, then one or two of these breaths before you step back in.",
   },
   {
     slug: "game-face",
     title: "Game Face",
     kind: "imagery",
     minutes: 3,
-    summary: "See your pre-game from arrival to first pitch and walk on the field at green.",
+    summary: "See your pre-game from arrival to first pitch and walk on the field locked in.",
     intro: [
       "Close your eyes or look at one spot. Take two reset breaths.",
       "See everything in detail: the field, the sounds, the feel of your gear. See it going right, at game speed.",
@@ -191,7 +163,7 @@ export const GUIDED_SESSIONS: GuidedSession[] = [
       { text: "You're warming up. Your legs feel loose, your throws are crisp, your partner's glove pops on every catch.", seconds: 30 },
       { text: "Infield and outfield. The ball finds your glove, your feet are quick, your throws are on the chest.", seconds: 30 },
       { text: "Team huddle. You hear your coach, you look at your teammates, you feel the energy.", seconds: 20 },
-      { text: "You run onto the field for the first pitch. Head up, quick feet, your cue word in your head. You're at green.", seconds: 30 },
+      { text: "You run onto the field for the first pitch. Head up, quick feet, your cue word in your head. You're locked in.", seconds: 30 },
       { text: "First pitch. You take your prep step and you want the ball hit to you.", seconds: 25 },
     ],
     close: "Do this the night before or the morning of a game. The real pre-game will feel familiar.",
@@ -231,7 +203,7 @@ export const GUIDED_SESSIONS: GuidedSession[] = [
       { text: "Every pitch: your prep step, eyes on the hitting zone. You want the ball.", seconds: 25 },
       { text: "A hard ground ball. You stay down, field it clean and make a strong throw. One out.", seconds: 25 },
       { text: "Next play doesn't go your way: a bobble, a walk or a hit. See it happen.", seconds: 20 },
-      { text: "Your release, a long breath out, your cue word. You're back to green before the next pitch.", seconds: 30 },
+      { text: "Your release, a long breath out, your cue word. You're locked back in before the next pitch.", seconds: 30 },
       { text: "The next ball comes to you and you make the play. You finish the inning and sprint off the field.", seconds: 25 },
     ],
     close: "The reset you just saw is the one to use for real. Rep it here and it shows up in games.",

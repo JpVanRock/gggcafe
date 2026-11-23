@@ -1,6 +1,6 @@
 "use server";
 
-// The mental-game tools on her Mental GP page (Standard): My signals, intensity
+// The mental-game tools on her Mental GP page (Standard): her zone, intensity
 // checks, the monthly self-scan, guided sessions and the practice journal. The
 // player edits her own; coaches can too (actForCheck). RLS checks it again.
 import { refresh } from "next/cache";
@@ -12,10 +12,10 @@ import { isUuid } from "@/lib/softball";
 import { MENTAL_FIELDS } from "./shared";
 import { isISODate, isoWeekday, todayISO, weekStart } from "@/lib/dates";
 import {
-  ADJUSTMENT_MAX, INTENSITY_CONTEXTS, JOURNAL_LIMITS, SCAN_NOTE_MAX, SIGNALS, SIGNAL_MAX, isValidScan, monthStart, sessionBySlug,
+  ADJUSTMENT_MAX, INTENSITY_CONTEXTS, JOURNAL_LIMITS, SCAN_NOTE_MAX, isValidScan, monthStart, sessionBySlug,
 } from "@/lib/mental";
 import { setTwisCheck } from "./twis-actions";
-import { STALE, failed, must, runAction } from "@/lib/actions";
+import { STALE, done, failed, must, runAction } from "@/lib/actions";
 
 async function playerFrom(fd: FormData): Promise<{ playerId: string } | { error: string }> {
   const playerId = text(fd, "player_id");
@@ -29,29 +29,23 @@ function level(fd: FormData, name: string): number | null {
   return Number.isInteger(n) && n >= 1 && n <= 10 ? n : null;
 }
 
-/** My signals: green / yellow / red, a release for yellow and red, and her zone. */
-export async function saveSignals(_prev: FormState, fd: FormData): Promise<FormState> {
-  const who = await playerFrom(fd);
-  if ("error" in who) return { error: who.error };
-  const values: Record<string, string | number | null> = {};
-  for (const s of SIGNALS) {
-    for (const field of [s.signs, s.release].filter(Boolean) as string[]) {
-      const v = text(fd, field);
-      if (v && v.length > SIGNAL_MAX) return { error: `Keep each one under ${SIGNAL_MAX} characters.` };
-      values[field] = v;
-    }
-  }
-  const low = level(fd, "zone_low");
-  const high = level(fd, "zone_high");
-  if ((low === null) !== (high === null)) return { error: "Pick both ends of your zone, or neither." };
-  if (low !== null && high !== null && low > high) return { error: "The low end of your zone can't be above the high end." };
-  values.zone_low = low;
-  values.zone_high = high;
-  const supabase = await createClient();
-  const { error } = await supabase.from("mental_game_plans").upsert({ player_id: who.playerId, ...values }, { onConflict: "player_id" });
-  if (error) return { error: friendlyDbError(error) };
-  refresh();
-  return { error: null, saved: true };
+/**
+ * Her zone: the intensity she plays her best at (both ends, or neither). It used to be saved with My signals, archived
+ * 2026-11-23 (user): this saves only the zone and leaves the archived signal columns as they are.
+ */
+export async function saveZone(_prev: FormState, fd: FormData): Promise<FormState> {
+  return runAction(async () => {
+    const who = await playerFrom(fd);
+    if ("error" in who) return failed(who.error);
+    const low = level(fd, "zone_low");
+    const high = level(fd, "zone_high");
+    if ((low === null) !== (high === null)) return invalid(low === null ? "zone_low" : "zone_high", "Pick both ends of your zone, or neither.");
+    if (low !== null && high !== null && low > high) return invalid("zone_low", "The low end of your zone can't be above the high end.");
+    const supabase = await createClient();
+    must(await supabase.from("mental_game_plans").upsert({ player_id: who.playerId, zone_low: low, zone_high: high }, { onConflict: "player_id" }));
+    refresh();
+    return done();
+  });
 }
 
 /** An intensity check: 1-10 before a game or practice, and what she'll adjust. */
