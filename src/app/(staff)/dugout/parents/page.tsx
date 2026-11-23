@@ -89,61 +89,85 @@ export default async function ParentsPage({ searchParams }: PageProps<"/dugout/p
         {approved.length === 0 ? (
           <EmptyState>No parents approved yet.</EmptyState>
         ) : (
+          // fixed columns from tablets up, so the actions line up row to row whatever the name and email (user,
+          // 2026-11-23); on phones the actions sit in one row under the name (the wrapper is `sm:contents`)
           <ul className="divide-y divide-navy-800">
-            {approved.map((l) => (
-              <li key={l.link_id} className="flex flex-wrap items-center justify-between gap-3 py-2.5">
-                <div>
-                  <p className="font-semibold">
-                    {l.parent_name} <span className="font-normal text-muted">· {l.email}</span>
-                  </p>
-                  <p className="text-sm text-muted">Parent of {l.player_id ? (nameOf.get(l.player_id) ?? l.child_name) : l.child_name}</p>
-                </div>
-                {parentOf.get(l.link_id) && (
-                  <ActionForm action={setTeamAdmin} className="flex items-center gap-2">
-                    <input type="hidden" name="team_id" value={team.id} />
-                    <input type="hidden" name="user_id" value={parentOf.get(l.link_id)} />
-                    <input type="hidden" name="on" value={teamAdmins.has(parentOf.get(l.link_id)!) ? "false" : "true"} />
-                    {teamAdmins.has(parentOf.get(l.link_id)!) ? (
-                      <>
-                        <span className={badgeClass("neon")}>Team admin</span>
-                        <ConfirmSubmit
-                          message={`Take team admin away from ${l.parent_name}? They keep their parent access.`}
-                          className={buttonStyles("removeQuiet")}
-                          confirmLabel="Take it away"
-                          label={`Remove ${l.parent_name} as team admin`}
-                        >
-                          Remove
-                        </ConfirmSubmit>
-                      </>
-                    ) : (
-                      <ConfirmSubmit
-                        message={`Make ${l.parent_name} a team admin? They can change ${team.name}'s calendar, GameDay (lineups, depth chart, box scores) and players' measurements. Nothing else.`}
-                        className={"inline-flex min-h-10 items-center gap-1 text-xs font-semibold text-link hover:underline sm:min-h-0"}
-                        confirmLabel="Make team admin"
-                        tone="primary"
-                      >
-                        Make team admin
-                      </ConfirmSubmit>
+            {approved.map((l) => {
+              const userId = parentOf.get(l.link_id);
+              const isAdmin = Boolean(userId && teamAdmins.has(userId));
+              return (
+                <li
+                  key={l.link_id}
+                  className={`grid grid-cols-1 gap-2 py-3 sm:items-center sm:gap-x-6 ${
+                    admin ? "sm:grid-cols-[minmax(0,1fr)_10.5rem_4.5rem_7rem]" : "sm:grid-cols-[minmax(0,1fr)_10.5rem_7rem]"
+                  }`}
+                >
+                  <div className="min-w-0">
+                    <p className="font-semibold [overflow-wrap:anywhere]">
+                      {l.parent_name} <span className="font-normal text-muted">· {l.email}</span>
+                    </p>
+                    <p className="text-sm text-muted">Parent of {l.player_id ? (nameOf.get(l.player_id) ?? l.child_name) : l.child_name}</p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-x-5 gap-y-1 sm:contents">
+                    <div className="sm:justify-self-start">
+                      {userId && (
+                        <ActionForm action={setTeamAdmin} className="flex items-center gap-2">
+                          <input type="hidden" name="team_id" value={team.id} />
+                          <input type="hidden" name="user_id" value={userId} />
+                          <input type="hidden" name="on" value={isAdmin ? "false" : "true"} />
+                          {isAdmin ? (
+                            <>
+                              <span className={badgeClass("neon")}>Team admin</span>
+                              <ConfirmSubmit
+                                message={`Take team admin away from ${l.parent_name}? They keep their parent access.`}
+                                className={buttonStyles("removeQuiet")}
+                                confirmLabel="Take it away"
+                                label={`Remove ${l.parent_name} as team admin`}
+                              >
+                                Remove
+                              </ConfirmSubmit>
+                            </>
+                          ) : (
+                            <ConfirmSubmit
+                              message={`Make ${l.parent_name} a team admin? They can change ${team.name}'s calendar, GameDay (lineups, depth chart, box scores) and players' measurements. Nothing else.`}
+                              className={"inline-flex min-h-10 items-center gap-1 text-xs font-semibold text-link hover:underline sm:min-h-0"}
+                              confirmLabel="Make team admin"
+                              tone="primary"
+                              label={`Make ${l.parent_name} a team admin`}
+                            >
+                              Make team admin
+                            </ConfirmSubmit>
+                          )}
+                        </ActionForm>
+                      )}
+                    </div>
+                    {admin && (
+                      <div className="sm:justify-self-start">
+                        {userId && (
+                          <Link
+                            href={`/view-as/parent/${userId}`}
+                            className="inline-flex min-h-10 items-center gap-1 text-xs font-semibold text-link hover:underline sm:min-h-0"
+                            aria-label={`View as ${l.parent_name}`}
+                          >
+                            View as <span aria-hidden="true">→</span>
+                          </Link>
+                        )}
+                      </div>
                     )}
-                  </ActionForm>
-                )}
-                {admin && parentOf.get(l.link_id) && (
-                  <Link href={`/view-as/parent/${parentOf.get(l.link_id)}`} className="text-xs font-semibold text-link hover:underline" aria-label={`View as ${l.parent_name}`}>
-                    View as <span aria-hidden="true">→</span>
-                  </Link>
-                )}
-                <ActionForm action={removeParentLink}>
-                  <input type="hidden" name="link_id" value={l.link_id} />
-                  <ConfirmSubmit
-                    message={`Remove ${l.parent_name}'s access to ${team.name}? If they shouldn't have had the parent code, make a new one too: they could join again with it.`}
-                    className={buttonStyles("remove")}
-                    label={`Remove access for ${l.parent_name}`}
-                  >
-                    Remove access
-                  </ConfirmSubmit>
-                </ActionForm>
-              </li>
-            ))}
+                    <ActionForm action={removeParentLink} className="sm:justify-self-end">
+                      <input type="hidden" name="link_id" value={l.link_id} />
+                      <ConfirmSubmit
+                        message={`Remove ${l.parent_name}'s access to ${team.name}? If they shouldn't have had the parent code, make a new one too: they could join again with it.`}
+                        className={buttonStyles("remove")}
+                        label={`Remove access for ${l.parent_name}`}
+                      >
+                        Remove access
+                      </ConfirmSubmit>
+                    </ActionForm>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         )}
       </Card>
