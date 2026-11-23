@@ -390,14 +390,14 @@ export function RequestForm({ defaults }: { defaults?: { code?: string; scope?: 
   );
 }
 
-export function RemoveMessage({ id }: { id: string }) {
+export function RemoveMessage({ id, who = "She" }: { id: string; who?: string }) {
   const [pending, startTransition] = useTransition();
   return (
     <button
       type="button"
       disabled={pending}
       onClick={async () => {
-        if (await confirmAction("Take this message back? She won't see it any more.")) startTransition(async () => void (await deleteMentorMessage({ id })));
+        if (await confirmAction(`Take this message back? ${who} won't see it any more.`)) startTransition(async () => void (await deleteMentorMessage({ id })));
       }}
       className="text-xs text-muted underline hover:text-danger"
     >

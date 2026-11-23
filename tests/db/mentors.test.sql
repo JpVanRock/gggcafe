@@ -232,6 +232,105 @@ select pg_temp.expect('the mentor reads the coach''s reply', (select count(*) fr
 reset role;
 
 -- ---------------------------------------------------------------------------
+-- Conversations (user, 2026-11-23): Jordan answers in her thread; her parents and the mentor write in theirs, which
+-- Jordan never reads. Names come from the database; replies notify the mentor; the parents thread is emailed.
+-- Left from above: Pat's private message to Jordan.
+-- ---------------------------------------------------------------------------
+set role authenticated;
+select pg_temp.as_user('cccccccc-0000-0000-0000-000000000004');
+insert into public.mentor_messages (player_id, mentor_id, author_role, body, sender_name)
+values ('00000000-0000-0000-0000-0000000000c2', 'cccccccc-0000-0000-0000-000000000001', 'player', 'Thanks! I''ll keep it closed.', 'Someone');
+select pg_temp.expect('her answer, signed from her record', (select sender_name || '/' || audience from public.mentor_messages where author_role = 'player'), 'Jordan/player');
+select pg_temp.expect('not to a mentor who isn''t hers', pg_temp.err($$insert into public.mentor_messages (player_id, mentor_id, author_role, body) values ('00000000-0000-0000-0000-0000000000c2', 'cccccccc-0000-0000-0000-000000000006', 'player', 'Hi')$$), '42501');
+select pg_temp.expect('she can''t write as the mentor', pg_temp.err($$insert into public.mentor_messages (player_id, mentor_id, body) values ('00000000-0000-0000-0000-0000000000c2', 'cccccccc-0000-0000-0000-000000000001', 'Hi')$$), '42501');
+select pg_temp.expect('she can''t write in the parents thread', pg_temp.err($$insert into public.mentor_messages (player_id, mentor_id, audience, author_role, body) values ('00000000-0000-0000-0000-0000000000c2', 'cccccccc-0000-0000-0000-000000000001', 'parents', 'player', 'Hi')$$) <> '', true);
+select pg_temp.expect('her answer is text only', pg_temp.err($$insert into public.mentor_messages (player_id, mentor_id, author_role, body, drill_id) values ('00000000-0000-0000-0000-0000000000c2', 'cccccccc-0000-0000-0000-000000000001', 'player', 'Hi', 'cccccccc-0000-0000-0000-0000000000d1')$$) <> '', true);
+select pg_temp.expect('she can''t mark her own answer read', pg_temp.err($$update public.mentor_messages set read_at = now() where author_role = 'player'$$), '42501');
+reset role;
+set role authenticated;
+select pg_temp.as_user('cccccccc-0000-0000-0000-000000000005');
+insert into public.mentor_messages (player_id, mentor_id, audience, author_role, body)
+values ('00000000-0000-0000-0000-0000000000c2', 'cccccccc-0000-0000-0000-000000000001', 'parents', 'parent', 'Thank you for the work with her. How is her drop ball?');
+select pg_temp.expect('the parent''s message, signed from her record', (select sender_name from public.mentor_messages where author_role = 'parent'), 'Jo Kim');
+select pg_temp.expect('a parent can''t write in Jordan''s thread', pg_temp.err($$insert into public.mentor_messages (player_id, mentor_id, author_role, body) values ('00000000-0000-0000-0000-0000000000c2', 'cccccccc-0000-0000-0000-000000000001', 'parent', 'Hi')$$) <> '', true);
+select pg_temp.expect('the parent reads both threads', (select string_agg(audience || ':' || author_role, ',' order by created_at) from public.mentor_messages),
+  'player:mentor,player:player,parents:parent');
+do $$ begin
+  update public.mentor_messages set read_at = now() where audience = 'player';
+  if found then raise exception 'FAIL: a parent marked her daughter''s messages read'; end if;
+end $$;
+reset role;
+set role authenticated;
+select pg_temp.as_user('cccccccc-0000-0000-0000-000000000001');
+insert into public.mentor_messages (player_id, audience, body)
+values ('00000000-0000-0000-0000-0000000000c2', 'parents', 'Summary: her drop ball is landing low; next week we add a target.');
+select pg_temp.expect('the mentor reads both her threads', (select count(*) from public.mentor_messages), 4::bigint);
+select pg_temp.expect('her summary is in her own thread', (select mentor_id::text from public.mentor_messages where audience = 'parents' and author_role = 'mentor'), 'cccccccc-0000-0000-0000-000000000001');
+select pg_temp.expect('no drill to the parents', pg_temp.err($$insert into public.mentor_messages (player_id, audience, body, drill_id) values ('00000000-0000-0000-0000-0000000000c2', 'parents', 'x', 'cccccccc-0000-0000-0000-0000000000d1')$$), '23514');
+select pg_temp.expect('the parents thread isn''t shared', pg_temp.err($$insert into public.mentor_messages (player_id, audience, body, shared_with_coaches) values ('00000000-0000-0000-0000-0000000000c2', 'parents', 'x', true)$$), '23514');
+update public.mentor_messages set read_at = now() where author_role <> 'mentor';
+select pg_temp.expect('she marks the answers read', (select count(*) from public.mentor_messages where author_role <> 'mentor' and read_at is not null), 2::bigint);
+select pg_temp.expect('not her own messages', pg_temp.err($$update public.mentor_messages set read_at = now() where author_role = 'mentor'$$), '42501');
+reset role;
+set role authenticated;
+select pg_temp.as_user('cccccccc-0000-0000-0000-000000000004');
+select pg_temp.expect('Jordan reads her thread only', (select string_agg(author_role, ',' order by created_at) from public.mentor_messages), 'mentor,player');
+reset role;
+set role authenticated;
+select pg_temp.as_user('cccccccc-0000-0000-0000-000000000005');
+update public.mentor_messages set read_at = now() where audience = 'parents' and author_role = 'mentor';
+select pg_temp.expect('the parent marks the summary read', (select count(*) from public.mentor_messages where audience = 'parents' and read_at is not null), 2::bigint);
+reset role;
+set role authenticated;
+select pg_temp.as_user('cccccccc-0000-0000-0000-000000000008');
+select pg_temp.expect('another parent reads none of it', (select count(*) from public.mentor_messages), 0::bigint);
+select pg_temp.expect('another parent can''t write about Jordan', pg_temp.err($$insert into public.mentor_messages (player_id, mentor_id, audience, author_role, body) values ('00000000-0000-0000-0000-0000000000c2', 'cccccccc-0000-0000-0000-000000000001', 'parents', 'parent', 'Hi')$$), '42501');
+reset role;
+set role authenticated;
+select pg_temp.as_user('cccccccc-0000-0000-0000-000000000003');
+select pg_temp.expect('coaches read no conversation', (select count(*) from public.mentor_messages), 0::bigint);
+reset role;
+set role authenticated;
+select pg_temp.as_user('cccccccc-0000-0000-0000-000000000002');
+select pg_temp.expect('admins read all of it', (select count(*) from public.mentor_messages), 4::bigint);
+reset role;
+select pg_temp.expect('the mentor heard about both replies',
+  (select string_agg(title, ' | ' order by created_at) from public.notifications where user_id = 'cccccccc-0000-0000-0000-000000000001' and kind = 'message'),
+  'Jordan answered you | Jo Kim (Jordan''s parent) wrote to you');
+select pg_temp.expect('the parent heard about the summary',
+  (select title || ' -> ' || href from public.notifications where user_id = 'cccccccc-0000-0000-0000-000000000005' and kind = 'message'),
+  'Pat Pitching (mentor) wrote to you about Jordan -> /family/mentors?player=00000000-0000-0000-0000-0000000000c2');
+select pg_temp.expect('the parents thread is emailed', (select count(*) from private.jobs where kind = 'email.mentor_message'), 2::bigint);
+insert into vault.decrypted_secrets (name, decrypted_secret) values ('jobs_secret', 'mm-test-secret-0123456789abcdefghijklmnop');
+select pg_temp.expect('the summary goes to her parent',
+  (select array_to_string(recipients, ',') || ' ' || author_name || ' ' || player_first
+     from private.jobs_mentor_message_email('mm-test-secret-0123456789abcdefghijklmnop', (select id from public.mentor_messages where audience = 'parents' and author_role = 'mentor'))),
+  'jordan-parent@example.test Pat Pitching Jordan');
+select pg_temp.expect('the parent''s message goes to the mentor',
+  (select array_to_string(recipients, ',') from private.jobs_mentor_message_email('mm-test-secret-0123456789abcdefghijklmnop', (select id from public.mentor_messages where author_role = 'parent'))),
+  'mentor@example.test');
+select pg_temp.expect('nothing for the player thread',
+  (select count(*) from private.jobs_mentor_message_email('mm-test-secret-0123456789abcdefghijklmnop', (select id from public.mentor_messages where author_role = 'player'))), 0::bigint);
+delete from vault.decrypted_secrets where name = 'jobs_secret';
+-- the Switchboard's "Message parents" closes the parents thread both ways; the player thread stays open
+insert into public.team_features_off (team_id, feature) values ('00000000-0000-0000-0000-0000000000b1', 'mentor.parent_messages');
+set role authenticated;
+select pg_temp.as_user('cccccccc-0000-0000-0000-000000000001');
+select pg_temp.expect('switched off: no message to the parents', pg_temp.err($$insert into public.mentor_messages (player_id, audience, body) values ('00000000-0000-0000-0000-0000000000c2', 'parents', 'x')$$), '42501');
+reset role;
+set role authenticated;
+select pg_temp.as_user('cccccccc-0000-0000-0000-000000000005');
+select pg_temp.expect('switched off: the parents can''t write either', pg_temp.err($$insert into public.mentor_messages (player_id, mentor_id, audience, author_role, body) values ('00000000-0000-0000-0000-0000000000c2', 'cccccccc-0000-0000-0000-000000000001', 'parents', 'parent', 'x')$$), '42501');
+reset role;
+set role authenticated;
+select pg_temp.as_user('cccccccc-0000-0000-0000-000000000004');
+select pg_temp.expect('the player thread is still open', pg_temp.err($$insert into public.mentor_messages (player_id, mentor_id, author_role, body) values ('00000000-0000-0000-0000-0000000000c2', 'cccccccc-0000-0000-0000-000000000001', 'player', 'One more thing')$$), '');
+reset role;
+delete from public.team_features_off where feature = 'mentor.parent_messages';
+delete from public.mentor_messages where body = 'One more thing';
+delete from private.jobs where kind = 'email.mentor_message';
+
+-- ---------------------------------------------------------------------------
 -- A whole-team request: the head coach approves; she works with the current roster
 -- ---------------------------------------------------------------------------
 set role authenticated;
@@ -285,7 +384,14 @@ reset role;
 set role authenticated;
 select pg_temp.as_user('cccccccc-0000-0000-0000-000000000001');
 select pg_temp.expect('removed: no players', (select count(*) from public.players), 0::bigint);
-select pg_temp.expect('she still sees what she sent', (select count(*) from public.mentor_messages), 1::bigint);
+select pg_temp.expect('she still sees her conversations', (select count(*) from public.mentor_messages), 4::bigint);
+reset role;
+set role authenticated;
+select pg_temp.as_user('cccccccc-0000-0000-0000-000000000005');
+select pg_temp.expect('no writing to a mentor once removed', pg_temp.err($$insert into public.mentor_messages (player_id, mentor_id, audience, author_role, body) values ('00000000-0000-0000-0000-0000000000c2', 'cccccccc-0000-0000-0000-000000000001', 'parents', 'parent', 'x')$$), '42501');
+reset role;
+set role authenticated;
+select pg_temp.as_user('cccccccc-0000-0000-0000-000000000001');
 select pg_temp.expect('no new notes once removed', pg_temp.err($$insert into public.mentor_notes (mentor_id, player_id, body) values ('cccccccc-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000c2', 'x')$$), '42501');
 reset role;
 set role authenticated;

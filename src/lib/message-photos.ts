@@ -31,6 +31,13 @@ export type MentorMessage = {
   read_at: string | null;
   /** the mentor shared it with the coaches (parents and admins see every message) */
   shared_with_coaches: boolean;
+  /** whose thread (user, 2026-11-23: conversations): the mentor */
+  mentor_id: string;
+  /** player: the mentor and the player; parents: the mentor and her approved parents (never shown to the player) */
+  audience: "player" | "parents";
+  /** who wrote it */
+  author_role: "mentor" | "player" | "parent";
 };
 
-export const MESSAGE_COLUMNS = "id, player_id, sender_id, sender_name, body, photo_path, drill_name, drill_video_url, created_at, read_at, shared_with_coaches";
+export const MESSAGE_COLUMNS =
+  "id, player_id, sender_id, sender_name, body, photo_path, drill_name, drill_video_url, created_at, read_at, shared_with_coaches, mentor_id, audience, author_role";

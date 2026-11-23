@@ -48,7 +48,9 @@ export function samplePages() {
     .map((segs) => "/" + fill(segs).join("/"));
   // Leadership Light pages need a player in that program (Lila; Maya is in the Full program)
   const light = ["", "/light-what-is-a-leader", "/plan"].map((p) => `/players/${ID.lightLeader}/advanced/leadership${p}`);
-  return [...new Set([...pages, ...light])].sort();
+  // a mentor's two conversations with one player (user, 2026-11-23), not only the list
+  const conversation = `/mentor/messages?player=${ID.player}`;
+  return [...new Set([...pages, ...light, conversation])].sort();
 }
 
 /** The PDF routes and file downloads (not pages, so not found by samplePages). */

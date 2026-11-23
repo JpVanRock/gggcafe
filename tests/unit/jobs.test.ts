@@ -2,7 +2,7 @@
 // The job worker (docs/architecture/jobs.md): job kinds, payload checks and the parents' emails.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { errorAlertEmail, isJobKind, jobPayload, mentorCallEmail, videoCallEmail } from "../../src/lib/jobs/rules.ts";
+import { errorAlertEmail, isJobKind, jobPayload, mentorCallEmail, mentorMessageEmail, videoCallEmail } from "../../src/lib/jobs/rules.ts";
 
 const CALL = "e9e9e9e9-0000-4000-8000-0000000000ca";
 
@@ -82,4 +82,23 @@ test("an invited mentor's email: who invited them, with whom, and the call page 
   assert.equal(cancelled.subject, "Video call cancelled: Thu, Jan 14 · 6:30 PM");
   assert.match(cancelled.text, /The video call with Emma that Pat Torres \(head coach\) invited you to is cancelled\./);
   assert.match(cancelled.html, /Open your mentor home/);
+});
+
+test("the parents' conversation with a mentor is emailed both ways (user, 2026-11-23)", () => {
+  assert.ok(isJobKind("email.mentor_message"));
+  assert.deepEqual(jobPayload("email.mentor_message", { message_id: CALL }), { messageId: CALL });
+  assert.equal(jobPayload("email.mentor_message", { message_id: "nope" }), null);
+  assert.equal(jobPayload("email.mentor_message", { call_id: CALL }), null);
+  const base = { authorName: "Jo <Kim>", mentorName: "Pat Pitching", player: "Jordan", body: "Good week.\nNext: a target & more reps.", url: "https://www.ggg.cafe/family/mentors?player=x" };
+  const toParents = mentorMessageEmail({ ...base, toParents: true });
+  assert.equal(toParents.subject, "Pat Pitching wrote to you about Jordan");
+  assert.match(toParents.text, /^Pat Pitching, Jordan's mentor, wrote to you on GGG\.Cafe:\n\nGood week\.\nNext: a target & more reps\./);
+  assert.match(toParents.text, /Jordan doesn't see your conversation with her mentor\. Replies to this email aren't read\./);
+  assert.match(toParents.html, /Good week\.<br>Next: a target &amp; more reps\./);
+  assert.match(toParents.html, /Open the family page/);
+  const toMentor = mentorMessageEmail({ ...base, toParents: false, url: "https://www.ggg.cafe/mentor/messages?player=x&with=parents" });
+  assert.equal(toMentor.subject, "Jo <Kim> (Jordan's parent) wrote to you");
+  assert.match(toMentor.text, /^Hi Pat Pitching,\n\nJo <Kim>, Jordan's parent, wrote to you/);
+  assert.match(toMentor.html, /Jo &lt;Kim&gt;, Jordan&#39;s parent/);
+  assert.match(toMentor.html, /href="https:\/\/www\.ggg\.cafe\/mentor\/messages\?player=x&amp;with=parents"/);
 });

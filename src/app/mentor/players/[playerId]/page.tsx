@@ -5,7 +5,6 @@ import { getCurrentUser, getMentor, getMentorAccess, getPlayerFeaturesOff } from
 import { formatDay, todayISO } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
 import { signedPhotoUrls } from "@/lib/player-photos";
-import { MESSAGE_COLUMNS, signedMessagePhotoUrls, type MentorMessage } from "@/lib/message-photos";
 import { GOAL_METHOD_LABEL, isUuid, playerName, type Player } from "@/lib/softball";
 
 import {
@@ -20,13 +19,12 @@ import type { BestVersionAnswers } from "@/lib/best-version";
 import { MentalDetail } from "@/app/(staff)/players/[playerId]/mental";
 import { MentalTools } from "@/app/(staff)/players/[playerId]/mental-game";
 import { loadMentalTools } from "@/app/(staff)/players/[playerId]/mental-data";
-import { MessageForm, RemoveMessage, TrainingForm, type LibraryDrill } from "../../mentor-client";
-import { ActionForm } from "@/components/action-form";
-import { SubmitButton } from "@/components/submit-button";
-import { Badge, RECENT_LIMIT, groupLabelClass } from "@/components/ui";
+import { TrainingForm } from "../../mentor-client";
+import { MentorConversation, loadConversation } from "../../conversation";
+import { RECENT_LIMIT, groupLabelClass } from "@/components/ui";
 import { JOURNAL_BUCKET } from "@/lib/journal";
 import { FocusBoard, FocusControls, FocusForm, NoteForm, NotesThread, RemoveNote, type FocusItem, type MentorNote } from "@/components/mentor-work";
-import { addMentorFocus, addMentorNote, removeMentorFocus, removeMentorNote, setMentorFocus, setMessageSharing } from "../../actions";
+import { addMentorFocus, addMentorNote, removeMentorFocus, removeMentorNote, setMentorFocus } from "../../actions";
 import { VIDEO_CALL_COLUMNS, VideoCallList, type VideoCallRow } from "@/components/video-calls";
 import { VideoCallForm } from "@/components/video-call-form";
 import { zoomConfigured } from "@/lib/zoom";
@@ -64,15 +62,14 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
   const first = player.preferred_name || player.first_name;
   const method = player.goal_method ?? "harada";
 
-  const [chart, smartGoals, metricOptions, pop, mental, styles, { data: drillRows }, { data: sentRows }, training, measurements, { data: best }, { data: focusRows }, { data: noteRows }, mentalTools] = await Promise.all([
+  const [chart, smartGoals, metricOptions, pop, mental, styles, conversation, training, measurements, { data: best }, { data: focusRows }, { data: noteRows }, mentalTools] = await Promise.all([
     loadHarada(supabase, player.id),
     loadSmartGoals(supabase, player.id),
     loadMetricOptions(supabase),
     loadPopReport(supabase, player.id),
     loadMentalPlan(supabase, player.id),
     loadMovementAndHitting(supabase, player.id),
-    supabase.from("practice_drills").select("id, name, video_url").order("name"),
-    supabase.from("mentor_messages").select(MESSAGE_COLUMNS).eq("player_id", player.id).eq("sender_id", mentor.userId).order("created_at", { ascending: false }).limit(20),
+    loadConversation(supabase, mentor.userId, player.id, false),
     loadTraining(supabase, mentor.userId, [player.id]),
     // mentors can't read team lists: her defaults plus whatever she has been measured on
     loadMeasurements(supabase, player, null),
@@ -128,11 +125,7 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
   const off = await getPlayerFeaturesOff(player.id);
   const focus = (focusRows ?? []) as FocusItem[];
   const notes = (noteRows ?? []) as MentorNote[];
-  const sent = (sentRows ?? []) as MentorMessage[];
-  const [photos, messagePhotos] = await Promise.all([
-    signedPhotoUrls(supabase, [player.photo_path]),
-    signedMessagePhotoUrls(supabase, sent.map((m) => m.photo_path)),
-  ]);
+  const photos = await signedPhotoUrls(supabase, [player.photo_path]);
   const spot = currentRostering(pop);
 
   return (
@@ -166,38 +159,23 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
       )}
       <ScrollToHash />
 
-      {!off.has("mentor.messages") && (
-        <Panel title={`Message ${first}`}>
-          <MessageForm playerId={player.id} mentorId={mentor.userId} playerName={first} drills={(drillRows ?? []) as LibraryDrill[]} />
-          {sent.length > 0 && (
-            <ul className="mt-2 divide-y divide-navy-700 rounded-xl border border-navy-700">
-              {sent.map((m) => (
-                <li key={m.id} className="flex flex-wrap items-start gap-x-4 gap-y-2 px-4 py-3 text-sm">
-                  <span className="w-24 shrink-0 font-display text-muted tabular-nums">{formatDay(m.created_at.slice(0, 10))}</span>
-                  {/* at least 12rem, so on a phone the message wraps to its own line instead of shrinking to a word a line */}
-                  <span className="min-w-48 flex-1">
-                    {m.body && <span className="block whitespace-pre-wrap">{m.body}</span>}
-                    {m.drill_name && <span className="block text-pink-soft">Drill: {m.drill_name}</span>}
-                    {m.photo_path && messagePhotos.get(m.photo_path) && (
-                      // eslint-disable-next-line @next/next/no-img-element -- short-lived signed Storage URL
-                      <img src={messagePhotos.get(m.photo_path)!} alt="Photo sent" className="mt-2 h-20 rounded-lg object-cover" />
-                    )}
-                  </span>
-                  <span className="font-sans text-2xs tracking-wider text-muted uppercase">{m.read_at ? "Seen" : "Not seen yet"}</span>
-                  <ActionForm action={setMessageSharing} className="flex flex-wrap items-center gap-2">
-                    <input type="hidden" name="message_id" value={m.id} />
-                    <input type="hidden" name="shared" value={m.shared_with_coaches ? "0" : "1"} />
-                    {m.shared_with_coaches && <Badge tone="pink">Shared with coaches</Badge>}
-                    <SubmitButton variant="link" pendingLabel="Saving…" className="text-xs">
-                      {m.shared_with_coaches ? "Stop sharing" : "Share with coaches"}
-                    </SubmitButton>
-                  </ActionForm>
-                  <RemoveMessage id={m.id} />
-                </li>
-              ))}
-            </ul>
-          )}
-        </Panel>
+      {/* her conversation with the player and the one with her parents (user, 2026-11-23); also on Messages */}
+      {!(off.has("mentor.messages") && off.has("mentor.parent_messages")) && (
+        <section id="messages" aria-label="Messages" className="flex scroll-mt-24 flex-col gap-4">
+          <div className="flex flex-wrap items-baseline justify-between gap-3">
+            <h2 className="text-2xl leading-tight font-bold tracking-wide text-highlight uppercase">Messages</h2>
+            <Link href={`/mentor/messages?player=${player.id}`} className="text-sm font-semibold text-link hover:underline">
+              Open in Messages <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+          <MentorConversation
+            mentorId={mentor.userId}
+            player={{ id: player.id, first }}
+            conversation={conversation}
+            off={off}
+            showAllHref={`/mentor/messages?player=${player.id}&all=1`}
+          />
+        </section>
       )}
 
       {(callTeam || calls.length > 0) && (
@@ -313,7 +291,8 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
 
       <p className="text-xs text-muted">
         You see {playerName(player)} because {access.playerIds.includes(player.id) ? "her parents approved you" : "her head coach approved you for the team"}. Her
-        parents and the site admins can read every message you send her; her coaches read only the ones you share.
+        parents and the site admins read your conversation with her; her coaches read only the messages you share. Your conversation with her parents is
+        between you and them (and the site admins); she doesn&apos;t see it.
       </p>
     </div>
   );

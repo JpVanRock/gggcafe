@@ -1,5 +1,5 @@
-// Mentor messages on her side: the alerts at the top of her player menu, and the
-// full list on her Messages page. Text, a photo, a suggested drill (with its video).
+// Mentor messages on her side: the alerts at the top of her player menu (her Messages page holds the
+// conversations, where she answers). Text, a photo, a suggested drill (with its video).
 import Link from "next/link";
 import { SpeedStripes } from "@/components/athletic";
 import { formatDay } from "@/lib/dates";
@@ -73,7 +73,7 @@ export function MentorAlerts({
       <Link href={href} className="flex items-center justify-between gap-3 rounded-2xl border border-navy-700 px-4 py-2.5 text-sm transition hover:border-pink">
         <span className={eyebrowClass}>From your mentors</span>
         <span className="text-muted">
-          {total} message{total === 1 ? "" : "s"} · all caught up →
+          {total} message{total === 1 ? "" : "s"} · all caught up · answer →
         </span>
       </Link>
     );
@@ -88,7 +88,7 @@ export function MentorAlerts({
         <span className="flex items-center gap-3">
           {canDismiss && unread.length > 1 && <GotIt playerId={playerId} ids={unread.map((m) => m.id)} label="Got them all" />}
           <Link href={href} className="text-sm text-link hover:underline">
-            All messages →
+            Open &amp; answer →
           </Link>
         </span>
       </div>

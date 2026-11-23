@@ -2,15 +2,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { getCurrentUser } from "@/lib/auth";
-import { formatDay } from "@/lib/dates";
+import { getCurrentUser, getPlayerFeaturesOff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { MESSAGE_COLUMNS, signedMessagePhotoUrls, type MentorMessage } from "@/lib/message-photos";
-import { Badge, EmptyState, Loading, groupLabelClass } from "@/components/ui";
+import { EmptyState, Loading, eyebrowClass, groupLabelClass } from "@/components/ui";
+import { MarkSeen } from "@/components/mark-seen";
+import { MessageThread } from "@/components/message-thread";
+import { ReplyForm } from "@/components/reply-form";
 import { FocusBoard, NotesThread, type FocusItem, type MentorNote } from "@/components/mentor-work";
 import { FamilyHeader } from "../header";
 import { DaughterMentors, loadFamilyMentors } from "../mentors";
 import { loadFamily } from "../family-data";
+import { markParentConversationsRead, writeToMentor } from "../actions";
 
 export const metadata: Metadata = { title: "Mentors · GGG.Cafe" };
 
@@ -29,7 +32,11 @@ export default function FamilyMentorsPage({ searchParams }: PageProps<"/family/m
 
 const heading = `mb-3 text-pink-soft ${groupLabelClass}`;
 
-/** Everything her mentors send her and write about her: messages (all of them), focus areas and notes with her coaches. */
+/**
+ * Everything her mentors send her and write about her: the parents' own conversation with each mentor (user,
+ * 2026-11-23: they answer; the player never sees it), her conversations with them (read only), focus areas and notes
+ * with her coaches.
+ */
 async function FamilyMentors({ searchParams }: Pick<PageProps<"/family/mentors">, "searchParams">) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
@@ -53,7 +60,7 @@ async function FamilyMentors({ searchParams }: Pick<PageProps<"/family/mentors">
   const { teamsOf } = family;
   const famDaughter = family.daughters.find((d) => d.player_id === daughter.player_id);
   const [{ data: msgRows }, { data: focusRows }, { data: noteRows }, { data: mentorRows }] = await Promise.all([
-    supabase.from("mentor_messages").select(MESSAGE_COLUMNS).eq("player_id", daughter.player_id).order("created_at", { ascending: false }).limit(50),
+    supabase.from("mentor_messages").select(MESSAGE_COLUMNS).eq("player_id", daughter.player_id).order("created_at", { ascending: false }).limit(300),
     supabase.from("mentor_focus").select("id, mentor_id, title, details, status, updated_at").eq("player_id", daughter.player_id).order("created_at"),
     supabase
       .from("mentor_notes")
@@ -62,13 +69,31 @@ async function FamilyMentors({ searchParams }: Pick<PageProps<"/family/mentors">
       .order("created_at"),
     supabase.from("mentors").select("user_id, display_name, specialty"),
   ]);
-  const messages = (msgRows ?? []) as MentorMessage[];
-  const photos = await signedMessagePhotoUrls(supabase, messages.map((m) => m.photo_path));
+  const messages = ((msgRows ?? []) as MentorMessage[]).slice().reverse();
+  const [photos, off] = await Promise.all([
+    signedMessagePhotoUrls(supabase, messages.map((m) => m.photo_path)),
+    getPlayerFeaturesOff(daughter.player_id),
+  ]);
   const mentors = mentorRows ?? [];
   const nameOf = (id: string) => mentors.find((m) => m.user_id === id)?.display_name ?? "Mentor";
   const focus: FocusItem[] = (focusRows ?? []).map((f) => ({ ...f, mentor_name: nameOf(f.mentor_id) }));
   const notes = (noteRows ?? []) as (MentorNote & { mentor_id: string })[];
   const threads = [...new Set(notes.map((n) => n.mentor_id))];
+  // the mentors who work with her now (her own approvals, and her teams' whole-team mentors): the parents can write to them
+  const herTeams = famDaughter ? teamsOf(famDaughter).map((t) => t.id) : [];
+  const current = new Set(
+    familyMentors.links
+      .filter((l) => l.status === "approved" && (l.player_id === daughter.player_id || (!l.player_id && l.team_id && herTeams.includes(l.team_id))))
+      .map((l) => l.mentor_id),
+  );
+  const ofAudience = (audience: MentorMessage["audience"]) => messages.filter((m) => m.audience === audience);
+  // a conversation with every mentor who works with her, and with any who wrote before
+  const parentThreads = [...new Set([...current, ...ofAudience("parents").map((m) => m.mentor_id)])];
+  const playerThreads = [...new Set(ofAudience("player").map((m) => m.mentor_id))];
+  const mentorLabel = (id: string) => {
+    const m = mentors.find((x) => x.user_id === id);
+    return m ? [m.display_name, m.specialty].filter(Boolean).join(" · ") : (messages.find((x) => x.mentor_id === id && x.author_role === "mentor")?.sender_name ?? "Mentor");
+  };
 
   return (
     <div className="flex flex-col gap-8">
@@ -99,6 +124,51 @@ async function FamilyMentors({ searchParams }: Pick<PageProps<"/family/mentors">
       {/* her mentors: approve or decline a request, remove one (user, 2026-11-13: moved here from the family page) */}
       {famDaughter && <DaughterMentors daughter={famDaughter} teams={teamsOf(famDaughter)} links={familyMentors.links} mentors={familyMentors.mentors} />}
 
+      <section aria-labelledby="your-conversations" className="flex flex-col gap-4">
+        <div>
+          <h2 id="your-conversations" className={heading}>
+            You and her mentors
+          </h2>
+          <p className="-mt-1 text-sm text-muted">
+            Summaries her mentors send you, and your answers. {first} doesn&apos;t see these. You get each new one by email too.
+          </p>
+        </div>
+        <MarkSeen action={markParentConversationsRead.bind(null, daughter.player_id)} />
+        {parentThreads.length === 0 ? (
+          <p className="text-sm text-muted">Once a mentor works with {first}, you can write to them here.</p>
+        ) : (
+          parentThreads.map((mentorId) => {
+            const name = nameOf(mentorId);
+            return (
+              <section key={mentorId} aria-label={`You and ${name}`} className="flex flex-col gap-4 rounded-2xl border border-navy-700 bg-navy-900/70 p-4 sm:p-5">
+                <p className="font-display text-lg leading-tight font-bold tracking-wide uppercase">{mentorLabel(mentorId)}</p>
+                <MessageThread
+                  messages={ofAudience("parents").filter((m) => m.mentor_id === mentorId)}
+                  viewer="parent"
+                  me={user.id}
+                  label={`Your conversation with ${name}`}
+                  empty={`Nothing yet. Ask ${name} how it's going, or wait for their first summary.`}
+                />
+                {!current.has(mentorId) ? (
+                  <p className="text-xs text-muted">{name} no longer works with {first}.</p>
+                ) : off.has("mentor.parent_messages") ? (
+                  <p className="text-xs text-muted">The head coach turned off messages between mentors and parents for now.</p>
+                ) : (
+                  <div className="border-t border-navy-700 pt-4">
+                    <ReplyForm
+                      action={writeToMentor.bind(null, daughter.player_id, mentorId)}
+                      label={`Write to ${name}`}
+                      placeholder={`Thanks for the work with ${first}. What should she practice at home this week?`}
+                      hint={`${name} gets it by email. ${first} doesn't see it.`}
+                    />
+                  </div>
+                )}
+              </section>
+            );
+          })
+        )}
+      </section>
+
       <section aria-label="Focus areas">
         <h2 className={heading}>What they&apos;re working on with {first}</h2>
         <FocusBoard items={focus} empty="No focus areas yet." />
@@ -120,49 +190,29 @@ async function FamilyMentors({ searchParams }: Pick<PageProps<"/family/mentors">
         )}
       </section>
 
-      <section aria-label="Messages">
-        <h2 className={heading}>Messages to {first}</h2>
-        {messages.length === 0 ? (
+      <section aria-labelledby="her-conversations" className="flex flex-col gap-4">
+        <div>
+          <h2 id="her-conversations" className={heading}>
+            {first} and her mentors
+          </h2>
+          <p className="-mt-1 text-sm text-muted">Their messages to {first} and her answers. You read them; only she and the mentor write here.</p>
+        </div>
+        {playerThreads.length === 0 ? (
           <p className="text-sm text-muted">No messages yet.</p>
         ) : (
-          <ul className="divide-y divide-navy-700 rounded-xl border border-navy-700">
-            {messages.map((m) => (
-              <li key={m.id} className="flex flex-col gap-1 px-4 py-3 text-sm">
-                {/* who, when and the status on one line; the message gets the full width under it (on a phone it
-                    was squeezed to one word a line beside the badge: second audit round, 2026-11-18) */}
-                <span className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-                  <span>
-                    <span className="font-semibold">{m.sender_name}</span>
-                    <span className="font-display text-muted tabular-nums"> · {formatDay(m.created_at.slice(0, 10))}</span>
-                  </span>
-                  <span className="flex flex-wrap items-center gap-2">
-                    {m.shared_with_coaches && <Badge tone="pink">Shared with coaches</Badge>}
-                    <span className="font-sans text-2xs tracking-wider text-muted uppercase">{m.read_at ? "Seen" : "Not seen yet"}</span>
-                  </span>
-                </span>
-                <span className="min-w-0">
-                  {m.body && <span className="block whitespace-pre-wrap">{m.body}</span>}
-                  {m.drill_name && (
-                    <span className="block text-pink-soft">
-                      Drill: {m.drill_name}
-                      {m.drill_video_url && (
-                        <>
-                          {" · "}
-                          <a href={m.drill_video_url} target="_blank" rel="noreferrer" className="text-link underline underline-offset-2">
-                            video
-                          </a>
-                        </>
-                      )}
-                    </span>
-                  )}
-                  {m.photo_path && photos.get(m.photo_path) && (
-                    // eslint-disable-next-line @next/next/no-img-element -- short-lived signed Storage URL
-                    <img src={photos.get(m.photo_path)!} alt={`Photo from ${m.sender_name}`} className="mt-2 h-28 rounded-lg object-cover" />
-                  )}
-                </span>
-              </li>
-            ))}
-          </ul>
+          playerThreads.map((mentorId) => (
+            <section key={mentorId} aria-label={`${first} and ${nameOf(mentorId)}`} className="flex flex-col gap-3 rounded-2xl border border-navy-700 p-4 sm:p-5">
+              <p className={eyebrowClass}>{mentorLabel(mentorId)}</p>
+              <MessageThread
+                messages={ofAudience("player").filter((m) => m.mentor_id === mentorId)}
+                viewer="staff"
+                me={user.id}
+                photoUrls={photos}
+                label={`${first}'s conversation with ${nameOf(mentorId)}`}
+                empty="No messages yet."
+              />
+            </section>
+          ))
         )}
       </section>
     </div>

@@ -2247,6 +2247,9 @@ export type Database = {
           created_at: string
           read_at: string | null
           shared_with_coaches: boolean
+          mentor_id: string
+          audience: "player" | "parents"
+          author_role: "mentor" | "player" | "parent"
         }
         Insert: {
           id?: string
@@ -2261,6 +2264,9 @@ export type Database = {
           created_at?: string
           read_at?: string | null
           shared_with_coaches?: boolean
+          mentor_id?: string
+          audience?: "player" | "parents"
+          author_role?: "mentor" | "player" | "parent"
         }
         Update: {
           id?: string
@@ -2275,6 +2281,9 @@ export type Database = {
           created_at?: string
           read_at?: string | null
           shared_with_coaches?: boolean
+          mentor_id?: string
+          audience?: "player" | "parents"
+          author_role?: "mentor" | "player" | "parent"
         }
         Relationships: [
           {
@@ -2471,7 +2480,7 @@ export type Database = {
         Row: {
           id: string
           user_id: string
-          kind: "player-of-the-week" | "video-call" | "parent-joined"
+          kind: "player-of-the-week" | "video-call" | "parent-joined" | "message"
           title: string
           body: string | null
           href: string | null
@@ -2483,7 +2492,7 @@ export type Database = {
         Insert: {
           id?: string
           user_id: string
-          kind: "player-of-the-week" | "video-call" | "parent-joined"
+          kind: "player-of-the-week" | "video-call" | "parent-joined" | "message"
           title: string
           body?: string | null
           href?: string | null
@@ -2495,7 +2504,7 @@ export type Database = {
         Update: {
           id?: string
           user_id?: string
-          kind?: "player-of-the-week" | "video-call" | "parent-joined"
+          kind?: "player-of-the-week" | "video-call" | "parent-joined" | "message"
           title?: string
           body?: string | null
           href?: string | null
@@ -6405,6 +6414,7 @@ export type Database = {
       jobs_error_alert: { Args: { p_secret: string | null; p_fingerprint: string | null }; Returns: { source: string; name: string; message: string; route: string; count: number; first_seen: string; recipients: string[] }[] }
       jobs_fail: { Args: { p_secret: string | null; p_id: number | null; p_error: string | null }; Returns: undefined }
       jobs_finish: { Args: { p_secret: string | null; p_id: number | null; p_outcome?: string | null; p_note?: string | null }; Returns: undefined }
+      jobs_mentor_message_email: { Args: { p_secret: string | null; p_message_id: string | null }; Returns: { recipients: string[]; author_role: string; author_name: string; mentor_name: string; player_first: string; player_id: string; body: string }[] }
       jobs_summary: { Args: Record<PropertyKey, never>; Returns: { kind: string; waiting: number; done: number; skipped: number; dead: number; retrying: number; last_error: string; last_error_at: string }[] }
       jobs_video_call_email: { Args: { p_secret: string | null; p_call_id: string | null }; Returns: { recipients: string[]; player_first: string; host_name: string; host_kind: string; topic: string; starts_at: string; minutes: number; cancelled: boolean }[] }
       jobs_video_call_mentor_email: { Args: { p_secret: string | null; p_call_id: string | null }; Returns: { email: string; mentor_name: string; player_first: string; group_size: number; host_name: string; topic: string; starts_at: string; minutes: number; cancelled: boolean }[] }

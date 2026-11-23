@@ -24,6 +24,38 @@ export function cleanMessage(
   return { body: body || null, photoPath, drillId };
 }
 
+/**
+ * Conversations (user, 2026-11-23): each mentor has a thread with each player (`player`) and one with her parents
+ * (`parents`, which the player never sees). The player, her parents and the mentor's notes to the parents write text.
+ */
+export type Audience = "player" | "parents";
+export const AUDIENCES: readonly Audience[] = ["player", "parents"];
+
+/** Text in a thread (an answer, a note to or from the parents): required, at most MESSAGE_MAX. */
+export function cleanText(input: unknown): { body: string } | string {
+  const body = typeof input === "string" ? input.trim() : "";
+  if (!body) return "Write something first.";
+  if (body.length > MESSAGE_MAX) return `Keep it under ${MESSAGE_MAX} characters.`;
+  return { body };
+}
+
+/** The newest message of each thread, newest thread first; `unread` counts what was written to `viewer`'s side. */
+export function threadSummaries<M extends { mentor_id: string; player_id: string; audience: Audience; author_role: string; read_at: string | null; created_at: string }>(
+  messages: M[],
+  mine: (m: M) => boolean,
+): { key: string; last: M; unread: number; count: number }[] {
+  const threads = new Map<string, { key: string; last: M; unread: number; count: number }>();
+  for (const m of messages) {
+    const key = `${m.mentor_id}:${m.player_id}:${m.audience}`;
+    const t = threads.get(key) ?? { key, last: m, unread: 0, count: 0 };
+    if (m.created_at > t.last.created_at) t.last = m;
+    if (!mine(m) && !m.read_at) t.unread += 1;
+    t.count += 1;
+    threads.set(key, t);
+  }
+  return [...threads.values()].sort((a, b) => b.last.created_at.localeCompare(a.last.created_at));
+}
+
 /** A new drill for the Drill Library: a name, and optionally a video link (https) and how to run it. */
 export function cleanNewDrill(input: { name?: unknown; videoUrl?: unknown; description?: unknown }):
   | { name: string; video_url: string | null; description: string | null }

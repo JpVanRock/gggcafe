@@ -37,7 +37,9 @@ export const SWITCHES = [
   { key: "parent.team", audience: "parents", label: "Team Standards & Culture", detail: "Standards, team culture and season goals" },
   { key: "parent.goals", audience: "parents", label: "Her goals", detail: "Her goals and her team commitment, view only (also off when Goals is off for players)" },
   // mentors: what they can do with your players
-  { key: "mentor.messages", audience: "mentors", label: "Message players", detail: "Messages, photos and drills to players" },
+  { key: "mentor.messages", audience: "mentors", label: "Message players", detail: "Conversations with players: messages, photos and drills, and their answers" },
+  // the mentor's conversation with a player's parents (user, 2026-11-23); emailed to them
+  { key: "mentor.parent_messages", audience: "mentors", label: "Message parents", detail: "Conversations with a player's parents: summaries and their answers (emailed)" },
   { key: "mentor.training", audience: "mentors", label: "Add training", detail: "Sessions on players' weeks (TWIS)" },
   { key: "mentor.notes", audience: "mentors", label: "Focus areas & notes", detail: "Working with the coaches about a player or the team" },
   { key: "mentor.goals", audience: "mentors", label: "See Goals", detail: "A player's goals and The Best Version of You" },

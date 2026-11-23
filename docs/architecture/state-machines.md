@@ -48,7 +48,7 @@ Labels and badge tones for these states come from the lifecycle (`PARENT_LINK.la
 | Team goal | `team_goals.achieved_at` | open ⇄ achieved |
 | Team quiz | `team_quizzes.published_at` | draft ⇄ published |
 | Mentor focus | `mentor_focus.status` | working_on ⇄ working |
-| Notifications, mentor messages | `read_at` | unread → read |
+| Notifications, mentor messages | `read_at` | unread → read (a mentor's message: the player, or for the parents thread any of her parents; an answer: the mentor; `private.guard_mentor_message_update`) |
 | Games | `games.status` (`game_status`) | scheduled, in_progress, final, suspended, cancelled (saving a box score marks the game final) |
 | Video call | `video_calls.cancelled_at` | booked → cancelled (`cancelVideoCall` only while not cancelled) |
 | Job (outbox) | `private.jobs`: `locked_at`, `done_at`, `outcome` | waiting → running → done / skipped, or back to waiting with a retry time, then dead. All in SQL (`jobs_claim`, `jobs_finish`, `jobs_fail`; a check keeps `done_at` and `outcome` together). See `jobs.md` |

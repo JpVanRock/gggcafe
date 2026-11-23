@@ -1,6 +1,6 @@
 # Player dashboard (`/players/[playerId]`, cafe-menu design)
 - Layout in `src/app/(staff)/players/[playerId]/player-menu.tsx`: menu header, video calls, the TWIS board
-  (right under her name since the 2026-11-18 design audit, M3), mentor messages, the "From the Dugout" strip,
+  (right under her name since the 2026-11-18 design audit, M3), mentor messages (her own thread only; she answers on her Messages page, user 2026-11-23), the "From the Dugout" strip,
   then menu boards. Each board shows a summary and LINKS to the section's own page
   (user, 2026-11-07: pages, not pop-ups): `/players/[id]/{goals,pop,mental,training,iq,trophies}`, plus
   `/team` (Team Standards & Culture, #standards / #culture) and `/activities` (TWIS "Manage

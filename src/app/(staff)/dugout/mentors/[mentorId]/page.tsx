@@ -79,7 +79,7 @@ export default async function MentorNotesPage({ params, searchParams }: PageProp
     ids.length
       ? supabase
           .from("mentor_messages")
-          .select("id, player_id, body, drill_name, photo_path, created_at, shared_with_coaches")
+          .select("id, player_id, body, drill_name, photo_path, created_at, shared_with_coaches, audience")
           .eq("sender_id", mentorId)
           .in("player_id", ids)
           .order("created_at", { ascending: false })
@@ -144,7 +144,7 @@ export default async function MentorNotesPage({ params, searchParams }: PageProp
 
       <section>
         <h3 className={`mb-3 text-pink-soft ${groupLabelClass}`}>
-          {user.staff.role === "admin" ? `${first}'s messages to players` : `Messages ${first} shared with you`}
+          {user.staff.role === "admin" ? `${first}'s messages to players and their parents` : `Messages ${first} shared with you`}
         </h3>
         {messages.length === 0 ? (
           <p className="text-sm text-muted">None.</p>
@@ -153,7 +153,10 @@ export default async function MentorNotesPage({ params, searchParams }: PageProp
             {messages.map((m) => (
               <li key={m.id} className="flex flex-wrap items-baseline gap-x-4 gap-y-1 px-4 py-2.5 text-sm">
                 <span className="w-24 shrink-0 font-display text-muted tabular-nums">{formatDay(m.created_at.slice(0, 10))}</span>
-                <span className="font-semibold">{roster.find((p) => p.id === m.player_id)?.name ?? "A player"}</span>
+                <span className="font-semibold">
+                  {roster.find((p) => p.id === m.player_id)?.name ?? "A player"}
+                  {m.audience === "parents" && "'s parents"}
+                </span>
                 <span className="min-w-0 flex-1 truncate text-muted">
                   {[m.body, m.drill_name && `Drill: ${m.drill_name}`, m.photo_path && "Photo"].filter(Boolean).join(" · ")}
                 </span>

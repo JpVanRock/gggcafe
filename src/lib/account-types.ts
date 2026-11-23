@@ -95,7 +95,7 @@ export const SECTIONS: { title: string; rows: Row[] }[] = [
         "Hers: her parents read it; a mentor reads only the entries she shares with them; coaches don't see it (the user's choice)."),
       row("Video calls", "Zoom calls with one player or a group from one team, held on GGG.Cafe and never recorded.", ["yes", "view", "part", "part", "part"],
         "Off until a site admin turns them on for a team; then the head coach switches them on for mentors (the Switchboard). Head coaches and her mentors book them; she and her parents are told and join; head coaches can drop in and can invite her mentors, who see it on their calendar and join; assistants see them on the Calendar."),
-      row("Mentor page", "Mentor Roster: the team's roster or her approved players, each with links to Goals, the Pop Report and Mental GP; a calendar of her training, her video calls (the ones she booked and the ones a head coach invited her to) and her players' team practices and games; messages with a photo or a drill (shared with coaches if she chooses), training for one player or a group, video calls with one player or a group from one team (where the head coach allows), notes and focus areas with the coaches.", ["no", "no", "no", "no", "yes"]),
+      row("Mentor page", "Mentor Roster: the team's roster or her approved players, each with links to Goals, the Pop Report and Mental GP; a calendar of her training, her video calls (the ones she booked and the ones a head coach invited her to) and her players' team practices and games; Messages: a conversation with each player (a photo or a drill too, shared with coaches if she chooses; the player answers) and one with each player's parents (summaries; they answer and get them by email), training for one player or a group, video calls with one player or a group from one team (where the head coach allows), notes and focus areas with the coaches.", ["no", "no", "no", "no", "yes"]),
     ],
   },
   {
@@ -120,7 +120,7 @@ export const SECTIONS: { title: string; rows: Row[] }[] = [
       row("Parents", "The parent code, parent requests that didn't match the roster, approved parents, and which of them is a team admin.", ["yes", "no", "no", "no", "no"],
         "Assistants and view-only staff can read the parent code; only head coaches change it. Players never see it."),
       row("Mentors", "Approve mentors for the whole team, read their notes and focus areas and reply, read the messages they share.", ["yes", "no", "no", "part", "no"],
-        "Parents approve a mentor for their daughter and read every message, note and focus area about her (family page). Admins read every message."),
+        "Parents approve a mentor for their daughter and read every message, note and focus area about her, and write to her mentors in their own conversation, which she doesn't see (family page). Admins read every message."),
     ],
   },
   {

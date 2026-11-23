@@ -2,7 +2,8 @@
 // the emails they send. No imports, so the unit tests can check them.
 
 // email.error_alert (user, 2026-11-14): a new error, or one back after it was resolved, emails the admins
-export const JOB_KINDS = ["email.video_call", "zoom.delete_meeting", "email.error_alert"] as const;
+// email.mentor_message (user, 2026-11-23): a message in a mentor's conversation with a player's parents
+export const JOB_KINDS = ["email.video_call", "zoom.delete_meeting", "email.error_alert", "email.mentor_message"] as const;
 export type JobKind = (typeof JOB_KINDS)[number];
 
 export function isJobKind(value: unknown): value is JobKind {
@@ -15,16 +16,51 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export function jobPayload(
   kind: JobKind,
   payload: unknown,
-): { callId: string; event: "booked" | "cancelled" } | { callId: string; meetingId: string } | { fingerprint: string } | null {
+):
+  | { callId: string; event: "booked" | "cancelled" }
+  | { callId: string; meetingId: string }
+  | { fingerprint: string }
+  | { messageId: string }
+  | null {
   if (!payload || typeof payload !== "object") return null;
   const p = payload as Record<string, unknown>;
   if (kind === "email.error_alert") return typeof p.fingerprint === "string" && /^[0-9a-f]{16}$/.test(p.fingerprint) ? { fingerprint: p.fingerprint } : null;
+  if (kind === "email.mentor_message") return typeof p.message_id === "string" && UUID.test(p.message_id) ? { messageId: p.message_id } : null;
   if (typeof p.call_id !== "string" || !UUID.test(p.call_id)) return null;
   if (kind === "email.video_call") return p.event === "booked" || p.event === "cancelled" ? { callId: p.call_id, event: p.event } : null;
   return typeof p.meeting_id === "string" && /^[0-9]{9,12}$/.test(p.meeting_id) ? { callId: p.call_id, meetingId: p.meeting_id } : null;
 }
 
 const escape = (value: string) => value.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+
+/**
+ * A message in a mentor's conversation with a player's parents (user, 2026-11-23): the mentor's goes to her parents,
+ * a parent's to the mentor. The message itself is in the email; `url` is where they answer (the family page's mentors
+ * page, or the mentor's Messages). Replies to the email aren't read (it comes from noreply).
+ */
+export function mentorMessageEmail(m: {
+  /** the mentor wrote it, to her parents */
+  toParents: boolean;
+  authorName: string;
+  mentorName: string;
+  player: string;
+  body: string;
+  url: string;
+}): { subject: string; text: string; html: string } {
+  const intro = m.toParents
+    ? [`${m.mentorName}, ${m.player}'s mentor, wrote to you on GGG.Cafe:`]
+    : [`Hi ${m.mentorName},`, `${m.authorName}, ${m.player}'s parent, wrote to you on GGG.Cafe:`];
+  const outro = m.toParents
+    ? `Answer on your family page on GGG.Cafe. ${m.player} doesn't see your conversation with her mentor. Replies to this email aren't read.`
+    : `Answer from Messages on GGG.Cafe. ${m.player} doesn't see your conversation with her parents. Replies to this email aren't read.`;
+  const subject = (m.toParents ? `${m.mentorName} wrote to you about ${m.player}` : `${m.authorName} (${m.player}'s parent) wrote to you`).slice(0, 120);
+  const quoted = `<blockquote style="margin:16px 0;padding-left:12px;border-left:3px solid #FE1F7C">${escape(m.body).replace(/\n/g, "<br>")}</blockquote>`;
+  return {
+    subject,
+    text: [...intro, m.body, outro, m.url].join("\n\n"),
+    html: `${intro.map((l) => `<p>${escape(l)}</p>`).join("")}${quoted}<p>${escape(outro)}</p><p><a href="${escape(m.url)}">${m.toParents ? "Open the family page" : "Open Messages"}</a></p>`,
+  };
+}
 
 /**
  * The email a mentor gets when a head coach invites them to a video call, and when that call is cancelled (user,

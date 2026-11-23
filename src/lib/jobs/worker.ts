@@ -11,7 +11,7 @@ import { APP_TIME_ZONE } from "@/lib/dates";
 import { emailConfigured, sendEmail } from "@/lib/email";
 import { formatCallTime } from "@/lib/video-calls";
 import { deleteZoomMeeting, zoomConfigured } from "@/lib/zoom";
-import { errorAlertEmail, isJobKind, jobPayload, mentorCallEmail, videoCallEmail } from "@/lib/jobs/rules";
+import { errorAlertEmail, isJobKind, jobPayload, mentorCallEmail, mentorMessageEmail, videoCallEmail } from "@/lib/jobs/rules";
 import { reportError } from "@/lib/errors";
 import { logAndKeep } from "@/lib/log-drain";
 
@@ -129,6 +129,30 @@ async function runOne(db: Db, secret: string, origin: string, kind: string, payl
     if (!err.recipients.length) return { outcome: "skipped", why: "No admins with an email." };
     const email = errorAlertEmail({ source: err.source, name: err.name, message: err.message, route: err.route, count: err.count, healthUrl: `${origin}/health` });
     for (const to of err.recipients) {
+      const sent = await sendEmail({ to: [to], ...email });
+      if (sent.error) throw new Error(sent.error);
+    }
+    return { outcome: "done" };
+  }
+
+  // a message in a mentor's conversation with a player's parents (user, 2026-11-23): one email per address
+  if (kind === "email.mentor_message" && "messageId" in job) {
+    if (!emailConfigured()) return { outcome: "skipped", why: "Email isn't set up (RESEND_API_KEY, EMAIL_FROM)." };
+    const { data, error } = await db.rpc("jobs_mentor_message_email", { p_secret: secret, p_message_id: job.messageId });
+    if (error) throw new Error(`Couldn't read the message: ${error.message}`);
+    const m = data?.[0];
+    if (!m) return { outcome: "skipped", why: "The message is gone (taken back)." };
+    const toParents = m.author_role === "mentor";
+    if (!m.recipients.length) return { outcome: "skipped", why: toParents ? "No approved parent has an email." : "The mentor has no email." };
+    const email = mentorMessageEmail({
+      toParents,
+      authorName: m.author_name,
+      mentorName: m.mentor_name,
+      player: m.player_first,
+      body: m.body ?? "",
+      url: toParents ? `${origin}/family/mentors?player=${m.player_id}` : `${origin}/mentor/messages?player=${m.player_id}&with=parents`,
+    });
+    for (const to of m.recipients) {
       const sent = await sendEmail({ to: [to], ...email });
       if (sent.error) throw new Error(sent.error);
     }

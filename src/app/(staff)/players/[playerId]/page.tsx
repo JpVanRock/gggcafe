@@ -51,8 +51,17 @@ export default async function PlayerDashboardPage({ params, searchParams }: Page
       // the Leader Badge: RLS shows it only to coaches/admins and the player herself
       loadLeaderCertificate(supabase, playerId),
       // Mentor messages: new ones show as alerts at the top of her menu
-      supabase.from("mentor_messages").select(MESSAGE_COLUMNS).eq("player_id", playerId).is("read_at", null).order("created_at", { ascending: false }).limit(10),
-      supabase.from("mentor_messages").select("id", { count: "exact", head: true }).eq("player_id", playerId),
+      // (her own thread only, user 2026-11-23: her parents, viewing as her, could otherwise see their own conversation)
+      supabase
+        .from("mentor_messages")
+        .select(MESSAGE_COLUMNS)
+        .eq("player_id", playerId)
+        .eq("audience", "player")
+        .eq("author_role", "mentor")
+        .is("read_at", null)
+        .order("created_at", { ascending: false })
+        .limit(10),
+      supabase.from("mentor_messages").select("id", { count: "exact", head: true }).eq("player_id", playerId).eq("audience", "player"),
       // her team's logo, top right of her menu (user, 2026-11-13)
       playerTeamLogo(supabase, playerId, Boolean(access.isParent)),
     ]);

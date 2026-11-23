@@ -206,9 +206,15 @@ const mentor_links: Row[] = [
   // Emma's one-on-one mentor (her parents approved), invited to the head coach's call with her
   { id: id("acac00", 5), mentor_id: U.mentor2, team_id: T.us, player_id: emma, player_name: "Emma Nguyen", status: "approved", requested_at: "2026-11-10T00:00:00Z" },
 ];
+// conversations (user, 2026-11-23): the sample admin mentors the team and is Maya's parent, so both threads render
+const MAYA_LOGIN = id("aaaaaa", 6);
+const OTHER_PARENT = id("aaaaaa", 7);
 const mentor_messages: Row[] = [
-  { id: id("adad00", 1), player_id: maya, sender_id: U.admin, sender_name: "Coach Sample", body: "Great pen today. Keep your front side closed on the drop.", photo_path: null, drill_id: null, drill_name: "Towel drill", drill_video_url: "https://example.com/towel", created_at: "2026-11-09T18:00:00Z", read_at: null, shared_with_coaches: true },
-  { id: id("adad00", 2), player_id: maya, sender_id: U.admin, sender_name: "Coach Sample", body: "Proud of how you bounced back after the second inning.", photo_path: null, drill_id: null, drill_name: null, drill_video_url: null, created_at: "2026-11-10T18:00:00Z", read_at: "2026-11-10T20:00:00Z", shared_with_coaches: false },
+  { id: id("adad00", 1), player_id: maya, sender_id: U.admin, sender_name: "Coach Sample", body: "Great pen today. Keep your front side closed on the drop.", photo_path: null, drill_id: null, drill_name: "Towel drill", drill_video_url: "https://example.com/towel", created_at: "2026-11-09T18:00:00Z", read_at: null, shared_with_coaches: true, mentor_id: U.admin, audience: "player", author_role: "mentor" },
+  { id: id("adad00", 2), player_id: maya, sender_id: U.admin, sender_name: "Coach Sample", body: "Proud of how you bounced back after the second inning.", photo_path: null, drill_id: null, drill_name: null, drill_video_url: null, created_at: "2026-11-10T18:00:00Z", read_at: "2026-11-10T20:00:00Z", shared_with_coaches: false, mentor_id: U.admin, audience: "player", author_role: "mentor" },
+  { id: id("adad00", 3), player_id: maya, sender_id: MAYA_LOGIN, sender_name: "Maya", body: "Thanks! The towel drill helped. Can we work on my rise ball next?", photo_path: null, drill_id: null, drill_name: null, drill_video_url: null, created_at: "2026-11-10T21:00:00Z", read_at: null, shared_with_coaches: false, mentor_id: U.admin, audience: "player", author_role: "player" },
+  { id: id("adad00", 4), player_id: maya, sender_id: U.admin, sender_name: "Coach Sample", body: "Good week with Maya. Her drop ball is landing low now; next we add a target. Ten minutes of towel work at home before Thursday would help.", photo_path: null, drill_id: null, drill_name: null, drill_video_url: null, created_at: "2026-11-11T18:00:00Z", read_at: "2026-11-11T20:00:00Z", shared_with_coaches: false, mentor_id: U.admin, audience: "parents", author_role: "mentor" },
+  { id: id("adad00", 5), player_id: maya, sender_id: OTHER_PARENT, sender_name: "Dana Torres", body: "Thank you! She's been doing it every night. Anything she should ice after?", photo_path: null, drill_id: null, drill_name: null, drill_video_url: null, created_at: "2026-11-12T09:00:00Z", read_at: null, shared_with_coaches: false, mentor_id: U.admin, audience: "parents", author_role: "parent" },
 ];
 const mentor_focus: Row[] = [
   { id: id("aeae00", 1), mentor_id: U.admin, player_id: maya, team_id: null, title: "Drive the drop ball down", details: "Towel drill, then 15 drops to a low target each pen.", status: "working_on", created_at: "2026-11-02T00:00:00Z", updated_at: "2026-11-09T00:00:00Z" },

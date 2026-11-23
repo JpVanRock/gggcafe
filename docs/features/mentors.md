@@ -15,7 +15,8 @@
   (→ `/mentor/teams/[id]`: team focus areas, team notes, team training), her one-player players, training on their
   weeks, what she sent lately. `/mentor/players/[id]` (her players only, else 404): message her, working with her
   coaches (focus board + notes), her week (training), Goals, Pop Report (Movement Preferences only with G3
-  Advanced) and Mental GP read-only, reusing the player-page components with canEdit=false. Helpers:
+  Advanced) and Mental GP read-only, reusing the player-page components with canEdit=false. Since 2026-11-23 "message
+  her" is her two conversations (below). Helpers:
   `getMentor`, `getMentorAccess` (player ids, team ids, rosters, all mentee ids), `mentorCheck` in auth.ts;
   page pieces in `mentor/parts.tsx`.
 - Messages (`mentor_messages`): text, a photo (private bucket `message-photos`, `<mentor uid>/<timestamp>.jpg`,
@@ -26,6 +27,36 @@
   parents and admins unless the mentor shares it (`shared_with_coaches`, a box when she sends it, "Share with
   coaches" / "Stop sharing" after; only the sender changes it, guarded by a trigger). Coaches and view-only staff
   read shared messages only; head coaches remove a shared one, admins any.
+- Conversations (user, 2026-11-23: "a messaging platform for mentors where they can send message to players as a free
+  form field. Also allow to send summary messages to parents as a separate field", then "Allow parents and girls to
+  submit responses and maintain as a conversation or thread"; migration 20261123222349). `mentor_messages` holds two
+  threads per mentor and player: `audience` `player` (the mentor and the player: the mentor's text, photo or drill,
+  and the player's answers) and `parents` (the mentor and the player's approved parents, text both ways). `author_role`
+  (mentor / player / parent) says who wrote it, `mentor_id` whose thread it is; the trigger fills the sender, name and
+  time (a player's first name, a parent's `parent_accounts` name). Rules:
+  - The player writes only in her own thread, only to a mentor approved for her now (`private.is_mentor_of`); a parent
+    only in the parents thread, same rule. Only the mentor's messages to the player carry a photo or a drill or can be
+    shared with the coaches (check `mentor_messages_extras`).
+  - The player reads her own thread only (her rule and its parent-view twin say `audience = 'player'`; the app filters
+    `audience` too, because a parent viewing as her reads both). Her parents read both threads; admins read all;
+    coaches read only what a mentor shares; the mentor reads both her threads (`mentor reads her conversations`).
+  - read_at: on a mentor's message, the player (her thread) or any approved parent (theirs); on an answer, the mentor
+    (`guard_mentor_message_update`). Opening a conversation marks it (`<MarkSeen>`); answering does too.
+  - Notices (`notify_mentor_message`, kind `message`): an answer notifies the mentor (linking to her Messages); the
+    mentor's message to the parents notifies each parent. The parents thread is emailed both ways (job
+    `email.mentor_message`, docs/architecture/jobs.md). The player's thread isn't emailed: her alerts and the mentor's
+    bell cover it.
+  - The Switchboard: "Message players" (`mentor.messages`) closes the player thread both ways, "Message parents"
+    (`mentor.parent_messages`) the parents thread.
+  - Pages: the mentor's `/mentor/messages` (in her menu: every player she works with, each with both threads' latest
+    message and new answers; `?player=` opens both side by side, `&with=parents` puts the parents' first, `&all=1` shows
+    every message) and the same two panels on `/mentor/players/[id]` (`MentorConversation` in `mentor/conversation.tsx`);
+    the player's `/players/[id]/messages` (one thread per mentor, an answer box under each); the family's
+    `/family/mentors` ("You and her mentors": a thread and a write box per mentor who works with her; "{her} and her
+    mentors": her threads, read only). Shared UI: `components/message-thread.tsx` (`MessageThread`: what the signed-in
+    user wrote sits on the right as "You"), `components/reply-form.tsx`, `components/mark-seen.tsx`.
+  - DB tests: the "Conversations" block in `tests/db/mentors.test.sql`; unit: `cleanText`, `threadSummaries`
+    (`tests/unit/mentors.test.ts`) and the email (`tests/unit/jobs.test.ts`).
 - Working with the coaches (user, 2026-11-11), about one player or the whole team (whole-team mentors):
   `mentor_focus` (focus areas: "Working on" / "What's working", the mentor adds, moves and removes her own) and
   `mentor_notes` (a thread per mentor and player/team: discussion summaries with the day they talked, notes, and
@@ -85,7 +116,8 @@ her requests, Coming up (the next two weeks of her calendar: `loadMentorCalendar
 `mentor/calendar-data.ts`, shared with `/mentor/calendar`), then numbered boards: My Roster (team by team, then one-on-one;
 Goals, Pop Report and Mental GP links per player), Training on Their Weeks (the next sessions; "Add & manage" opens
 `/mentor/training` with the form and the full list), Messages You Sent (the last five, seen or new) and Work With More
-Players (the request form). Helpers in `mentor/parts.tsx`: `trainingGroups`, `oneOnOne`, `menteeLabel`.
+Players (the request form). Since 2026-11-23 board 4 is Messages: the latest five in her conversations, both ways,
+with players and parents ("Open messages" → `/mentor/messages`). Helpers in `mentor/parts.tsx`: `trainingGroups`, `oneOnOne`, `menteeLabel`.
 - Second design-audit round (2026-11-18): on the Dugout's Mentors tab, requests waiting for approval come first when there
   are any (above the team's mentoring values); Approve / Decline say who and for what. A message row gives the message the
   full width under who sent it, when and its status (on phones it had squeezed to one word a line beside the badge). The

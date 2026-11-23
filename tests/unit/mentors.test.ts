@@ -1,7 +1,7 @@
 // Run with: npm run test:unit
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { cleanFocus, cleanMentorNote, cleanMentorRequest, cleanMessage, cleanNewDrill, mentorTraining, trainingDates } from "../../src/lib/mentors.ts";
+import { MESSAGE_MAX, cleanFocus, cleanMentorNote, cleanMentorRequest, cleanMessage, cleanNewDrill, cleanText, mentorTraining, threadSummaries, trainingDates } from "../../src/lib/mentors.ts";
 
 test("training on the mentor's calendar: its weekdays, inside the month shown", () => {
   // Tuesdays and Thursdays (2, 4) from Tue Nov 3 through Thu Nov 26, 2026
@@ -75,4 +75,34 @@ test("notes with the coaches and focus areas", () => {
   assert.deepEqual(cleanFocus({ title: " Drive the drop ball ", details: "" }), { title: "Drive the drop ball", details: null, status: "working_on" });
   assert.equal(cleanFocus({ title: "Hips first", status: "working" }).status, "working");
   assert.equal((cleanFocus({ title: "" }) as { field: string }).field, "title");
+});
+
+test("conversations (user, 2026-11-23): text is required and capped", () => {
+  assert.deepEqual(cleanText("  Thanks, coach!  "), { body: "Thanks, coach!" });
+  assert.equal(cleanText("   "), "Write something first.");
+  assert.equal(cleanText(undefined), "Write something first.");
+  assert.equal(cleanText("x".repeat(MESSAGE_MAX + 1)), `Keep it under ${MESSAGE_MAX} characters.`);
+});
+
+test("conversations: one per mentor, player and audience, newest first, counting what's new for the viewer", () => {
+  const msg = (id: string, mentor: string, audience: "player" | "parents", author_role: string, created_at: string, read_at: string | null = null) => ({
+    id, mentor_id: mentor, player_id: "p1", audience, author_role, created_at, read_at,
+  });
+  const rows = [
+    msg("a", "m1", "player", "mentor", "2026-11-20T10:00:00Z", "2026-11-20T11:00:00Z"),
+    msg("b", "m1", "player", "player", "2026-11-21T10:00:00Z"),
+    msg("c", "m1", "parents", "mentor", "2026-11-22T10:00:00Z"),
+    msg("d", "m1", "parents", "parent", "2026-11-23T10:00:00Z", "2026-11-23T12:00:00Z"),
+    msg("e", "m2", "player", "player", "2026-11-19T10:00:00Z"),
+  ];
+  // the mentor's view: answers she hasn't read are new; her own messages never are
+  const forMentor = threadSummaries(rows, (m) => m.author_role === "mentor");
+  assert.deepEqual(forMentor.map((t) => [t.key, t.last.id, t.unread, t.count]), [
+    ["m1:p1:parents", "d", 0, 2],
+    ["m1:p1:player", "b", 1, 2],
+    ["m2:p1:player", "e", 1, 1],
+  ]);
+  // the player's view of her thread with m1: the mentor's message was read, her own answer doesn't count
+  const forPlayer = threadSummaries(rows.filter((m) => m.audience === "player"), (m) => m.author_role === "player");
+  assert.deepEqual(forPlayer.map((t) => [t.key, t.unread]), [["m1:p1:player", 0], ["m2:p1:player", 0]]);
 });

@@ -71,8 +71,8 @@ export default async function MentorHome() {
     mentor
       ? supabase
           .from("mentor_messages")
-          .select("id, player_id, body, photo_path, drill_name, created_at, read_at, shared_with_coaches")
-          .eq("sender_id", mentor.userId)
+          .select("id, player_id, audience, author_role, sender_name, body, photo_path, drill_name, created_at, read_at, shared_with_coaches")
+          .eq("mentor_id", mentor.userId)
           .order("created_at", { ascending: false })
           .limit(5)
       : Promise.resolve({ data: [] }),
@@ -241,17 +241,18 @@ export default async function MentorHome() {
             )}
           </MenuPanel>
 
-          <MenuPanel number={4} title="Messages You Sent" subtitle="Seen when she opens them" variant="navy">
+          {/* her latest messages both ways, with players and with their parents (user, 2026-11-23) */}
+          <MenuPanel number={4} title="Messages" subtitle="With players and their parents" variant="navy" cta={{ href: "/mentor/messages", label: "Open messages" }}>
             {(sent ?? []).length === 0 ? (
-              <p className={menuNote}>Nothing sent yet. Open a player on your roster to message her a note, a photo or a drill.</p>
+              <p className={menuNote}>Nothing yet. Open Messages to write to a player (a note, a photo or a drill) or send her parents a summary.</p>
             ) : (
               <div className="flex flex-col gap-4">
-                {((sent ?? []) as { id: string; player_id: string; body: string | null; photo_path: string | null; drill_name: string | null; created_at: string; read_at: string | null; shared_with_coaches: boolean }[]).map((m) => (
+                {(sent ?? []).map((m) => (
                   <MenuItem
                     key={m.id}
-                    name={nameOf(m.player_id)}
-                    value={m.read_at ? "Seen" : "New"}
-                    note={[m.body, m.drill_name && `Drill: ${m.drill_name}`, m.photo_path && "Photo", m.shared_with_coaches && "shared with coaches"].filter(Boolean).join(" · ")}
+                    name={m.audience === "parents" ? `${nameOf(m.player_id)}'s parents` : nameOf(m.player_id)}
+                    value={m.author_role === "mentor" ? (m.read_at ? "Seen" : "Sent") : m.read_at ? "Answer" : "New"}
+                    note={`${m.author_role === "mentor" ? "You" : m.sender_name}: ${[m.body, m.drill_name && `Drill: ${m.drill_name}`, m.photo_path && "Photo", m.shared_with_coaches && "shared with coaches"].filter(Boolean).join(" · ")}`}
                   />
                 ))}
               </div>

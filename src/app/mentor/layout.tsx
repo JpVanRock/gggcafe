@@ -1,5 +1,5 @@
 // The mentor area: mentors and skill coaches (not staff) see the players coaches
-// assign them. Its own header: logo, My players, notifications, theme, sign out.
+// assign them. Its own header: logo, My players, Messages, Calendar, notifications, theme, sign out.
 import { Suspense, type ReactNode } from "react";
 import { NotificationBell } from "@/components/notification-bell";
 import { NavLink } from "@/components/nav-link";
@@ -14,6 +14,10 @@ export default function MentorLayout({ children }: { children: ReactNode }) {
           <nav aria-label="Main" className={navClass}>
             <NavLink href="/mentor" exact className={navItemClass}>
               My players
+            </NavLink>
+            {/* her conversations with players and their parents (user, 2026-11-23) */}
+            <NavLink href="/mentor/messages" className={navItemClass}>
+              Messages
             </NavLink>
             {/* her training and video calls by month (user, 2026-11-13) */}
             <NavLink href="/mentor/calendar" className={navItemClass}>

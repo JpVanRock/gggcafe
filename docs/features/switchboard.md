@@ -26,9 +26,11 @@
     Yearbook and Calendar pages and the Yearbook banner on the family menu. Her goals also hide when Goals is off for players.
   - Mentors: the mentor player and team pages hide the panels; the mentor actions refuse (`switchedOff()` in auth.ts); the
     database also refuses mentor messages and mentor training when off (restrictive policies on `mentor_messages` and
-    `player_activities`). "See the team calendar" (`mentor.calendar`, 2026-11-13) is checked inside `mentor_calendar()`, so
+    `player_activities`). Since 2026-11-23 each mentor conversation has its switch, both ways: "Message players"
+    (`mentor.messages`) closes the thread with the player (her answers too), "Message parents" (`mentor.parent_messages`)
+    the thread with her parents. "See the team calendar" (`mentor.calendar`, 2026-11-13) is checked inside `mentor_calendar()`, so
     the database leaves that team's practices and games off her calendar.
-- Always on (not switchable): TWIS, messages from mentors (set by Message players), the medical card, her login and
+- Always on (not switchable): TWIS, messages from mentors (set by Message players / Message parents), the medical card, her login and
   parental consent, parents' oversight of mentors.
 - DB tests: `tests/db/switchboard.test.sql`.
 

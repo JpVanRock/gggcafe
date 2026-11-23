@@ -1,7 +1,7 @@
 "use server";
 
 // Mentor actions: ask to work with a team or one player (the parent code), message a player (text,
-// a photo, a suggested drill; shared with the coaches only if she chooses), training on her
+// a photo, a suggested drill; shared with the coaches only if she chooses) or her parents, training on her
 // players' weeks (one player or a group), and notes and focus areas for the coaches. The
 // database checks all of it again (her players only; names and authors from the database).
 import { refresh } from "next/cache";
@@ -9,7 +9,7 @@ import { getMentor, mentorCheck, switchedOff } from "@/lib/auth";
 import { STALE, failed, must, runAction } from "@/lib/actions";
 import { friendlyDbError, invalid, text, type FormState } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
-import { MESSAGE_PHOTO_BUCKET, cleanFocus, cleanMentorNote, cleanMentorRequest, cleanMessage, cleanNewDrill, isFocusStatus, mentorTraining } from "@/lib/mentors";
+import { MESSAGE_PHOTO_BUCKET, cleanFocus, cleanMentorNote, cleanMentorRequest, cleanMessage, cleanNewDrill, cleanText, isFocusStatus, mentorTraining, type Audience } from "@/lib/mentors";
 import { createClient } from "@/lib/supabase/server";
 
 type Result = { error: string | null };
@@ -85,8 +85,52 @@ export async function sendMentorMessage(input: {
     shared_with_coaches: Boolean(input.share),
   });
   if (error) return { error: friendlyDbError(error) };
+  // writing back means she read the player's answers
+  await markRepliesRead(supabase, mentor.userId, input.playerId, "player");
   refresh();
   return { error: null };
+}
+
+/**
+ * Her conversation with a player's parents (user, 2026-11-23: "send summary messages to parents as a separate field"):
+ * text only; the parents get a notice and an email, and the player never sees it. Bound to the player on the page.
+ */
+export async function sendParentMessage(playerId: string, body: string): Promise<Result> {
+  if (!isUuid(playerId)) return { error: STALE };
+  const denied = (await mentorCheck(playerId)) ?? (await switchedOff("mentor.parent_messages", { playerId }));
+  if (denied) return { error: denied };
+  const mentor = (await getMentor())!;
+  const text = cleanText(body);
+  if (typeof text === "string") return { error: text };
+  const supabase = await createClient();
+  const { error } = await supabase.from("mentor_messages").insert({ player_id: playerId, audience: "parents", body: text.body });
+  if (error) return { error: friendlyDbError(error) };
+  await markRepliesRead(supabase, mentor.userId, playerId, "parents");
+  refresh();
+  return { error: null };
+}
+
+/** She opened a player's conversations: the answers in both are read (no refresh: the page already shows them). */
+export async function markConversationsRead(playerId: string): Promise<Result> {
+  if (!isUuid(playerId)) return { error: STALE };
+  const mentor = await getMentor();
+  if (!mentor) return { error: "Only mentors can do that." };
+  const supabase = await createClient();
+  await markRepliesRead(supabase, mentor.userId, playerId, null);
+  return { error: null };
+}
+
+async function markRepliesRead(supabase: Awaited<ReturnType<typeof createClient>>, mentorId: string, playerId: string, audience: Audience | null) {
+  let q = supabase
+    .from("mentor_messages")
+    .update({ read_at: new Date().toISOString() })
+    .eq("mentor_id", mentorId)
+    .eq("player_id", playerId)
+    .neq("author_role", "mentor")
+    .is("read_at", null);
+  if (audience) q = q.eq("audience", audience);
+  const { error } = await q;
+  if (error) console.error("Marking replies read failed:", error.message);
 }
 
 /** Take back a message she sent (and its photo). */

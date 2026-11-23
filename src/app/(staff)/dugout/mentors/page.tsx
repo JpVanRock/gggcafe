@@ -17,7 +17,22 @@ export const metadata: Metadata = { title: "Mentors · Coaches Dugout · GGG.Caf
 
 type Link_ = { id: string; mentor_id: string; team_id: string | null; player_id: string | null; player_name: string | null; status: string; requested_at: string };
 type Mentor = { user_id: string; display_name: string; specialty: string | null };
-type Msg = { id: string; player_id: string; sender_id: string; sender_name: string; body: string | null; photo_path: string | null; drill_name: string | null; created_at: string; read_at: string | null; shared_with_coaches: boolean };
+type Msg = {
+  id: string;
+  player_id: string;
+  sender_id: string;
+  sender_name: string;
+  body: string | null;
+  photo_path: string | null;
+  drill_name: string | null;
+  created_at: string;
+  read_at: string | null;
+  shared_with_coaches: boolean;
+  // conversations (user, 2026-11-23): admins also see the players' answers and the threads with parents
+  mentor_id: string;
+  audience: "player" | "parents";
+  author_role: "mentor" | "player" | "parent";
+};
 
 const heading = `mb-3 text-pink-soft ${groupLabelClass}`;
 
@@ -77,7 +92,7 @@ export default async function MentorsPage({ searchParams }: PageProps<"/dugout/m
     ids.length
       ? supabase
           .from("mentor_messages")
-          .select("id, player_id, sender_id, sender_name, body, photo_path, drill_name, created_at, read_at, shared_with_coaches")
+          .select("id, player_id, sender_id, sender_name, body, photo_path, drill_name, created_at, read_at, shared_with_coaches, mentor_id, audience, author_role")
           .in("player_id", ids)
           .order("created_at", { ascending: false })
           .limit(30)
@@ -251,10 +266,16 @@ export default async function MentorsPage({ searchParams }: PageProps<"/dugout/m
               <li key={msg.id} className="flex flex-wrap items-baseline gap-x-4 gap-y-1 px-4 py-2.5 text-sm">
                 <span className="w-24 shrink-0 font-display text-muted tabular-nums">{formatDay(msg.created_at.slice(0, 10))}</span>
                 <span className="font-semibold">
-                  {msg.sender_name} →{" "}
-                  <Link href={`/players/${msg.player_id}/messages`} className="hover:underline">
-                    {nameOf(msg.player_id)}
-                  </Link>
+                  {msg.sender_name}
+                  {msg.author_role === "parent" && ` (${nameOf(msg.player_id)}'s parent)`} →{" "}
+                  {msg.author_role === "mentor" ? (
+                    <Link href={`/players/${msg.player_id}/messages`} className="hover:underline">
+                      {nameOf(msg.player_id)}
+                      {msg.audience === "parents" && "'s parents"}
+                    </Link>
+                  ) : (
+                    who(msg.mentor_id)
+                  )}
                 </span>
                 {/* its own line on phones, where beside the names it shrank to a letter (second round) */}
                 <span className="min-w-0 basis-full truncate text-muted sm:basis-auto sm:flex-1">
@@ -264,7 +285,7 @@ export default async function MentorsPage({ searchParams }: PageProps<"/dugout/m
                 <span className="font-sans text-2xs tracking-wider text-muted uppercase">{msg.read_at ? "Seen" : "New"}</span>
                 <ActionForm action={removeMentorMessage} className="flex items-center gap-2">
                   <input type="hidden" name="message_id" value={msg.id} />
-                  <ConfirmSubmit message="Remove this message? The player won't see it any more." confirmLabel="Remove" tone="danger" label={`Remove the message to ${nameOf(msg.player_id)}, ${formatDay(msg.created_at.slice(0, 10))}`} className={buttonStyles("removeQuiet")}>
+                  <ConfirmSubmit message="Remove this message? Nobody will see it any more." confirmLabel="Remove" tone="danger" label={`Remove the message to ${nameOf(msg.player_id)}, ${formatDay(msg.created_at.slice(0, 10))}`} className={buttonStyles("removeQuiet")}>
                     Remove
                   </ConfirmSubmit>
                 </ActionForm>

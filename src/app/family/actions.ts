@@ -3,9 +3,10 @@
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, getMyChildIds, switchedOff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { text, type FormState, invalid } from "@/lib/form";
+import { friendlyDbError, text, type FormState, invalid } from "@/lib/form";
+import { cleanText } from "@/lib/mentors";
 import { isUuid } from "@/lib/softball";
 import { isValidUsername, normalizeUsername } from "@/lib/player-logins";
 import { cleanMedical, cleanQuestionnaire } from "@/lib/family";
@@ -280,4 +281,47 @@ export async function removeMentorFromDaughter(_prev: FormState, fd: FormData): 
     if (!data?.length) return failed("That mentor works with the whole team. Ask the head coach.");
     refresh();
   });
+}
+
+// ---------------------------------------------------------------------------
+// Her mentors' conversations with the parents (user, 2026-11-23: "Allow parents and girls to submit responses")
+// ---------------------------------------------------------------------------
+
+/** A parent writes in her conversation with one of her daughter's mentors (bound on the page); the mentor is emailed. */
+export async function writeToMentor(playerId: string, mentorId: string, body: string): Promise<{ error: string | null }> {
+  if (!isUuid(playerId) || !isUuid(mentorId)) return { error: STALE };
+  if (!(await getMyChildIds()).includes(playerId)) return { error: "Only her approved parents can write to her mentors." };
+  const off = await switchedOff("mentor.parent_messages", { playerId });
+  if (off) return { error: off };
+  const message = cleanText(body);
+  if (typeof message === "string") return { error: message };
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("mentor_messages")
+    .insert({ player_id: playerId, mentor_id: mentorId, audience: "parents", author_role: "parent", body: message.body });
+  if (error) {
+    if (error.code === "42501") return { error: "You can't write to this mentor any more: they no longer work with her." };
+    return { error: friendlyDbError(error) };
+  }
+  await markMentorNotesRead(supabase, playerId);
+  refresh();
+  return { error: null };
+}
+
+/** She opened her daughter's mentors page: what the mentors wrote to the parents is read (no refresh needed). */
+export async function markParentConversationsRead(playerId: string): Promise<{ error: string | null }> {
+  if (!isUuid(playerId) || !(await getMyChildIds()).includes(playerId)) return { error: STALE };
+  await markMentorNotesRead(await createClient(), playerId);
+  return { error: null };
+}
+
+async function markMentorNotesRead(supabase: Awaited<ReturnType<typeof createClient>>, playerId: string) {
+  const { error } = await supabase
+    .from("mentor_messages")
+    .update({ read_at: new Date().toISOString() })
+    .eq("player_id", playerId)
+    .eq("audience", "parents")
+    .eq("author_role", "mentor")
+    .is("read_at", null);
+  if (error) console.error("Marking mentor messages read failed:", error.message);
 }
