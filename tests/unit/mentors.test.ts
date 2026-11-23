@@ -1,7 +1,7 @@
 // Run with: npm run test:unit
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { MESSAGE_MAX, cleanFocus, cleanMentorNote, cleanMentorRequest, cleanMessage, cleanNewDrill, cleanText, mentorTraining, threadSummaries, trainingDates } from "../../src/lib/mentors.ts";
+import { MESSAGE_MAX, cleanFocus, cleanMentorNote, cleanMentorRequest, cleanMessage, cleanNewDrill, cleanText, inboxWhen, mentorTraining, messagePreview, threadSummaries, trainingDates } from "../../src/lib/mentors.ts";
 
 test("training on the mentor's calendar: its weekdays, inside the month shown", () => {
   // Tuesdays and Thursdays (2, 4) from Tue Nov 3 through Thu Nov 26, 2026
@@ -105,4 +105,15 @@ test("conversations: one per mentor, player and audience, newest first, counting
   // the player's view of her thread with m1: the mentor's message was read, her own answer doesn't count
   const forPlayer = threadSummaries(rows.filter((m) => m.audience === "player"), (m) => m.author_role === "player");
   assert.deepEqual(forPlayer.map((t) => [t.key, t.unread]), [["m1:p1:player", 0], ["m2:p1:player", 0]]);
+});
+
+test("the inbox: today's messages show the time, older ones the day, in the team's time zone", () => {
+  const tz = "America/New_York";
+  // 7:04 PM in New York on Nov 23; "now" is later that evening
+  assert.equal(inboxWhen("2026-11-24T00:04:00Z", "2026-11-24T02:00:00Z", tz), "7:04 PM");
+  // the day before there
+  assert.equal(inboxWhen("2026-11-23T04:30:00Z", "2026-11-24T02:00:00Z", tz), "Nov 22");
+  assert.equal(messagePreview({ body: "Great pen today." }), "Great pen today.");
+  assert.equal(messagePreview({ body: null, drill_name: "Towel drill", photo_path: "x/1.jpg" }), "Drill: Towel drill");
+  assert.equal(messagePreview({ body: null, drill_name: null, photo_path: "x/1.jpg" }), "Photo");
 });

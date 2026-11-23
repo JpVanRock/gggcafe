@@ -49,6 +49,8 @@ export function groupLabel(groupSize: number): string | null {
 export const BOOK_AHEAD_DAYS = 90;
 /** The call opens this long before it starts, and stays open this long after it should end. */
 export const OPENS_EARLY_MINUTES = 10;
+/** The longest message in a call's chat (user, 2026-11-23); the database says the same. */
+export const CALL_CHAT_MAX = 1000;
 export const STAYS_OPEN_MINUTES = 15;
 
 /**

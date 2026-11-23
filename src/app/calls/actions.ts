@@ -12,7 +12,7 @@ import { createClient } from "@/lib/supabase/server";
 import { friendlyDbError, invalid, text, type FormState } from "@/lib/form";
 import { STALE, failed, runAction } from "@/lib/actions";
 import { isUuid, playerName } from "@/lib/softball";
-import { CALL_MENTOR_BOUND, CALL_PLAYER_BOUND, callCalendars, callState, cleanCallInput } from "@/lib/video-calls";
+import { CALL_CHAT_MAX, CALL_MENTOR_BOUND, CALL_PLAYER_BOUND, callCalendars, callState, cleanCallInput } from "@/lib/video-calls";
 import { ZOOM_NOT_CONNECTED, createZoomMeeting, deleteZoomMeeting, zoomConfigured, zoomJoinDetails, type JoinDetails } from "@/lib/zoom";
 
 const OFF_FOR_HER = "Video calls are off for her team. A site admin turns them on for the team, and the head coach for mentors (the Switchboard).";
@@ -154,4 +154,25 @@ async function guestName(user: NonNullable<Awaited<ReturnType<typeof getCurrentU
   }
   const { data: parent } = await supabase.from("parent_accounts").select("display_name").eq("user_id", user.id).maybeSingle();
   return parent?.display_name ? `${parent.display_name} (parent)` : "Guest";
+}
+
+/**
+ * Chat in the call (user, 2026-11-23: "a live chat in the video call ... that is saved"), bound to the call on the
+ * page. The database checks she's on the call and that it's open, and signs the message.
+ */
+export async function sendCallMessage(callId: string, body: string): Promise<{ error: string | null }> {
+  if (!isUuid(callId)) return { error: STALE };
+  const user = await getCurrentUser();
+  if (!user) return { error: "Your session has ended. Sign in again." };
+  const text = typeof body === "string" ? body.trim() : "";
+  if (!text) return { error: "Write something first." };
+  if (text.length > CALL_CHAT_MAX) return { error: `Keep it under ${CALL_CHAT_MAX} characters.` };
+  const supabase = await createClient();
+  const { error } = await supabase.from("video_call_messages").insert({ call_id: callId, body: text });
+  if (error) {
+    if (error.code === "42501") return { error: "The chat is closed. It's open from 10 minutes before the call until 15 minutes after it ends." };
+    return { error: friendlyDbError(error) };
+  }
+  refresh();
+  return { error: null };
 }

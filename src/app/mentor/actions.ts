@@ -110,13 +110,13 @@ export async function sendParentMessage(playerId: string, body: string): Promise
   return { error: null };
 }
 
-/** She opened a player's conversations: the answers in both are read (no refresh: the page already shows them). */
-export async function markConversationsRead(playerId: string): Promise<Result> {
-  if (!isUuid(playerId)) return { error: STALE };
+/** She opened a conversation: the answers in it are read (no refresh: the page already shows them). */
+export async function markConversationRead(playerId: string, audience: Audience): Promise<Result> {
+  if (!isUuid(playerId) || (audience !== "player" && audience !== "parents")) return { error: STALE };
   const mentor = await getMentor();
   if (!mentor) return { error: "Only mentors can do that." };
   const supabase = await createClient();
-  await markRepliesRead(supabase, mentor.userId, playerId, null);
+  await markRepliesRead(supabase, mentor.userId, playerId, audience);
   return { error: null };
 }
 

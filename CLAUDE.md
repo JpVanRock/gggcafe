@@ -44,7 +44,9 @@ src/components/main-nav.tsx  top menu: staff get Dashboard/Coaches Dugout (opens
                          (`TeamLogoMark`, `playerTeamLogo()`); components/team-logo.tsx, lib/team-logos.ts; parents get
                          it from `parent_team_logos()`
 src/proxy.ts             refreshes the Supabase auth session each request (Next 16 "proxy", formerly middleware)
-src/app/calls/[callId]   a video call (Zoom, in public/zoom-call.html's frame); docs/features/video-calls.md
+src/app/calls/[callId]   a video call (Zoom, in public/zoom-call.html's frame) with a chat saved with the call; docs/features/video-calls.md
+src/components/inbox.tsx  the messaging inbox (mentors, players, admins' Message center); live pages: components/live.tsx
+                         (Supabase Realtime, `supabase_realtime` publication; off in sample mode); docs/features/mentors.md
 src/app/api/errors, (staff)/health, instrumentation(-client).ts   error tracking and structured logs (src/lib/log.ts,
                          src/lib/errors.ts); the log drain keeps lines 30 days in our database (src/lib/log-drain.ts,
                          `logAndKeep`); admins read /health; docs/architecture/observability.md

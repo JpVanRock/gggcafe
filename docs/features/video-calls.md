@@ -64,13 +64,24 @@ to every call.
 - **A player on more than one team** needs every one of her teams to allow calls. This is the
   same rule as the Switchboard.
 
+- **Chat in the call** (user, 2026-11-23: "should be able to chat with players during video call ... a live chat in the
+  video call back that is saved"; migration 20261123232024): a chat beside the video on the call page
+  (`src/app/calls/[callId]/chat.tsx`, `sendCallMessage`), live (Supabase Realtime on `video_call_messages`, see
+  mentors.md). Everyone who may join the call (`video_call_role`: the host, the invited players and their parents,
+  invited mentors, head coaches and admins) writes while the call is open, 10 minutes before the start until 15 minutes
+  after the end (`private.video_call_chat_open`), and reads it afterwards on the call page: it's kept with the call.
+  Nobody else reads it (`private.in_video_call`); nobody edits; admins remove a message. The name and role (host,
+  mentor, player, parent, coach) come from the database. 120 messages an hour per person; 1,000 characters each.
+  Zoom's own chat isn't saved (the page says so). DB tests: the chat block in `tests/db/video_calls.test.sql`.
+
 ## Safeguards
 - **Parents:** her parents are invited to every call and told when one is booked or cancelled.
   Head coaches are told of every mentor's call and can drop in.
 - **Waiting room:** it's on, and nobody gets in before the host. The host starts the call from
   the site; Zoom only gives the host's key (ZAK) to the person who booked it, while the call is
   open.
-- **Recording:** none. Turn recording off in Zoom's account settings too (setup below).
+- **Recording:** none. Turn recording off in Zoom's account settings too (setup below). The site's chat is saved with
+  the call (above), so parents and admins can read it afterwards.
 - **What people see in the call:** no passcode, meeting number or invite link, only the topic,
   the host and who's there. Each person joins under their own name: "Name (parent)" or
   "Name (coach)".

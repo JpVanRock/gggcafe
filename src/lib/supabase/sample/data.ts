@@ -391,6 +391,12 @@ const soon = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
 soon.setUTCHours(23, 30, 0, 0);
 // mentors a head coach invited (user, 2026-11-22): Emma's mentor on the head coach's call with her
 const video_call_mentors: Row[] = [{ call_id: id("a0ca11", 2), mentor_id: U.mentor2, mentor_name: "Dana Ortiz" }];
+// the chat beside a call, saved with it (user, 2026-11-23)
+const video_call_messages: Row[] = [
+  { id: id("a0cc00", 1), call_id: id("a0ca11", 1), author_id: U.admin, author_name: "Coach Sample", author_role: "host", body: "Can everyone hear me? Grab a ball for the grip part.", created_at: "2027-01-12T00:01:00Z" },
+  { id: id("a0cc00", 2), call_id: id("a0ca11", 1), author_id: MAYA_LOGIN, author_name: "Maya", author_role: "player", body: "Yes! Got one.", created_at: "2027-01-12T00:01:30Z" },
+  { id: id("a0cc00", 3), call_id: id("a0ca11", 1), author_id: OTHER_PARENT, author_name: "Dana Torres", author_role: "parent", body: "Watching from the kitchen. Thank you!", created_at: "2027-01-12T00:02:10Z" },
+];
 const video_calls: Row[] = [
   { id: id("a0ca11", 1), team_id: T.us, player_id: maya, host_id: U.admin, host_kind: "mentor", host_name: "Coach Sample", topic: "Changeup grip and release", starts_at: "2027-01-12T00:00:00Z", minutes: 30, zoom_meeting_id: "81000000101", cancelled_at: null, cancelled_by: null, created_at: "2026-11-12T19:00:00Z", calendars: ["player", "family", "coaches"], group_size: 2 },
   { id: id("a0ca11", 2), team_id: T.us, player_id: emma, host_id: U.admin, host_kind: "coach", host_name: "Pat Torres", topic: "Winter plan check-in", starts_at: "2027-01-14T23:30:00Z", minutes: 45, zoom_meeting_id: "81000000102", cancelled_at: null, cancelled_by: null, created_at: "2026-11-12T19:10:00Z", calendars: ["player", "coaches"], group_size: 1 },
@@ -407,7 +413,7 @@ export const TABLES: Record<string, Row[]> = {
   mentors, mentor_links, mentor_messages, mentor_focus, mentor_notes, player_activities,
   budget_fees, budget_entries, budget_credits, budget_coach_expenses, player_mental_lessons, coach_mental_lessons, mental_game_plans,
   team_hitting_philosophy, team_throwing_programs, player_journal_entries, parent_links, team_parent_codes, hitting_styles, hitting_zones, team_features_off, team_admins,
-  team_video_access, video_calls, video_call_players, video_call_mentors,
+  team_video_access, video_calls, video_call_players, video_call_mentors, video_call_messages,
 };
 
 /** table -> the column other tables use to point at it (for embedded selects) */
@@ -477,6 +483,16 @@ export function sampleRpc(name: string, args: Row = {}): unknown {
     case "team_leaderboard": return leaderboard();
     case "team_squads": return [];
     case "unread_notifications": return 2;
+    // what happened to each message, for the admins' message center (user, 2026-11-23)
+    case "admin_message_trail":
+      return ((args.p_message_ids as string[] | undefined) ?? []).flatMap((mid) => {
+        const m = mentor_messages.find((x) => x.id === mid);
+        if (!m) return [];
+        const toParents = m.audience === "parents";
+        const notified = m.author_role === "mentor" ? [{ name: toParents ? "Dana Torres" : "Maya", read_at: m.read_at }] : [{ name: "Coach Sample", read_at: null }];
+        const email = !toParents ? "none" : m.author_role === "mentor" ? "done" : "skipped";
+        return [{ message_id: mid, notified, email, email_note: email === "skipped" ? "The mentor has no email." : null, email_at: email === "none" ? null : m.created_at }];
+      });
     case "pending_approvals": return [];
     case "player_mentors": return [{ mentor_id: U.admin, display_name: "Coach Sample", specialty: "Pitching" }];
     case "my_admin_team_ids": return [T.us];

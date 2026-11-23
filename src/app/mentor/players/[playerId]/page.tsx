@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getCurrentUser, getMentor, getMentorAccess, getPlayerFeaturesOff } from "@/lib/auth";
-import { formatDay, todayISO } from "@/lib/dates";
+import { APP_TIME_ZONE, formatDay, todayISO } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
 import { signedPhotoUrls } from "@/lib/player-photos";
 import { GOAL_METHOD_LABEL, isUuid, playerName, type Player } from "@/lib/softball";
@@ -20,7 +20,8 @@ import { MentalDetail } from "@/app/(staff)/players/[playerId]/mental";
 import { MentalTools } from "@/app/(staff)/players/[playerId]/mental-game";
 import { loadMentalTools } from "@/app/(staff)/players/[playerId]/mental-data";
 import { TrainingForm } from "../../mentor-client";
-import { MentorConversation, loadConversation } from "../../conversation";
+import { InboxList } from "@/components/inbox";
+import { inboxWhen, messagePreview, threadSummaries, type Audience } from "@/lib/mentors";
 import { RECENT_LIMIT, groupLabelClass } from "@/components/ui";
 import { JOURNAL_BUCKET } from "@/lib/journal";
 import { FocusBoard, FocusControls, FocusForm, NoteForm, NotesThread, RemoveNote, type FocusItem, type MentorNote } from "@/components/mentor-work";
@@ -62,14 +63,21 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
   const first = player.preferred_name || player.first_name;
   const method = player.goal_method ?? "harada";
 
-  const [chart, smartGoals, metricOptions, pop, mental, styles, conversation, training, measurements, { data: best }, { data: focusRows }, { data: noteRows }, mentalTools] = await Promise.all([
+  const [chart, smartGoals, metricOptions, pop, mental, styles, { data: messageRows }, training, measurements, { data: best }, { data: focusRows }, { data: noteRows }, mentalTools] = await Promise.all([
     loadHarada(supabase, player.id),
     loadSmartGoals(supabase, player.id),
     loadMetricOptions(supabase),
     loadPopReport(supabase, player.id),
     loadMentalPlan(supabase, player.id),
     loadMovementAndHitting(supabase, player.id),
-    loadConversation(supabase, mentor.userId, player.id, false),
+    // her two conversations' latest messages (the Messages page holds them)
+    supabase
+      .from("mentor_messages")
+      .select("id, player_id, mentor_id, audience, author_role, body, photo_path, drill_name, read_at, created_at")
+      .eq("mentor_id", mentor.userId)
+      .eq("player_id", player.id)
+      .order("created_at", { ascending: false })
+      .limit(200),
     loadTraining(supabase, mentor.userId, [player.id]),
     // mentors can't read team lists: her defaults plus whatever she has been measured on
     loadMeasurements(supabase, player, null),
@@ -126,6 +134,10 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
   const focus = (focusRows ?? []) as FocusItem[];
   const notes = (noteRows ?? []) as MentorNote[];
   const photos = await signedPhotoUrls(supabase, [player.photo_path]);
+  const threads = threadSummaries(
+    (messageRows ?? []) as { id: string; player_id: string; mentor_id: string; audience: Audience; author_role: string; body: string | null; photo_path: string | null; drill_name: string | null; read_at: string | null; created_at: string }[],
+    (m) => m.author_role === "mentor",
+  );
   const spot = currentRostering(pop);
 
   return (
@@ -159,21 +171,35 @@ export default async function MentorPlayerPage({ params, searchParams }: PagePro
       )}
       <ScrollToHash />
 
-      {/* her conversation with the player and the one with her parents (user, 2026-11-23); also on Messages */}
+      {/* her conversation with the player and the one with her parents (user, 2026-11-23): they open in Messages */}
       {!(off.has("mentor.messages") && off.has("mentor.parent_messages")) && (
         <section id="messages" aria-label="Messages" className="flex scroll-mt-24 flex-col gap-4">
           <div className="flex flex-wrap items-baseline justify-between gap-3">
             <h2 className="text-2xl leading-tight font-bold tracking-wide text-highlight uppercase">Messages</h2>
-            <Link href={`/mentor/messages?player=${player.id}`} className="text-sm font-semibold text-link hover:underline">
-              Open in Messages <span aria-hidden="true">→</span>
+            <Link href="/mentor/messages" className="text-sm font-semibold text-link hover:underline">
+              All messages <span aria-hidden="true">→</span>
             </Link>
           </div>
-          <MentorConversation
-            mentorId={mentor.userId}
-            player={{ id: player.id, first }}
-            conversation={conversation}
-            off={off}
-            showAllHref={`/mentor/messages?player=${player.id}&all=1`}
+          <InboxList
+            label={`Messages with ${first} and her parents`}
+            empty=""
+            items={(["player", "parents"] as Audience[])
+              .filter((a) => !off.has(a === "parents" ? "mentor.parent_messages" : "mentor.messages") || threads.some((t) => t.last.audience === a))
+              .map((a) => {
+                const t = threads.find((x) => x.last.audience === a);
+                return {
+                  key: a,
+                  href: `/mentor/messages?player=${player.id}${a === "parents" ? "&with=parents" : ""}`,
+                  title: a === "parents" ? `${first}'s parents` : `${first} ${player.last_name}`,
+                  tag: a === "parents" ? "Her parents · emailed to them" : "Player",
+                  preview: t ? `${t.last.author_role === "mentor" ? "You: " : ""}${messagePreview(t.last)}` : "Start the conversation",
+                  when: t ? inboxWhen(t.last.created_at, new Date().toISOString(), APP_TIME_ZONE) : null,
+                  unread: t?.unread ?? 0,
+                  active: false,
+                  photo: a === "player" ? (player.photo_path ? (photos.get(player.photo_path) ?? null) : null) : null,
+                  initials: a === "parents" ? "P" : `${player.first_name[0] ?? ""}${player.last_name[0] ?? ""}`,
+                };
+              })}
           />
         </section>
       )}

@@ -312,6 +312,23 @@ select pg_temp.expect('the parent''s message goes to the mentor',
 select pg_temp.expect('nothing for the player thread',
   (select count(*) from private.jobs_mentor_message_email('mm-test-secret-0123456789abcdefghijklmnop', (select id from public.mentor_messages where author_role = 'player'))), 0::bigint);
 delete from vault.decrypted_secrets where name = 'jobs_secret';
+-- players have no email: her login hears about a mentor's message in the bell (user, 2026-11-23, migration 20261123231322)
+select pg_temp.expect('Jordan heard about her mentor''s message',
+  (select title || ' -> ' || href from public.notifications where user_id = 'cccccccc-0000-0000-0000-000000000004' and kind = 'message'),
+  'Pat Pitching sent you a message -> /players/00000000-0000-0000-0000-0000000000c2/messages?mentor=cccccccc-0000-0000-0000-000000000001');
+-- what happened to each message, for admins only
+create temp table trail_ids as
+  select id, author_role || '/' || audience as what from public.mentor_messages where sender_id::text like 'cccccccc-%';
+grant select on trail_ids to authenticated;
+set role authenticated;
+select pg_temp.as_user('cccccccc-0000-0000-0000-000000000002');
+select pg_temp.expect('the trail: who was told, the email, for each',
+  (select string_agg(i.what || ' told ' || (select string_agg(x->>'name', '+') from jsonb_array_elements(t.notified) x) || ' email ' || t.email, ', ' order by i.what)
+     from public.admin_message_trail((select array_agg(id) from trail_ids)) t join trail_ids i on i.id = t.message_id),
+  'mentor/parents told Jo Kim email waiting, mentor/player told Jordan email none, parent/parents told Pat Pitching email waiting, player/player told Pat Pitching email none');
+select pg_temp.as_user('cccccccc-0000-0000-0000-000000000001');
+select pg_temp.expect('only admins read the trail', pg_temp.err($$select * from public.admin_message_trail(array[]::uuid[])$$), '42501');
+reset role;
 -- the Switchboard's "Message parents" closes the parents thread both ways; the player thread stays open
 insert into public.team_features_off (team_id, feature) values ('00000000-0000-0000-0000-0000000000b1', 'mentor.parent_messages');
 set role authenticated;

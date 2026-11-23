@@ -56,6 +56,18 @@ export function threadSummaries<M extends { mentor_id: string; player_id: string
   return [...threads.values()].sort((a, b) => b.last.created_at.localeCompare(a.last.created_at));
 }
 
+/** An inbox row's time: the clock for today ("2:04 PM"), else the day ("Nov 21"), in the team's time zone. */
+export function inboxWhen(iso: string, nowIso: string, timeZone: string): string {
+  const day = (x: string) => new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(x));
+  if (day(iso) === day(nowIso)) return new Intl.DateTimeFormat("en-US", { timeZone, hour: "numeric", minute: "2-digit" }).format(new Date(iso));
+  return new Intl.DateTimeFormat("en-US", { timeZone, month: "short", day: "numeric" }).format(new Date(iso));
+}
+
+/** What an inbox row shows of the newest message: its text, else what it carries. */
+export function messagePreview(m: { body: string | null; drill_name?: string | null; photo_path?: string | null }): string {
+  return m.body ?? (m.drill_name ? `Drill: ${m.drill_name}` : m.photo_path ? "Photo" : "");
+}
+
 /** A new drill for the Drill Library: a name, and optionally a video link (https) and how to run it. */
 export function cleanNewDrill(input: { name?: unknown; videoUrl?: unknown; description?: unknown }):
   | { name: string; video_url: string | null; description: string | null }

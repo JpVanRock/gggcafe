@@ -6,6 +6,8 @@ import { getCurrentUser, getPlayerFeaturesOff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { MESSAGE_COLUMNS, signedMessagePhotoUrls, type MentorMessage } from "@/lib/message-photos";
 import { EmptyState, Loading, eyebrowClass, groupLabelClass } from "@/components/ui";
+import { ChatScroll } from "@/components/chat-scroll";
+import { Live } from "@/components/live";
 import { MarkSeen } from "@/components/mark-seen";
 import { MessageThread } from "@/components/message-thread";
 import { ReplyForm } from "@/components/reply-form";
@@ -134,6 +136,8 @@ async function FamilyMentors({ searchParams }: Pick<PageProps<"/family/mentors">
           </p>
         </div>
         <MarkSeen action={markParentConversationsRead.bind(null, daughter.player_id)} />
+        {/* live: a mentor's message, or one from her other parent, shows as it arrives (user, 2026-11-23) */}
+        <Live table="mentor_messages" column="player_id" value={daughter.player_id} />
         {parentThreads.length === 0 ? (
           <p className="text-sm text-muted">Once a mentor works with {first}, you can write to them here.</p>
         ) : (
@@ -142,13 +146,15 @@ async function FamilyMentors({ searchParams }: Pick<PageProps<"/family/mentors">
             return (
               <section key={mentorId} aria-label={`You and ${name}`} className="flex flex-col gap-4 rounded-2xl border border-navy-700 bg-navy-900/70 p-4 sm:p-5">
                 <p className="font-display text-lg leading-tight font-bold tracking-wide uppercase">{mentorLabel(mentorId)}</p>
-                <MessageThread
-                  messages={ofAudience("parents").filter((m) => m.mentor_id === mentorId)}
-                  viewer="parent"
-                  me={user.id}
-                  label={`Your conversation with ${name}`}
-                  empty={`Nothing yet. Ask ${name} how it's going, or wait for their first summary.`}
-                />
+                <ChatScroll count={ofAudience("parents").filter((m) => m.mentor_id === mentorId).length} label={`Messages with ${name}`} className="max-h-[55vh] p-1">
+                  <MessageThread
+                    messages={ofAudience("parents").filter((m) => m.mentor_id === mentorId)}
+                    viewer="parent"
+                    me={user.id}
+                    label={`Your conversation with ${name}`}
+                    empty={`Nothing yet. Ask ${name} how it's going, or wait for their first summary.`}
+                  />
+                </ChatScroll>
                 {!current.has(mentorId) ? (
                   <p className="text-xs text-muted">{name} no longer works with {first}.</p>
                 ) : off.has("mentor.parent_messages") ? (
@@ -203,14 +209,16 @@ async function FamilyMentors({ searchParams }: Pick<PageProps<"/family/mentors">
           playerThreads.map((mentorId) => (
             <section key={mentorId} aria-label={`${first} and ${nameOf(mentorId)}`} className="flex flex-col gap-3 rounded-2xl border border-navy-700 p-4 sm:p-5">
               <p className={eyebrowClass}>{mentorLabel(mentorId)}</p>
-              <MessageThread
-                messages={ofAudience("player").filter((m) => m.mentor_id === mentorId)}
-                viewer="staff"
-                me={user.id}
-                photoUrls={photos}
-                label={`${first}'s conversation with ${nameOf(mentorId)}`}
-                empty="No messages yet."
-              />
+              <ChatScroll count={ofAudience("player").filter((m) => m.mentor_id === mentorId).length} label={`${first} and ${nameOf(mentorId)}`} className="max-h-[45vh] p-1">
+                <MessageThread
+                  messages={ofAudience("player").filter((m) => m.mentor_id === mentorId)}
+                  viewer="staff"
+                  me={user.id}
+                  photoUrls={photos}
+                  label={`${first}'s conversation with ${nameOf(mentorId)}`}
+                  empty="No messages yet."
+                />
+              </ChatScroll>
             </section>
           ))
         )}

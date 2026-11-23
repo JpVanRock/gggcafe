@@ -54,3 +54,19 @@ export async function answerMentor(playerId: string, mentorId: string, body: str
   refresh();
   return { error: null };
 }
+
+/** She opened a mentor's conversation: what the mentor sent is read (no refresh: the page already shows it). */
+export async function markMentorThreadRead(playerId: string, mentorId: string): Promise<{ error: string | null }> {
+  if (!isUuid(playerId) || !isUuid(mentorId) || !(await getMyPlayerIds()).includes(playerId)) return { error: STALE };
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("mentor_messages")
+    .update({ read_at: new Date().toISOString() })
+    .eq("player_id", playerId)
+    .eq("mentor_id", mentorId)
+    .eq("audience", "player")
+    .eq("author_role", "mentor")
+    .is("read_at", null);
+  if (error) console.error("Marking messages read failed:", error.message);
+  return { error: null };
+}

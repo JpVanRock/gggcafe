@@ -49,8 +49,13 @@ export function samplePages() {
   // Leadership Light pages need a player in that program (Lila; Maya is in the Full program)
   const light = ["", "/light-what-is-a-leader", "/plan"].map((p) => `/players/${ID.lightLeader}/advanced/leadership${p}`);
   // a mentor's two conversations with one player (user, 2026-11-23), not only the list
-  const conversation = `/mentor/messages?player=${ID.player}`;
-  return [...new Set([...pages, ...light, conversation])].sort();
+  const conversations = [
+    `/mentor/messages?player=${ID.player}`,
+    `/mentor/messages?player=${ID.player}&with=parents`,
+    // the admins' message center with a conversation open, and what happened to each message
+    `/dugout/mentors/messages?team=${ID.team}&thread=${ID.mentor}.${ID.player}.parents`,
+  ];
+  return [...new Set([...pages, ...light, ...conversations])].sort();
 }
 
 /** The PDF routes and file downloads (not pages, so not found by samplePages). */

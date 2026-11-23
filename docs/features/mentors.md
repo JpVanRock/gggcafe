@@ -48,15 +48,36 @@
     bell cover it.
   - The Switchboard: "Message players" (`mentor.messages`) closes the player thread both ways, "Message parents"
     (`mentor.parent_messages`) the parents thread.
-  - Pages: the mentor's `/mentor/messages` (in her menu: every player she works with, each with both threads' latest
-    message and new answers; `?player=` opens both side by side, `&with=parents` puts the parents' first, `&all=1` shows
-    every message) and the same two panels on `/mentor/players/[id]` (`MentorConversation` in `mentor/conversation.tsx`);
-    the player's `/players/[id]/messages` (one thread per mentor, an answer box under each); the family's
-    `/family/mentors` ("You and her mentors": a thread and a write box per mentor who works with her; "{her} and her
-    mentors": her threads, read only). Shared UI: `components/message-thread.tsx` (`MessageThread`: what the signed-in
-    user wrote sits on the right as "You"), `components/reply-form.tsx`, `components/mark-seen.tsx`.
-  - DB tests: the "Conversations" block in `tests/db/mentors.test.sql`; unit: `cleanText`, `threadSummaries`
-    (`tests/unit/mentors.test.ts`) and the email (`tests/unit/jobs.test.ts`).
+  - Inbox and live chat (user, 2026-11-23: "The messaging center should be like a streaming platform or inbox",
+    "players do not have email so is there a way to have a ongoing dialogue like a chat"; migration 20261123231322):
+    every page with conversations is an inbox (`components/inbox.tsx`: `Inbox`, `InboxList`, `ConversationPane`), the
+    list newest first with what's new, the open conversation as a chat (`components/chat-scroll.tsx`: scrolled to the
+    newest, `role="log"`). On phones the list fills the screen until one is open, with a link back. Live: an open
+    page re-renders when a message (or "Seen") arrives (`components/live.tsx` → `live-updates.tsx`: Supabase Realtime
+    on `mentor_messages`, which is in the `supabase_realtime` publication, Realtime checks each viewer's read rules;
+    a 30-second check while the page is visible as a fallback; off in the sample-data mode). Players have no email, so
+    a mentor's message to a player also notifies her login (the bell, linking to her conversation), on top of the
+    alert on her menu. Each notice names its message (`notifications.message_id`).
+  - Pages: the mentor's `/mentor/messages` (in her menu): every conversation, one row per player and one per player's
+    parents, filters All / New / Players / Parents (`?box=`), "+ New message" (pick a player and her or her parents);
+    `?player=&with=player|parents` opens one (`MentorConversation` in `mentor/conversation.tsx`; the player thread's
+    composer is the message form with a photo, a drill and sharing; the parents' a text box), `&all=1` shows all of it.
+    Her player page `/mentor/players/[id]` lists the two conversations and opens them in Messages. The player's
+    `/players/[id]/messages`: one conversation per mentor (`?mentor=`; with one mentor it's open), an answer box, opening
+    marks it read. The family's `/family/mentors`: "You and her mentors" (a live conversation and a write box per mentor
+    who works with her), then "{her} and her mentors" (her conversations, read only).
+  - Admins' message center (user, 2026-11-23: "allow the admin role to actually see what happens when a message is
+    sent"): Coaches Dugout → Mentors → "Message center" (`/dugout/mentors/messages?team=`, admins only): every
+    conversation about the team's players as a read-only inbox (`?thread=<mentor>.<player>.<player|parents>`), and under
+    each message what happened (`admin_message_trail(ids)`, a definer for admins): who was notified (and opened it), the
+    email for the parents' conversation (sent, waiting, failed and trying again, skipped and why, gave up; none for a
+    player's conversation: players have no email), and when it was read. Admins can remove a message there.
+  - Shared UI: `components/message-thread.tsx` (`MessageThread`: what the signed-in user wrote sits on the right as
+    "You"; what was written to the viewer's side and is still unread stands out), `components/reply-form.tsx`,
+    `components/mark-seen.tsx`.
+  - DB tests: the "Conversations" block in `tests/db/mentors.test.sql` (with the player's notice and the trail); unit:
+    `cleanText`, `threadSummaries`, `inboxWhen`, `messagePreview` (`tests/unit/mentors.test.ts`) and the email
+    (`tests/unit/jobs.test.ts`).
 - Working with the coaches (user, 2026-11-11), about one player or the whole team (whole-team mentors):
   `mentor_focus` (focus areas: "Working on" / "What's working", the mentor adds, moves and removes her own) and
   `mentor_notes` (a thread per mentor and player/team: discussion summaries with the day they talked, notes, and

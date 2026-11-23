@@ -8,12 +8,13 @@ import { isUuid, playerName } from "@/lib/softball";
 import { CALL_STATE_LABEL, OPENS_EARLY_MINUTES, callState, formatCallClock, formatCallDay, formatCallTime } from "@/lib/video-calls";
 import { Badge, Eyebrow } from "@/components/ui";
 import { CallRoom } from "./call-room";
+import { CallChat } from "./chat";
 
 export const metadata: Metadata = { title: "Video call · GGG.Cafe" };
 
 // A video call (user, 2026-11-12; docs/features/video-calls.md), held here on Zoom: the mentor or
 // head coach who booked it hosts; she, her parents, head coaches and any mentors a head coach invited (user,
-// 2026-11-22) join. Anyone else gets a 404.
+// 2026-11-22) join. Anyone else gets a 404. Beside the video, a chat that's saved with the call (user, 2026-11-23).
 export default async function CallPage({ params }: PageProps<"/calls/[callId]">) {
   const { callId } = await params;
   if (!isUuid(callId)) notFound();
@@ -52,6 +53,9 @@ export default async function CallPage({ params }: PageProps<"/calls/[callId]">)
         ? { href: `/players/${myInvite}`, label: "My dashboard" }
         : { href: "/family", label: "Family home" };
   const opens = new Date(new Date(call.starts_at).getTime() - OPENS_EARLY_MINUTES * 60_000).toISOString();
+  // the chat beside the video (user, 2026-11-23): written while the call is open, kept with it after
+  const onCall = role === "host" || role === "guest" || role === "cancelled" || role === "off";
+  const live = (role === "host" || role === "guest") && state === "open";
 
   return (
     <div className="flex flex-col gap-6">
@@ -85,11 +89,15 @@ export default async function CallPage({ params }: PageProps<"/calls/[callId]">)
       ) : state === "over" ? (
         <p className="rounded-xl border border-navy-700 px-4 py-3 text-sm">This call is over.</p>
       ) : (
-        <CallRoom callId={call.id} host={role === "host"} />
+        <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]">
+          <CallRoom callId={call.id} host={role === "host"} />
+          <CallChat callId={call.id} me={user.id} open />
+        </div>
       )}
+      {onCall && !live && <CallChat callId={call.id} me={user.id} open={false} />}
 
       <ul className="flex flex-col gap-1 text-xs text-muted">
-        <li>Calls aren&apos;t recorded, here or on Zoom.</li>
+        <li>Calls aren&apos;t recorded, here or on Zoom. The chat beside the call is saved with it; Zoom&apos;s own chat isn&apos;t.</li>
         <li>{group ? "Every invited player's parents are invited and can join it" : "Her parents are invited to every call and can join it"}; head coaches can drop in.</li>
         <li>Everyone waits in the waiting room until the host lets them in.</li>
       </ul>

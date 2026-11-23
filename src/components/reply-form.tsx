@@ -12,6 +12,8 @@ export function ReplyForm({
   placeholder,
   sendLabel = "Send",
   hint,
+  maxLength = MESSAGE_MAX,
+  rows = 3,
 }: {
   /** a server action bound to the thread: gets the text */
   action: (body: string) => Promise<{ error: string | null }>;
@@ -19,6 +21,8 @@ export function ReplyForm({
   placeholder?: string;
   sendLabel?: string;
   hint?: string;
+  maxLength?: number;
+  rows?: number;
 }) {
   const [body, setBody] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -48,8 +52,8 @@ export function ReplyForm({
             setBody(e.target.value);
             setSent(false);
           }}
-          maxLength={MESSAGE_MAX}
-          rows={3}
+          maxLength={maxLength}
+          rows={rows}
           placeholder={placeholder}
           aria-invalid={error ? true : undefined}
           className={inputClass}

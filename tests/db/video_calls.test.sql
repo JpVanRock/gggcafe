@@ -118,6 +118,51 @@ select pg_temp.expect('head coach told of the mentor''s call', (select count(*) 
 select pg_temp.expect('head coach drops in', (select public.video_call_role(id) from public.video_calls where zoom_meeting_id = '81000000006'), 'guest');
 reset role;
 
+-- Chat in the call (user, 2026-11-23; migration 20261123232024): kept with the call; the people on it write while it's
+-- open and read it after; signed from the database; nobody else reads it; nobody edits; admins remove
+update public.video_calls set starts_at = now() + interval '5 minutes' where zoom_meeting_id = '81000000001';  -- open now
+create temp table vc_chat as select id from public.video_calls where zoom_meeting_id = '81000000001';
+grant select on vc_chat to authenticated;
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000001"}', false);
+insert into public.video_call_messages (call_id, body, author_name, author_role) values ((select id from vc_chat), 'Can everyone hear me?', 'Someone', 'player');
+select pg_temp.expect('the host, signed from the call', (select author_name || '/' || author_role from public.video_call_messages), 'VC Head/host');
+select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000004"}', false);
+insert into public.video_call_messages (call_id, body) values ((select id from vc_chat), 'Yes! Loud and clear.');
+select pg_temp.expect('Avery reads the chat, signed as the player',
+  (select string_agg(author_name || '/' || author_role, ',' order by created_at, author_role) from public.video_call_messages), 'VC Head/host,Avery/player');
+select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000006"}', false);
+insert into public.video_call_messages (call_id, body) values ((select id from vc_chat), 'Watching from the kitchen.');
+select pg_temp.expect('her parent writes as a parent', (select author_name || '/' || author_role from public.video_call_messages where body like 'Watching%'), 'VC Parent/parent');
+select pg_temp.expect('not in a call that isn''t open yet',
+  pg_temp.err($$insert into public.video_call_messages (call_id, body) values ((select id from public.video_calls where zoom_meeting_id = '81000000006'), 'Early')$$), '42501');
+do $$ begin
+  update public.video_call_messages set body = 'changed';
+  if found then raise exception 'FAIL: a chat message was edited'; end if;
+exception when insufficient_privilege then null;
+end $$;
+delete from public.video_call_messages;  -- not hers to remove
+select pg_temp.expect('a parent removes nothing', (select count(*) from public.video_call_messages), 3::bigint);
+select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000007"}', false);
+select pg_temp.expect('Casey reads none of it', (select count(*) from public.video_call_messages), 0::bigint);
+select pg_temp.expect('Casey can''t write in it', pg_temp.err($$insert into public.video_call_messages (call_id, body) values ((select id from vc_chat), 'Hi')$$), '42501');
+select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000002"}', false);
+select pg_temp.expect('an assistant reads none of it', (select count(*) from public.video_call_messages), 0::bigint);
+select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000005"}', false);
+select pg_temp.expect('a mentor not on the call reads none of it', (select count(*) from public.video_call_messages), 0::bigint);
+select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000003"}', false);
+delete from public.video_call_messages where body like 'Watching%';
+select pg_temp.expect('an admin reads and removes', (select count(*) from public.video_call_messages), 2::bigint);
+reset role;
+-- over: read, not written
+update public.video_calls set starts_at = now() - interval '2 hours' where zoom_meeting_id = '81000000001';
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"e7e7e7e7-0000-0000-0000-000000000004"}', false);
+select pg_temp.expect('after the call: still there', (select count(*) from public.video_call_messages), 2::bigint);
+select pg_temp.expect('after the call: closed', pg_temp.err($$insert into public.video_call_messages (call_id, body) values ((select id from vc_chat), 'Late')$$), '42501');
+reset role;
+update public.video_calls set starts_at = now() + interval '1 day' where zoom_meeting_id = '81000000001';
+
 -- Group calls (migration 20261114224959): the mentor books one call with two of her players at once; each
 -- invited player and her parents read it, join it and were told; a parent sees only her own child's invite
 insert into auth.users (id, email, raw_user_meta_data) values ('e7e7e7e7-0000-0000-0000-000000000008', 'vc-parent2@example.test', '{"role": "parent"}');

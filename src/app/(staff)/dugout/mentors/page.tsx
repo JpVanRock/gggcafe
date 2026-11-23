@@ -148,6 +148,12 @@ export default async function MentorsPage({ searchParams }: PageProps<"/dugout/m
   return (
     <div className="flex flex-col gap-8">
       <TeamPicker teams={teams} current={team.id} basePath="/dugout/mentors" />
+      {/* admins: every mentor conversation on the team and what happened to each message (user, 2026-11-23) */}
+      {admin && (
+        <Link href={`/dugout/mentors/messages?team=${team.id}`} className={buttonStyles("pill", "self-start")}>
+          Message center <span aria-hidden="true">→</span>
+        </Link>
+      )}
       {/* admins: what this team's mentors see, drawn like their mentor page (user, 2026-11-14) */}
       {admin && (
         <ViewToggle

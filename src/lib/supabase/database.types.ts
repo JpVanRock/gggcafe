@@ -2488,6 +2488,7 @@ export type Database = {
           player_id: string | null
           created_at: string
           read_at: string | null
+          message_id: string | null
         }
         Insert: {
           id?: string
@@ -2500,6 +2501,7 @@ export type Database = {
           player_id?: string | null
           created_at?: string
           read_at?: string | null
+          message_id?: string | null
         }
         Update: {
           id?: string
@@ -2512,8 +2514,16 @@ export type Database = {
           player_id?: string | null
           created_at?: string
           read_at?: string | null
+          message_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "notifications_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "mentor_messages"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "notifications_player_id_fkey"
             columns: ["player_id"]
@@ -6005,6 +6015,44 @@ export type Database = {
           },
         ]
       }
+      video_call_messages: {
+        Row: {
+          id: string
+          call_id: string
+          author_id: string
+          author_name: string
+          author_role: "host" | "mentor" | "coach" | "player" | "parent" | "guest"
+          body: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          call_id: string
+          author_id?: string
+          author_name?: string
+          author_role?: "host" | "mentor" | "coach" | "player" | "parent" | "guest"
+          body: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          call_id?: string
+          author_id?: string
+          author_name?: string
+          author_role?: "host" | "mentor" | "coach" | "player" | "parent" | "guest"
+          body?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_call_messages_call_id_fkey"
+            columns: ["call_id"]
+            isOneToOne: false
+            referencedRelation: "video_calls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       video_call_players: {
         Row: {
           call_id: string
@@ -6393,6 +6441,7 @@ export type Database = {
       accept_parental_consent: { Args: { p_player_id: string | null; p_parent_name: string | null; p_relationship: string | null; p_notice_version: string | null; p_ip: string | null; p_user_agent: string | null }; Returns: string }
       admin_account: { Args: { p_user: string | null }; Returns: Json }
       admin_logs: { Args: { p_level?: string | null; p_search?: string | null; p_before?: number | null; p_limit?: number | null }; Returns: { id: number; at: string; level: string; event: string; route: string; message: string; fields: Json }[] }
+      admin_message_trail: { Args: { p_message_ids: string[] | null }; Returns: { message_id: string; notified: Json; email: string; email_note: string; email_at: string }[] }
       admin_view_mentor: { Args: { p_user: string | null }; Returns: Json }
       admin_view_parent: { Args: { p_user: string | null }; Returns: Json }
       allow_password_reset: { Args: { p_email: string | null }; Returns: boolean }
