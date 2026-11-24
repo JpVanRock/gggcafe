@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { getCurrentUser, getMentor, getMentorAccess } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { isUuid, playerName } from "@/lib/softball";
-import { Disclosure, groupLabelClass } from "@/components/ui";
+import { Disclosure, buttonStyles, groupLabelClass } from "@/components/ui";
 import { FocusBoard, FocusControls, FocusForm, NoteForm, NotesThread, RemoveNote, type FocusItem, type MentorNote } from "@/components/mentor-work";
 import { addMentorFocus, addMentorNote, removeMentorFocus, removeMentorNote, setMentorFocus } from "../../actions";
 import { TrainingForm } from "../../mentor-client";
@@ -66,9 +66,17 @@ export default async function MentorTeamPage({ params }: PageProps<"/mentor/team
       <Link href="/mentor" className="self-start text-sm text-muted hover:text-ink">
         ← My players
       </Link>
-      <header>
-        <p className="font-sans text-xs tracking-[0.25em] text-pink-soft uppercase">Whole team · {roster.length} players</p>
-        <h1 className="mt-1 text-4xl leading-none font-bold tracking-tight text-highlight uppercase sm:text-5xl">{team.name}</h1>
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="font-sans text-xs tracking-[0.25em] text-pink-soft uppercase">Whole team · {roster.length} players</p>
+          <h1 className="mt-1 text-4xl leading-none font-bold tracking-tight text-highlight uppercase sm:text-5xl">{team.name}</h1>
+        </div>
+        {/* one message to every player (user, 2026-11-23: "message the whole team") */}
+        {roster.length > 0 && !off.has("mentor.messages") && (
+          <Link href={`/mentor/messages?team=${team.id}`} className={buttonStyles("pill")}>
+            Message the whole team <span aria-hidden="true">→</span>
+          </Link>
+        )}
       </header>
 
       {roster.length > 0 && <PlayerTiles cards={roster.flatMap((p) => (cards.has(p.id) ? [cards.get(p.id)!] : []))} />}

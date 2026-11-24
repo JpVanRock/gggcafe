@@ -102,7 +102,11 @@ export async function removeMentorMessage(_prev: FormState, fd: FormData): Promi
     const supabase = await createClient();
     const { data } = await supabase.from("mentor_messages").select("photo_path").eq("id", id).maybeSingle();
     must(await supabase.from("mentor_messages").delete().eq("id", id));
-    if (data?.photo_path) await supabase.storage.from(MESSAGE_PHOTO_BUCKET).remove([data.photo_path]);
+    // a team message's copies share one photo: remove it only with the last of them
+    if (data?.photo_path) {
+      const { count } = await supabase.from("mentor_messages").select("id", { count: "exact", head: true }).eq("photo_path", data.photo_path);
+      if (!count) await supabase.storage.from(MESSAGE_PHOTO_BUCKET).remove([data.photo_path]);
+    }
     refresh();
   });
 }

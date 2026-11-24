@@ -66,6 +66,14 @@
     `/players/[id]/messages`: one conversation per mentor (`?mentor=`; with one mentor it's open), an answer box, opening
     marks it read. The family's `/family/mentors`: "You and her mentors" (a live conversation and a write box per mentor
     who works with her), then "{her} and her mentors" (her conversations, read only).
+  - Whole-team messages (user, 2026-11-23: a mentor had sent one note to a whole roster one player at a time, twice to
+    some): a whole-team mentor writes once to everyone on the team ("Message everyone on {team}" in Messages,
+    `?team=`, and "Message the whole team" on her team page). `sendTeamMessage` inserts one copy per player on the
+    team's current roster in one statement (all or nothing; the database checks each row), leaving out players whose
+    head coach switched mentor messages off; each copy is in that player's own conversation and banner, and she
+    answers there. The copies share their `created_at`, so the team view groups them back into sends (`teamSends`,
+    "Sent to N · seen by M"). A photo is shared by the copies: taking one back removes the photo only with the last.
+    The rate limit counts each copy (60 an hour).
   - Admins' message center (user, 2026-11-23: "allow the admin role to actually see what happens when a message is
     sent"): Coaches Dugout → Mentors → "Message center" (`/dugout/mentors/messages?team=`, admins only): every
     conversation about the team's players as a read-only inbox (`?thread=<mentor>.<player>.<player|parents>`), and under

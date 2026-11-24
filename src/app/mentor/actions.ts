@@ -5,7 +5,7 @@
 // players' weeks (one player or a group), and notes and focus areas for the coaches. The
 // database checks all of it again (her players only; names and authors from the database).
 import { refresh } from "next/cache";
-import { getMentor, mentorCheck, switchedOff } from "@/lib/auth";
+import { getMentor, getMentorAccess, getPlayerFeaturesOff, mentorCheck, switchedOff } from "@/lib/auth";
 import { STALE, failed, must, runAction } from "@/lib/actions";
 import { friendlyDbError, invalid, text, type FormState } from "@/lib/form";
 import { isUuid } from "@/lib/softball";
@@ -133,7 +133,56 @@ async function markRepliesRead(supabase: Awaited<ReturnType<typeof createClient>
   if (error) console.error("Marking replies read failed:", error.message);
 }
 
-/** Take back a message she sent (and its photo). */
+/**
+ * One message to every player on a team she mentors as a whole (user, 2026-11-23: "message the whole team"): a copy
+ * in each player's own conversation (and her banner), written in one go so it's all or nothing. Players whose head
+ * coach switched mentor messages off (on any of their teams) are left out. The database checks every row again.
+ */
+export async function sendTeamMessage(input: {
+  teamId: string;
+  body?: string;
+  photoPath?: string;
+  drillId?: string;
+  newDrill?: { name?: string; videoUrl?: string; description?: string } | null;
+  share?: boolean;
+}): Promise<Result & { sent?: number }> {
+  if (!isUuid(input.teamId)) return { error: STALE };
+  const denied = await mentorCheck(undefined, input.teamId);
+  if (denied) return { error: denied };
+  const mentor = (await getMentor())!;
+  const access = await getMentorAccess();
+  const roster = access.rosters.find((r) => r.teamId === input.teamId)?.players ?? [];
+  if (roster.length === 0) return { error: "Nobody is on that team's roster yet." };
+  const offFor = await Promise.all(roster.map(async (p) => (await getPlayerFeaturesOff(p.id)).has("mentor.messages")));
+  const to = roster.filter((_, i) => !offFor[i]).map((p) => p.id);
+  if (to.length === 0) return { error: "Message players is turned off for now by the head coach." };
+  const supabase = await createClient();
+
+  let drillId = input.drillId;
+  if (input.newDrill) {
+    const drill = cleanNewDrill(input.newDrill);
+    if (typeof drill === "string") return { error: drill };
+    const { data, error } = await supabase.from("practice_drills").insert(drill).select("id").single();
+    if (error) return { error: error.code === "23505" ? "There's already a drill with that name in the library. Pick it from the list." : friendlyDbError(error) };
+    drillId = data.id;
+  }
+  const message = cleanMessage({ body: input.body, photoPath: input.photoPath, drillId }, mentor.userId);
+  if (typeof message === "string") return { error: message };
+  const { error } = await supabase.from("mentor_messages").insert(
+    to.map((playerId) => ({
+      player_id: playerId,
+      body: message.body,
+      photo_path: message.photoPath,
+      drill_id: message.drillId,
+      shared_with_coaches: Boolean(input.share),
+    })),
+  );
+  if (error) return { error: friendlyDbError(error) };
+  refresh();
+  return { error: null, sent: to.length };
+}
+
+/** Take back a message she sent (and its photo, unless another message still shows it: a team message shares one). */
 export async function deleteMentorMessage(input: { id: string }): Promise<Result> {
   const mentor = await getMentor();
   if (!mentor) return { error: "Only mentors can do that." };
@@ -142,7 +191,10 @@ export async function deleteMentorMessage(input: { id: string }): Promise<Result
   const { data } = await supabase.from("mentor_messages").select("photo_path").eq("id", input.id).eq("sender_id", mentor.userId).maybeSingle();
   const { error } = await supabase.from("mentor_messages").delete().eq("id", input.id).eq("sender_id", mentor.userId);
   if (error) return { error: friendlyDbError(error) };
-  if (data?.photo_path) await supabase.storage.from(MESSAGE_PHOTO_BUCKET).remove([data.photo_path]);
+  if (data?.photo_path) {
+    const { count } = await supabase.from("mentor_messages").select("id", { count: "exact", head: true }).eq("photo_path", data.photo_path);
+    if (!count) await supabase.storage.from(MESSAGE_PHOTO_BUCKET).remove([data.photo_path]);
+  }
   refresh();
   return { error: null };
 }

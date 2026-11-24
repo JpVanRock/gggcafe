@@ -56,6 +56,23 @@ export function threadSummaries<M extends { mentor_id: string; player_id: string
   return [...threads.values()].sort((a, b) => b.last.created_at.localeCompare(a.last.created_at));
 }
 
+/**
+ * A whole-team message (user, 2026-11-23: "message the whole team") is one row per player, all written in one go, so
+ * they share their created_at. Her messages to a team's players, grouped back into sends of two or more, newest
+ * first, with how many players got it and how many have read it.
+ */
+export function teamSends<M extends { id: string; player_id: string; created_at: string; read_at: string | null }>(
+  messages: M[],
+  rosterIds: string[],
+): { at: string; first: M; players: number; seen: number }[] {
+  const groups = new Map<string, M[]>();
+  for (const m of messages) if (rosterIds.includes(m.player_id)) groups.set(m.created_at, [...(groups.get(m.created_at) ?? []), m]);
+  return [...groups.entries()]
+    .filter(([, g]) => g.length > 1)
+    .map(([at, g]) => ({ at, first: g[0], players: new Set(g.map((m) => m.player_id)).size, seen: g.filter((m) => m.read_at).length }))
+    .sort((a, b) => b.at.localeCompare(a.at));
+}
+
 /** An inbox row's time: the clock for today ("2:04 PM"), else the day ("Nov 21"), in the team's time zone. */
 export function inboxWhen(iso: string, nowIso: string, timeZone: string): string {
   const day = (x: string) => new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(x));

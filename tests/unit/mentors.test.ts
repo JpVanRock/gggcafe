@@ -1,7 +1,7 @@
 // Run with: npm run test:unit
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { MESSAGE_MAX, cleanFocus, cleanMentorNote, cleanMentorRequest, cleanMessage, cleanNewDrill, cleanText, inboxWhen, mentorTraining, messagePreview, threadSummaries, trainingDates } from "../../src/lib/mentors.ts";
+import { MESSAGE_MAX, cleanFocus, cleanMentorNote, cleanMentorRequest, cleanMessage, cleanNewDrill, cleanText, inboxWhen, mentorTraining, messagePreview, teamSends, threadSummaries, trainingDates } from "../../src/lib/mentors.ts";
 
 test("training on the mentor's calendar: its weekdays, inside the month shown", () => {
   // Tuesdays and Thursdays (2, 4) from Tue Nov 3 through Thu Nov 26, 2026
@@ -116,4 +116,22 @@ test("the inbox: today's messages show the time, older ones the day, in the team
   assert.equal(messagePreview({ body: "Great pen today." }), "Great pen today.");
   assert.equal(messagePreview({ body: null, drill_name: "Towel drill", photo_path: "x/1.jpg" }), "Drill: Towel drill");
   assert.equal(messagePreview({ body: null, drill_name: null, photo_path: "x/1.jpg" }), "Photo");
+});
+
+test("whole-team messages (user, 2026-11-23): copies written at one moment group into one send, with who read it", () => {
+  const row = (id: string, player_id: string, created_at: string, read_at: string | null = null) => ({ id, player_id, created_at, read_at });
+  const at = "2026-11-23T23:46:00.123Z";
+  const rows = [
+    row("a", "p1", at, "2026-11-24T01:00:00Z"),
+    row("b", "p2", at),
+    row("c", "p3", at),
+    // a message to one player, and one to a player who isn't on this team
+    row("d", "p1", "2026-11-22T10:00:00Z"),
+    row("e", "x9", "2026-11-21T10:00:00Z"),
+    row("f", "x8", "2026-11-21T10:00:00Z"),
+  ];
+  assert.deepEqual(
+    teamSends(rows, ["p1", "p2", "p3"]).map((t) => [t.at, t.players, t.seen]),
+    [[at, 3, 1]],
+  );
 });

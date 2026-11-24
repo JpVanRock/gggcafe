@@ -9,7 +9,7 @@ import { ActionForm } from "@/components/action-form";
 import { SubmitButton } from "@/components/submit-button";
 import { browserClient } from "@/lib/supabase/lazy-client";
 import { MESSAGE_MAX, MESSAGE_PHOTO_BUCKET } from "@/lib/mentors";
-import { addMentorTraining, deleteMentorMessage, requestMentor, sendMentorMessage } from "./actions";
+import { addMentorTraining, deleteMentorMessage, requestMentor, sendMentorMessage, sendTeamMessage } from "./actions";
 import { confirmAction } from "@/components/confirm-submit";
 
 const MAX_SIDE = 1600; // px: sharp enough to show a grip or a swing frame
@@ -45,11 +45,15 @@ export function MessageForm({
   mentorId,
   playerName,
   drills,
+  team,
 }: {
+  /** the player it goes to (or, with `team`, where the photo input's id comes from) */
   playerId: string;
   mentorId: string;
   playerName: string;
   drills: LibraryDrill[];
+  /** a whole-team message (user, 2026-11-23): every player on the team gets her own copy */
+  team?: { id: string; name: string };
 }) {
   const [body, setBody] = useState("");
   const [photo, setPhoto] = useState<{ path: string; preview: string } | null>(null);
@@ -59,7 +63,7 @@ export function MessageForm({
   const [share, setShare] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [sent, setSent] = useState(false);
+  const [sent, setSent] = useState<number | null>(null);
   const [pending, startTransition] = useTransition();
   const fileInput = useRef<HTMLInputElement>(null);
 
@@ -86,16 +90,16 @@ export function MessageForm({
 
   function send() {
     setError(null);
-    setSent(false);
+    setSent(null);
     startTransition(async () => {
-      const res = await sendMentorMessage({
-        playerId,
+      const content = {
         body,
         photoPath: photo?.path,
         drillId: drillMode === "library" ? drillId : undefined,
         newDrill: drillMode === "new" ? newDrill : null,
         share,
-      });
+      };
+      const res = team ? await sendTeamMessage({ teamId: team.id, ...content }) : await sendMentorMessage({ playerId, ...content });
       if (res.error) return setError(res.error);
       setBody("");
       if (photo) URL.revokeObjectURL(photo.preview);
@@ -104,7 +108,7 @@ export function MessageForm({
       setDrillId("");
       setNewDrill({ name: "", videoUrl: "", description: "" });
       setShare(false);
-      setSent(true);
+      setSent("sent" in res && typeof res.sent === "number" ? res.sent : 1);
     });
   }
 
@@ -123,7 +127,7 @@ export function MessageForm({
           onChange={(e) => setBody(e.target.value)}
           maxLength={MESSAGE_MAX}
           rows={3}
-          placeholder="Great pen today. Keep your front side closed on the drop ball."
+          placeholder={team ? "Team: bring a towel Thursday. We start with the drop-ball drill." : "Great pen today. Keep your front side closed on the drop ball."}
           className={inputClass}
         />
       </label>
@@ -212,16 +216,22 @@ export function MessageForm({
       <label className="flex items-start gap-2 text-sm">
         <input type="checkbox" checked={share} onChange={(e) => setShare(e.target.checked)} className="mt-0.5 size-4 accent-pink" />
         <span>
-          Share with her coaches
-          <span className="block text-xs text-muted">Off: only {playerName}, her parents and the site admins see it.</span>
+          Share with {team ? "the" : "her"} coaches
+          <span className="block text-xs text-muted">
+            {team ? "Off: only the players, their parents and the site admins see it." : `Off: only ${playerName}, her parents and the site admins see it.`}
+          </span>
         </span>
       </label>
 
       <div className="flex flex-wrap items-center gap-3">
         <button type="submit" disabled={pending || uploading} className={buttonClass}>
-          {pending ? "Sending…" : "Send"}
+          {pending ? "Sending…" : team ? "Send to the team" : "Send"}
         </button>
-        {sent && <span className="text-sm font-semibold text-highlight">Sent. It shows up on {playerName}&apos;s menu.</span>}
+        {sent !== null && (
+          <span role="status" className="text-sm font-semibold text-highlight">
+            {team ? `Sent to ${sent} player${sent === 1 ? "" : "s"}. It's in each one's messages and on her page.` : `Sent. It shows up on ${playerName}'s menu.`}
+          </span>
+        )}
         <ErrorLine error={error} />
       </div>
     </form>

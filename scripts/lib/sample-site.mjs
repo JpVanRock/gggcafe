@@ -52,6 +52,8 @@ export function samplePages() {
   const conversations = [
     `/mentor/messages?player=${ID.player}`,
     `/mentor/messages?player=${ID.player}&with=parents`,
+    // one message to the whole team (user, 2026-11-23)
+    `/mentor/messages?team=${ID.team}`,
     // the admins' message center with a conversation open, and what happened to each message
     `/dugout/mentors/messages?team=${ID.team}&thread=${ID.mentor}.${ID.player}.parents`,
   ];

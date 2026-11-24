@@ -3,15 +3,17 @@ import { notFound, redirect } from "next/navigation";
 import { getCurrentUser, getMentor, getMentorAccess, getPlayerFeaturesOff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { APP_TIME_ZONE } from "@/lib/dates";
-import { inboxWhen, messagePreview, threadSummaries, type Audience } from "@/lib/mentors";
+import { inboxWhen, messagePreview, teamSends, threadSummaries, type Audience } from "@/lib/mentors";
 import { isUuid, playerName } from "@/lib/softball";
 import { PillNav } from "@/components/pill-nav";
-import { Inbox, InboxList, InboxPlaceholder, type InboxItem } from "@/components/inbox";
+import { ConversationPane, Inbox, InboxList, InboxPlaceholder, type InboxItem } from "@/components/inbox";
 import { Live } from "@/components/live";
-import { PageHeader, buttonStyles, inputClass } from "@/components/ui";
+import { PageHeader, buttonStyles, eyebrowClass, inputClass, pillQuietClass } from "@/components/ui";
+import { formatCallTime } from "@/lib/video-calls";
+import Link from "next/link";
 import { loadMentees, type MenteeCard } from "../parts";
 import { MentorConversation, loadThread } from "../conversation";
-import type { LibraryDrill } from "../mentor-client";
+import { MessageForm, type LibraryDrill } from "../mentor-client";
 
 export const metadata: Metadata = { title: "Messages · Mentor · GGG.Cafe" };
 
@@ -40,21 +42,24 @@ type Box = (typeof BOXES)[number]["key"];
 // A mentor's messaging center (user, 2026-11-23: "like a streaming platform or inbox", "an ongoing dialogue like a
 // chat"): every conversation on the left, newest first (one with each player, a separate one with her parents), the
 // open one on the right, live. `?player=&with=player|parents` opens one (a new one too, from "New message");
-// `box=` filters the list; `all=1` shows a whole conversation.
+// `box=` filters the list; `all=1` shows a whole conversation. `?team=` (user, 2026-11-23: "message the whole team"):
+// a whole-team mentor writes once to every player on the team, each in her own conversation.
 export default async function MentorMessagesPage({ searchParams }: PageProps<"/mentor/messages">) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
   const mentor = await getMentor();
   if (!mentor) redirect("/mentor");
-  const { player: playerParam, with: withParam, box: boxParam, all } = await searchParams;
+  const { player: playerParam, with: withParam, box: boxParam, all, team: teamParam } = await searchParams;
   const box: Box = BOXES.some((b) => b.key === boxParam) ? (boxParam as Box) : "all";
   const audience: Audience = withParam === "parents" ? "parents" : "player";
   const selected = typeof playerParam === "string" ? playerParam : null;
   const access = await getMentorAccess();
   if (selected && (!isUuid(selected) || !access.menteeIds.includes(selected))) notFound();
+  const teamOpen = !selected && typeof teamParam === "string" ? teamParam : null;
+  if (teamOpen && (!isUuid(teamOpen) || !access.teamIds.includes(teamOpen))) notFound();
 
   const supabase = await createClient();
-  const [cards, { data }, open] = await Promise.all([
+  const [cards, { data }, open, { data: teamRows }, teamDrills] = await Promise.all([
     loadMentees(supabase, access.menteeIds),
     supabase
       .from("mentor_messages")
@@ -69,7 +74,11 @@ export default async function MentorMessagesPage({ searchParams }: PageProps<"/m
           getPlayerFeaturesOff(selected),
         ])
       : null,
+    // the teams she mentors as a whole: one message to every player (user, 2026-11-23)
+    access.teamIds.length ? supabase.from("teams").select("id, name").in("id", access.teamIds).order("name") : Promise.resolve({ data: [] }),
+    teamOpen ? supabase.from("practice_drills").select("id, name, video_url").order("name") : Promise.resolve({ data: [] }),
   ]);
+  const wholeTeams = (teamRows ?? []) as { id: string; name: string }[];
 
   const now = new Date().toISOString();
   const first = (c: MenteeCard) => c.player.preferred_name || c.player.first_name;
@@ -148,7 +157,7 @@ export default async function MentorMessagesPage({ searchParams }: PageProps<"/m
         back={{ href: "/mentor", label: "Mentor menu" }}
       />
       <Inbox
-        open={Boolean(selected && card && open)}
+        open={Boolean((selected && card && open) || teamOpen)}
         placeholder={
           <InboxPlaceholder>
             {threads.length === 0 ? "No conversations yet. Start one with New message." : `Pick a conversation.${unread ? ` ${unread} new.` : ""}`}
@@ -163,11 +172,31 @@ export default async function MentorMessagesPage({ searchParams }: PageProps<"/m
               <>
                 <PillNav label="Show" size="sm" current={box} items={BOXES.map((b) => ({ key: b.key, label: b.label, href: qs({ box: b.key === "all" ? null : b.key }) }))} />
                 {newMessage}
+                {wholeTeams.map((t) => (
+                  <Link
+                    key={t.id}
+                    href={qs({ team: t.id, box: boxQ })}
+                    aria-current={teamOpen === t.id ? "page" : undefined}
+                    className={`${pillQuietClass} self-start ${teamOpen === t.id ? "border-pink text-ink" : ""}`}
+                  >
+                    Message everyone on {t.name}
+                  </Link>
+                ))}
               </>
             }
           />
         }
       >
+        {teamOpen && (
+          <TeamMessage
+            mentorId={mentor.userId}
+            team={wholeTeams.find((t) => t.id === teamOpen) ?? { id: teamOpen, name: "the team" }}
+            roster={access.rosters.find((r) => r.teamId === teamOpen)?.players.map((p) => p.id) ?? []}
+            messages={(data ?? []) as Row[]}
+            drills={(teamDrills.data ?? []) as LibraryDrill[]}
+            back={qs({ box: boxQ })}
+          />
+        )}
         {selected && card && open && (
           <MentorConversation
             mentorId={mentor.userId}
@@ -182,5 +211,60 @@ export default async function MentorMessagesPage({ searchParams }: PageProps<"/m
         )}
       </Inbox>
     </div>
+  );
+}
+
+/** One message to the whole team: what went out before (with how many have read it), then the form. */
+function TeamMessage({
+  mentorId,
+  team,
+  roster,
+  messages,
+  drills,
+  back,
+}: {
+  mentorId: string;
+  team: { id: string; name: string };
+  roster: string[];
+  messages: Row[];
+  drills: LibraryDrill[];
+  back: string;
+}) {
+  const sends = teamSends(
+    messages.filter((m) => m.audience === "player" && m.author_role === "mentor"),
+    roster,
+  ).slice(0, 10);
+  return (
+    <ConversationPane
+      back={{ href: back, label: "All conversations" }}
+      title={`Everyone on ${team.name}`}
+      tag={`Whole team · ${roster.length} player${roster.length === 1 ? "" : "s"}`}
+      note="Each player gets her own copy in her conversation with you and in the banner on her page, and can answer you there. Her parents read it too."
+      composer={<MessageForm playerId={team.id} mentorId={mentorId} playerName={`everyone on ${team.name}`} drills={drills} team={team} />}
+    >
+      {sends.length === 0 ? (
+        <p className="text-sm text-muted">No team messages yet. Write one below: every player on the roster gets it.</p>
+      ) : (
+        <ol aria-label="Team messages you sent" className="flex flex-col gap-3">
+          {sends.map((t) => (
+            <li key={t.at} className="flex flex-col items-end gap-1">
+              <div className="flex max-w-[min(36rem,92%)] flex-col gap-1.5 rounded-2xl border border-pink/50 bg-pink/10 px-4 py-3 text-sm">
+                <p className="flex flex-wrap items-baseline gap-x-2">
+                  <span className="font-semibold">You</span>
+                  <span className={eyebrowClass}>To the team</span>
+                  <span className="font-display text-xs text-muted tabular-nums">{formatCallTime(t.at, APP_TIME_ZONE)}</span>
+                </p>
+                {t.first.body && <p className="whitespace-pre-wrap text-ink/90">{t.first.body}</p>}
+                {t.first.drill_name && <p className="text-pink-soft">Drill: {t.first.drill_name}</p>}
+                {t.first.photo_path && <p className="text-muted">With a photo</p>}
+              </div>
+              <p className="px-1 font-sans text-2xs tracking-wider text-muted uppercase">
+                Sent to {t.players} · seen by {t.seen}
+              </p>
+            </li>
+          ))}
+        </ol>
+      )}
+    </ConversationPane>
   );
 }
