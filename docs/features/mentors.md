@@ -21,9 +21,9 @@
   page pieces in `mentor/parts.tsx`.
 - Messages (`mentor_messages`): text, a photo (private bucket `message-photos`, `<mentor uid>/<timestamp>.jpg`,
   shrunk to 1600px in the browser) and/or a drill (Drill Library `practice_drills`; she can add one first).
-  The trigger sets sender name and copies the drill's name and video (players can't read the library). They
-  show as "From your mentors" alerts at the top of the player's menu ("Got it" = read_at, only the player may
-  change it) and on `/players/[id]/messages`. User, 2026-11-11: PRIVATE to the mentor, the player, her approved
+  The trigger sets sender name and copies the drill's name and video (players can't read the library). The newest
+  one is a banner at the top of the player's menu (user, 2026-11-23: "Latest from your mentors", read or not, with
+  Answer and "Got it" = read_at, which only the player may change) and they're all on `/players/[id]/messages`. User, 2026-11-11: PRIVATE to the mentor, the player, her approved
   parents and admins unless the mentor shares it (`shared_with_coaches`, a box when she sends it, "Share with
   coaches" / "Stop sharing" after; only the sender changes it, guarded by a trigger). Coaches and view-only staff
   read shared messages only; head coaches remove a shared one, admins any.

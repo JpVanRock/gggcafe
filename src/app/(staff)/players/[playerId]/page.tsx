@@ -35,7 +35,7 @@ export default async function PlayerDashboardPage({ params, searchParams }: Page
   const monday = weekStart(isISODate(week) ? week : today);
   // Everything that only needs the player's id loads together (one round trip, not six);
   // what depends on those results (her leadership book, signed photo links) loads next.
-  const [{ data }, twis, chart, mental, pop, smartGoals, performance, iq, dugout, styles, advanced, certificate, { data: unreadRows }, { count: messageCount }, teamLogo] =
+  const [{ data }, twis, chart, mental, pop, smartGoals, performance, iq, dugout, styles, advanced, certificate, { data: unreadRows }, { data: latestRows }, teamLogo] =
     await Promise.all([
       supabase.from("players").select("*").eq("id", playerId).maybeSingle(),
       loadTwisWeek(supabase, playerId, monday),
@@ -50,7 +50,7 @@ export default async function PlayerDashboardPage({ params, searchParams }: Page
       loadAdvanced(supabase, playerId),
       // the Leader Badge: RLS shows it only to coaches/admins and the player herself
       loadLeaderCertificate(supabase, playerId),
-      // Mentor messages: new ones show as alerts at the top of her menu
+      // Mentor messages: the latest one is a banner at the top of her menu (user, 2026-11-23), with the new ones counted
       // (her own thread only, user 2026-11-23: her parents, viewing as her, could otherwise see their own conversation)
       supabase
         .from("mentor_messages")
@@ -61,20 +61,28 @@ export default async function PlayerDashboardPage({ params, searchParams }: Page
         .is("read_at", null)
         .order("created_at", { ascending: false })
         .limit(10),
-      supabase.from("mentor_messages").select("id", { count: "exact", head: true }).eq("player_id", playerId).eq("audience", "player"),
+      supabase
+        .from("mentor_messages")
+        .select(MESSAGE_COLUMNS)
+        .eq("player_id", playerId)
+        .eq("audience", "player")
+        .eq("author_role", "mentor")
+        .order("created_at", { ascending: false })
+        .limit(1),
       // her team's logo, top right of her menu (user, 2026-11-13)
       playerTeamLogo(supabase, playerId, Boolean(access.isParent)),
     ]);
   const player = data as Player | null;
   if (!player) notFound();
   const unread = (unreadRows ?? []) as MentorMessage[];
+  const latestMessage = ((latestRows ?? []) as MentorMessage[])[0] ?? null;
   // the Switchboard: what her head coach turned off (coaches see everything)
   const off = access.user.staff ? new Set<SwitchKey>() : await getPlayerFeaturesOff(player.id);
   const offNotice = isSwitchKey(offParam) && off.has(offParam) ? switchLabel(offParam) : null;
   const [leadership, photos, messagePhotos, { calls: callRows }] = await Promise.all([
     loadLeadership(supabase, player.id, advanced.unlocked),
     player.photo_path ? signedPhotoUrls(supabase, [player.photo_path]) : Promise.resolve(null),
-    signedMessagePhotoUrls(supabase, unread.map((m) => m.photo_path)),
+    signedMessagePhotoUrls(supabase, [latestMessage?.photo_path]),
     // video calls she's invited to (user, 2026-11-12; group calls 2026-11-14), still ahead or happening now
     callsForPlayers(supabase, [player.id], { since: comingSinceISO(), limit: 5 }),
   ]);
@@ -109,7 +117,11 @@ export default async function PlayerDashboardPage({ params, searchParams }: Page
       advanced={advanced}
       leadership={leadership.open ? { work: leadership.work, program: leadership.program } : null}
       leader={Boolean(certificate)}
-      mentorMessages={{ unread, total: messageCount ?? 0, photoUrls: messagePhotos }}
+      mentorMessages={
+        latestMessage
+          ? { latest: latestMessage, unread, photoUrl: latestMessage.photo_path ? (messagePhotos.get(latestMessage.photo_path) ?? null) : null }
+          : null
+      }
       off={off}
       calls={callPanel || null}
       teamLogo={teamLogo}

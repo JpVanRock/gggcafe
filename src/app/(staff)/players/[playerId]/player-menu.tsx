@@ -27,7 +27,7 @@ import { AdvancedSummary, LEVEL_LABEL, advancedHref } from "./advanced";
 import type { AdvancedBook } from "./advanced-data";
 import type { LessonWork, Program } from "@/lib/leadership-guide";
 import { PlayerName } from "./player-name";
-import { MentorAlerts } from "./mentor-messages";
+import { MentorBanner } from "./mentor-messages";
 import type { MentorMessage } from "@/lib/message-photos";
 import { leadershipHref } from "./leadership";
 import { eyebrowClass } from "@/components/ui";
@@ -79,7 +79,8 @@ export function PlayerMenu({
   /** she earned the Leader Badge (only coaches/admins and she herself are told) */
   leader?: boolean;
   /** messages from her mentors: new ones show as alerts at the top */
-  mentorMessages?: { unread: MentorMessage[]; total: number; photoUrls: Map<string, string> } | null;
+  /** the newest message a mentor sent her (the banner), and the ones she hasn't read */
+  mentorMessages?: { latest: MentorMessage; unread: MentorMessage[]; photoUrl: string | null } | null;
   /** head coaches/admins: links to write the team's standards and culture */
   canWriteCulture?: boolean;
   /** the signed-in player viewing her own dashboard */
@@ -267,18 +268,19 @@ export function PlayerMenu({
       </header>
 
       <div className="flex flex-col gap-3">
+        {/* the latest from her mentors, first under her name (user, 2026-11-23: "a banner ... the most recent message a mentor sends") */}
+        {mentorMessages && (
+          <MentorBanner
+            playerId={player.id}
+            latest={mentorMessages.latest}
+            unread={mentorMessages.unread}
+            photoUrl={mentorMessages.photoUrl}
+            isSelf={isSelf}
+          />
+        )}
         {calls}
         {/* her week right under her name (design audit 2026-11-18, M3): it's the board she opens the site for */}
         <TwisBoard playerId={player.id} week={twis} today={today} canEdit={editor} />
-        {mentorMessages && (
-          <MentorAlerts
-            playerId={player.id}
-            unread={mentorMessages.unread}
-            total={mentorMessages.total}
-            photoUrls={mentorMessages.photoUrls}
-            canDismiss={isSelf}
-          />
-        )}
         <DugoutStrip
           teams={dugout}
           canEdit={canWriteCulture}
